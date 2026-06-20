@@ -1,4 +1,7 @@
+from unittest.mock import patch
+
 from django.test import TestCase, override_settings
+from django.urls import reverse
 
 from orders.margins import (
     compute_margins_from_values,
@@ -72,3 +75,83 @@ class CartTotalsTests(TestCase):
         totals = compute_cart_totals([_Item(100, 1)], "IT")
         self.assertEqual(totals.shipping_cost, 0.0)
         self.assertTrue(totals.shipping_quote.free)
+
+
+@override_settings(
+    N8N_ENABLED=False, EMAIL_SMTP_FALLBACK=True,
+    EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+    DEFAULT_FROM_EMAIL="shop@example.com", SHIPPING_USE_PRINTIFY=False,
+)
+class StripeWebhookTests(TestCase):
+    def setUp(self):
+        from category.models import Category
+        from store.models import Product
+        from carts.models import Cart, CartItem
+        from orders.models import Order
+
+        cat = Category.objects.create(category_name="Tees", slug="tees-wh")
+        self.product = Product.objects.create(
+            product_name="WH Tee", slug="wh-tee", description="d", price=25, stock=5,
+            is_available=True, category=cat, printify_product_id="ppwh", base_cost=10.0)
+        self.cart = Cart.objects.create(cart_id="sesskey1")
+        CartItem.objects.create(product=self.product, cart=self.cart, quantity=2, is_active=True)
+        self.order = Order.objects.create(
+            order_number="WH123", first_name="G", last_name="U", phone="1",
+            email="g@example.com", address_line_1="x", country="IT", state="s", city="c",
+            items_subtotal=50.0, shipping_cost=0.0, tax=1.0, order_total=51.0,
+            is_guest=True, session_key="sesskey1", is_ordered=False)
+
+    def _post(self, event):
+        with patch("orders.views.stripe.Webhook.construct_event", return_value=event):
+            return self.client.post(reverse("stripe_webhook"), data=b"{}",
+                                    content_type="application/json",
+                                    HTTP_STRIPE_SIGNATURE="t=1,v1=sig")
+
+    SUCCEEDED = {"type": "payment_intent.succeeded", "data": {"object": {
+        "id": "pi_1", "status": "succeeded", "amount": 5100,
+        "metadata": {"order_number": "WH123"}}}}
+
+    def test_invalid_signature_returns_400(self):
+        with patch("orders.views.stripe.Webhook.construct_event", side_effect=ValueError("bad sig")):
+            resp = self.client.post(reverse("stripe_webhook"), data=b"{}",
+                                    content_type="application/json")
+        self.assertEqual(resp.status_code, 400)
+
+    def test_payment_succeeded_finalizes_order(self):
+        from orders.models import OrderProduct, Payment
+
+        resp = self._post(self.SUCCEEDED)
+        self.assertEqual(resp.status_code, 200)
+        self.order.refresh_from_db()
+        self.assertTrue(self.order.is_ordered)
+        self.assertEqual(OrderProduct.objects.filter(order=self.order).count(), 1)
+        self.assertTrue(Payment.objects.filter(payment_id="pi_1").exists())
+        # production cost snapshotted (2 × base_cost 10)
+        self.assertAlmostEqual(self.order.cost_production, 20.0, places=2)
+
+    def test_webhook_is_idempotent(self):
+        from orders.models import OrderProduct
+
+        self._post(self.SUCCEEDED)
+        self._post(self.SUCCEEDED)  # duplicate delivery
+        self.assertEqual(OrderProduct.objects.filter(order=self.order).count(), 1)
+
+    def test_charge_refunded_records_amount(self):
+        self._post(self.SUCCEEDED)
+        refund = {"type": "charge.refunded", "data": {"object": {
+            "payment_intent": "pi_1", "amount_refunded": 2500}}}
+        self._post(refund)
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.refunded_amount, 25.0)
+        # idempotent: same cumulative refund again doesn't change it
+        self._post(refund)
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.refunded_amount, 25.0)
+
+    def test_payment_failed_does_not_finalize(self):
+        event = {"type": "payment_intent.payment_failed", "data": {"object": {
+            "metadata": {"order_number": "WH123"}}}}
+        resp = self._post(event)
+        self.assertEqual(resp.status_code, 200)
+        self.order.refresh_from_db()
+        self.assertFalse(self.order.is_ordered)

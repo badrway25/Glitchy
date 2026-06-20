@@ -87,7 +87,7 @@ def stripe_return(request):
     # finalize only if not already ordered
     if not order.is_ordered:
         try:
-            finalize_order_payment(request=request, order=order, payment=payment)
+            finalize_order_payment(order=order, payment=payment)
         except Exception:
             messages.error(request, "Payment succeeded, but we couldn't finalize your order. Please contact support.")
             return redirect("home")
@@ -172,7 +172,7 @@ def stripe_confirm(request):
     # finalize only if needed
     if not order.is_ordered:
         try:
-            finalize_order_payment(request=request, order=order, payment=payment)
+            finalize_order_payment(order=order, payment=payment)
         except Exception:
             messages.error(request, "Payment succeeded, but we couldn't finalize your order. Please contact support.")
             return JsonResponse({"error": "finalize_failed"}, status=500)
@@ -184,8 +184,20 @@ def stripe_confirm(request):
     })
 
 
+def _ev_get(obj, key, default=None):
+    """Access a field on a Stripe object OR a plain dict (for tests)."""
+    if isinstance(obj, dict):
+        return obj.get(key, default)
+    return getattr(obj, key, default)
+
+
 @csrf_exempt
+@require_POST
 def stripe_webhook(request):
+    """
+    Signature-verified Stripe webhook. Idempotently finalizes orders and records
+    refunds server-side, then lets the notifications layer fire order.paid.
+    """
     payload = request.body
     sig_header = request.META.get("HTTP_STRIPE_SIGNATURE", "")
     secret = settings.STRIPE_WEBHOOK_SECRET
@@ -193,12 +205,47 @@ def stripe_webhook(request):
     try:
         event = stripe.Webhook.construct_event(payload, sig_header, secret)
     except Exception:
+        # Invalid signature / payload — reject (no secret logged).
         return HttpResponse(status=400)
 
-    if event["type"] == "payment_intent.succeeded":
-        intent = event["data"]["object"]
-        _order_number = intent.get("metadata", {}).get("order_number")
-        # opzionale: finalizzare server-side in modo idempotente
+    etype = _ev_get(event, "type")
+    obj = (_ev_get(event, "data") or {}).get("object") if isinstance(_ev_get(event, "data"), dict) \
+        else _ev_get(_ev_get(event, "data"), "object")
+    obj = obj or {}
+
+    from .services import apply_stripe_refund, finalize_from_intent
+
+    try:
+        if etype in ("payment_intent.succeeded", "checkout.session.completed"):
+            meta = dict(_ev_get(obj, "metadata") or {})
+            order_number = meta.get("order_number")
+            if order_number:
+                # checkout.session uses amount_total; payment_intent uses amount
+                amount_cents = _ev_get(obj, "amount") or _ev_get(obj, "amount_total")
+                amount = round(float(amount_cents) / 100.0, 2) if amount_cents else None
+                intent_id = _ev_get(obj, "payment_intent") or _ev_get(obj, "id")
+                finalize_from_intent(
+                    order_number=order_number,
+                    intent_id=str(intent_id),
+                    intent_status=_ev_get(obj, "status") or "succeeded",
+                    amount=amount,
+                    email=_ev_get(obj, "receipt_email") or "",
+                )
+        elif etype == "payment_intent.payment_failed":
+            meta = dict(_ev_get(obj, "metadata") or {})
+            # Don't finalize; just record for ops visibility.
+            import logging
+            logging.getLogger("orders").warning(
+                "Stripe payment_failed for order %s", meta.get("order_number"))
+        elif etype == "charge.refunded":
+            apply_stripe_refund(
+                payment_intent_id=str(_ev_get(obj, "payment_intent") or ""),
+                amount_refunded_cents=_ev_get(obj, "amount_refunded") or 0,
+            )
+    except Exception:
+        import logging
+        logging.getLogger("orders").exception("Stripe webhook handler error (%s)", etype)
+        # Return 200 so Stripe doesn't hammer retries on our own bug; we logged it.
 
     return HttpResponse(status=200)
 
@@ -345,7 +392,7 @@ def payments(request):
 
     if not order.is_ordered:
         try:
-            finalize_order_payment(request=request, order=order, payment=payment)
+            finalize_order_payment(order=order, payment=payment)
         except Exception:
             messages.error(request, "Payment succeeded, but we couldn't finalize your order. Please contact support.")
             return JsonResponse({"error": "finalize_failed"}, status=500)

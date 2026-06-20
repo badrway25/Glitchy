@@ -84,13 +84,13 @@ def push_order_to_printify(order, *, auto_send=True):
 # --------------------------------------------------------------------------- #
 # Finalisation
 # --------------------------------------------------------------------------- #
-def _cart_items_for(request, order):
-    """Resolve the active cart for either an authed user or a guest session."""
-    if order.user_id and request.user.is_authenticated:
+def _cart_items_for_order(order):
+    """Resolve the active cart from the ORDER (no request needed → webhook-safe)."""
+    if order.user_id:
         return CartItem.objects.select_related("product").prefetch_related("variations").filter(
-            user=request.user, is_active=True)
-    # Guest: by session cart.
-    session_key = order.session_key or request.session.session_key
+            user_id=order.user_id, is_active=True)
+    # Guest: by session cart stored on the order.
+    session_key = order.session_key
     if not session_key:
         return CartItem.objects.none()
     cart = Cart.objects.filter(cart_id=session_key).first()
@@ -101,16 +101,23 @@ def _cart_items_for(request, order):
 
 
 @transaction.atomic
-def finalize_order_payment(*, request, order, payment):
+def finalize_order_payment(*, order, payment, request=None):
     """
     Attach payment, convert cart → OrderProduct, snapshot costs/margins,
     decrement stock, clear cart, and fire notifications.
+
+    Idempotent + request-independent: callable from the web flow OR the Stripe
+    webhook. `request` is accepted for backward-compatibility but unused.
     """
+    # Idempotency guard: never finalize twice.
+    if order.is_ordered and order.orderproduct_set.exists():
+        return
+
     order.payment = payment
     order.is_ordered = True
     order.status = "Accepted"
 
-    cart_items = list(_cart_items_for(request, order))
+    cart_items = list(_cart_items_for_order(order))
 
     total_production_cost = 0.0
     for item in cart_items:
@@ -170,3 +177,67 @@ def finalize_order_payment(*, request, order, payment):
         notify_negative_margin(order)
     except Exception as exc:
         logger.warning("Order notification failed for %s: %s", order.order_number, exc)
+
+
+# --------------------------------------------------------------------------- #
+# Stripe webhook helpers (request-less, idempotent)
+# --------------------------------------------------------------------------- #
+def finalize_from_intent(*, order_number, intent_id, intent_status="succeeded",
+                         amount=None, email=""):
+    """
+    Idempotently finalize an order from a confirmed Stripe PaymentIntent.
+
+    Returns (order, result) where result ∈ {"finalized","already_finalized",
+    "order_not_found"}. Safe to call multiple times for the same event.
+    """
+    from .models import Order, Payment
+
+    order = Order.objects.filter(order_number=order_number).first()
+    if not order:
+        logger.warning("Stripe webhook: order %s not found", order_number)
+        return None, "order_not_found"
+
+    if order.is_ordered:
+        return order, "already_finalized"
+
+    payment, _created = Payment.objects.get_or_create(
+        payment_id=intent_id,
+        defaults={
+            "user": order.user,
+            "email": order.email or email,
+            "payment_method": "Stripe",
+            "amount_paid": str(amount if amount is not None else order.order_total),
+            "status": intent_status or "succeeded",
+        },
+    )
+    finalize_order_payment(order=order, payment=payment)
+    logger.info("Stripe webhook finalized order %s", order_number)
+    return order, "finalized"
+
+
+def apply_stripe_refund(*, payment_intent_id, amount_refunded_cents):
+    """
+    Idempotently record a Stripe refund on the matching order.
+
+    `amount_refunded_cents` is Stripe's CUMULATIVE refunded amount on the charge,
+    so we SET (not add) → calling twice is safe.
+    """
+    from .models import Order, Payment
+
+    payment = Payment.objects.filter(payment_id=payment_intent_id).first()
+    if not payment:
+        logger.warning("Stripe refund: no payment for intent")
+        return None
+    order = Order.objects.filter(payment=payment).order_by("-created_at").first()
+    if not order:
+        return None
+    refunded = round(float(amount_refunded_cents or 0) / 100.0, 2)
+    if refunded > float(order.refunded_amount or 0):
+        order.refunded_amount = refunded
+        order.save(update_fields=["refunded_amount", "updated_at"])
+        try:
+            from notifications.notify import notify_negative_margin
+            notify_negative_margin(order)
+        except Exception:
+            pass
+    return order
