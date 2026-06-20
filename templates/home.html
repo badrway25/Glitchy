@@ -11,14 +11,31 @@
            onerror="this.style.display='none'">
       <div class="hero-overlay">
         <div class="hero-copy">
-          <div class="hero-kicker">{% trans "New drops" %}</div>
-          <h1 class="hero-title">{% trans "Premium print-on-demand" %}</h1>
-          <p class="hero-sub">{% trans "Discover bestsellers and latest arrivals." %}</p>
-          <a href="{% url 'store' %}" class="btn btn-primary btn-icontext">
-            <span>{% trans "Browse store" %}</span> <i class="fa fa-arrow-right"></i>
-          </a>
+          <div class="hero-kicker">{% trans "New season" %}</div>
+          <h1 class="hero-title">{% trans "Wear something worth keeping." %}</h1>
+          <p class="hero-sub">{% trans "Considered essentials, made on demand. Premium fabrics, honest pricing, free 14-day returns." %}</p>
+          <div class="d-flex flex-wrap" style="gap:12px;margin-top:6px;">
+            <a href="{% url 'store' %}" class="btn btn-primary btn-icontext">
+              <span>{% trans "Shop the collection" %}</span> <i class="fa fa-arrow-right ml-1"></i>
+            </a>
+            <a href="{% url 'store' %}?sort=newest" class="btn btn-soft btn-icontext">
+              <span>{% trans "New arrivals" %}</span>
+            </a>
+          </div>
         </div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST STRIP -->
+<section class="lux-strip">
+  <div class="container py-3" style="max-width:1280px;">
+    <div class="d-flex flex-wrap justify-content-center text-center" style="gap:10px 38px;">
+      <span class="lux-item"><i class="fa fa-truck mr-2"></i>{% blocktrans with t=FREE_SHIPPING_THRESHOLD %}Free shipping over {{ t }}{% endblocktrans %} {{ CURRENCY_SYMBOL }}</span>
+      <span class="lux-item"><i class="fa fa-undo mr-2"></i>{% blocktrans with d=RETURN_WINDOW_DAYS %}{{ d }}-day free returns{% endblocktrans %}</span>
+      <span class="lux-item"><i class="fa fa-leaf mr-2"></i>{% trans "Premium, ethically printed" %}</span>
+      <span class="lux-item"><i class="fa fa-lock mr-2"></i>{% trans "Secure checkout" %}</span>
     </div>
   </div>
 </section>
@@ -59,6 +76,46 @@
         </div>
       {% endfor %}
     </div>
+  </div>
+</section>
+
+<!-- WHY US -->
+<section class="home-section">
+  <div class="container" style="max-width:1280px;">
+    <div class="text-center mb-4">
+      <div class="lux-eyebrow mb-2">{% trans "The Glitchy promise" %}</div>
+      <h3 class="section-title mb-1">{% trans "Designed to be worn, made to last" %}</h3>
+    </div>
+    <div class="row g-3 g-md-4">
+      <div class="col-6 col-lg-3 d-flex"><div class="lux-feature w-100 p-4">
+        <div class="lux-ic mb-3"><i class="fa fa-gem"></i></div>
+        <h4 class="mb-1">{% trans "Premium fabrics" %}</h4>
+        <p class="text-muted mb-0" style="font-size:.9rem;">{% trans "Heavyweight, soft-touch materials chosen for comfort and longevity." %}</p>
+      </div></div>
+      <div class="col-6 col-lg-3 d-flex"><div class="lux-feature w-100 p-4">
+        <div class="lux-ic mb-3"><i class="fa fa-truck"></i></div>
+        <h4 class="mb-1">{% trans "Made on demand" %}</h4>
+        <p class="text-muted mb-0" style="font-size:.9rem;">{% trans "Printed only when you order — less waste, always fresh." %}</p>
+      </div></div>
+      <div class="col-6 col-lg-3 d-flex"><div class="lux-feature w-100 p-4">
+        <div class="lux-ic mb-3"><i class="fa fa-undo"></i></div>
+        <h4 class="mb-1">{% blocktrans with d=RETURN_WINDOW_DAYS %}{{ d }}-day returns{% endblocktrans %}</h4>
+        <p class="text-muted mb-0" style="font-size:.9rem;">{% trans "Changed your mind? Send it back, free and easy." %}</p>
+      </div></div>
+      <div class="col-6 col-lg-3 d-flex"><div class="lux-feature w-100 p-4">
+        <div class="lux-ic mb-3"><i class="fa fa-shield-alt"></i></div>
+        <h4 class="mb-1">{% trans "Secure & simple" %}</h4>
+        <p class="text-muted mb-0" style="font-size:.9rem;">{% trans "Encrypted checkout, guest-friendly, no account required." %}</p>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- EDITORIAL QUOTE -->
+<section class="home-section" style="padding-top:0;">
+  <div class="container text-center" style="max-width:760px;">
+    <div class="lux-eyebrow mb-3">{% trans "Our philosophy" %}</div>
+    <p class="lux-quote mb-0">{% trans "“Fewer, better things — pieces you reach for again and again, not just once.”" %}</p>
   </div>
 </section>
 
