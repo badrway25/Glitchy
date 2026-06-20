@@ -3,6 +3,7 @@ from django.contrib import admin, messages
 from django.db.models import F, FloatField, Sum
 from django.db.models.functions import Coalesce
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 from .models import Order, OrderProduct, Payment
@@ -104,8 +105,8 @@ class OrderAdmin(admin.ModelAdmin):
         colors = {"good": "#16a34a", "low": "#d97706", "negative": "#dc2626"}
         return format_html(
             '<span style="background:{};color:#fff;padding:2px 8px;border-radius:999px;'
-            'font-weight:600;font-size:11px;">{} {:.2f}</span>',
-            colors.get(m.band, "#64748b"), m.currency, m.net_margin)
+            'font-weight:600;font-size:11px;">{}</span>',
+            colors.get(m.band, "#64748b"), f"{m.currency} {m.net_margin:.2f}")
 
     @admin.display(description=_("Margin %"))
     def margin_pct_display(self, obj):
@@ -115,8 +116,8 @@ class OrderAdmin(admin.ModelAdmin):
     def refunded_display(self, obj):
         if not obj.refunded_amount:
             return "—"
-        return format_html('<span style="color:#dc2626">-{} {:.2f}</span>',
-                           obj.currency, obj.refunded_amount)
+        return format_html('<span style="color:#dc2626">{}</span>',
+                           f"-{obj.currency} {obj.refunded_amount:.2f}")
 
     @admin.display(description=_("Margin breakdown"))
     def margin_breakdown(self, obj):
@@ -129,17 +130,17 @@ class OrderAdmin(admin.ModelAdmin):
             (_("Refunded"), -m.refunded_amount),
             (_("Net margin"), m.net_margin),
         ]
-        html = "<table style='border-collapse:collapse'>"
+        parts = ["<table style='border-collapse:collapse'>"]
         for label, val in rows:
-            html += format_html(
+            parts.append(format_html(
                 "<tr><td style='padding:2px 14px 2px 0;color:#555'>{}</td>"
-                "<td style='text-align:right;font-variant-numeric:tabular-nums'>{} {:.2f}</td></tr>",
-                label, m.currency, val)
-        html += format_html(
-            "<tr><td style='padding-top:4px;color:#555'>{}</td><td style='text-align:right'>{:.1f}%</td></tr>",
-            _("Margin %"), m.margin_pct)
-        html += "</table>"
-        return format_html(html)
+                "<td style='text-align:right;font-variant-numeric:tabular-nums'>{}</td></tr>",
+                label, f"{m.currency} {val:.2f}"))
+        parts.append(format_html(
+            "<tr><td style='padding-top:4px;color:#555'>{}</td><td style='text-align:right'>{}</td></tr>",
+            _("Margin %"), f"{m.margin_pct:.1f}%"))
+        parts.append("</table>")
+        return mark_safe("".join(str(p) for p in parts))
 
     def changelist_view(self, request, extra_context=None):
         qs = self.get_queryset(request).filter(is_ordered=True)
@@ -147,10 +148,8 @@ class OrderAdmin(admin.ModelAdmin):
             sales=Coalesce(Sum("order_total"), 0.0, output_field=FloatField()),
             production=Coalesce(Sum("cost_production"), 0.0, output_field=FloatField()),
             shipping=Coalesce(Sum("cost_shipping"), 0.0, output_field=FloatField()),
-            fees=Coalesce(Sum("payment_fee"), 0.0, output_field=FloatField()),
-            tax=Coalesce(Sum("tax"), 0.0, output_field=FloatField()),
-            refunded=Coalesce(Sum("refunded_amount"), 0.0, output_field=FloatField()),
-            net=Coalesce(Sum(NET_MARGIN_EXPR, output_field=FloatField()), 0.0),
+            net=Coalesce(Sum(NET_MARGIN_EXPR, output_field=FloatField()), 0.0,
+                         output_field=FloatField()),
         )
         kpis = {
             "sales": round(agg["sales"], 2),

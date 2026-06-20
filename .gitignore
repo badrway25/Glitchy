@@ -35,3 +35,7 @@ Thumbs.db
 
 # ---- collectstatic output (regenerated) ----
 /static/
+
+# QA artifacts
+qa-*.png
+.playwright-mcp/

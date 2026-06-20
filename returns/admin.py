@@ -56,8 +56,8 @@ class ReturnRequestAdmin(admin.ModelAdmin):
     def margin_after_refund_display(self, obj):
         m = obj.margin_after_refund()
         color = {"good": "#16a34a", "low": "#d97706", "negative": "#dc2626"}.get(m.band, "#475569")
-        return format_html('<strong style="color:{}">{} {:.2f}</strong>',
-                           color, m.currency, m.net_margin_after_refund)
+        return format_html('<strong style="color:{}">{}</strong>',
+                           color, f"{m.currency} {m.net_margin_after_refund:.2f}")
 
     # --- State transitions ---
     @admin.action(description=_("Approve selected returns"))

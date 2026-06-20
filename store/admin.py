@@ -46,7 +46,7 @@ class ProductAdmin(admin.ModelAdmin):
             return "—"
         margin = float(obj.price) - float(obj.base_cost)
         color = "#16a34a" if margin > 0 else "#dc2626"
-        return format_html('<span style="color:{}">{:.2f}</span>', color, margin)
+        return format_html('<span style="color:{}">{}</span>', color, f"{margin:.2f}")
 
     @admin.display(description=_("Sync"))
     def sync_badge(self, obj):
