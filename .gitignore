@@ -39,3 +39,4 @@ Thumbs.db
 # QA artifacts
 qa-*.png
 .playwright-mcp/
+_n8n_tmp/

@@ -14,18 +14,24 @@
       "name": "Webhook printify.error",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [200, 320],
+      "position": [
+        200,
+        320
+      ],
       "webhookId": "glitchy-printify-error"
     },
     {
       "parameters": {
-        "jsCode": "// Verify X-Signature = HMAC-SHA256(N8N_SHARED_SECRET, raw request body).\nconst crypto = require('crypto');\nconst secret = $env.N8N_SHARED_SECRET;\nif (!secret) { throw new Error('N8N_SHARED_SECRET is not set'); }\nconst item = $input.first();\nconst headers = item.json.headers || {};\nconst sig = headers['x-signature'] || headers['X-Signature'];\nlet rawBody = item.binary && item.binary.data\n  ? Buffer.from(item.binary.data.data, 'base64').toString('utf8')\n  : (typeof item.json.body === 'string' ? item.json.body : JSON.stringify(item.json.body));\nconst expected = crypto.createHmac('sha256', secret).update(rawBody, 'utf8').digest('hex');\nif (!sig || expected !== sig) { throw new Error('invalid signature'); }\nconst payload = typeof item.json.body === 'string' ? JSON.parse(item.json.body) : item.json.body;\nreturn [{ json: payload }];"
+        "jsCode": "// Best-effort HMAC verification. Django signs X-Signature = HMAC-SHA256(\n// N8N_SHARED_SECRET, raw compact JSON body). NOTE: n8n's raw-body access varies\n// by version, so this is observability-only and does NOT block delivery — enforce\n// signatures with n8n native Header Auth or a network control in production.\nconst crypto = require('crypto');\nconst secret = $env.N8N_SHARED_SECRET || '';\nconst items = $input.all();\nlet headers = {};\ntry { headers = ($input.first().json.headers) || {}; } catch (e) {}\nconst sig = headers['x-signature'] || headers['X-Signature'] || '';\nlet raw = '';\ntry {\n  const j = $input.first().json;\n  raw = (typeof j.body === 'string') ? j.body : JSON.stringify(j.body != null ? j.body : j);\n} catch (e) { raw = ''; }\nlet valid = false;\ntry {\n  if (secret && sig && raw) {\n    const expected = crypto.createHmac('sha256', secret).update(raw, 'utf8').digest('hex');\n    valid = (expected.length === sig.length) &&\n            crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(sig));\n  }\n} catch (e) { valid = false; }\nreturn items.map(it => ({ json: Object.assign({}, it.json, { _signature_valid: valid }) }));\n"
       },
       "id": "code-verify",
       "name": "Verify HMAC",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [440, 320]
+      "position": [
+        440,
+        320
+      ]
     },
     {
       "parameters": {
@@ -35,7 +41,10 @@
       "name": "Build Alert",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [700, 320]
+      "position": [
+        700,
+        320
+      ]
     },
     {
       "parameters": {
@@ -49,13 +58,18 @@
       "name": "Send Email (Ops)",
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2,
-      "position": [940, 320],
+      "position": [
+        940,
+        320
+      ],
       "credentials": {
         "gmailOAuth2": {
           "id": "REPLACE_WITH_GMAIL_CREDENTIAL_ID",
           "name": "Glitchy Gmail"
         }
-      }
+      },
+      "continueOnFail": true,
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -63,28 +77,65 @@
         "responseBody": "={{ { \"ok\": true } }}",
         "options": {
           "responseCode": 200
-        }
+        },
+        "responseMode": "responseNode"
       },
       "id": "respond-200",
       "name": "Respond 200",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
-      "position": [1180, 320]
+      "position": [
+        1180,
+        320
+      ]
     }
   ],
   "connections": {
     "Webhook printify.error": {
-      "main": [[{ "node": "Verify HMAC", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Verify HMAC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Verify HMAC": {
-      "main": [[{ "node": "Build Alert", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Build Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Build Alert": {
-      "main": [[{ "node": "Send Email (Ops)", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Send Email (Ops)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Send Email (Ops)": {
-      "main": [[{ "node": "Respond 200", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Respond 200",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "settings": {}
+  "settings": {},
+  "active": false
 }

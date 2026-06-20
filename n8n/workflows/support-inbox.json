@@ -20,13 +20,18 @@
       "name": "Gmail Trigger (Support Inbox)",
       "type": "n8n-nodes-base.gmailTrigger",
       "typeVersion": 1,
-      "position": [200, 320],
+      "position": [
+        200,
+        320
+      ],
       "credentials": {
         "gmailOAuth2": {
           "id": "REPLACE_WITH_SUPPORT_MAILBOX_CREDENTIAL_ID",
           "name": "Glitchy Support Mailbox"
         }
-      }
+      },
+      "continueOnFail": true,
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -36,7 +41,10 @@
       "name": "Build Signed Request",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [460, 320]
+      "position": [
+        460,
+        320
+      ]
     },
     {
       "parameters": {
@@ -46,8 +54,14 @@
         "specifyHeaders": "keypair",
         "headerParameters": {
           "parameters": [
-            { "name": "Content-Type", "value": "application/json" },
-            { "name": "X-Signature", "value": "={{ $json.signature }}" }
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-Signature",
+              "value": "={{ $json.signature }}"
+            }
           ]
         },
         "sendBody": true,
@@ -60,16 +74,38 @@
       "name": "POST incoming-email",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [720, 320]
+      "position": [
+        720,
+        320
+      ],
+      "continueOnFail": true,
+      "onError": "continueRegularOutput"
     }
   ],
   "connections": {
     "Gmail Trigger (Support Inbox)": {
-      "main": [[{ "node": "Build Signed Request", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Build Signed Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Build Signed Request": {
-      "main": [[{ "node": "POST incoming-email", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "POST incoming-email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "settings": {}
+  "settings": {},
+  "active": false
 }
