@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+{% block title %}{% if mode == 'edit' %}{% trans "Edit address" %}{% else %}{% trans "Add address" %}{% endif %} • {{ SITE_NAME }}{% endblock %}
+
+{% block extra_css %}
+<style>
+  .address-form .form-group { margin-bottom: 1rem; }
+  .address-form input:not([type=checkbox]), .address-form select, .address-form textarea {
+    width: 100%; padding: .6rem .8rem; border: 1px solid var(--border, #e2e8f0);
+    border-radius: 10px; font-size: .95rem; background: var(--surface, #fff);
+    color: var(--text, #0f172a);
+  }
+  .address-form label { font-weight: 600; font-size: .85rem; margin-bottom: .3rem; display:block; }
+  .address-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1rem; }
+  @media (max-width: 600px){ .address-grid { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="section-content padding-y">
+  <div class="container" style="max-width: 1280px;">
+    <div class="row g-4">
+
+      <aside class="col-lg-3">
+        {% include 'accounts/_sidebar.html' %}
+      </aside>
+
+      <main class="col-lg-9">
+        <div class="acc-layout">
+          <div class="dash-top">
+            <div>
+              <h1 class="dash-title mb-0">
+                {% if mode == 'edit' %}{% trans "Edit address" %}{% else %}{% trans "Add a new address" %}{% endif %}
+              </h1>
+              <div class="text-muted">{% trans "These details will be used for delivery and billing." %}</div>
+            </div>
+            <div class="dash-actions">
+              <a href="{% url 'address_list' %}" class="btn btn-soft">
+                <i class="fa fa-arrow-left mr-2"></i>{% trans "Back to addresses" %}
+              </a>
+            </div>
+          </div>
+
+          <div class="dash-card">
+            <div class="dash-card-body">
+              <form method="post" class="address-form">
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                  <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                {% endif %}
+                <div class="address-grid">
+                  {% for field in form %}
+                    {% if field.name != 'is_default' %}
+                    <div class="form-group">
+                      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                      {{ field }}
+                      {% if field.errors %}<div class="text-danger small mt-1">{{ field.errors.0 }}</div>{% endif %}
+                    </div>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+
+                {% if form.is_default %}
+                <div class="custom-control custom-checkbox mt-2 mb-3">
+                  {{ form.is_default }}
+                  <label class="custom-control-label" for="{{ form.is_default.id_for_label }}">
+                    {% trans "Set as my default address" %}
+                  </label>
+                </div>
+                {% endif %}
+
+                <button type="submit" class="btn btn-primary">
+                  <i class="fa fa-save mr-2"></i>{% trans "Save address" %}
+                </button>
+                <a href="{% url 'address_list' %}" class="btn btn-soft">{% trans "Cancel" %}</a>
+              </form>
+            </div>
+          </div>
+        </div>
+      </main>
+
+    </div>
+  </div>
+</section>
+{% endblock %}
