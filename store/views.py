@@ -14,7 +14,7 @@ from orders.models import OrderProduct
 
 def store(request, category_slug=None):
     category = None
-    products = Product.objects.filter(is_available=True)
+    products = Product.objects.filter(is_available=True).prefetch_related("gallery")
 
     # Categories for sidebar
     all_categories = Category.objects.all().order_by("category_name")
@@ -70,12 +70,23 @@ def product_detail(request, category_slug, product_slug):
     shipping_quote = fallback_quote(detect_country(request), total_quantity=1,
                                     subtotal=single_product.price)
 
+    # "You may also like" — same category first, topped up with other products.
+    related = list(Product.objects.filter(is_available=True, category=single_product.category)
+                   .exclude(id=single_product.id).prefetch_related("gallery")[:4])
+    if len(related) < 4:
+        extra = (Product.objects.filter(is_available=True)
+                 .exclude(id=single_product.id)
+                 .exclude(id__in=[p.id for p in related])
+                 .prefetch_related("gallery")[:4 - len(related)])
+        related += list(extra)
+
     context = {
         'single_product': single_product,
         'in_cart': in_cart,
         'orderproduct': orderproduct,
         'reviews': reviews,
         'shipping_quote': shipping_quote,
+        'related_products': related,
     }
     return render(request, 'store/product_detail.html', context)
 

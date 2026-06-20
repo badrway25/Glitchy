@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static i18n %}
+{% load static i18n uikit %}
 
 {% block title %}{% if category %}{{ category.category_name }}{% else %}{% trans "Store" %}{% endif %} • {{ SITE_NAME }}{% endblock %}
 
@@ -144,23 +144,35 @@
 </div>
 
 
+    <!-- MOBILE FILTER BAR (drawer trigger) -->
+    <div class="filter-bar">
+      <button class="btn btn-soft" type="button" data-open-filters>
+        {% icon "sliders" %} <span class="ml-2">{% trans "Filters" %}</span>
+      </button>
+    </div>
+
     <div class="row">
 
       <!-- SIDEBAR FILTERS -->
-      <aside class="col-md-3 mb-4">
+      <aside class="col-lg-3 mb-4 shop-aside">
   <div class="filter-card">
+
+    <div class="filter-drawer-head">
+      <span class="h6">{% trans "Filters" %}</span>
+      <button class="btn btn-link p-0" type="button" data-drawer-close aria-label="{% trans 'Close' %}">{% icon "close" %}</button>
+    </div>
 
     <!-- Categories -->
     <div class="filter-section">
-      <div class="filter-head">
-        <h6>{% trans "Categories" %}</h6>
+      <div class="filter-head" data-collapsible>
+        <h6>{% icon "tag" "ic" 16 %} {% trans "Categories" %}</h6>
         <span class="filter-chip">{% if product_count %}{{ product_count }}{% else %}0{% endif %}</span>
       </div>
 
-      <div class="cat-list">
+      <div class="filter-body cat-list">
         <a class="cat-item" href="{% url 'store' %}">
           <span>{% trans "All products" %}</span>
-          <span class="text-muted">→</span>
+          <span class="text-muted">{% icon "chevron-right" "ic" 15 %}</span>
         </a>
 
         {% if categories %}
@@ -168,14 +180,14 @@
   <a class="cat-item {% if category and category.id == c.id %}active{% endif %}"
      href="{{ c.get_url }}">
     <span>{{ c.category_name }}</span>
-    <span class="text-muted">→</span>
+    <span class="text-muted">{% icon "chevron-right" "ic" 15 %}</span>
   </a>
 {% endfor %}
         {% elif links %}
           {% for c in links %}
             <a class="cat-item" href="{{ c.get_url }}">
               <span>{{ c.category_name }}</span>
-              <span class="text-muted">→</span>
+              <span class="text-muted">{% icon "chevron-right" "ic" 15 %}</span>
             </a>
           {% endfor %}
         {% endif %}
@@ -184,12 +196,12 @@
 
     <!-- Price -->
     <div class="filter-section">
-      <div class="filter-head">
-        <h6>{% trans "Price range" %}</h6>
-        <span class="filter-chip">€ <span id="priceMinText">0</span> – € <span id="priceMaxText">0</span></span>
+      <div class="filter-head" data-collapsible>
+        <h6>{% icon "card" "ic" 16 %} {% trans "Price range" %}</h6>
+        <span class="filter-chip">{{ CURRENCY_SYMBOL }} <span id="priceMinText">0</span> – {{ CURRENCY_SYMBOL }} <span id="priceMaxText">0</span></span>
       </div>
 
-      <div class="price-range">
+      <div class="filter-body price-range">
         {# slider: sets "max" dynamically from products on page #}
         <input id="priceRange" name="price_range" type="range" class="range-slider" min="0" value="0">
 
@@ -207,12 +219,12 @@
 
     <!-- Availability -->
     <div class="filter-section">
-      <div class="filter-head">
-        <h6>{% trans "Availability" %}</h6>
-        <span class="filter-chip" id="stockChip">All</span>
+      <div class="filter-head" data-collapsible>
+        <h6>{% icon "check" "ic" 16 %} {% trans "Availability" %}</h6>
+        <span class="filter-chip" id="stockChip">{% trans "All" %}</span>
       </div>
 
-      <div class="custom-control custom-checkbox">
+      <div class="filter-body custom-control custom-checkbox">
         <input type="checkbox" name="instock" class="custom-control-input" id="inStockOnly" checked>
         <label class="custom-control-label" for="inStockOnly">{% trans "In stock only" %}</label>
       </div>
@@ -231,7 +243,7 @@
 
 
       <!-- PRODUCTS GRID -->
-      <main class="col-md-9">
+      <main class="col-lg-9">
 
         <div class="row" id="productGrid">
           {% for product in products %}
@@ -248,13 +260,20 @@
       <span class="badge-corner badge-low">{% trans "Low stock" %}</span>
     {% endif %}
 
-    {% if product.countReview == 0 %}
+    {% if product.on_sale %}
+      <span class="badge-corner badge-out">{% trans "Sale" %}</span>
+    {% elif product.countReview == 0 %}
       <span class="badge-corner badge-new">{% trans "New" %}</span>
     {% endif %}
   </div>
 
   <a href="{{ product.get_url }}">
     <img data-skeleton src="{% if product.cover_image %}{{ product.cover_image }}{% else %}{% static 'images/placeholder.png' %}{% endif %}" alt="{{ product.product_name }}">
+    {% with hover=product.hover_image %}{% if hover %}<img class="p-img-2" src="{{ hover }}" alt="" loading="lazy" aria-hidden="true">{% endif %}{% endwith %}
+  </a>
+
+  <a href="{{ product.get_url }}" class="quick-add" aria-label="{% trans 'View' %} {{ product.product_name }}">
+    {% icon "bag" "ic" 16 %} {% trans "Quick view" %}
   </a>
 </div>
 
@@ -265,16 +284,19 @@
                   </a>
 
                   <div class="product-meta">
-                    <div class="price">{{ CURRENCY_SYMBOL }} {{ product.price }}</div>
+                    <div class="price">
+                      {{ CURRENCY_SYMBOL }} {{ product.price }}
+                      {% if product.on_sale %}<span class="price-was">{{ CURRENCY_SYMBOL }} {{ product.compare_at_price }}</span>{% endif %}
+                    </div>
 
 
                     {% if product.countReview %}
                       <span class="pill">
-                        <i class="fa fa-star"></i>
+                        {% icon "star" "ic" 14 %}
                         {{ product.averageReview|floatformat:1 }} ({{ product.countReview }})
                       </span>
                     {% else %}
-                      <span class="pill"><i class="fa fa-star"></i> New</span>
+                      <span class="pill">{% icon "spark" "ic" 14 %} {% trans "New" %}</span>
                     {% endif %}
                   </div>
 

@@ -82,6 +82,14 @@ class Product(models.Model):
             return first.image.url
         return ""
 
+    def hover_image(self):
+        """Second distinct image for the card hover effect (empty if only one)."""
+        cover = self.cover_image()
+        for g in self.gallery.all():
+            if g.image and g.image.url and g.image.url != cover:
+                return g.image.url
+        return ""
+
     def on_sale(self):
         return bool(self.compare_at_price and self.compare_at_price > self.price)
 
