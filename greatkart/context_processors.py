@@ -10,4 +10,7 @@ def site_globals(request):
         "CURRENCY_SYMBOL": getattr(settings, "STORE_CURRENCY_SYMBOL", "€"),
         "RETURN_WINDOW_DAYS": getattr(settings, "RETURN_WINDOW_DAYS", 14),
         "FREE_SHIPPING_THRESHOLD": getattr(settings, "SHIPPING_FREE_THRESHOLD", 0),
+        "PAYPAL_CLIENT_ID": getattr(settings, "PAYPAL_CLIENT_ID", ""),
+        "PAYPAL_CURRENCY": getattr(settings, "PAYPAL_CURRENCY", "EUR"),
+        "SUPPORT_EMAIL": getattr(settings, "SUPPORT_EMAIL", ""),
     }

@@ -173,7 +173,7 @@
   </div>
 </section>
 
-<script src="https://www.paypal.com/sdk/js?client-id=AUIKvs_bE9ru_ivBkYfrV27fsmk1iT8o_4noVrvc4o-nuJwK-qoyvtX10ocmyT4hWjapFm0A4BAQyZaQ&currency=EUR&components=buttons"></script>
+{% if PAYPAL_CLIENT_ID %}<script src="https://www.paypal.com/sdk/js?client-id={{ PAYPAL_CLIENT_ID }}&currency={{ PAYPAL_CURRENCY }}&components=buttons"></script>{% endif %}
 <script>
   window.__STRIPE_CREATE_INTENT_URL = "{% url 'stripe_create_intent' %}";
   window.__STRIPE_CONFIRM_URL = "{% url 'stripe_confirm' %}";
@@ -219,7 +219,8 @@
   var payment_method = 'PayPal';
   var redirect_url = "{% url 'order_complete' %}";
 
-  // ✅ render once
+  // ✅ render once (only if the PayPal SDK actually loaded)
+  if (window.paypal) {
   paypal.Buttons({
     style: { shape: 'rect', label: 'pay', height: 44 },
 
@@ -251,6 +252,7 @@
       });
     }
   }).render('#paypal-button-container');
+  }
 </script>
 
 

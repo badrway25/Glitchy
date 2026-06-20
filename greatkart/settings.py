@@ -236,6 +236,10 @@ STRIPE_SECRET_KEY = env("STRIPE_SECRET_KEY", "")
 STRIPE_WEBHOOK_SECRET = env("STRIPE_WEBHOOK_SECRET", "")
 STRIPE_CURRENCY = env("STRIPE_CURRENCY", "eur")
 
+# PayPal (client id is a PUBLIC identifier, but kept configurable via env)
+PAYPAL_CLIENT_ID = env("PAYPAL_CLIENT_ID", "")
+PAYPAL_CURRENCY = env("PAYPAL_CURRENCY", "EUR")
+
 # Payment processing fee model (used for net-margin estimation)
 PAYMENT_FEE_PERCENT = float(env("PAYMENT_FEE_PERCENT", "1.5"))   # %
 PAYMENT_FEE_FIXED = float(env("PAYMENT_FEE_FIXED", "0.25"))      # currency units
