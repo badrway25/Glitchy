@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static i18n %}
+{% load static i18n uikit %}
 
 {% block content %}
 
@@ -32,10 +32,10 @@
 <section class="lux-strip">
   <div class="container py-3" style="max-width:1280px;">
     <div class="d-flex flex-wrap justify-content-center text-center" style="gap:10px 38px;">
-      <span class="lux-item"><i class="fa fa-truck mr-2"></i>{% blocktrans with t=FREE_SHIPPING_THRESHOLD %}Free shipping over {{ t }}{% endblocktrans %} {{ CURRENCY_SYMBOL }}</span>
-      <span class="lux-item"><i class="fa fa-undo mr-2"></i>{% blocktrans with d=RETURN_WINDOW_DAYS %}{{ d }}-day free returns{% endblocktrans %}</span>
-      <span class="lux-item"><i class="fa fa-leaf mr-2"></i>{% trans "Premium, ethically printed" %}</span>
-      <span class="lux-item"><i class="fa fa-lock mr-2"></i>{% trans "Secure checkout" %}</span>
+      <span class="lux-item">{% icon "truck" "ic" 18 %}{% blocktrans with t=FREE_SHIPPING_THRESHOLD %}Free shipping over {{ t }}{% endblocktrans %} {{ CURRENCY_SYMBOL }}</span>
+      <span class="lux-item">{% icon "returns" "ic" 18 %}{% blocktrans with d=RETURN_WINDOW_DAYS %}{{ d }}-day free returns{% endblocktrans %}</span>
+      <span class="lux-item">{% icon "leaf" "ic" 18 %}{% trans "Premium, ethically printed" %}</span>
+      <span class="lux-item">{% icon "lock" "ic" 18 %}{% trans "Secure checkout" %}</span>
     </div>
   </div>
 </section>
@@ -88,22 +88,22 @@
     </div>
     <div class="row g-3 g-md-4">
       <div class="col-6 col-lg-3 d-flex"><div class="lux-feature w-100 p-4">
-        <div class="lux-ic mb-3"><i class="fa fa-gem"></i></div>
+        <div class="lux-ic mb-3">{% icon "gem" "ic" 22 %}</div>
         <h4 class="mb-1">{% trans "Premium fabrics" %}</h4>
         <p class="text-muted mb-0" style="font-size:.9rem;">{% trans "Heavyweight, soft-touch materials chosen for comfort and longevity." %}</p>
       </div></div>
       <div class="col-6 col-lg-3 d-flex"><div class="lux-feature w-100 p-4">
-        <div class="lux-ic mb-3"><i class="fa fa-truck"></i></div>
+        <div class="lux-ic mb-3">{% icon "package" "ic" 22 %}</div>
         <h4 class="mb-1">{% trans "Made on demand" %}</h4>
         <p class="text-muted mb-0" style="font-size:.9rem;">{% trans "Printed only when you order — less waste, always fresh." %}</p>
       </div></div>
       <div class="col-6 col-lg-3 d-flex"><div class="lux-feature w-100 p-4">
-        <div class="lux-ic mb-3"><i class="fa fa-undo"></i></div>
+        <div class="lux-ic mb-3">{% icon "returns" "ic" 22 %}</div>
         <h4 class="mb-1">{% blocktrans with d=RETURN_WINDOW_DAYS %}{{ d }}-day returns{% endblocktrans %}</h4>
         <p class="text-muted mb-0" style="font-size:.9rem;">{% trans "Changed your mind? Send it back, free and easy." %}</p>
       </div></div>
       <div class="col-6 col-lg-3 d-flex"><div class="lux-feature w-100 p-4">
-        <div class="lux-ic mb-3"><i class="fa fa-shield-alt"></i></div>
+        <div class="lux-ic mb-3">{% icon "shield" "ic" 22 %}</div>
         <h4 class="mb-1">{% trans "Secure & simple" %}</h4>
         <p class="text-muted mb-0" style="font-size:.9rem;">{% trans "Encrypted checkout, guest-friendly, no account required." %}</p>
       </div></div>

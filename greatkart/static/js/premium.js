@@ -60,3 +60,65 @@
     });
   });
 })();
+
+/* Deep upgrade: mobile drawers (filters + nav), accessible + body-scroll lock. */
+(function () {
+  "use strict";
+  function ready(fn){ if(document.readyState!=="loading") fn(); else document.addEventListener("DOMContentLoaded", fn); }
+
+  function makeDrawer(panel, openers, opts){
+    if(!panel) return;
+    var backdrop = document.createElement("div");
+    backdrop.className = opts.backdropClass;
+    document.body.appendChild(backdrop);
+    function open(){
+      panel.classList.add(opts.openClass);
+      backdrop.classList.add("is-open");
+      document.body.style.overflow="hidden";
+      var f = panel.querySelector("a,button,input,select"); if(f) f.focus();
+    }
+    function close(){
+      panel.classList.remove(opts.openClass);
+      backdrop.classList.remove("is-open");
+      document.body.style.overflow="";
+    }
+    openers.forEach(function(o){ o && o.addEventListener("click", function(e){ e.preventDefault(); open(); }); });
+    backdrop.addEventListener("click", close);
+    panel.querySelectorAll("[data-drawer-close]").forEach(function(b){ b.addEventListener("click", close); });
+    document.addEventListener("keydown", function(e){ if(e.key==="Escape") close(); });
+    return { open: open, close: close };
+  }
+
+  ready(function(){
+    /* Mobile nav drawer — reuse the existing Bootstrap toggler button. */
+    var nav = document.getElementById("navbarMain");
+    var toggler = document.querySelector(".navbar-toggler");
+    if(nav && toggler){
+      // stop Bootstrap collapse from also firing
+      toggler.removeAttribute("data-toggle");
+      var navDrawer = makeDrawer(nav, [toggler], {backdropClass:"nav-backdrop", openClass:"drawer-open"});
+      // add a close button into the drawer
+      if(!nav.querySelector(".drawer-close")){
+        var c=document.createElement("button"); c.className="drawer-close"; c.setAttribute("aria-label","Close menu");
+        c.setAttribute("data-drawer-close",""); c.innerHTML="&times;"; c.style.fontSize="1.8rem";
+        nav.insertBefore(c, nav.firstChild);
+      }
+      // close drawer when a nav link is tapped
+      nav.querySelectorAll(".nav-link, .dropdown-item").forEach(function(l){
+        l.addEventListener("click", function(){ if(window.innerWidth<992) navDrawer.close(); });
+      });
+    }
+
+    /* Mobile shop filter drawer */
+    var aside = document.querySelector(".shop-aside");
+    var openBtn = document.querySelector("[data-open-filters]");
+    if(aside && openBtn){
+      makeDrawer(aside, [openBtn], {backdropClass:"filter-backdrop", openClass:"is-open"});
+    }
+
+    /* Collapsible filter sections (premium) */
+    document.querySelectorAll(".filter-section .filter-head[data-collapsible]").forEach(function(h){
+      h.addEventListener("click", function(){ h.closest(".filter-section").classList.toggle("is-collapsed"); });
+    });
+  });
+})();
