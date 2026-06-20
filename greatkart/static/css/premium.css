@@ -1,0 +1,246 @@
+/* ============================================================================
+   GLITCHY — Premium Fashion design layer (Phase 7 rebrand)
+   Loaded AFTER theme.css. Re-skins via tokens + refined component overrides.
+   Palette: warm ivory / espresso / champagne gold / deep sage — editorial,
+   architectural, mobile-first. Markup is unchanged; only styles are overridden.
+   ============================================================================ */
+
+/* ---- 1. Design tokens (override theme.css :root) ---- */
+:root{
+  --bg:#f5f1e9;            /* warm ivory / bone */
+  --surface:#ffffff;
+  --surface-2:#efe9dd;     /* sand */
+  --text:#1c1a17;          /* espresso near-black */
+  --muted:#7a7368;         /* warm taupe */
+  --primary:#1c1a17;       /* CTAs are architectural near-black */
+  --primary-2:#000000;
+  --accent:#a6824c;        /* champagne / antique gold */
+  --accent-2:#8c6a3a;
+  --success:#3f6b4e;       /* deep sage */
+  --danger:#a23b2d;        /* terracotta */
+  --warning:#b8893a;
+
+  --radius:10px;
+  --radius-sm:6px;
+  --radius-pill:999px;
+  --border:1px solid rgba(28,26,23,.12);
+  --border-strong:1px solid rgba(28,26,23,.22);
+  --shadow:0 20px 50px rgba(28,26,23,.10);
+  --shadow-soft:0 10px 28px rgba(28,26,23,.07);
+  --nav-bg:rgba(245,241,233,.86);
+  --footer-bg:#1c1a17;
+  --focus-ring:0 0 0 .18rem rgba(166,130,76,.30);
+
+  --font-display:"Fraunces","Times New Roman",Georgia,serif;
+  --font-ui:"Inter",system-ui,-apple-system,sans-serif;
+  --ease:cubic-bezier(.22,.61,.36,1);
+  --tr:.35s var(--ease);
+}
+:root[data-theme="dark"]{
+  --bg:#15130f;
+  --surface:#1f1c17;
+  --surface-2:#272219;
+  --text:#f3eee4;
+  --muted:#b6ab99;
+  --primary:#f3eee4;       /* on dark, CTAs invert to light */
+  --primary-2:#ffffff;
+  --accent:#caa56a;
+  --accent-2:#b8945a;
+  --border:1px solid rgba(243,238,228,.12);
+  --border-strong:1px solid rgba(243,238,228,.22);
+  --shadow:0 22px 56px rgba(0,0,0,.5);
+  --shadow-soft:0 12px 30px rgba(0,0,0,.35);
+  --nav-bg:rgba(21,19,15,.78);
+  --footer-bg:#100e0b;
+  --focus-ring:0 0 0 .18rem rgba(202,165,106,.34);
+}
+
+/* ---- 2. Base typography ---- */
+body{
+  font-family:var(--font-ui);
+  background:var(--bg);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  letter-spacing:.005em;
+}
+h1,h2,h3,.hero-title,.section-title,.pdp-title,.cart-title,.dash-title{
+  font-family:var(--font-display)!important;
+  font-weight:500;
+  letter-spacing:-.01em;
+  color:var(--text);
+}
+a{color:var(--text);}
+a:hover{color:var(--accent-2);}
+.text-muted{color:var(--muted)!important;}
+::selection{background:var(--accent);color:#fff;}
+
+/* refined focus visibility for accessibility */
+a:focus-visible,button:focus-visible,.btn:focus-visible,
+input:focus-visible,select:focus-visible,textarea:focus-visible{
+  outline:none;box-shadow:var(--focus-ring);border-radius:var(--radius-sm);
+}
+
+/* ---- 3. Buttons (architectural, restrained) ---- */
+.btn{font-family:var(--font-ui);font-weight:600;border-radius:var(--radius-sm);
+  transition:transform var(--tr),background var(--tr),color var(--tr),box-shadow var(--tr);}
+.btn-primary,.summary-cta,.btn.btn-primary{
+  background:var(--primary)!important;border:1px solid var(--primary)!important;
+  color:#fff!important;border-radius:var(--radius-sm)!important;
+  letter-spacing:.06em;text-transform:uppercase;font-size:.82rem;font-weight:600;
+  padding:.72rem 1.4rem;box-shadow:none!important;
+}
+.btn-primary:hover{background:var(--accent)!important;border-color:var(--accent)!important;
+  color:#fff!important;transform:translateY(-1px);}
+.btn-outline-primary,.btn-outline-dark{
+  border:1px solid var(--primary)!important;color:var(--text)!important;background:transparent!important;
+  letter-spacing:.04em;text-transform:uppercase;font-size:.8rem;border-radius:var(--radius-sm)!important;}
+.btn-outline-primary:hover,.btn-outline-dark:hover{background:var(--primary)!important;color:#fff!important;}
+.btn-soft,.btn.btn-soft{
+  background:var(--surface)!important;border:var(--border)!important;color:var(--text)!important;
+  border-radius:var(--radius-sm)!important;box-shadow:none!important;}
+.btn-soft:hover{border:var(--border-strong)!important;background:var(--surface-2)!important;}
+.btn-dark{background:var(--primary)!important;border-color:var(--primary)!important;}
+.btn-link{color:var(--accent-2)!important;}
+
+/* ---- 4. Navbar ---- */
+.section-header .navbar{background:var(--nav-bg);backdrop-filter:saturate(140%) blur(14px);
+  border-bottom:var(--border);}
+.navbar-brand span,.navbar-brand{font-family:var(--font-display)!important;font-weight:600;
+  letter-spacing:.04em;color:var(--text)!important;}
+.navbar .nav-link{font-family:var(--font-ui);font-weight:500;letter-spacing:.02em;
+  color:var(--text)!important;font-size:.92rem;}
+.navbar .nav-link:hover,.navbar .nav-link.active{color:var(--accent-2)!important;}
+.searchbar .form-control{border-radius:var(--radius-pill);border:var(--border);background:var(--surface);}
+.nav-icon{color:var(--text);}
+.badge-danger,.badge.badge-danger{background:var(--accent)!important;color:#fff!important;}
+.lang-switcher .lang-code{font-weight:600;letter-spacing:.04em;}
+
+/* ---- 5. Hero (editorial) ---- */
+.hero-banner{border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-soft);}
+.hero-overlay{background:linear-gradient(90deg,rgba(28,26,23,.66) 0%,rgba(28,26,23,.20) 55%,rgba(28,26,23,0) 100%);}
+.hero-kicker{font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.28em;
+  font-size:.72rem;font-weight:600;color:var(--accent);opacity:1;}
+.hero-title{font-family:var(--font-display)!important;font-weight:500;line-height:1.04;
+  letter-spacing:-.015em;font-size:clamp(2.1rem,5vw,3.6rem);color:#fff;}
+.hero-sub{font-family:var(--font-ui);color:rgba(255,255,255,.85);font-size:1.02rem;max-width:34ch;}
+.hero-copy .btn-primary{background:#fff!important;color:var(--text)!important;border-color:#fff!important;}
+.hero-copy .btn-primary:hover{background:var(--accent)!important;color:#fff!important;border-color:var(--accent)!important;}
+
+/* ---- 6. Section headings ---- */
+.section-title{font-size:clamp(1.4rem,2.6vw,2rem);}
+.section-sub{color:var(--muted);font-family:var(--font-ui);}
+.section-head .btn-soft{text-transform:uppercase;letter-spacing:.05em;font-size:.76rem;}
+.home-section-muted{background:linear-gradient(180deg,var(--surface-2),var(--bg));}
+
+/* ---- 7. Product cards ---- */
+.p-card,.product-card,.card.product-card{
+  background:var(--surface);border:var(--border);border-radius:var(--radius);overflow:hidden;
+  box-shadow:none;transition:transform var(--tr),box-shadow var(--tr),border-color var(--tr);}
+.p-card:hover,.product-card:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:rgba(166,130,76,.4);}
+.p-media,.media-skeleton{background:var(--surface-2);overflow:hidden;}
+.p-media img,.product-card img,.media-skeleton img{transition:transform .7s var(--ease);}
+.p-card:hover .p-media img,.product-card:hover img{transform:scale(1.05);}
+.p-title,.product-title{font-family:var(--font-ui);font-weight:600;color:var(--text);letter-spacing:0;}
+.p-price,.price{font-family:var(--font-display)!important;font-weight:500;color:var(--text);font-size:1.05rem;}
+.p-link{color:var(--accent-2)!important;text-transform:uppercase;letter-spacing:.06em;font-size:.72rem;font-weight:600;}
+
+/* ---- 8. Badges / chips (no emoji feel) ---- */
+.p-chip,.badge-corner{font-family:var(--font-ui)!important;text-transform:uppercase;
+  letter-spacing:.08em;font-size:.62rem;font-weight:600;border-radius:var(--radius-sm);
+  padding:.28rem .55rem;}
+.p-chip{background:rgba(28,26,23,.06);color:var(--text);border:var(--border);}
+.p-chip-top,.badge-new{background:var(--primary)!important;color:#fff!important;border-color:var(--primary)!important;}
+.badge-out{background:var(--danger)!important;color:#fff!important;}
+.badge-low{background:var(--warning)!important;color:#fff!important;}
+.badge-pill{border-radius:var(--radius-pill);}
+
+/* ---- 9. Product detail ---- */
+.pdp-card{background:var(--surface);border:var(--border);border-radius:var(--radius);box-shadow:var(--shadow-soft);}
+.pdp-title{font-size:clamp(1.6rem,3vw,2.3rem);}
+.pdp-price{font-family:var(--font-display)!important;font-weight:500;color:var(--text);font-size:1.6rem;}
+.pdp-badges .badge{text-transform:uppercase;letter-spacing:.08em;font-size:.62rem;font-weight:600;}
+.pdp-pill{background:var(--surface-2);border:var(--border);border-radius:var(--radius-pill);}
+.pdp-pill--stock.is-in{color:var(--success);}
+.pdp-pill--stock.is-out{color:var(--danger);}
+.custom-select-btn,.pdp-thumb{border:var(--border)!important;border-radius:var(--radius-sm)!important;background:var(--surface)!important;}
+.pdp-thumb.active{border-color:var(--accent)!important;}
+.pdp-more-toggle{color:var(--accent-2)!important;text-transform:uppercase;letter-spacing:.06em;font-size:.8rem;}
+.pdp-more-list li strong{color:var(--text);}
+.pdp-trust span{color:var(--muted);}
+
+/* ---- 10. Cart / checkout / summary ---- */
+.summary-card,.cart-card,.checkout-card,.dash-card{
+  background:var(--surface);border:var(--border);border-radius:var(--radius);box-shadow:var(--shadow-soft);}
+.summary-title,.summary-head h5{font-family:var(--font-display)!important;}
+.summary-chip{background:var(--surface-2);border:var(--border);border-radius:var(--radius-pill);color:var(--muted);}
+.summary-lines .grand span{font-family:var(--font-display)!important;font-weight:600;}
+.variant-pill{background:var(--surface-2);border:var(--border);border-radius:var(--radius-pill);}
+.variant-pill .variant-k{color:var(--muted);}
+.qty-control{border:var(--border);border-radius:var(--radius-pill);}
+.qty-btn{color:var(--text);}
+.form-control{border-radius:var(--radius-sm);border:var(--border);background:var(--surface);color:var(--text);}
+.form-control:focus{border-color:var(--accent);box-shadow:var(--focus-ring);}
+.checkout-grid label,.checkout-note label{font-weight:600;font-size:.82rem;color:var(--text);}
+.trust-box,.trust-item,.trust-row,.trust-chip{color:var(--muted);}
+.trust-chip{background:var(--surface);border:var(--border);border-radius:var(--radius-pill);}
+
+/* ---- 11. Alerts / toasts ---- */
+.alert{border-radius:var(--radius);border:var(--border);}
+.alert-success{background:rgba(63,107,78,.10);color:var(--success);border-color:rgba(63,107,78,.25);}
+.alert-danger,.alert-warning{border-radius:var(--radius);}
+.toast{border-radius:var(--radius)!important;border:var(--border)!important;}
+
+/* ---- 12. Footer (dark, editorial) ---- */
+.footer-premium{background:var(--footer-bg);color:#cfc7b8;}
+.footer-premium .footer-title{font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.16em;
+  font-size:.72rem;color:#fff;font-weight:600;}
+.footer-premium .footer-link{color:#cfc7b8;}
+.footer-premium .footer-link:hover{color:var(--accent);}
+.footer-premium .footer-badge{font-family:var(--font-display);color:#fff;letter-spacing:.04em;}
+.footer-premium .footer-desc{color:#a59c8c;}
+.footer-premium .social-btn{border:1px solid rgba(255,255,255,.16);color:#cfc7b8;border-radius:var(--radius-pill);}
+.footer-premium .social-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent);}
+.footer-premium .trust-chip{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.10);color:#cfc7b8;}
+.footer-premium .newsletter-input{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:#fff;border-radius:var(--radius-pill);}
+.footer-premium .newsletter-btn{background:var(--accent);border-color:var(--accent);border-radius:var(--radius-pill);}
+.footer-premium .country-switcher select{background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,255,255,.14);border-radius:var(--radius-sm);}
+.footer-premium .footer-bottom{border-top:1px solid rgba(255,255,255,.10);color:#9a917f;}
+.footer-premium .footer-bottom .footer-link{color:#9a917f;}
+
+/* ---- 13. Account / admin readability (light touch) ---- */
+.badge-soft-success{background:rgba(63,107,78,.12);color:var(--success);}
+.badge-soft-danger{background:rgba(162,59,45,.12);color:var(--danger);}
+.badge-soft-info{background:rgba(166,130,76,.14);color:var(--accent-2);}
+.dash-table thead th{font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.06em;
+  font-size:.7rem;color:var(--muted);}
+
+/* ---- 14. Reveal-on-scroll (progressive enhancement) ----
+   Gated behind .js-anim so content is ALWAYS visible without JS / for crawlers. */
+.js-anim [data-reveal]{opacity:0;transform:translateY(18px);transition:opacity .7s var(--ease),transform .7s var(--ease);}
+.js-anim [data-reveal].is-visible{opacity:1;transform:none;}
+@media (prefers-reduced-motion:reduce){
+  .js-anim [data-reveal]{opacity:1!important;transform:none!important;transition:none!important;}
+  *{scroll-behavior:auto!important;}
+}
+
+/* ---- 15. Premium home sections (new markup in home.html) ---- */
+.lux-strip{background:var(--primary);color:#f5f1e9;}
+.lux-strip .lux-item{font-family:var(--font-ui);letter-spacing:.04em;}
+.lux-strip .lux-item i{color:var(--accent);}
+.lux-feature{background:var(--surface);border:var(--border);border-radius:var(--radius);box-shadow:none;
+  transition:transform var(--tr),box-shadow var(--tr);}
+.lux-feature:hover{transform:translateY(-3px);box-shadow:var(--shadow-soft);}
+.lux-feature .lux-ic{width:46px;height:46px;display:grid;place-items:center;border-radius:var(--radius-pill);
+  background:var(--surface-2);color:var(--accent-2);font-size:1.1rem;}
+.lux-feature h4{font-family:var(--font-display);font-weight:500;font-size:1.05rem;}
+.lux-quote{font-family:var(--font-display);font-style:italic;font-size:clamp(1.3rem,3vw,2rem);
+  line-height:1.3;color:var(--text);}
+.lux-eyebrow{font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.28em;font-size:.7rem;
+  font-weight:600;color:var(--accent);}
+
+/* ---- 16. Small refinements ---- */
+.breadcrumb-clean .breadcrumb-item,.breadcrumb-clean a{font-size:.82rem;color:var(--muted);}
+.breadcrumb-clean a:hover{color:var(--accent-2);}
+img{max-width:100%;}
+.pagination .page-link{color:var(--text);border:var(--border);border-radius:var(--radius-sm);margin:0 3px;}
+.pagination .page-item.active .page-link{background:var(--primary);border-color:var(--primary);color:#fff;}
