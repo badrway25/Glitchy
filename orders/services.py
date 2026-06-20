@@ -37,6 +37,79 @@ def production_cost_for_item(cart_item) -> float:
     return float(getattr(cart_item.product, "base_cost", 0) or 0)
 
 
+def production_cost_for_order_product(op) -> float:
+    """Best available per-unit production cost for an order line (from current data)."""
+    costs = [float(getattr(v, "production_cost", 0) or 0) for v in op.variations.all()]
+    variant_cost = max(costs) if costs else 0.0
+    if variant_cost > 0:
+        return variant_cost
+    return float(getattr(op.product, "base_cost", 0) or 0)
+
+
+def backfill_order_costs(*, only_zero=True, dry_run=False):
+    """
+    Estimate costs/margins for historical orders that predate the cost fields.
+
+    SAFE: production cost is backfilled ONLY from real synced product/variant
+    data — never fabricated. Payment fee uses the configured formula; shipping
+    cost is proxied from what the customer was charged (only when known).
+    Returns a summary dict.
+    """
+    from django.conf import settings as dj_settings
+
+    from .models import Order, OrderProduct
+
+    qs = Order.objects.filter(is_ordered=True)
+    if only_zero:
+        qs = qs.filter(cost_production=0)
+
+    summary = {"examined": 0, "updated": 0, "full_cost": 0, "partial_cost": 0,
+               "no_cost_data": 0}
+    for order in qs:
+        summary["examined"] += 1
+        ops = list(OrderProduct.objects.prefetch_related("variations", "product").filter(order=order))
+        if not ops:
+            continue
+
+        prod_cost = 0.0
+        lines_with_cost = 0
+        for op in ops:
+            unit = production_cost_for_order_product(op)
+            if unit > 0:
+                lines_with_cost += 1
+            prod_cost += unit * int(op.quantity)
+
+        if lines_with_cost == 0:
+            summary["no_cost_data"] += 1
+        elif lines_with_cost == len(ops):
+            summary["full_cost"] += 1
+        else:
+            summary["partial_cost"] += 1
+
+        fee = estimate_payment_fee(
+            order.order_total,
+            percent=getattr(dj_settings, "PAYMENT_FEE_PERCENT", 0),
+            fixed=getattr(dj_settings, "PAYMENT_FEE_FIXED", 0),
+        )
+        ship = float(order.shipping_cost or 0)
+
+        if not dry_run:
+            changed = []
+            if prod_cost > 0 and not order.cost_production:
+                order.cost_production = round(prod_cost, 2)
+                changed.append("cost_production")
+            if ship > 0 and not order.cost_shipping:
+                order.cost_shipping = round(ship, 2)
+                changed.append("cost_shipping")
+            if fee > 0 and not order.payment_fee:
+                order.payment_fee = fee
+                changed.append("payment_fee")
+            if changed:
+                order.save(update_fields=changed + ["updated_at"])
+                summary["updated"] += 1
+    return summary
+
+
 # --------------------------------------------------------------------------- #
 # Printify push (idempotent)
 # --------------------------------------------------------------------------- #
