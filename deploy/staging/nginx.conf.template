@@ -1,0 +1,72 @@
+# nginx site for greatkart staging. Copy to
+# /etc/nginx/sites-available/greatkart-staging, replace __PLACEHOLDERS__,
+# symlink into sites-enabled, then `nginx -t && systemctl reload nginx`.
+#
+# Static is collected to STATIC_ROOT (__APP_DIR__/static) by collectstatic.
+# Media (user/Printify images) lives in MEDIA_ROOT (__APP_DIR__/media).
+# Django does NOT serve media/static in production — nginx does (below).
+
+# --- HTTP: redirect everything to HTTPS (ACME challenge stays on HTTP) ---
+server {
+    listen 80;
+    listen [::]:80;
+    server_name __STAGING_DOMAIN__;
+
+    location /.well-known/acme-challenge/ { root /var/www/certbot; }
+    location / { return 301 https://$host$request_uri; }
+}
+
+# --- HTTPS ---
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name __STAGING_DOMAIN__;
+
+    ssl_certificate     __TLS_CERT_PATH__;       # e.g. /etc/letsencrypt/live/<domain>/fullchain.pem
+    ssl_certificate_key __TLS_KEY_PATH__;        # e.g. /etc/letsencrypt/live/<domain>/privkey.pem
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers off;
+
+    client_max_body_size 16m;
+
+    # gzip (brotli if the module is available)
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript
+               text/xml application/xml image/svg+xml;
+    gzip_min_length 1024;
+
+    # Security headers (Django also sets HSTS/X-Frame when DEBUG=False; harmless to add)
+    add_header X-Content-Type-Options nosniff always;
+    add_header X-Frame-Options DENY always;
+    add_header Referrer-Policy same-origin always;
+    # add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
+    # Static files (collectstatic output)
+    location /static/ {
+        alias __APP_DIR__/static/;
+        access_log off;
+        expires 30d;
+        add_header Cache-Control "public";
+    }
+
+    # Media files (uploads / synced Printify images)
+    location /media/ {
+        alias __APP_DIR__/media/;
+        access_log off;
+        expires 7d;
+    }
+
+    # App
+    location / {
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;     # matches SECURE_PROXY_SSL_HEADER
+        proxy_redirect off;
+        proxy_pass http://127.0.0.1:8001;               # or http://unix:/run/greatkart-staging.sock;
+        proxy_read_timeout 60s;
+    }
+}
+
+# Test:   sudo nginx -t
+# Reload: sudo systemctl reload nginx

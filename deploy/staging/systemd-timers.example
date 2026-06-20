@@ -1,0 +1,48 @@
+# Background jobs as systemd services + timers (preferred over cron on systemd hosts).
+# Create these 4 files under /etc/systemd/system/, replace __PLACEHOLDERS__, then:
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now greatkart-n8n-retry.timer
+#   sudo systemctl enable --now greatkart-printify-pull.timer
+#   systemctl list-timers | grep greatkart
+
+# ===== /etc/systemd/system/greatkart-n8n-retry.service =====
+# [Unit]
+# Description=greatkart: retry failed n8n outbound events
+# [Service]
+# Type=oneshot
+# User=__APP_USER__
+# WorkingDirectory=__APP_DIR__
+# EnvironmentFile=__APP_DIR__/.env
+# ExecStart=__APP_DIR__/env/bin/python manage.py n8n_retry --limit 50
+
+# ===== /etc/systemd/system/greatkart-n8n-retry.timer =====
+# [Unit]
+# Description=Run greatkart n8n retry every 10 minutes
+# [Timer]
+# OnBootSec=5min
+# OnUnitActiveSec=10min
+# [Install]
+# WantedBy=timers.target
+
+# ===== /etc/systemd/system/greatkart-printify-pull.service =====
+# [Unit]
+# Description=greatkart: pull Printify order statuses/tracking
+# [Service]
+# Type=oneshot
+# User=__APP_USER__
+# WorkingDirectory=__APP_DIR__
+# EnvironmentFile=__APP_DIR__/.env
+# ExecStart=__APP_DIR__/env/bin/python manage.py printify_pull_orders --limit 20
+
+# ===== /etc/systemd/system/greatkart-printify-pull.timer =====
+# [Unit]
+# Description=Run greatkart Printify pull every 30 minutes
+# [Timer]
+# OnBootSec=10min
+# OnUnitActiveSec=30min
+# [Install]
+# WantedBy=timers.target
+
+# --- cron alternative (if not using systemd timers) ---
+# */10 * * * * cd __APP_DIR__ && env/bin/python manage.py n8n_retry --limit 50
+# */30 * * * * cd __APP_DIR__ && env/bin/python manage.py printify_pull_orders --limit 20

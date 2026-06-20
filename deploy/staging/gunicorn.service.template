@@ -1,0 +1,52 @@
+# systemd unit for the greatkart staging app server (gunicorn).
+# Install: copy to /etc/systemd/system/greatkart-staging.service, replace the
+# __PLACEHOLDERS__, then: daemon-reload + enable + start (see commands at bottom).
+#
+# No secrets here — all secrets live in the EnvironmentFile (.env, chmod 600).
+
+[Unit]
+Description=greatkart staging (gunicorn)
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=notify
+User=__APP_USER__
+Group=__APP_GROUP__
+WorkingDirectory=__APP_DIR__
+# .env must NOT be world-readable: chmod 600, chown __APP_USER__
+EnvironmentFile=__APP_DIR__/.env
+ExecStart=__APP_DIR__/env/bin/gunicorn greatkart.wsgi:application \
+    --workers __WORKERS__ \
+    --bind 127.0.0.1:8001 \
+    --timeout 60 \
+    --graceful-timeout 30 \
+    --max-requests 1000 \
+    --max-requests-jitter 100 \
+    --access-logfile - \
+    --error-logfile - \
+    --capture-output
+# To use a unix socket instead of TCP, swap --bind for:
+#   --bind unix:/run/greatkart-staging.sock
+# and point nginx proxy_pass at that socket (see gunicorn.socket.template).
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=on-failure
+RestartSec=5
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target
+
+# WORKERS guidance: (2 * CPU cores) + 1. Start with 3 on a small staging box.
+#
+# Commands:
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable greatkart-staging
+#   sudo systemctl start greatkart-staging
+#   sudo systemctl status greatkart-staging
+#   journalctl -u greatkart-staging -f --no-pager
+#   sudo systemctl reload greatkart-staging   # graceful worker reload after deploy
