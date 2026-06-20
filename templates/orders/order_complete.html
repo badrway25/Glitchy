@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static i18n %}
 
-{% block title %}Order complete{% endblock %}
+{% block title %}{% trans "Order complete" %}{% endblock %}
 
 {% block content %}
 
@@ -22,26 +22,26 @@
       <div class="oc-hero-body">
         <h1 class="oc-title">
           {% if order.status == 'Cancelled' %}
-            Order cancelled
+            {% trans "Order cancelled" %}
           {% else %}
-            Payment successful
+            {% trans "Payment successful" %}
           {% endif %}
         </h1>
 
         <p class="oc-subtitle text-muted mb-0">
           {% if order.status == 'Cancelled' %}
-            This order was cancelled. If you believe this is a mistake, please contact support.
+            {% trans "This order was cancelled. If you believe this is a mistake, please contact support." %}
           {% else %}
-            Thanks! Your order has been confirmed and is now being processed.
+            {% trans "Thanks! Your order has been confirmed and is now being processed." %}
           {% endif %}
         </p>
 
         <div class="oc-chips">
           <span class="meta-chip">
-            <i class="fa fa-receipt"></i> Order #{{ order_number }}
+            <i class="fa fa-receipt"></i> {% blocktrans with n=order_number %}Order #{{ n }}{% endblocktrans %}
           </span>
           <span class="meta-chip">
-            <i class="fa fa-fingerprint"></i> Transaction {{ transID }}
+            <i class="fa fa-fingerprint"></i> {% blocktrans with t=transID %}Transaction {{ t }}{% endblocktrans %}
           </span>
           <span class="meta-chip">
             <i class="fa fa-circle-check"></i> {{ payment.status }}
@@ -51,12 +51,12 @@
 
       <div class="oc-hero-actions">
         <a href="{% url 'invoice_pdf' order_number %}" class="btn btn-soft btn-block">
-          <i class="fa fa-file-pdf mr-2"></i>Download PDF invoice
+          <i class="fa fa-file-pdf mr-2"></i>{% trans "Download PDF invoice" %}
         </a>
 
 
         <a href="{% url 'store' %}" class="btn btn-primary btn-block">
-          Shop more <i class="fa fa-arrow-right ml-2"></i>
+          {% trans "Shop more" %} <i class="fa fa-arrow-right ml-2"></i>
         </a>
       </div>
     </div>
@@ -76,32 +76,32 @@
         <div class="oc-step is-muted">
           <div class="dot"></div>
           <div class="label">
-            <div class="title">Confirmed</div>
-            <div class="sub text-muted">Order received</div>
+            <div class="title">{% trans "Confirmed" %}</div>
+            <div class="sub text-muted">{% trans "Order received" %}</div>
           </div>
         </div>
 
         <div class="oc-step is-muted">
           <div class="dot"></div>
           <div class="label">
-            <div class="title">Packed</div>
-            <div class="sub text-muted">Preparing shipment</div>
+            <div class="title">{% trans "Packed" %}</div>
+            <div class="sub text-muted">{% trans "Preparing shipment" %}</div>
           </div>
         </div>
 
         <div class="oc-step is-muted">
           <div class="dot"></div>
           <div class="label">
-            <div class="title">Shipped</div>
-            <div class="sub text-muted">On the way</div>
+            <div class="title">{% trans "Shipped" %}</div>
+            <div class="sub text-muted">{% trans "On the way" %}</div>
           </div>
         </div>
 
         <div class="oc-step is-danger done">
           <div class="dot"></div>
           <div class="label">
-            <div class="title">Cancelled</div>
-            <div class="sub">This order has been cancelled</div>
+            <div class="title">{% trans "Cancelled" %}</div>
+            <div class="sub">{% trans "This order has been cancelled" %}</div>
           </div>
         </div>
       </div>
@@ -112,32 +112,32 @@
         <div class="oc-step done">
           <div class="dot"></div>
           <div class="label">
-            <div class="title">Confirmed</div>
-            <div class="sub text-muted">Order received</div>
+            <div class="title">{% trans "Confirmed" %}</div>
+            <div class="sub text-muted">{% trans "Order received" %}</div>
           </div>
         </div>
 
         <div class="oc-step {% if order.status == 'Accepted' or order.status == 'Completed' %}done{% endif %}">
           <div class="dot"></div>
           <div class="label">
-            <div class="title">Packed</div>
-            <div class="sub text-muted">Preparing shipment</div>
+            <div class="title">{% trans "Packed" %}</div>
+            <div class="sub text-muted">{% trans "Preparing shipment" %}</div>
           </div>
         </div>
 
         <div class="oc-step {% if order.status == 'Completed' %}done{% endif %}">
           <div class="dot"></div>
           <div class="label">
-            <div class="title">Shipped</div>
-            <div class="sub text-muted">On the way</div>
+            <div class="title">{% trans "Shipped" %}</div>
+            <div class="sub text-muted">{% trans "On the way" %}</div>
           </div>
         </div>
 
         <div class="oc-step is-muted">
           <div class="dot"></div>
           <div class="label">
-            <div class="title">Cancelled</div>
-            <div class="sub text-muted">Only if payment fails or you cancel</div>
+            <div class="title">{% trans "Cancelled" %}</div>
+            <div class="sub text-muted">{% trans "Only if payment fails or you cancel" %}</div>
           </div>
         </div>
       </div>
@@ -149,18 +149,18 @@
         <div class="oc-brand">
           <img src="{% static 'images/logo.png' %}" alt="Logo">
           <div class="oc-brand-text">
-            <div class="oc-brand-name">Invoice</div>
-            <div class="oc-brand-meta text-muted">Order details & receipt</div>
+            <div class="oc-brand-name">{% trans "Invoice" %}</div>
+            <div class="oc-brand-meta text-muted">{% trans "Order details & receipt" %}</div>
           </div>
         </div>
 
         <div class="oc-meta">
           <div class="oc-meta-row">
-            <span class="text-muted">Order date</span>
+            <span class="text-muted">{% trans "Order date" %}</span>
             <span>{{ order.created_at }}</span>
           </div>
           <div class="oc-meta-row">
-            <span class="text-muted">Payment</span>
+            <span class="text-muted">{% trans "Payment" %}</span>
             <span style="font-weight:800;">{{ payment.payment_method }}</span>
           </div>
         </div>
@@ -168,7 +168,7 @@
 
       <div class="oc-split">
         <div class="oc-box">
-          <div class="oc-box-title">Invoiced to</div>
+          <div class="oc-box-title">{% trans "Invoiced to" %}</div>
           <div class="oc-box-body">
             <div style="font-weight:800;">{{ order.full_name }}</div>
             <div class="text-muted">{{ order.full_address }}</div>
@@ -178,11 +178,11 @@
         </div>
 
         <div class="oc-box">
-          <div class="oc-box-title">Order info</div>
+          <div class="oc-box-title">{% trans "Order info" %}</div>
           <div class="oc-box-body">
-            <div class="oc-kv"><span class="text-muted">Order #</span><span>{{ order_number }}</span></div>
-            <div class="oc-kv"><span class="text-muted">Transaction</span><span>{{ transID }}</span></div>
-            <div class="oc-kv"><span class="text-muted">Status</span><span style="font-weight:800;">{{ payment.status }}</span></div>
+            <div class="oc-kv"><span class="text-muted">{% trans "Order #" %}</span><span>{{ order_number }}</span></div>
+            <div class="oc-kv"><span class="text-muted">{% trans "Transaction" %}</span><span>{{ transID }}</span></div>
+            <div class="oc-kv"><span class="text-muted">{% trans "Status" %}</span><span style="font-weight:800;">{{ payment.status }}</span></div>
           </div>
         </div>
       </div>
@@ -192,9 +192,9 @@
         <table class="table oc-table">
           <thead>
             <tr>
-              <th>Product</th>
-              <th class="text-center" style="width: 90px;">Qty</th>
-              <th class="text-right" style="width: 140px;">Total</th>
+              <th>{% trans "Product" %}</th>
+              <th class="text-center" style="width: 90px;">{% trans "Qty" %}</th>
+              <th class="text-right" style="width: 140px;">{% trans "Total" %}</th>
             </tr>
           </thead>
           <tbody>
@@ -226,21 +226,21 @@
       <!-- Totals -->
       <div class="oc-totals">
         <div class="oc-total-row">
-          <span class="text-muted">Subtotal</span>
+          <span class="text-muted">{% trans "Subtotal" %}</span>
           <span>€ {{ subtotal }}</span>
         </div>
         <div class="oc-total-row">
-          <span class="text-muted">Tax</span>
+          <span class="text-muted">{% trans "Tax" %}</span>
           <span>€ {{ order.tax }}</span>
         </div>
         <div class="oc-total-row oc-grand">
-          <span>Grand total</span>
+          <span>{% trans "Grand total" %}</span>
           <span>€ {{ order.order_total }}</span>
         </div>
       </div>
 
       <div class="oc-footer text-muted">
-        Thank you for shopping with us — if you need help, contact support with your order number.
+        {% trans "Thank you for shopping with us — if you need help, contact support with your order number." %}
       </div>
     </div>
 
@@ -249,12 +249,12 @@
   <section class="oc-rec">
     <div class="oc-rec-head">
       <div class="oc-rec-title">
-        <h3 class="m-0">Recommended for you</h3>
-        <div class="text-muted">Based on your purchase</div>
+        <h3 class="m-0">{% trans "Recommended for you" %}</h3>
+        <div class="text-muted">{% trans "Based on your purchase" %}</div>
       </div>
 
       <a href="{% url 'store' %}" class="btn btn-soft oc-rec-cta">
-        Browse all <i class="fa fa-arrow-right ml-2"></i>
+        {% trans "Browse all" %} <i class="fa fa-arrow-right ml-2"></i>
       </a>
     </div>
 
@@ -281,8 +281,8 @@
               </div>
 
               <div class="product-actions">
-                <a href="{{ p.get_url }}" class="btn btn-primary">View</a>
-                <a href="{{ p.get_url }}" class="btn btn-soft">Details</a>
+                <a href="{{ p.get_url }}" class="btn btn-primary">{% trans "View" %}</a>
+                <a href="{{ p.get_url }}" class="btn btn-soft">{% trans "Details" %}</a>
               </div>
             </div>
           </div>

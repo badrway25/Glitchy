@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static i18n %}
 
-{% block title %}Transactions{% endblock %}
+{% block title %}{% trans "Transactions" %}{% endblock %}
 
 {% block content %}
 <section class="section-content padding-y">
@@ -21,19 +21,19 @@
 
           <nav class="acc-nav">
             <a class="acc-link" href="{% url 'dashboard' %}">
-              <i class="fa fa-grid-2"></i> Overview
+              <i class="fa fa-grid-2"></i> {% trans "Overview" %}
             </a>
             <a class="acc-link" href="{% url 'my_orders' %}">
-              <i class="fa fa-box"></i> My orders
+              <i class="fa fa-box"></i> {% trans "My orders" %}
             </a>
             <a class="acc-link active" href="{% url 'transactions' %}">
-              <i class="fa fa-credit-card"></i> Transactions
+              <i class="fa fa-credit-card"></i> {% trans "Transactions" %}
             </a>
           </nav>
 
           <div class="acc-footer">
             <a class="btn btn-soft btn-block" href="{% url 'logout' %}">
-              <i class="fa fa-power-off mr-2"></i>Log out
+              <i class="fa fa-power-off mr-2"></i>{% trans "Log out" %}
             </a>
           </div>
         </div>
@@ -43,12 +43,12 @@
       <main class="col-lg-9">
         <div class="dash-top">
           <div>
-            <h1 class="dash-title">Transactions</h1>
-            <div class="text-muted">Your payments and transaction history.</div>
+            <h1 class="dash-title">{% trans "Transactions" %}</h1>
+            <div class="text-muted">{% trans "Your payments and transaction history." %}</div>
           </div>
           <div class="dash-actions">
             <a href="{% url 'store' %}" class="btn btn-soft">
-              <i class="fa fa-bag-shopping mr-2"></i>Shop
+              <i class="fa fa-bag-shopping mr-2"></i>{% trans "Shop" %}
             </a>
           </div>
         </div>
@@ -64,27 +64,27 @@
                     name="q"
                     class="form-control"
                     value="{{ q }}"
-                    placeholder="Search Order # or Payment ID"
+                    placeholder="{% trans 'Search Order # or Payment ID' %}"
                 >
                 </div>
 
 
             <select class="form-control form-control-sm" name="status" style="max-width:180px;">
-              <option value="">All status</option>
+              <option value="">{% trans "All status" %}</option>
               {% for s in status_options %}
                 <option value="{{ s }}" {% if status == s %}selected{% endif %}>{{ s }}</option>
               {% endfor %}
             </select>
 
             <select class="form-control form-control-sm" name="method" style="max-width:180px;">
-              <option value="">All methods</option>
+              <option value="">{% trans "All methods" %}</option>
               {% for m in method_options %}
                 <option value="{{ m }}" {% if method == m %}selected{% endif %}>{{ m }}</option>
               {% endfor %}
             </select>
 
-            <button class="btn btn-soft btn-sm" type="submit">Apply</button>
-            <a class="btn btn-soft btn-sm" href="{% url 'transactions' %}">Reset</a>
+            <button class="btn btn-soft btn-sm" type="submit">{% trans "Apply" %}</button>
+            <a class="btn btn-soft btn-sm" href="{% url 'transactions' %}">{% trans "Reset" %}</a>
           </form>
 
           {% if transactions %}
@@ -92,13 +92,13 @@
               <table class="table dash-table">
                 <thead>
                   <tr>
-                    <th>Order</th>
-                    <th>Date</th>
-                    <th>Method</th>
-                    <th>Payment ID</th>
-                    <th class="text-right">Paid</th>
-                    <th>Status</th>
-                    <th class="text-right">Action</th>
+                    <th>{% trans "Order" %}</th>
+                    <th>{% trans "Date" %}</th>
+                    <th>{% trans "Method" %}</th>
+                    <th>{% trans "Payment ID" %}</th>
+                    <th class="text-right">{% trans "Paid" %}</th>
+                    <th>{% trans "Status" %}</th>
+                    <th class="text-right">{% trans "Action" %}</th>
                   </tr>
                 </thead>
 
@@ -129,7 +129,7 @@
                       <td>
                         {% if o.payment and o.payment.status %}
                           {% if o.payment.status|lower == 'completed' %}
-                            <span class="badge-soft badge-soft-success">Paid</span>
+                            <span class="badge-soft badge-soft-success">{% trans "Paid" %}</span>
                           {% else %}
                             <span class="badge-soft badge-soft-warning">{{ o.payment.status }}</span>
                           {% endif %}
@@ -139,7 +139,7 @@
                       </td>
 
                       <td class="text-right">
-                        <a href="{% url 'order_detail' o.order_number %}" class="btn btn-soft btn-sm">Details</a>
+                        <a href="{% url 'order_detail' o.order_number %}" class="btn btn-soft btn-sm">{% trans "Details" %}</a>
                       </td>
                     </tr>
                   {% endfor %}
@@ -181,9 +181,9 @@
           {% else %}
             <div class="dash-empty">
               <div class="dash-empty-icon"><i class="fa fa-receipt"></i></div>
-              <h4>No transactions yet</h4>
-              <p class="text-muted mb-3">When you pay for an order, it will appear here.</p>
-              <a href="{% url 'store' %}" class="btn btn-primary">Browse products</a>
+              <h4>{% trans "No transactions yet" %}</h4>
+              <p class="text-muted mb-3">{% trans "When you pay for an order, it will appear here." %}</p>
+              <a href="{% url 'store' %}" class="btn btn-primary">{% trans "Browse products" %}</a>
             </div>
           {% endif %}
         </div>

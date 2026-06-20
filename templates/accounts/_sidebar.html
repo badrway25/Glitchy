@@ -1,3 +1,4 @@
+{% load i18n %}
 <div class="acc-card acc-sticky">
   <div class="acc-head">
     <div class="acc-avatar">{{ request.user.first_name|default:"U"|slice:":1" }}</div>
@@ -10,23 +11,23 @@
   <nav class="acc-nav">
     <a class="acc-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
        href="{% url 'dashboard' %}">
-      <i class="fa fa-home"></i> Overview
+      <i class="fa fa-home"></i> {% trans "Overview" %}
     </a>
 
     <a class="acc-link {% if request.resolver_match.url_name == 'my_orders' or request.resolver_match.url_name == 'order_detail' %}active{% endif %}"
        href="{% url 'my_orders' %}">
-      <i class="fa fa-box"></i> My orders
+      <i class="fa fa-box"></i> {% trans "My orders" %}
     </a>
 
     <a class="acc-link {% if request.resolver_match.url_name == 'transactions' %}active{% endif %}"
        href="{% url 'transactions' %}">
-      <i class="fa fa-credit-card"></i> Transactions
+      <i class="fa fa-credit-card"></i> {% trans "Transactions" %}
     </a>
   </nav>
 
   <div class="acc-footer">
     <a class="btn btn-soft btn-block" href="{% url 'logout' %}">
-      <i class="fa fa-power-off mr-2"></i>Log out
+      <i class="fa fa-power-off mr-2"></i>{% trans "Log out" %}
     </a>
   </div>
 </div>

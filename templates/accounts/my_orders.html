@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static i18n %}
 
-{% block title %}My orders{% endblock %}
+{% block title %}{% trans "My orders" %}{% endblock %}
 
 {% block content %}
 <section class="section-content padding-y">
@@ -17,12 +17,12 @@
 
           <div class="dash-top">
             <div>
-              <h1 class="dash-title">My orders</h1>
-              <div class="text-muted">All your completed purchases.</div>
+              <h1 class="dash-title">{% trans "My orders" %}</h1>
+              <div class="text-muted">{% trans "All your completed purchases." %}</div>
             </div>
             <div class="dash-actions">
               <a href="{% url 'store' %}" class="btn btn-soft">
-                <i class="fa fa-bag-shopping mr-2"></i>Shop
+                <i class="fa fa-bag-shopping mr-2"></i>{% trans "Shop" %}
               </a>
             </div>
           </div>
@@ -35,11 +35,11 @@
                   <table class="table dash-table">
                     <thead>
                       <tr>
-                        <th>Order</th>
-                        <th>Date</th>
-                        <th>Status</th>
-                        <th class="text-right">Total</th>
-                        <th class="text-right">Action</th>
+                        <th>{% trans "Order" %}</th>
+                        <th>{% trans "Date" %}</th>
+                        <th>{% trans "Status" %}</th>
+                        <th class="text-right">{% trans "Total" %}</th>
+                        <th class="text-right">{% trans "Action" %}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -48,7 +48,7 @@
                           <td>
                             <div class="ord-id">#{{ o.order_number }}</div>
                             <div class="text-muted" style="font-size:12px;">
-                              {% if o.payment %}{{ o.payment.payment_method }}{% else %}Payment pending{% endif %}
+                              {% if o.payment %}{{ o.payment.payment_method }}{% else %}{% trans "Payment pending" %}{% endif %}
                             </div>
                           </td>
 
@@ -56,20 +56,20 @@
 
                           <td>
                             {% if o.status == 'Completed' %}
-                              <span class="badge-soft badge-soft-success">Completed</span>
+                              <span class="badge-soft badge-soft-success">{% trans "Completed" %}</span>
                             {% elif o.status == 'Cancelled' %}
-                              <span class="badge-soft badge-soft-danger">Cancelled</span>
+                              <span class="badge-soft badge-soft-danger">{% trans "Cancelled" %}</span>
                             {% elif o.status == 'Accepted' %}
-                              <span class="badge-soft badge-soft-info">Packed</span>
+                              <span class="badge-soft badge-soft-info">{% trans "Packed" %}</span>
                             {% else %}
-                              <span class="badge-soft badge-soft-warning">Confirmed</span>
+                              <span class="badge-soft badge-soft-warning">{% trans "Confirmed" %}</span>
                             {% endif %}
                           </td>
 
                           <td class="text-right" style="font-weight:900;">€ {{ o.order_total|floatformat:2 }}</td>
 
                           <td class="text-right">
-                            <a href="{% url 'order_detail' o.order_number %}" class="btn btn-soft btn-sm">Details</a>
+                            <a href="{% url 'order_detail' o.order_number %}" class="btn btn-soft btn-sm">{% trans "Details" %}</a>
                           </td>
                         </tr>
                       {% endfor %}
@@ -105,9 +105,9 @@
               {% else %}
                 <div class="dash-empty">
                   <div class="dash-empty-icon"><i class="fa fa-box-open"></i></div>
-                  <h4>No orders yet</h4>
-                  <p class="text-muted mb-3">Start shopping to see your orders here.</p>
-                  <a href="{% url 'store' %}" class="btn btn-primary">Browse products</a>
+                  <h4>{% trans "No orders yet" %}</h4>
+                  <p class="text-muted mb-3">{% trans "Start shopping to see your orders here." %}</p>
+                  <a href="{% url 'store' %}" class="btn btn-primary">{% trans "Browse products" %}</a>
                 </div>
               {% endif %}
 

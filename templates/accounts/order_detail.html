@@ -20,21 +20,21 @@
           <div class="dash-top">
             <div>
               <div class="d-flex flex-wrap align-items-center gap-2 mb-1 ">
-                <h1 class="dash-title mb-0">Order #{{ order.order_number }}</h1>
+                <h1 class="dash-title mb-0">{% blocktrans with n=order.order_number %}Order #{{ n }}{% endblocktrans %}</h1>
 
                 {% if order.status == 'Completed' %}
-                  <span class="badge-soft badge-soft-success ml-2">Completed</span>
+                  <span class="badge-soft badge-soft-success ml-2">{% trans "Completed" %}</span>
                 {% elif order.status == 'Cancelled' %}
-                  <span class="badge-soft badge-soft-danger ml-2">Cancelled</span>
+                  <span class="badge-soft badge-soft-danger ml-2">{% trans "Cancelled" %}</span>
                 {% elif order.status == 'Accepted' %}
-                  <span class="badge-soft badge-soft-info ml-2">Packed</span>
+                  <span class="badge-soft badge-soft-info ml-2">{% trans "Packed" %}</span>
                 {% else %}
-                  <span class="badge-soft badge-soft-warning ml-2">Confirmed</span>
+                  <span class="badge-soft badge-soft-warning ml-2">{% trans "Confirmed" %}</span>
                 {% endif %}
               </div>
 
               <div class="text-muted">
-                Placed on {{ order.created_at|date:"M d, Y" }}
+                {% blocktrans with d=order.created_at|date:"M d, Y" %}Placed on {{ d }}{% endblocktrans %}
                 {% if order.payment and order.payment.payment_method %}
                   <span class="mx-2">•</span>
                   <span class="chip">{{ order.payment.payment_method }}</span>
@@ -64,7 +64,7 @@
               <div class="od-grid od-grid-premium">
                 <!-- Delivery -->
                 <div class="od-box od-box-premium">
-                  <div class="od-title">Delivery</div>
+                  <div class="od-title">{% trans "Delivery" %}</div>
                   <div class="od-strong">{{ order.full_name }}</div>
 
                   <div class="od-muted">{{ order.full_address }}</div>
@@ -80,29 +80,29 @@
 
                 <!-- Payment -->
                 <div class="od-box od-box-premium">
-                  <div class="od-title">Payment</div>
+                  <div class="od-title">{% trans "Payment" %}</div>
 
                   {% if order.payment %}
                     <div class="od-strong">{{ order.payment.payment_method }}</div>
-                    <div class="od-muted">Transaction: {{ order.payment.payment_id }}</div>
+                    <div class="od-muted">{% blocktrans with id=order.payment.payment_id %}Transaction: {{ id }}{% endblocktrans %}</div>
                   {% else %}
-                    <div class="od-strong">Pending</div>
-                    <div class="od-muted">No payment attached.</div>
+                    <div class="od-strong">{% trans "Pending" %}</div>
+                    <div class="od-muted">{% trans "No payment attached." %}</div>
                   {% endif %}
 
                   <div class="dash-divider"></div>
 
                   <div class="od-lines">
                     <div class="line">
-                      <span class="text-muted">Subtotal</span>
+                      <span class="text-muted">{% trans "Subtotal" %}</span>
                       <span>€ {{ subtotal|floatformat:2 }}</span>
                     </div>
                     <div class="line">
-                      <span class="text-muted">Tax</span>
+                      <span class="text-muted">{% trans "Tax" %}</span>
                       <span>€ {{ order.tax|floatformat:2 }}</span>
                     </div>
                     <div class="line grand">
-                      <span>Grand total</span>
+                      <span>{% trans "Grand total" %}</span>
                       <span>€ {{ order.order_total|floatformat:2 }}</span>
                     </div>
                   </div>
@@ -116,9 +116,9 @@
                 <table class="table dash-table align-middle">
                   <thead>
                     <tr>
-                      <th>Item</th>
-                      <th style="width:90px;" class="text-center">Qty</th>
-                      <th style="width:160px;" class="text-right">Price</th>
+                      <th>{% trans "Item" %}</th>
+                      <th style="width:90px;" class="text-center">{% trans "Qty" %}</th>
+                      <th style="width:160px;" class="text-right">{% trans "Price" %}</th>
                     </tr>
                   </thead>
                   <tbody>
