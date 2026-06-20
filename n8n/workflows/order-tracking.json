@@ -1,25 +1,27 @@
 {
-  "name": "Glitchy - Shipping Update",
+  "name": "Glitchy - Order Tracking Available",
+  "active": true,
+  "settings": {},
   "nodes": [
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "order-shipped",
+        "path": "order-tracking_available",
         "responseMode": "responseNode",
         "options": {
           "rawBody": true
         },
         "authentication": "headerAuth"
       },
-      "id": "wh-order-shipped",
-      "name": "Webhook order.shipped",
+      "id": "eb274278-a8b1-402b-a9fd-11279d77f52e",
+      "name": "Webhook order.tracking_available",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
         200,
-        240
+        440
       ],
-      "webhookId": "glitchy-order-shipped",
+      "webhookId": "698d4df5-09b8-4007-bc42-3e57cba70057",
       "credentials": {
         "httpHeaderAuth": {
           "name": "Glitchy n8n Header Auth"
@@ -30,7 +32,7 @@
       "parameters": {
         "jsCode": "// Best-effort HMAC verification. Django signs X-Signature = HMAC-SHA256(\n// N8N_SHARED_SECRET, raw compact JSON body). NOTE: n8n's raw-body access varies\n// by version, so this is observability-only and does NOT block delivery — enforce\n// signatures with n8n native Header Auth or a network control in production.\nconst crypto = require('crypto');\nconst secret = $env.N8N_SHARED_SECRET || '';\nconst items = $input.all();\nlet headers = {};\ntry { headers = ($input.first().json.headers) || {}; } catch (e) {}\nconst sig = headers['x-signature'] || headers['X-Signature'] || '';\nlet raw = '';\ntry {\n  const j = $input.first().json;\n  raw = (typeof j.body === 'string') ? j.body : JSON.stringify(j.body != null ? j.body : j);\n} catch (e) { raw = ''; }\nlet valid = false;\ntry {\n  if (secret && sig && raw) {\n    const expected = crypto.createHmac('sha256', secret).update(raw, 'utf8').digest('hex');\n    valid = (expected.length === sig.length) &&\n            crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(sig));\n  }\n} catch (e) { valid = false; }\nreturn items.map(it => ({ json: Object.assign({}, it.json, { _signature_valid: valid }) }));\n"
       },
-      "id": "code-verify",
+      "id": "f559d692-4f91-4f7b-9ec9-bc29a6b86302",
       "name": "Verify HMAC",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -43,7 +45,7 @@
       "parameters": {
         "jsCode": "// Multilingual shipping/tracking email.\nconst p = $input.first().json;\nconst lang = (p.language || 'en').toLowerCase();\nconst d = p.data || {};\nconst isTracking = (p.event === 'order.tracking_available');\n\nconst t = {\n  en: { subjShip: `Your order ${d.order_number} has shipped`, subjTrack: `Tracking available for order ${d.order_number}`, hi: `Hi ${d.first_name || ''},`, shipped: 'Good news — your order is on its way!', tracking: 'Your tracking details are now available.', track_btn: 'Track your parcel', track_no: 'Tracking number', eta: 'Estimated delivery', days: 'business days', thanks: 'Thank you for shopping with Glitchy.' },\n  it: { subjShip: `Il tuo ordine ${d.order_number} è stato spedito`, subjTrack: `Tracking disponibile per l’ordine ${d.order_number}`, hi: `Ciao ${d.first_name || ''},`, shipped: 'Buone notizie — il tuo ordine è in viaggio!', tracking: 'I dettagli di tracciamento sono ora disponibili.', track_btn: 'Traccia il pacco', track_no: 'Numero di tracking', eta: 'Consegna stimata', days: 'giorni lavorativi', thanks: 'Grazie per aver acquistato da Glitchy.' },\n  fr: { subjShip: `Votre commande ${d.order_number} a été expédiée`, subjTrack: `Suivi disponible pour la commande ${d.order_number}`, hi: `Bonjour ${d.first_name || ''},`, shipped: 'Bonne nouvelle — votre commande est en route !', tracking: 'Les informations de suivi sont maintenant disponibles.', track_btn: 'Suivre mon colis', track_no: 'Numéro de suivi', eta: 'Livraison estimée', days: 'jours ouvrés', thanks: 'Merci d’avoir choisi Glitchy.' }\n}[lang];\nconst L = t || { subjShip: `Your order ${d.order_number} has shipped`, subjTrack: `Tracking available for order ${d.order_number}`, hi: `Hi ${d.first_name || ''},`, shipped: 'Good news — your order is on its way!', tracking: 'Your tracking details are now available.', track_btn: 'Track your parcel', track_no: 'Tracking number', eta: 'Estimated delivery', days: 'business days', thanks: 'Thank you for shopping with Glitchy.' };\n\nconst subject = isTracking ? L.subjTrack : L.subjShip;\nconst lead = isTracking ? L.tracking : L.shipped;\nconst ship = d.shipping || {};\nconst eta = (ship.min_days != null && ship.max_days != null) ? `${ship.min_days}–${ship.max_days} ${L.days}` : '';\nconst btn = d.tracking_url ? `<p style=\"margin:18px 0\"><a href=\"${d.tracking_url}\" style=\"background:#111;color:#fff;padding:10px 18px;text-decoration:none;border-radius:6px;display:inline-block\">${L.track_btn}</a></p>` : '';\nconst tno = d.tracking_number ? `<p><strong>${L.track_no}:</strong> ${d.tracking_number}</p>` : '';\n\nconst html = `<div style=\"font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:auto;color:#222\">\n<h2 style=\"color:#111\">${subject}</h2>\n<p>${L.hi}</p>\n<p>${lead}</p>\n${tno}\n${btn}\n${eta ? `<p><strong>${L.eta}:</strong> ${eta}</p>` : ''}\n<p style=\"margin-top:20px;color:#666\">${L.thanks}</p>\n</div>`;\n\nreturn [{ json: { to: p.recipient, subject, html } }];"
       },
-      "id": "code-build-email",
+      "id": "2be30776-a8c8-4d41-9f9c-6ee299f3e81a",
       "name": "Build Email",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -60,7 +62,7 @@
         "message": "={{ $json.html }}",
         "options": {}
       },
-      "id": "gmail-send",
+      "id": "5b396ca8-b3da-4287-aaf8-98e894fd81c0",
       "name": "Send Email (Gmail)",
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2,
@@ -87,7 +89,7 @@
         "responseMode": "responseNode",
         "authentication": "headerAuth"
       },
-      "id": "respond-200",
+      "id": "b1c35834-771f-417a-addc-a56689ec6756",
       "name": "Respond 200",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
@@ -103,7 +105,7 @@
     }
   ],
   "connections": {
-    "Webhook order.shipped": {
+    "Webhook order.tracking_available": {
       "main": [
         [
           {
@@ -148,6 +150,5 @@
       ]
     }
   },
-  "settings": {},
-  "active": false
+  "versionId": "f809474c-47d9-4243-adb1-f1b8c9a1dbd9"
 }
