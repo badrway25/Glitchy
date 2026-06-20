@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static i18n %}
+{% load static i18n uikit %}
 {% block title %}{{ single_product.product_name }} • {{ SITE_NAME }}{% endblock %}
 
 {% block content %}
@@ -62,7 +62,7 @@
 
 
         <main class="col-md-6">
-          <form action="{% url 'add_cart' single_product.id %}" method="POST">
+          <form action="{% url 'add_cart' single_product.id %}" method="POST" id="pdpForm">
             {% csrf_token %}
 
             <div class="pdp-body pdp-sticky">
@@ -231,25 +231,17 @@
                   <i class="fas fa-chevron-down ml-1 small"></i>
                 </button>
                 <div class="collapse mt-3" id="pdpMore">
-                  <ul class="pdp-more-list list-unstyled" style="font-size:.9rem;color:#475569;">
-                    {% if single_product.composition %}
-                      <li class="mb-2"><strong>{% trans "Composition" %}:</strong> {{ single_product.composition }}</li>
-                    {% else %}
-                      <li class="mb-2"><strong>{% trans "Composition" %}:</strong> {% trans "Premium quality materials." %}</li>
-                    {% endif %}
+                  <ul class="pdp-more-list list-unstyled" style="font-size:.9rem;color:var(--muted);">
+                    <li class="mb-2">{% icon "leaf" "ic" 17 %}<span><strong>{% trans "Composition" %}:</strong> {% if single_product.composition %}{{ single_product.composition }}{% else %}{% trans "Premium quality materials." %}{% endif %}</span></li>
                     {% if single_product.fit_notes %}
-                      <li class="mb-2"><strong>{% trans "Fit" %}:</strong> {{ single_product.fit_notes }}</li>
+                      <li class="mb-2">{% icon "ruler" "ic" 17 %}<span><strong>{% trans "Fit" %}:</strong> {{ single_product.fit_notes }}</span></li>
                     {% endif %}
-                    {% if single_product.care_instructions %}
-                      <li class="mb-2"><strong>{% trans "Care" %}:</strong> {{ single_product.care_instructions }}</li>
-                    {% else %}
-                      <li class="mb-2"><strong>{% trans "Care" %}:</strong> {% trans "Machine wash cold, do not tumble dry." %}</li>
-                    {% endif %}
-                    <li class="mb-2"><strong>{% trans "Sizes" %}:</strong>
-                      {% for s in single_product.variation_set.sizes %}{{ s.variation_value|upper }}{% if not forloop.last %}, {% endif %}{% empty %}{% trans "One size" %}{% endfor %}
+                    <li class="mb-2">{% icon "spark" "ic" 17 %}<span><strong>{% trans "Care" %}:</strong> {% if single_product.care_instructions %}{{ single_product.care_instructions }}{% else %}{% trans "Machine wash cold, do not tumble dry." %}{% endif %}</span></li>
+                    <li class="mb-2">{% icon "ruler" "ic" 17 %}<span><strong>{% trans "Sizes" %}:</strong>
+                      {% for s in single_product.variation_set.sizes %}{{ s.variation_value|upper }}{% if not forloop.last %}, {% endif %}{% empty %}{% trans "One size" %}{% endfor %}</span>
                     </li>
-                    <li class="mb-2"><strong>{% trans "Shipping" %}:</strong> {% blocktrans with c=ship_country_name %}Calculated at checkout for {{ c }}.{% endblocktrans %}{% if shipping_quote %} {{ shipping_quote.eta_label }}.{% endif %}</li>
-                    <li><strong>{% trans "Returns" %}:</strong> <a href="{% url 'returns:policy' %}">{% blocktrans with d=RETURN_WINDOW_DAYS %}Free returns within {{ d }} days{% endblocktrans %}</a></li>
+                    <li class="mb-2">{% icon "truck" "ic" 17 %}<span><strong>{% trans "Shipping" %}:</strong> {% blocktrans with c=ship_country_name %}Calculated at checkout for {{ c }}.{% endblocktrans %}{% if shipping_quote %} {{ shipping_quote.eta_label }}.{% endif %}</span></li>
+                    <li>{% icon "returns" "ic" 17 %}<span><strong>{% trans "Returns" %}:</strong> <a href="{% url 'returns:policy' %}">{% blocktrans with d=RETURN_WINDOW_DAYS %}Free returns within {{ d }} days{% endblocktrans %}</a></span></li>
                   </ul>
                 </div>
               </div>
@@ -260,6 +252,35 @@
 
       </div>
     </div>
+
+    <!-- You may also like -->
+    {% if related_products %}
+    <section class="ymal-wrap mt-5">
+      <div class="d-flex align-items-end justify-content-between mb-3">
+        <div>
+          <div class="lux-eyebrow mb-1">{% trans "Complete the look" %}</div>
+          <h3 class="section-title m-0">{% trans "You may also like" %}</h3>
+        </div>
+      </div>
+      <div class="row g-3 g-md-4">
+        {% for p in related_products %}
+          <div class="col-6 col-lg-3 d-flex">
+            <div class="ymal-card h-100 w-100">
+              <a href="{{ p.get_url }}" class="p-media d-block" style="aspect-ratio:1/1;">
+                <img src="{% if p.cover_image %}{{ p.cover_image }}{% else %}{% static 'images/placeholder.png' %}{% endif %}"
+                     alt="{{ p.product_name }}" loading="lazy" decoding="async"
+                     style="width:100%;height:100%;object-fit:cover;">
+              </a>
+              <div class="p-3">
+                <a href="{{ p.get_url }}" class="product-title d-block mb-1" style="font-size:.9rem;">{{ p.product_name|truncatechars:42 }}</a>
+                <div class="price" style="font-size:1rem;">{{ CURRENCY_SYMBOL }} {{ p.price }}</div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
 
     <!-- Reviews -->
 <section id="reviews" class="reviews-wrap mt-4">
@@ -436,5 +457,18 @@
 </div>  <!-- /container -->
 </div>  <!-- /container-fluid -->
 </section>
+
+<!-- Mobile sticky add-to-cart -->
+<div class="pdp-sticky-cta">
+  <span class="psc-price">{{ CURRENCY_SYMBOL }} {{ single_product.price }}</span>
+  {% if single_product.stock <= 0 or not single_product.is_available %}
+    <button type="button" class="btn btn-primary" disabled>{% trans "Out of stock" %}</button>
+  {% else %}
+    <button type="submit" form="pdpForm" class="btn btn-primary">
+      {% icon "bag" "ic" 16 %} <span class="ml-1">{% trans "Add to Cart" %}</span>
+    </button>
+  {% endif %}
+</div>
+<script>document.body.classList.add('has-sticky-cta');</script>
 
 {% endblock %}
