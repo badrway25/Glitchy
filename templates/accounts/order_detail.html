@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static i18n %}
 
-{% block title %}Order details{% endblock %}
+{% block title %}{% trans "Order details" %} • {{ SITE_NAME }}{% endblock %}
 
 {% block content %}
 <section class="section-content padding-y">
@@ -44,10 +44,15 @@
 
             <div class="dash-actions">
               <a href="{% url 'invoice_pdf' order.order_number %}" class="btn btn-soft">
-                <i class="fa fa-file-pdf mr-2"></i>PDF invoice
+                <i class="fa fa-file-pdf mr-2"></i>{% trans "PDF invoice" %}
               </a>
+              {% if order.is_ordered %}
+                <a href="{% url 'returns:request' order.order_number %}" class="btn btn-soft">
+                  <i class="fa fa-undo mr-2"></i>{% trans "Request a return" %}
+                </a>
+              {% endif %}
               <a href="{% url 'my_orders' %}" class="btn btn-primary">
-                Back to orders
+                {% trans "Back to orders" %}
               </a>
             </div>
           </div>

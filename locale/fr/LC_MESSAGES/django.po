@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: greatkart 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-20 11:27+0200\n"
+"POT-Creation-Date: 2026-06-20 11:44+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -165,88 +165,90 @@ msgstr "Veuillez saisir une adresse e-mail valide."
 
 #: .\notifications\views.py:47
 msgid "Thanks for subscribing! Check your inbox to confirm."
-msgstr "Merci de votre inscription ! Consultez votre boîte de réception pour confirmer."
+msgstr ""
+"Merci de votre inscription ! Consultez votre boîte de réception pour "
+"confirmer."
 
-#: .\orders\admin.py:22
+#: .\orders\admin.py:23
 msgid "Accept order and send to Printify"
 msgstr "Accepter la commande et l'envoyer à Printify"
 
-#: .\orders\admin.py:34
+#: .\orders\admin.py:35
 msgid "Refresh Printify status/tracking"
 msgstr "Actualiser le statut/suivi Printify"
 
-#: .\orders\admin.py:39
+#: .\orders\admin.py:40
 msgid "Refreshed Printify statuses."
 msgstr "Statuts Printify actualisés."
 
-#: .\orders\admin.py:43
+#: .\orders\admin.py:44
 msgid "margin"
 msgstr "marge"
 
-#: .\orders\admin.py:47
+#: .\orders\admin.py:48
 msgid "Positive"
 msgstr "Positive"
 
-#: .\orders\admin.py:47
+#: .\orders\admin.py:48
 msgid "Negative / loss"
 msgstr "Négative / perte"
 
-#: .\orders\admin.py:79 .\orders\admin.py:93
+#: .\orders\admin.py:80 .\orders\admin.py:94
 msgid "Customer"
 msgstr "Client"
 
-#: .\orders\admin.py:80
+#: .\orders\admin.py:81
 msgid "Shipping address"
 msgstr "Adresse de livraison"
 
-#: .\orders\admin.py:84
+#: .\orders\admin.py:85
 msgid "Money & margin"
 msgstr "Chiffre d'affaires et marge"
 
-#: .\orders\admin.py:88
+#: .\orders\admin.py:89
 msgid "Printify fulfilment"
 msgstr "Traitement Printify"
 
-#: .\orders\admin.py:95
+#: .\orders\admin.py:96
 msgid "Guest"
 msgstr "Invité"
 
-#: .\orders\admin.py:97 .\templates\notifications\email\transactional.html:91
+#: .\orders\admin.py:98 .\templates\notifications\email\transactional.html:91
 msgid "Total"
 msgstr "Total"
 
-#: .\orders\admin.py:101 .\orders\admin.py:130
+#: .\orders\admin.py:102 .\orders\admin.py:131
 #: .\templates\admin\orders\order_changelist.html:20
 msgid "Net margin"
 msgstr "Marge nette"
 
-#: .\orders\admin.py:110 .\orders\admin.py:140
+#: .\orders\admin.py:111 .\orders\admin.py:141
 msgid "Margin %"
 msgstr "Marge %"
 
-#: .\orders\admin.py:114 .\orders\admin.py:129 .\returns\models.py:23
+#: .\orders\admin.py:115 .\orders\admin.py:130 .\returns\models.py:23
 #: .\templates\admin\orders\order_changelist.html:24
 #: .\templates\returns\status.html:32
 msgid "Refunded"
 msgstr "Remboursé"
 
-#: .\orders\admin.py:121
+#: .\orders\admin.py:122
 msgid "Margin breakdown"
 msgstr "Détail de la marge"
 
-#: .\orders\admin.py:125
+#: .\orders\admin.py:126
 msgid "Revenue (excl. tax)"
 msgstr "Chiffre d'affaires (hors taxes)"
 
-#: .\orders\admin.py:126
+#: .\orders\admin.py:127
 msgid "Production cost"
 msgstr "Coût de production"
 
-#: .\orders\admin.py:127
+#: .\orders\admin.py:128
 msgid "Shipping cost"
 msgstr "Coût de livraison"
 
-#: .\orders\admin.py:128
+#: .\orders\admin.py:129
 msgid "Payment fee"
 msgstr "Frais de paiement"
 
@@ -270,7 +272,8 @@ msgstr "Récupérer maintenant les statuts de commande Printify"
 #: .\printify_integration\admin.py:39
 #, python-format
 msgid "Order pull finished: %(u)d updated (errors %(e)d)."
-msgstr "Récupération des commandes terminée : %(u)d mise(s) à jour (erreurs %(e)d)."
+msgstr ""
+"Récupération des commandes terminée : %(u)d mise(s) à jour (erreurs %(e)d)."
 
 #: .\printify_integration\models.py:13
 msgid "Products sync"
@@ -365,7 +368,8 @@ msgstr "Motif du retour"
 
 #: .\returns\forms.py:15
 msgid "Tell us why you'd like to return your order (optional)."
-msgstr "Indiquez-nous pourquoi vous souhaitez retourner votre commande (facultatif)."
+msgstr ""
+"Indiquez-nous pourquoi vous souhaitez retourner votre commande (facultatif)."
 
 #: .\returns\forms.py:30
 msgid "Please enter the email used for this order."
@@ -410,7 +414,9 @@ msgstr "Cet e-mail ne correspond pas à cette commande."
 
 #: .\returns\views.py:78
 msgid "Your return request has been submitted. We'll be in touch shortly."
-msgstr "Votre demande de retour a bien été envoyée. Nous vous recontacterons prochainement."
+msgstr ""
+"Votre demande de retour a bien été envoyée. Nous vous recontacterons "
+"prochainement."
 
 #: .\shipping\constants.py:7
 msgid "Italy"
@@ -518,6 +524,27 @@ msgstr "Resynchroniser les produits sélectionnés depuis Printify"
 #, python-format
 msgid "Resynced %(ok)d product(s), %(err)d error(s)."
 msgstr "%(ok)d produit(s) resynchronisé(s), %(err)d erreur(s)."
+
+#: .\templates\accounts\order_detail.html:4
+#, fuzzy
+#| msgid "Orders"
+msgid "Order details"
+msgstr "Commandes"
+
+#: .\templates\accounts\order_detail.html:47
+msgid "PDF invoice"
+msgstr "Facture PDF"
+
+#: .\templates\accounts\order_detail.html:51 .\templates\returns\request.html:3
+#: .\templates\returns\request.html:16
+msgid "Request a return"
+msgstr "Demander un retour"
+
+#: .\templates\accounts\order_detail.html:55
+#, fuzzy
+#| msgid "Back to home"
+msgid "Back to orders"
+msgstr "Retour à l'accueil"
 
 #: .\templates\admin\orders\order_changelist.html:5
 msgid "Orders"
@@ -670,7 +697,8 @@ msgstr "Retours et remboursements"
 
 #: .\templates\includes\footer.html:58
 #: .\templates\notifications\email\transactional.html:89
-#: .\templates\store\cart.html:137 .\templates\store\checkout.html:178
+#: .\templates\orders\payments.html:115 .\templates\store\cart.html:137
+#: .\templates\store\checkout.html:178
 #: .\templates\store\product_detail.html:251
 msgid "Shipping"
 msgstr "Livraison"
@@ -826,11 +854,13 @@ msgstr "Bonne nouvelle — votre commande <strong>#%(n)s</strong> est en route !
 #: .\templates\notifications\email\transactional.html:39
 #, python-format
 msgid "Here is an update on your order <strong>#%(n)s</strong>."
-msgstr "Voici une mise à jour concernant votre commande <strong>#%(n)s</strong>."
+msgstr ""
+"Voici une mise à jour concernant votre commande <strong>#%(n)s</strong>."
 
 #: .\templates\notifications\email\transactional.html:45
 msgid "We have received your return request and our team is reviewing it."
-msgstr "Nous avons bien reçu votre demande de retour et notre équipe l'examine."
+msgstr ""
+"Nous avons bien reçu votre demande de retour et notre équipe l'examine."
 
 #: .\templates\notifications\email\transactional.html:46
 msgid ""
@@ -889,13 +919,14 @@ msgid "Here is an update from our team."
 msgstr "Voici une mise à jour de notre équipe."
 
 #: .\templates\notifications\email\transactional.html:88
-#: .\templates\store\cart.html:51 .\templates\store\cart.html:135
-#: .\templates\store\checkout.html:176
+#: .\templates\orders\payments.html:114 .\templates\store\cart.html:51
+#: .\templates\store\cart.html:135 .\templates\store\checkout.html:176
 msgid "Subtotal"
 msgstr "Sous-total"
 
 #: .\templates\notifications\email\transactional.html:90
-#: .\templates\store\cart.html:140 .\templates\store\checkout.html:181
+#: .\templates\orders\payments.html:116 .\templates\store\cart.html:140
+#: .\templates\store\checkout.html:181
 msgid "Tax"
 msgstr "TVA"
 
@@ -923,11 +954,29 @@ msgstr "Voir le statut du retour"
 #: .\templates\notifications\email\transactional.html:116
 #, python-format
 msgid "Not quite right? You can return your order within %(d)s days."
-msgstr "Pas tout à fait ce qu'il vous fallait ? Vous pouvez retourner votre commande sous %(d)s jours."
+msgstr ""
+"Pas tout à fait ce qu'il vous fallait ? Vous pouvez retourner votre commande "
+"sous %(d)s jours."
 
 #: .\templates\notifications\email\transactional.html:118
 msgid "Premium fashion, printed on demand."
 msgstr "Mode premium, imprimée à la demande."
+
+#: .\templates\orders\payments.html:4
+#, fuzzy
+#| msgid "Payments"
+msgid "Payment"
+msgstr "Paiements"
+
+#: .\templates\orders\payments.html:115 .\templates\store\cart.html:138
+#: .\templates\store\checkout.html:179
+msgid "Free"
+msgstr "Gratuite"
+
+#: .\templates\orders\payments.html:117 .\templates\store\cart.html:141
+#: .\templates\store\checkout.html:182
+msgid "Grand total"
+msgstr "Total général"
 
 #: .\templates\returns\policy.html:10 .\templates\returns\request.html:10
 #: .\templates\store\product_detail.html:13 .\templates\store\store.html:22
@@ -972,11 +1021,14 @@ msgstr "Sélectionnez les articles et indiquez-nous le motif (facultatif)."
 
 #: .\templates\returns\policy.html:35
 msgid "We review your request and email you the next steps."
-msgstr "Nous examinons votre demande et vous envoyons les étapes suivantes par e-mail."
+msgstr ""
+"Nous examinons votre demande et vous envoyons les étapes suivantes par e-"
+"mail."
 
 #: .\templates\returns\policy.html:36
 msgid "Once the return is approved and received, we issue your refund."
-msgstr "Une fois le retour approuvé et reçu, nous procédons à votre remboursement."
+msgstr ""
+"Une fois le retour approuvé et reçu, nous procédons à votre remboursement."
 
 #: .\templates\returns\policy.html:43
 msgid "Refunds"
@@ -995,15 +1047,13 @@ msgstr ""
 
 #: .\templates\returns\policy.html:51
 msgid "Need help? Contact our support team and we'll be glad to assist."
-msgstr "Besoin d'aide ? Contactez notre équipe d'assistance, nous serons ravis de vous aider."
+msgstr ""
+"Besoin d'aide ? Contactez notre équipe d'assistance, nous serons ravis de "
+"vous aider."
 
 #: .\templates\returns\policy.html:55
 msgid "Go to my orders"
 msgstr "Accéder à mes commandes"
-
-#: .\templates\returns\request.html:3 .\templates\returns\request.html:16
-msgid "Request a return"
-msgstr "Demander un retour"
 
 #: .\templates\returns\request.html:22
 msgid "View status"
@@ -1157,14 +1207,6 @@ msgstr "Paiement sécurisé"
 msgid "Protected"
 msgstr "Protégé"
 
-#: .\templates\store\cart.html:138 .\templates\store\checkout.html:179
-msgid "Free"
-msgstr "Gratuite"
-
-#: .\templates\store\cart.html:141 .\templates\store\checkout.html:182
-msgid "Grand total"
-msgstr "Total général"
-
 #: .\templates\store\cart.html:154
 msgid "Estimated delivery"
 msgstr "Livraison estimée"
@@ -1234,7 +1276,9 @@ msgstr "Par défaut"
 
 #: .\templates\store\checkout.html:69
 msgid "Pick one to autofill your billing details."
-msgstr "Choisissez-en une pour remplir automatiquement vos informations de facturation."
+msgstr ""
+"Choisissez-en une pour remplir automatiquement vos informations de "
+"facturation."
 
 #: .\templates\store\checkout.html:75
 msgid "First name"
@@ -1294,7 +1338,8 @@ msgstr "Enregistrer / mettre à jour mon adresse par défaut"
 
 #: .\templates\store\checkout.html:134
 msgid "You can create an account after checkout to track your order."
-msgstr "Vous pourrez créer un compte après la commande pour suivre votre commande."
+msgstr ""
+"Vous pourrez créer un compte après la commande pour suivre votre commande."
 
 #: .\templates\store\checkout.html:167
 msgid "each"
@@ -1302,7 +1347,9 @@ msgstr "l'unité"
 
 #: .\templates\store\checkout.html:191
 msgid "We don't ship to this country yet — choose another at checkout."
-msgstr "Nous ne livrons pas encore dans ce pays — choisissez-en un autre lors du paiement."
+msgstr ""
+"Nous ne livrons pas encore dans ce pays — choisissez-en un autre lors du "
+"paiement."
 
 #: .\templates\store\checkout.html:197
 msgid "Continue to payment"
