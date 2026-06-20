@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static i18n %}
 
-{% block title %}Payment{% endblock %}
+{% block title %}{% trans "Payment" %} • {{ SITE_NAME }}{% endblock %}
 
 {% block content %}
 <section class="section-content padding-y">
@@ -70,7 +70,7 @@
             {% for cart_item in cart_items %}
               <div class="mini-row">
                 <a class="mini-thumb" href="{{ cart_item.product.get_url }}">
-                  <img src="{{ cart_item.product.images.url }}" alt="{{ cart_item.product.product_name }}">
+                  {% if cart_item.product.images %}<img src="{{ cart_item.product.images.url }}" alt="{{ cart_item.product.product_name }}">{% endif %}
                 </a>
 
                 <div class="mini-info">
@@ -111,9 +111,10 @@
           </div>
 
           <div class="summary-lines">
-            <div class="line"><span>Total</span><span>€ {{ total }}</span></div>
-            <div class="line"><span>Tax</span><span>€ {{ tax }}</span></div>
-            <div class="line grand"><span>Grand total</span><span>€ {{ grand_total }}</span></div>
+            <div class="line"><span>{% trans "Subtotal" %}</span><span>{{ CURRENCY_SYMBOL }} {{ total }}</span></div>
+            <div class="line"><span>{% trans "Shipping" %}</span><span>{% if shipping_cost %}{{ CURRENCY_SYMBOL }} {{ shipping_cost }}{% else %}{% trans "Free" %}{% endif %}</span></div>
+            <div class="line"><span>{% trans "Tax" %}</span><span>{{ CURRENCY_SYMBOL }} {{ tax }}</span></div>
+            <div class="line grand"><span>{% trans "Grand total" %}</span><span>{{ CURRENCY_SYMBOL }} {{ grand_total }}</span></div>
           </div>
 
           <div class="pay-method">

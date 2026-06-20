@@ -1,0 +1,1506 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: greatkart 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-06-20 11:27+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: .\greatkart\settings.py:165
+msgid "English"
+msgstr "Inglese"
+
+#: .\greatkart\settings.py:166
+msgid "Italiano"
+msgstr "Italiano"
+
+#: .\greatkart\settings.py:167
+msgid "Français"
+msgstr "Francese"
+
+#: .\notifications\admin.py:19 .\printify_integration\admin.py:17
+#: .\returns\admin.py:40
+msgid "Status"
+msgstr "Stato"
+
+#: .\notifications\admin.py:28
+msgid "Resend selected events to n8n"
+msgstr "Invia di nuovo gli eventi selezionati a n8n"
+
+#: .\notifications\admin.py:35
+#, python-format
+msgid "Re-dispatched %(n)d event(s); %(s)d delivered."
+msgstr "Reinviati %(n)d eventi; %(s)d consegnati."
+
+#: .\notifications\admin.py:49 .\returns\admin.py:36
+#: .\templates\returns\request.html:17 .\templates\returns\status.html:9
+msgid "Order"
+msgstr "Ordine"
+
+#: .\notifications\emails.py:36
+msgid "Order confirmed"
+msgstr "Ordine confermato"
+
+#: .\notifications\emails.py:37
+msgid "Payment received"
+msgstr "Pagamento ricevuto"
+
+#: .\notifications\emails.py:38
+msgid "Your order is in production"
+msgstr "Il tuo ordine è in produzione"
+
+#: .\notifications\emails.py:39
+msgid "Your order has shipped"
+msgstr "Il tuo ordine è stato spedito"
+
+#: .\notifications\emails.py:40
+msgid "Your tracking is ready"
+msgstr "Il tuo tracciamento è pronto"
+
+#: .\notifications\emails.py:41
+msgid "We received your return request"
+msgstr "Abbiamo ricevuto la tua richiesta di reso"
+
+#: .\notifications\emails.py:42
+msgid "Your return has been approved"
+msgstr "Il tuo reso è stato approvato"
+
+#: .\notifications\emails.py:43
+msgid "Update on your return request"
+msgstr "Aggiornamento sulla tua richiesta di reso"
+
+#: .\notifications\emails.py:44
+msgid "Your refund is complete"
+msgstr "Il tuo rimborso è stato completato"
+
+#: .\notifications\emails.py:45
+msgid "You left something behind"
+msgstr "Hai dimenticato qualcosa"
+
+#: .\notifications\emails.py:46
+#, python-format
+msgid "Welcome to %(brand)s"
+msgstr "Benvenuto su %(brand)s"
+
+#: .\notifications\emails.py:47
+msgid "We received your message"
+msgstr "Abbiamo ricevuto il tuo messaggio"
+
+#: .\notifications\emails.py:49
+#, python-format
+msgid "Update from %(brand)s"
+msgstr "Aggiornamento da %(brand)s"
+
+#: .\notifications\models.py:18
+msgid "Pending"
+msgstr "In attesa"
+
+#: .\notifications\models.py:19
+msgid "Sent"
+msgstr "Inviato"
+
+#: .\notifications\models.py:20
+msgid "Failed"
+msgstr "Non riuscito"
+
+#: .\notifications\models.py:21
+msgid "Retrying"
+msgstr "Nuovo tentativo in corso"
+
+#: .\notifications\models.py:22
+msgid "Skipped (n8n disabled)"
+msgstr "Saltato (n8n disattivato)"
+
+#: .\notifications\models.py:47
+msgid "Outbound event"
+msgstr "Evento in uscita"
+
+#: .\notifications\models.py:48
+msgid "Outbound events (Django → n8n)"
+msgstr "Eventi in uscita (Django → n8n)"
+
+#: .\notifications\models.py:80 .\templates\home.html:88
+#: .\templates\store\product_detail.html:72 .\templates\store\store.html:252
+msgid "New"
+msgstr "Novità"
+
+#: .\notifications\models.py:81
+msgid "In progress"
+msgstr "In corso"
+
+#: .\notifications\models.py:82 .\returns\models.py:24
+msgid "Closed"
+msgstr "Chiuso"
+
+#: .\notifications\models.py:109
+msgid "Support message"
+msgstr "Messaggio di assistenza"
+
+#: .\notifications\models.py:110
+msgid "Support messages (inbound)"
+msgstr "Messaggi di assistenza (in arrivo)"
+
+#: .\notifications\models.py:134
+msgid "Newsletter subscriber"
+msgstr "Iscritto alla newsletter"
+
+#: .\notifications\models.py:135
+msgid "Newsletter subscribers"
+msgstr "Iscritti alla newsletter"
+
+#: .\notifications\views.py:25
+msgid "Please enter a valid email address."
+msgstr "Inserisci un indirizzo email valido."
+
+#: .\notifications\views.py:47
+msgid "Thanks for subscribing! Check your inbox to confirm."
+msgstr "Grazie per l'iscrizione! Controlla la tua casella di posta per confermare."
+
+#: .\orders\admin.py:22
+msgid "Accept order and send to Printify"
+msgstr "Accetta l'ordine e invia a Printify"
+
+#: .\orders\admin.py:34
+msgid "Refresh Printify status/tracking"
+msgstr "Aggiorna stato/tracciamento Printify"
+
+#: .\orders\admin.py:39
+msgid "Refreshed Printify statuses."
+msgstr "Stati Printify aggiornati."
+
+#: .\orders\admin.py:43
+msgid "margin"
+msgstr "margine"
+
+#: .\orders\admin.py:47
+msgid "Positive"
+msgstr "Positivo"
+
+#: .\orders\admin.py:47
+msgid "Negative / loss"
+msgstr "Negativo / perdita"
+
+#: .\orders\admin.py:79 .\orders\admin.py:93
+msgid "Customer"
+msgstr "Cliente"
+
+#: .\orders\admin.py:80
+msgid "Shipping address"
+msgstr "Indirizzo di spedizione"
+
+#: .\orders\admin.py:84
+msgid "Money & margin"
+msgstr "Importi e margine"
+
+#: .\orders\admin.py:88
+msgid "Printify fulfilment"
+msgstr "Evasione Printify"
+
+#: .\orders\admin.py:95
+msgid "Guest"
+msgstr "Ospite"
+
+#: .\orders\admin.py:97 .\templates\notifications\email\transactional.html:91
+msgid "Total"
+msgstr "Totale"
+
+#: .\orders\admin.py:101 .\orders\admin.py:130
+#: .\templates\admin\orders\order_changelist.html:20
+msgid "Net margin"
+msgstr "Margine netto"
+
+#: .\orders\admin.py:110 .\orders\admin.py:140
+msgid "Margin %"
+msgstr "Margine %"
+
+#: .\orders\admin.py:114 .\orders\admin.py:129 .\returns\models.py:23
+#: .\templates\admin\orders\order_changelist.html:24
+#: .\templates\returns\status.html:32
+msgid "Refunded"
+msgstr "Rimborsato"
+
+#: .\orders\admin.py:121
+msgid "Margin breakdown"
+msgstr "Dettaglio del margine"
+
+#: .\orders\admin.py:125
+msgid "Revenue (excl. tax)"
+msgstr "Ricavi (IVA esclusa)"
+
+#: .\orders\admin.py:126
+msgid "Production cost"
+msgstr "Costo di produzione"
+
+#: .\orders\admin.py:127
+msgid "Shipping cost"
+msgstr "Costo di spedizione"
+
+#: .\orders\admin.py:128
+msgid "Payment fee"
+msgstr "Commissione di pagamento"
+
+#: .\printify_integration\admin.py:25
+msgid "Duration"
+msgstr "Durata"
+
+#: .\printify_integration\admin.py:30
+msgid "Run a full Printify product sync now"
+msgstr "Esegui ora una sincronizzazione completa dei prodotti Printify"
+
+#: .\printify_integration\admin.py:33
+#, python-format
+msgid "Product sync finished: +%(c)d ~%(u)d (errors %(e)d)."
+msgstr "Sincronizzazione prodotti completata: +%(c)d ~%(u)d (errori %(e)d)."
+
+#: .\printify_integration\admin.py:36
+msgid "Pull Printify order statuses now"
+msgstr "Recupera ora gli stati degli ordini Printify"
+
+#: .\printify_integration\admin.py:39
+#, python-format
+msgid "Order pull finished: %(u)d updated (errors %(e)d)."
+msgstr "Recupero ordini completato: %(u)d aggiornati (errori %(e)d)."
+
+#: .\printify_integration\models.py:13
+msgid "Products sync"
+msgstr "Sincronizzazione prodotti"
+
+#: .\printify_integration\models.py:14
+msgid "Variant costs sync"
+msgstr "Sincronizzazione costi varianti"
+
+#: .\printify_integration\models.py:15
+msgid "Order status pull"
+msgstr "Recupero stato ordini"
+
+#: .\printify_integration\models.py:16
+msgid "Single product resync"
+msgstr "Risincronizzazione singolo prodotto"
+
+#: .\printify_integration\models.py:24
+msgid "Running"
+msgstr "In esecuzione"
+
+#: .\printify_integration\models.py:25 .\templates\base.html:62
+msgid "Success"
+msgstr "Operazione riuscita"
+
+#: .\printify_integration\models.py:26
+msgid "Partial"
+msgstr "Parziale"
+
+#: .\printify_integration\models.py:27 .\templates\base.html:63
+msgid "Error"
+msgstr "Errore"
+
+#: .\printify_integration\models.py:41
+msgid "Printify sync log"
+msgstr "Registro di sincronizzazione Printify"
+
+#: .\printify_integration\models.py:42
+msgid "Printify sync logs"
+msgstr "Registri di sincronizzazione Printify"
+
+#: .\returns\admin.py:51
+msgid "Refund"
+msgstr "Rimborso"
+
+#: .\returns\admin.py:55
+msgid "Net margin after refund"
+msgstr "Margine netto dopo il rimborso"
+
+#: .\returns\admin.py:63
+msgid "Approve selected returns"
+msgstr "Approva i resi selezionati"
+
+#: .\returns\admin.py:69
+#, python-format
+msgid "Approved %(n)d return(s)."
+msgstr "Approvati %(n)d resi."
+
+#: .\returns\admin.py:71
+msgid "Reject selected returns"
+msgstr "Rifiuta i resi selezionati"
+
+#: .\returns\admin.py:78
+#, python-format
+msgid "Rejected %(n)d return(s)."
+msgstr "Rifiutati %(n)d resi."
+
+#: .\returns\admin.py:80
+msgid "Mark refund in progress"
+msgstr "Segna rimborso in corso"
+
+#: .\returns\admin.py:84
+msgid "Mark as refunded (updates order margin)"
+msgstr "Segna come rimborsato (aggiorna il margine dell'ordine)"
+
+#: .\returns\admin.py:96
+#, python-format
+msgid "Marked %(n)d return(s) as refunded."
+msgstr "Segnati %(n)d resi come rimborsati."
+
+#: .\returns\forms.py:8
+msgid "Email on the order"
+msgstr "Email dell'ordine"
+
+#: .\returns\forms.py:9
+msgid "you@example.com"
+msgstr "tu@esempio.com"
+
+#: .\returns\forms.py:12
+msgid "Reason for return"
+msgstr "Motivo del reso"
+
+#: .\returns\forms.py:15
+msgid "Tell us why you'd like to return your order (optional)."
+msgstr "Indicaci il motivo per cui desideri restituire il tuo ordine (facoltativo)."
+
+#: .\returns\forms.py:30
+msgid "Please enter the email used for this order."
+msgstr "Inserisci l'email utilizzata per questo ordine."
+
+#: .\returns\models.py:19 .\templates\returns\status.html:25
+msgid "Return requested"
+msgstr "Reso richiesto"
+
+#: .\returns\models.py:20
+msgid "Return approved"
+msgstr "Reso approvato"
+
+#: .\returns\models.py:21
+msgid "Return rejected"
+msgstr "Reso rifiutato"
+
+#: .\returns\models.py:22
+msgid "Refund in progress"
+msgstr "Rimborso in corso"
+
+#: .\returns\models.py:47
+msgid "Return request"
+msgstr "Richiesta di reso"
+
+#: .\returns\models.py:48
+msgid "Return requests"
+msgstr "Richieste di reso"
+
+#: .\returns\views.py:36
+#, python-format
+msgid "This order is outside the %(d)d-day return window."
+msgstr "Questo ordine è oltre il periodo di reso di %(d)d giorni."
+
+#: .\returns\views.py:40 .\templates\returns\request.html:21
+msgid "There is already an open return for this order."
+msgstr "Esiste già un reso aperto per questo ordine."
+
+#: .\returns\views.py:47
+msgid "That email does not match this order."
+msgstr "Questa email non corrisponde a questo ordine."
+
+#: .\returns\views.py:78
+msgid "Your return request has been submitted. We'll be in touch shortly."
+msgstr "La tua richiesta di reso è stata inviata. Ti contatteremo a breve."
+
+#: .\shipping\constants.py:7
+msgid "Italy"
+msgstr "Italia"
+
+#: .\shipping\constants.py:8
+msgid "France"
+msgstr "Francia"
+
+#: .\shipping\constants.py:9
+msgid "Germany"
+msgstr "Germania"
+
+#: .\shipping\constants.py:10
+msgid "Spain"
+msgstr "Spagna"
+
+#: .\shipping\constants.py:11
+msgid "Netherlands"
+msgstr "Paesi Bassi"
+
+#: .\shipping\constants.py:12
+msgid "Belgium"
+msgstr "Belgio"
+
+#: .\shipping\constants.py:13
+msgid "Austria"
+msgstr "Austria"
+
+#: .\shipping\constants.py:14
+msgid "Portugal"
+msgstr "Portogallo"
+
+#: .\shipping\constants.py:15
+msgid "Ireland"
+msgstr "Irlanda"
+
+#: .\shipping\constants.py:16
+msgid "Switzerland"
+msgstr "Svizzera"
+
+#: .\shipping\constants.py:17
+msgid "United Kingdom"
+msgstr "Regno Unito"
+
+#: .\shipping\constants.py:18
+msgid "United States"
+msgstr "Stati Uniti"
+
+#: .\shipping\constants.py:19
+msgid "Canada"
+msgstr "Canada"
+
+#: .\shipping\constants.py:20
+msgid "Australia"
+msgstr "Australia"
+
+#: .\shipping\services.py:41
+#, python-format
+msgid "%(d)d business days"
+msgstr "%(d)d giorni lavorativi"
+
+#: .\shipping\services.py:42
+#, python-format
+msgid "%(a)d–%(b)d business days"
+msgstr "%(a)d–%(b)d giorni lavorativi"
+
+#: .\shipping\services.py:68
+msgid "We do not ship to this country yet."
+msgstr "Non spediamo ancora in questo Paese."
+
+#: .\shipping\services.py:81 .\templates\store\product_detail.html:131
+msgid "Free shipping"
+msgstr "Spedizione gratuita"
+
+#: .\store\admin.py:34
+msgid "Pricing & stock"
+msgstr "Prezzi e disponibilità"
+
+#: .\store\admin.py:36
+msgid "Premium content"
+msgstr "Contenuti premium"
+
+#: .\store\admin.py:37
+msgid "Merchandising"
+msgstr "Merchandising"
+
+#: .\store\admin.py:38
+msgid "Printify"
+msgstr "Printify"
+
+#: .\store\admin.py:43
+msgid "Margin/unit"
+msgstr "Margine/unità"
+
+#: .\store\admin.py:51
+msgid "Sync"
+msgstr "Sincronizza"
+
+#: .\store\admin.py:60
+msgid "Resync selected products from Printify"
+msgstr "Risincronizza i prodotti selezionati da Printify"
+
+#: .\store\admin.py:71
+#, python-format
+msgid "Resynced %(ok)d product(s), %(err)d error(s)."
+msgstr "Risincronizzati %(ok)d prodotti, %(err)d errori."
+
+#: .\templates\admin\orders\order_changelist.html:5
+msgid "Orders"
+msgstr "Ordini"
+
+#: .\templates\admin\orders\order_changelist.html:12
+msgid "Total sales"
+msgstr "Vendite totali"
+
+#: .\templates\admin\orders\order_changelist.html:16
+msgid "Printify costs"
+msgstr "Costi Printify"
+
+#: .\templates\admin\orders\order_changelist.html:28
+msgid "In error"
+msgstr "In errore"
+
+#: .\templates\admin\orders\order_changelist.html:32
+msgid "To fulfil"
+msgstr "Da evadere"
+
+#: .\templates\base.html:64
+msgid "Warning"
+msgstr "Avviso"
+
+#: .\templates\base.html:65
+msgid "Info"
+msgstr "Informazione"
+
+#: .\templates\home.html:14
+msgid "New drops"
+msgstr "Nuovi arrivi"
+
+#: .\templates\home.html:15
+msgid "Premium print-on-demand"
+msgstr "Stampa on demand premium"
+
+#: .\templates\home.html:16
+msgid "Discover bestsellers and latest arrivals."
+msgstr "Scopri i bestseller e le ultime novità."
+
+#: .\templates\home.html:18
+msgid "Browse store"
+msgstr "Esplora lo store"
+
+#: .\templates\home.html:31
+msgid "Popular products"
+msgstr "Prodotti popolari"
+
+#: .\templates\home.html:32
+msgid "Customer favorites and trending items"
+msgstr "I preferiti dei clienti e gli articoli di tendenza"
+
+#: .\templates\home.html:35
+msgid "View all"
+msgstr "Vedi tutti"
+
+#: .\templates\home.html:49
+msgid "Top seller"
+msgstr "Più venduto"
+
+#: .\templates\home.html:50
+#, python-format
+msgid "%(n)s sold"
+msgid_plural "%(n)s sold"
+msgstr[0] "%(n)s venduto"
+msgstr[1] "%(n)s venduti"
+
+#: .\templates\home.html:55 .\templates\home.html:94
+msgid "Details"
+msgstr "Dettagli"
+
+#: .\templates\home.html:70
+msgid "Latest arrivals"
+msgstr "Ultimi arrivi"
+
+#: .\templates\home.html:71
+msgid "Freshly added — don’t miss out"
+msgstr "Appena aggiunti — da non perdere"
+
+#: .\templates\home.html:74
+msgid "See new"
+msgstr "Scopri le novità"
+
+#: .\templates\home.html:89 .\templates\store\product_detail.html:73
+msgid "Bestseller"
+msgstr "Bestseller"
+
+#: .\templates\includes\country_switcher.html:6 .\templates\store\cart.html:147
+#: .\templates\store\checkout.html:187
+msgid "Ship to"
+msgstr "Spedisci in"
+
+#: .\templates\includes\country_switcher.html:9
+msgid "Shipping country"
+msgstr "Paese di spedizione"
+
+#: .\templates\includes\footer.html:19
+msgid ""
+"Curated essentials, designed for everyday comfort. Premium quality, fast "
+"shipping, easy returns."
+msgstr ""
+"Essenziali selezionati, pensati per il comfort di ogni giorno. Qualità "
+"premium, spedizione rapida, resi facili."
+
+#: .\templates\includes\footer.html:36
+msgid "Shop"
+msgstr "Shop"
+
+#: .\templates\includes\footer.html:38
+msgid "All Products"
+msgstr "Tutti i prodotti"
+
+#: .\templates\includes\footer.html:39
+msgid "New Arrivals"
+msgstr "Nuovi arrivi"
+
+#: .\templates\includes\footer.html:40
+msgid "Best Sellers"
+msgstr "Bestseller"
+
+#: .\templates\includes\footer.html:45
+msgid "Company"
+msgstr "Azienda"
+
+#: .\templates\includes\footer.html:47
+msgid "About"
+msgstr "Chi siamo"
+
+#: .\templates\includes\footer.html:48
+msgid "Sustainability"
+msgstr "Sostenibilità"
+
+#: .\templates\includes\footer.html:49
+msgid "Press"
+msgstr "Stampa"
+
+#: .\templates\includes\footer.html:54
+msgid "Support"
+msgstr "Assistenza"
+
+#: .\templates\includes\footer.html:56
+msgid "Contact"
+msgstr "Contatti"
+
+#: .\templates\includes\footer.html:57 .\templates\returns\policy.html:3
+#: .\templates\returns\policy.html:11 .\templates\returns\policy.html:15
+msgid "Returns & refunds"
+msgstr "Resi e rimborsi"
+
+#: .\templates\includes\footer.html:58
+#: .\templates\notifications\email\transactional.html:89
+#: .\templates\store\cart.html:137 .\templates\store\checkout.html:178
+#: .\templates\store\product_detail.html:251
+msgid "Shipping"
+msgstr "Spedizione"
+
+#: .\templates\includes\footer.html:64
+msgid "Newsletter"
+msgstr "Newsletter"
+
+#: .\templates\includes\footer.html:69
+msgid "Email address"
+msgstr "Indirizzo email"
+
+#: .\templates\includes\footer.html:70
+msgid "Subscribe"
+msgstr "Iscriviti"
+
+#: .\templates\includes\footer.html:75
+msgid "By subscribing, you agree to our"
+msgstr "Iscrivendoti, accetti la nostra"
+
+#: .\templates\includes\footer.html:75
+msgid "Privacy Policy"
+msgstr "Informativa sulla privacy"
+
+#: .\templates\includes\footer.html:83
+msgid "Store benefits"
+msgstr "Vantaggi dello store"
+
+#: .\templates\includes\footer.html:84
+msgid "Fast Shipping"
+msgstr "Spedizione rapida"
+
+#: .\templates\includes\footer.html:85
+#, python-format
+msgid "%(d)s-Day Returns"
+msgstr "Resi entro %(d)s giorni"
+
+#: .\templates\includes\footer.html:86
+msgid "Secure Checkout"
+msgstr "Pagamento sicuro"
+
+#: .\templates\includes\footer.html:87 .\templates\store\cart.html:173
+msgid "Support 7/7"
+msgstr "Assistenza 7/7"
+
+#: .\templates\includes\footer.html:94
+msgid "All rights reserved."
+msgstr "Tutti i diritti riservati."
+
+#: .\templates\includes\footer.html:98
+msgid "Terms"
+msgstr "Termini"
+
+#: .\templates\includes\footer.html:100
+msgid "Privacy"
+msgstr "Privacy"
+
+#: .\templates\includes\footer.html:102 .\templates\returns\request.html:11
+#: .\templates\store\product_detail.html:252
+msgid "Returns"
+msgstr "Resi"
+
+#: .\templates\includes\lang_switcher.html:6
+#: .\templates\includes\lang_switcher.html:11
+msgid "Language"
+msgstr "Lingua"
+
+#: .\templates\includes\navbar.html:15
+msgid "Toggle navigation"
+msgstr "Apri/chiudi navigazione"
+
+#: .\templates\includes\navbar.html:25 .\templates\store\product_detail.html:14
+#: .\templates\store\store.html:4 .\templates\store\store.html:25
+msgid "Store"
+msgstr "Store"
+
+#: .\templates\includes\navbar.html:30 .\templates\store\store.html:156
+msgid "Categories"
+msgstr "Categorie"
+
+#: .\templates\includes\navbar.html:33
+msgid "Browse categories"
+msgstr "Esplora le categorie"
+
+#: .\templates\includes\navbar.html:39 .\templates\store\store.html:33
+#: .\templates\store\store.html:162
+msgid "All products"
+msgstr "Tutti i prodotti"
+
+#: .\templates\includes\navbar.html:56
+msgid "No categories available"
+msgstr "Nessuna categoria disponibile"
+
+#: .\templates\includes\navbar.html:68
+msgid "Search products, categories…"
+msgstr "Cerca prodotti, categorie…"
+
+#: .\templates\includes\navbar.html:80
+msgid "Theme"
+msgstr "Tema"
+
+#: .\templates\includes\navbar.html:88
+msgid "Account"
+msgstr "Account"
+
+#: .\templates\includes\navbar.html:97
+msgid "Dashboard"
+msgstr "Dashboard"
+
+#: .\templates\includes\navbar.html:98
+msgid "My orders"
+msgstr "I miei ordini"
+
+#: .\templates\includes\navbar.html:99
+msgid "Logout"
+msgstr "Esci"
+
+#: .\templates\includes\navbar.html:103
+msgid "Login"
+msgstr "Accedi"
+
+#: .\templates\includes\navbar.html:104
+msgid "Register"
+msgstr "Registrati"
+
+#: .\templates\includes\navbar.html:108
+msgid "Cart"
+msgstr "Carrello"
+
+#: .\templates\notifications\email\transactional.html:23
+#, python-format
+msgid "Hi %(name)s,"
+msgstr "Ciao %(name)s,"
+
+#: .\templates\notifications\email\transactional.html:25
+msgid "Hello,"
+msgstr "Ciao,"
+
+#: .\templates\notifications\email\transactional.html:31
+#, python-format
+msgid ""
+"Thank you for your order <strong>#%(n)s</strong>. We have received it and "
+"will start production shortly."
+msgstr ""
+"Grazie per il tuo ordine <strong>#%(n)s</strong>. Lo abbiamo ricevuto e "
+"avvieremo la produzione a breve."
+
+#: .\templates\notifications\email\transactional.html:35
+#, python-format
+msgid "Good news — your order <strong>#%(n)s</strong> is on its way!"
+msgstr "Buone notizie — il tuo ordine <strong>#%(n)s</strong> è in viaggio!"
+
+#: .\templates\notifications\email\transactional.html:39
+#, python-format
+msgid "Here is an update on your order <strong>#%(n)s</strong>."
+msgstr "Ecco un aggiornamento sul tuo ordine <strong>#%(n)s</strong>."
+
+#: .\templates\notifications\email\transactional.html:45
+msgid "We have received your return request and our team is reviewing it."
+msgstr ""
+"Abbiamo ricevuto la tua richiesta di reso e il nostro team la sta esaminando."
+
+#: .\templates\notifications\email\transactional.html:46
+msgid ""
+"Your return has been approved. Please follow the instructions below to send "
+"the item back."
+msgstr ""
+"Il tuo reso è stato approvato. Segui le istruzioni qui sotto per rispedire "
+"l'articolo."
+
+#: .\templates\notifications\email\transactional.html:47
+msgid ""
+"After review, we are unable to approve this return request. See the note "
+"below for details."
+msgstr ""
+"Dopo un'attenta valutazione, non possiamo approvare questa richiesta di "
+"reso. Consulta la nota qui sotto per i dettagli."
+
+#: .\templates\notifications\email\transactional.html:48
+msgid ""
+"Your refund has been processed and should appear on your statement soon."
+msgstr ""
+"Il tuo rimborso è stato elaborato e comparirà a breve sul tuo estratto conto."
+
+#: .\templates\notifications\email\transactional.html:52
+#: .\templates\returns\status.html:50
+msgid "Refund amount"
+msgstr "Importo del rimborso"
+
+#: .\templates\notifications\email\transactional.html:57
+msgid ""
+"Your selection is still waiting for you. Complete your order before it sells "
+"out."
+msgstr ""
+"La tua selezione ti sta ancora aspettando. Completa l'ordine prima che vada "
+"esaurito."
+
+#: .\templates\notifications\email\transactional.html:62
+msgid ""
+"Welcome aboard! You will be the first to hear about new drops, restocks and "
+"members-only offers."
+msgstr ""
+"Benvenuto a bordo! Sarai il primo a scoprire nuovi arrivi, riassortimenti e "
+"offerte riservate ai membri."
+
+#: .\templates\notifications\email\transactional.html:67
+msgid ""
+"Thanks for getting in touch. We have received your message and will reply as "
+"soon as possible."
+msgstr ""
+"Grazie per averci contattato. Abbiamo ricevuto il tuo messaggio e ti "
+"risponderemo il prima possibile."
+
+#: .\templates\notifications\email\transactional.html:70
+msgid "Here is an update from our team."
+msgstr "Ecco un aggiornamento dal nostro team."
+
+#: .\templates\notifications\email\transactional.html:88
+#: .\templates\store\cart.html:51 .\templates\store\cart.html:135
+#: .\templates\store\checkout.html:176
+msgid "Subtotal"
+msgstr "Subtotale"
+
+#: .\templates\notifications\email\transactional.html:90
+#: .\templates\store\cart.html:140 .\templates\store\checkout.html:181
+msgid "Tax"
+msgstr "IVA"
+
+#: .\templates\notifications\email\transactional.html:98
+#, python-format
+msgid "Estimated delivery: %(a)s–%(b)s business days."
+msgstr "Consegna stimata: %(a)s–%(b)s giorni lavorativi."
+
+#: .\templates\notifications\email\transactional.html:103
+msgid "Track my order"
+msgstr "Traccia il mio ordine"
+
+#: .\templates\notifications\email\transactional.html:105
+msgid "View my order"
+msgstr "Vedi il mio ordine"
+
+#: .\templates\notifications\email\transactional.html:107
+msgid "Return to my cart"
+msgstr "Torna al mio carrello"
+
+#: .\templates\notifications\email\transactional.html:109
+msgid "View return status"
+msgstr "Vedi lo stato del reso"
+
+#: .\templates\notifications\email\transactional.html:116
+#, python-format
+msgid "Not quite right? You can return your order within %(d)s days."
+msgstr "Non è proprio quello che cercavi? Puoi restituire il tuo ordine entro %(d)s giorni."
+
+#: .\templates\notifications\email\transactional.html:118
+msgid "Premium fashion, printed on demand."
+msgstr "Moda premium, stampata on demand."
+
+#: .\templates\returns\policy.html:10 .\templates\returns\request.html:10
+#: .\templates\store\product_detail.html:13 .\templates\store\store.html:22
+msgid "Home"
+msgstr "Home"
+
+#: .\templates\returns\policy.html:17
+#, python-format
+msgid ""
+"We want you to love what you ordered. If something isn't right, you can "
+"return it within %(window_days)s days."
+msgstr ""
+"Vogliamo che tu sia soddisfatto di ciò che hai ordinato. Se qualcosa non va, "
+"puoi restituirlo entro %(window_days)s giorni."
+
+#: .\templates\returns\policy.html:22
+msgid "The 14-day window"
+msgstr "Il periodo di 14 giorni"
+
+#: .\templates\returns\policy.html:24
+#, python-format
+msgid ""
+"You have %(window_days)s days from the delivery of your order to request a "
+"return. Items should be unworn, unwashed and in their original condition "
+"with tags attached."
+msgstr ""
+"Hai %(window_days)s giorni dalla consegna del tuo ordine per richiedere un "
+"reso. Gli articoli devono essere non indossati, non lavati e nelle loro "
+"condizioni originali con i cartellini attaccati."
+
+#: .\templates\returns\policy.html:31
+msgid "How it works"
+msgstr "Come funziona"
+
+#: .\templates\returns\policy.html:33
+msgid "Open your order and choose “Request a return”."
+msgstr "Apri il tuo ordine e scegli “Richiedi un reso”."
+
+#: .\templates\returns\policy.html:34
+msgid "Pick the items and tell us the reason (optional)."
+msgstr "Seleziona gli articoli e indicaci il motivo (facoltativo)."
+
+#: .\templates\returns\policy.html:35
+msgid "We review your request and email you the next steps."
+msgstr "Esaminiamo la tua richiesta e ti inviamo via email i passaggi successivi."
+
+#: .\templates\returns\policy.html:36
+msgid "Once the return is approved and received, we issue your refund."
+msgstr "Una volta approvato e ricevuto il reso, emettiamo il tuo rimborso."
+
+#: .\templates\returns\policy.html:43
+msgid "Refunds"
+msgstr "Rimborsi"
+
+#: .\templates\returns\policy.html:45
+msgid ""
+"Refunds are issued to your original payment method. The value of the "
+"returned goods is refunded; original shipping costs may be non-refundable "
+"for change-of-mind returns, in line with EU consumer rules."
+msgstr ""
+"I rimborsi vengono emessi sul tuo metodo di pagamento originale. Viene "
+"rimborsato il valore della merce restituita; i costi di spedizione iniziali "
+"potrebbero non essere rimborsabili per i resi per ripensamento, in linea con "
+"le normative UE a tutela dei consumatori."
+
+#: .\templates\returns\policy.html:51
+msgid "Need help? Contact our support team and we'll be glad to assist."
+msgstr "Hai bisogno di aiuto? Contatta il nostro team di assistenza, saremo lieti di aiutarti."
+
+#: .\templates\returns\policy.html:55
+msgid "Go to my orders"
+msgstr "Vai ai miei ordini"
+
+#: .\templates\returns\request.html:3 .\templates\returns\request.html:16
+msgid "Request a return"
+msgstr "Richiedi un reso"
+
+#: .\templates\returns\request.html:22
+msgid "View status"
+msgstr "Vedi lo stato"
+
+#: .\templates\returns\request.html:27
+#, python-format
+msgid "You're within the return window — %(d)s day(s) left."
+msgstr "Sei ancora nei termini per il reso — %(d)s giorni rimasti."
+
+#: .\templates\returns\request.html:41
+msgid "Select the items to return"
+msgstr "Seleziona gli articoli da restituire"
+
+#: .\templates\returns\request.html:54 .\templates\returns\status.html:45
+#: .\templates\store\checkout.html:167
+msgid "Qty"
+msgstr "Qtà"
+
+#: .\templates\returns\request.html:65
+msgid "Read our returns policy"
+msgstr "Leggi la nostra politica di reso"
+
+#: .\templates\returns\request.html:66
+msgid "Submit return request"
+msgstr "Invia richiesta di reso"
+
+#: .\templates\returns\request.html:71
+#, python-format
+msgid ""
+"This order is outside the %(d)s-day return window and is no longer eligible "
+"for return."
+msgstr ""
+"Questo ordine è oltre il periodo di reso di %(d)s giorni e non è più "
+"idoneo al reso."
+
+#: .\templates\returns\request.html:73 .\templates\returns\status.html:61
+#: .\templates\store\cart.html:25 .\templates\store\cart.html:167
+#: .\templates\store\checkout.html:199
+msgid "Continue shopping"
+msgstr "Continua lo shopping"
+
+#: .\templates\returns\status.html:3 .\templates\returns\status.html:8
+msgid "Return status"
+msgstr "Stato del reso"
+
+#: .\templates\returns\status.html:15
+msgid "Current status"
+msgstr "Stato attuale"
+
+#: .\templates\returns\status.html:28
+msgid "Rejected"
+msgstr "Rifiutato"
+
+#: .\templates\returns\status.html:28
+msgid "Approved"
+msgstr "Approvato"
+
+#: .\templates\returns\status.html:41
+msgid "Items"
+msgstr "Articoli"
+
+#: .\templates\returns\status.html:58
+msgid "Note from our team:"
+msgstr "Nota dal nostro team:"
+
+#: .\templates\store\cart.html:4 .\templates\store\cart.html:13
+msgid "Shopping cart"
+msgstr "Carrello"
+
+#: .\templates\store\cart.html:16 .\templates\store\checkout.html:145
+#, python-format
+msgid "%(c)s item"
+msgid_plural "%(c)s items"
+msgstr[0] "%(c)s articolo"
+msgstr[1] "%(c)s articoli"
+
+#: .\templates\store\cart.html:17
+msgid "0 items"
+msgstr "0 articoli"
+
+#: .\templates\store\cart.html:20
+msgid "Review items before checkout"
+msgstr "Controlla gli articoli prima del pagamento"
+
+#: .\templates\store\cart.html:34
+msgid "Your cart is empty"
+msgstr "Il tuo carrello è vuoto"
+
+#: .\templates\store\cart.html:35
+msgid "Browse products and add your favorites to the cart."
+msgstr "Esplora i prodotti e aggiungi i tuoi preferiti al carrello."
+
+#: .\templates\store\cart.html:37
+msgid "Browse products"
+msgstr "Esplora i prodotti"
+
+#: .\templates\store\cart.html:38
+msgid "Back to home"
+msgstr "Torna alla home"
+
+#: .\templates\store\cart.html:49
+msgid "Product"
+msgstr "Prodotto"
+
+#: .\templates\store\cart.html:50 .\templates\store\cart.html:95
+msgid "Quantity"
+msgstr "Quantità"
+
+#: .\templates\store\cart.html:58
+msgid "Open product"
+msgstr "Apri prodotto"
+
+#: .\templates\store\cart.html:62
+msgid "No image"
+msgstr "Nessuna immagine"
+
+#: .\templates\store\cart.html:82 .\templates\store\cart.html:113
+msgid "Remove this item from your cart?"
+msgstr "Rimuovere questo articolo dal carrello?"
+
+#: .\templates\store\cart.html:84 .\templates\store\cart.html:115
+msgid "Remove"
+msgstr "Rimuovi"
+
+#: .\templates\store\cart.html:91
+msgid "Quantity controls"
+msgstr "Controlli quantità"
+
+#: .\templates\store\cart.html:92
+msgid "Decrease quantity"
+msgstr "Diminuisci quantità"
+
+#: .\templates\store\cart.html:101
+msgid "Increase quantity"
+msgstr "Aumenta quantità"
+
+#: .\templates\store\cart.html:108
+msgid "Includes selected options"
+msgstr "Opzioni selezionate incluse"
+
+#: .\templates\store\cart.html:128 .\templates\store\checkout.html:144
+msgid "Order summary"
+msgstr "Riepilogo dell'ordine"
+
+#: .\templates\store\cart.html:129
+msgid "Secure checkout"
+msgstr "Pagamento sicuro"
+
+#: .\templates\store\cart.html:131
+msgid "Protected"
+msgstr "Protetto"
+
+#: .\templates\store\cart.html:138 .\templates\store\checkout.html:179
+msgid "Free"
+msgstr "Gratuita"
+
+#: .\templates\store\cart.html:141 .\templates\store\checkout.html:182
+msgid "Grand total"
+msgstr "Totale complessivo"
+
+#: .\templates\store\cart.html:154
+msgid "Estimated delivery"
+msgstr "Consegna stimata"
+
+#: .\templates\store\cart.html:163 .\templates\store\checkout.html:3
+#: .\templates\store\checkout.html:12
+msgid "Checkout"
+msgstr "Procedi all'ordine"
+
+#: .\templates\store\cart.html:165
+msgid "No account needed — checkout as a guest."
+msgstr "Nessun account necessario — acquista come ospite."
+
+#: .\templates\store\cart.html:171 .\templates\store\checkout.html:208
+#: .\templates\store\product_detail.html:75
+#, python-format
+msgid "%(d)s-day returns"
+msgstr "Resi entro %(d)s giorni"
+
+#: .\templates\store\cart.html:172
+msgid "Secure payments"
+msgstr "Pagamenti sicuri"
+
+#: .\templates\store\cart.html:177 .\templates\store\checkout.html:203
+msgid "Payments"
+msgstr "Pagamenti"
+
+#: .\templates\store\checkout.html:13
+msgid "Enter your billing details, then continue to payment."
+msgstr "Inserisci i tuoi dati di fatturazione, poi procedi al pagamento."
+
+#: .\templates\store\checkout.html:16
+msgid "Back to cart"
+msgstr "Torna al carrello"
+
+#: .\templates\store\checkout.html:23
+msgid "You're checking out as a guest. No account needed."
+msgstr "Stai effettuando l'acquisto come ospite. Nessun account necessario."
+
+#: .\templates\store\checkout.html:25
+msgid "Have an account? Sign in"
+msgstr "Hai già un account? Accedi"
+
+#: .\templates\store\checkout.html:38
+msgid "Billing address"
+msgstr "Indirizzo di fatturazione"
+
+#: .\templates\store\checkout.html:39
+msgid "Secure"
+msgstr "Sicuro"
+
+#: .\templates\store\checkout.html:44
+msgid "Use saved address"
+msgstr "Usa indirizzo salvato"
+
+#: .\templates\store\checkout.html:51
+msgid "Default:"
+msgstr "Predefinito:"
+
+#: .\templates\store\checkout.html:52
+msgid "Select an address"
+msgstr "Seleziona un indirizzo"
+
+#: .\templates\store\checkout.html:64
+msgid "Default"
+msgstr "Predefinito"
+
+#: .\templates\store\checkout.html:69
+msgid "Pick one to autofill your billing details."
+msgstr "Selezionane uno per compilare automaticamente i tuoi dati di fatturazione."
+
+#: .\templates\store\checkout.html:75
+msgid "First name"
+msgstr "Nome"
+
+#: .\templates\store\checkout.html:79
+msgid "Last name"
+msgstr "Cognome"
+
+#: .\templates\store\checkout.html:83
+msgid "Email"
+msgstr "Email"
+
+#: .\templates\store\checkout.html:87
+msgid "Phone"
+msgstr "Telefono"
+
+#: .\templates\store\checkout.html:91
+msgid "Address line 1"
+msgstr "Indirizzo riga 1"
+
+#: .\templates\store\checkout.html:95
+msgid "Address line 2"
+msgstr "Indirizzo riga 2"
+
+#: .\templates\store\checkout.html:99
+msgid "City"
+msgstr "Città"
+
+#: .\templates\store\checkout.html:103
+msgid "State"
+msgstr "Provincia"
+
+#: .\templates\store\checkout.html:107
+msgid "Postal code"
+msgstr "CAP"
+
+#: .\templates\store\checkout.html:111
+msgid "Country"
+msgstr "Paese"
+
+#: .\templates\store\checkout.html:113
+msgid "Select country"
+msgstr "Seleziona Paese"
+
+#: .\templates\store\checkout.html:122
+msgid "Order note (optional)"
+msgstr "Nota all'ordine (facoltativa)"
+
+#: .\templates\store\checkout.html:124
+msgid "Delivery instructions, notes for the seller..."
+msgstr "Istruzioni per la consegna, note per il venditore..."
+
+#: .\templates\store\checkout.html:130
+msgid "Save / update my default address"
+msgstr "Salva / aggiorna il mio indirizzo predefinito"
+
+#: .\templates\store\checkout.html:134
+msgid "You can create an account after checkout to track your order."
+msgstr "Puoi creare un account dopo l'acquisto per tracciare il tuo ordine."
+
+#: .\templates\store\checkout.html:167
+msgid "each"
+msgstr "cad."
+
+#: .\templates\store\checkout.html:191
+msgid "We don't ship to this country yet — choose another at checkout."
+msgstr "Non spediamo ancora in questo Paese — scegline un altro al momento del pagamento."
+
+#: .\templates\store\checkout.html:197
+msgid "Continue to payment"
+msgstr "Procedi al pagamento"
+
+#: .\templates\store\checkout.html:208
+msgid "Secure payment"
+msgstr "Pagamento sicuro"
+
+#: .\templates\store\product_detail.html:74
+msgid "Sale"
+msgstr "Saldi"
+
+#: .\templates\store\product_detail.html:98
+#, python-format
+msgid "%(counter)s review"
+msgid_plural "%(counter)s reviews"
+msgstr[0] "%(counter)s recensione"
+msgstr[1] "%(counter)s recensioni"
+
+#: .\templates\store\product_detail.html:105
+msgid "In stock"
+msgstr "Disponibile"
+
+#: .\templates\store\product_detail.html:111
+#: .\templates\store\product_detail.html:217
+msgid "Out of stock"
+msgstr "Esaurito"
+
+#: .\templates\store\product_detail.html:131
+#, python-format
+msgid "Ships to %(c)s"
+msgstr "Spedizione in %(c)s"
+
+#: .\templates\store\product_detail.html:132
+#, python-format
+msgid "Free %(d)s-day returns"
+msgstr "Resi gratuiti entro %(d)s giorni"
+
+#: .\templates\store\product_detail.html:143
+msgid "Color"
+msgstr "Colore"
+
+#: .\templates\store\product_detail.html:155
+msgid "Select color"
+msgstr "Seleziona colore"
+
+#: .\templates\store\product_detail.html:170
+msgid "No color options"
+msgstr "Nessuna opzione di colore"
+
+#: .\templates\store\product_detail.html:176
+msgid "Size"
+msgstr "Taglia"
+
+#: .\templates\store\product_detail.html:188
+msgid "Select size"
+msgstr "Seleziona taglia"
+
+#: .\templates\store\product_detail.html:203
+msgid "No size options"
+msgstr "Nessuna opzione di taglia"
+
+#: .\templates\store\product_detail.html:212 .\templates\store\store.html:283
+msgid "Reviews"
+msgstr "Recensioni"
+
+#: .\templates\store\product_detail.html:220
+msgid "Add to Cart"
+msgstr "Aggiungi al carrello"
+
+#: .\templates\store\product_detail.html:230
+msgid "More information"
+msgstr "Maggiori informazioni"
+
+#: .\templates\store\product_detail.html:236
+#: .\templates\store\product_detail.html:238
+msgid "Composition"
+msgstr "Composizione"
+
+#: .\templates\store\product_detail.html:238
+msgid "Premium quality materials."
+msgstr "Materiali di qualità premium."
+
+#: .\templates\store\product_detail.html:241
+msgid "Fit"
+msgstr "Vestibilità"
+
+#: .\templates\store\product_detail.html:244
+#: .\templates\store\product_detail.html:246
+msgid "Care"
+msgstr "Cura"
+
+#: .\templates\store\product_detail.html:246
+msgid "Machine wash cold, do not tumble dry."
+msgstr "Lavare in lavatrice a freddo, non asciugare in asciugatrice."
+
+#: .\templates\store\product_detail.html:248
+msgid "Sizes"
+msgstr "Taglie"
+
+#: .\templates\store\product_detail.html:249
+msgid "One size"
+msgstr "Taglia unica"
+
+#: .\templates\store\product_detail.html:251
+#, python-format
+msgid "Calculated at checkout for %(c)s."
+msgstr "Calcolata al momento del pagamento per %(c)s."
+
+#: .\templates\store\product_detail.html:252
+#, python-format
+msgid "Free returns within %(d)s days"
+msgstr "Resi gratuiti entro %(d)s giorni"
+
+#: .\templates\store\store.html:31
+msgid "Search:"
+msgstr "Cerca:"
+
+#: .\templates\store\store.html:44
+#, python-format
+msgid "%(n)s product found"
+msgid_plural "%(n)s products found"
+msgstr[0] "%(n)s prodotto trovato"
+msgstr[1] "%(n)s prodotti trovati"
+
+#: .\templates\store\store.html:44
+msgid "No products found"
+msgstr "Nessun prodotto trovato"
+
+#: .\templates\store\store.html:83 .\templates\store\store.html:102
+msgid "Price: low to high"
+msgstr "Prezzo: dal più basso al più alto"
+
+#: .\templates\store\store.html:84 .\templates\store\store.html:108
+msgid "Price: high to low"
+msgstr "Prezzo: dal più alto al più basso"
+
+#: .\templates\store\store.html:85 .\templates\store\store.html:114
+msgid "Name: A → Z"
+msgstr "Nome: A → Z"
+
+#: .\templates\store\store.html:86 .\templates\store\store.html:120
+msgid "Name: Z → A"
+msgstr "Nome: Z → A"
+
+#: .\templates\store\store.html:87 .\templates\store\store.html:126
+msgid "Newest"
+msgstr "Più recenti"
+
+#: .\templates\store\store.html:88 .\templates\store\store.html:96
+msgid "Sort: recommended"
+msgstr "Ordina: consigliati"
+
+#: .\templates\store\store.html:137
+msgid "Reset"
+msgstr "Reimposta"
+
+#: .\templates\store\store.html:188
+msgid "Price range"
+msgstr "Fascia di prezzo"
+
+#: .\templates\store\store.html:197
+msgid "Min"
+msgstr "Min"
+
+#: .\templates\store\store.html:198
+msgid "Max"
+msgstr "Max"
+
+#: .\templates\store\store.html:211
+msgid "Availability"
+msgstr "Disponibilità"
+
+#: .\templates\store\store.html:217
+msgid "In stock only"
+msgstr "Solo disponibili"
+
+#: .\templates\store\store.html:224
+msgid "Apply"
+msgstr "Applica"
+
+#: .\templates\store\store.html:225
+msgid "Clear"
+msgstr "Cancella"
+
+#: .\templates\store\store.html:246
+msgid "Sold out"
+msgstr "Esaurito"
+
+#: .\templates\store\store.html:248
+msgid "Low stock"
+msgstr "Scorte limitate"
+
+#: .\templates\store\store.html:282
+msgid "View"
+msgstr "Vedi"
+
+#: .\templates\store\store.html:292
+msgid "No products available."
+msgstr "Nessun prodotto disponibile."

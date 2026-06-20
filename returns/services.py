@@ -41,7 +41,8 @@ def eligibility_for_order(order, *, now=None) -> Eligibility:
 
     deadline = placed + timedelta(days=window)
     days_left = (deadline.date() - now.date()).days
-    if now <= deadline:
+    # Inclusive of the final day: you have until the end of day 14.
+    if now.date() <= deadline.date():
         return Eligibility(True, max(days_left, 0), deadline)
     return Eligibility(False, 0, deadline, reason="window_passed")
 
