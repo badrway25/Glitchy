@@ -7,8 +7,8 @@
 <section class="section-intro padding-y-sm">
   <div class="container" style="max-width:1280px;">
     <div class="intro-banner-wrap hero-banner">
-      <img src="{% static 'images/banners/cover.jpg' %}" class="img-fluid hero-img" alt="{{ SITE_NAME }}"
-           onerror="this.style.display='none'">
+      <img src="{% static 'images/banners/hero-blazer.jpg' %}" class="img-fluid hero-img"
+           alt="{% trans 'Editorial fashion — premium tailoring' %}" fetchpriority="high">
       <div class="hero-overlay">
         <div class="hero-copy">
           <div class="hero-kicker">{% trans "New season" %}</div>
@@ -116,6 +116,24 @@
   <div class="container text-center" style="max-width:760px;">
     <div class="lux-eyebrow mb-3">{% trans "Our philosophy" %}</div>
     <p class="lux-quote mb-0">{% trans "“Fewer, better things — pieces you reach for again and again, not just once.”" %}</p>
+  </div>
+</section>
+
+<!-- EDITORIAL CRAFT BAND -->
+<section class="home-section" style="padding-top:0;">
+  <div class="container" style="max-width:1280px;">
+    <div class="lux-split">
+      <div class="lux-split-media">
+        <img src="{% static 'images/editorial/craft.jpg' %}" loading="lazy" decoding="async"
+             alt="{% trans 'Premium fabrics, carefully finished' %}">
+      </div>
+      <div class="lux-split-body">
+        <div class="lux-eyebrow mb-2">{% trans "Crafted, not churned" %}</div>
+        <h3 class="section-title mb-3">{% trans "Quality you can feel" %}</h3>
+        <p class="text-muted mb-4" style="max-width:42ch;">{% trans "Considered cuts, durable fabrics and a finish made to last — pieces designed to stay in rotation, season after season." %}</p>
+        <a href="{% url 'store' %}" class="btn btn-primary">{% trans "Explore the collection" %}</a>
+      </div>
+    </div>
   </div>
 </section>
 
