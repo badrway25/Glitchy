@@ -1,23 +1,20 @@
-import requests
-from django.conf import settings
+"""
+Thin order-side wrappers around the resilient Printify client.
 
-PRINTIFY_BASE = "https://api.printify.com/v1"
+Kept as functions so existing imports (`from .printify import create_order,
+send_to_production`) keep working, but now backed by retry/backoff + rate-limit
+handling from printify_integration.printify_client.
+"""
+from printify_integration.printify_client import get_client
 
-def _headers():
-    return {
-        "Authorization": f"Bearer {settings.PRINTIFY_API_TOKEN}",
-        "Content-Type": "application/json",
-        "User-Agent": "YourStore",
-    }
 
 def create_order(payload: dict) -> dict:
-    url = f"{PRINTIFY_BASE}/shops/{settings.PRINTIFY_SHOP_ID}/orders.json"
-    r = requests.post(url, headers=_headers(), json=payload, timeout=30)
-    r.raise_for_status()
-    return r.json()
+    return get_client().create_order(payload)
+
 
 def send_to_production(printify_order_id: str) -> dict:
-    url = f"{PRINTIFY_BASE}/shops/{settings.PRINTIFY_SHOP_ID}/orders/{printify_order_id}/send_to_production.json"
-    r = requests.post(url, headers=_headers(), json={}, timeout=30)
-    r.raise_for_status()
-    return r.json()
+    return get_client().send_to_production(printify_order_id)
+
+
+def get_order(printify_order_id: str) -> dict:
+    return get_client().get_order(printify_order_id)

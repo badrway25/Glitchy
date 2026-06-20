@@ -28,6 +28,24 @@ class Product(models.Model):
                                                help_text="Printify print provider id (for shipping/cost)")
     sku = models.CharField(max_length=64, unique=True, blank=True, null=True)
 
+    # Printify sync state
+    SYNC_NOT_SYNCED = "not_synced"
+    SYNC_SYNCED = "synced"
+    SYNC_UPDATED = "updated"
+    SYNC_DRAFT = "draft"
+    SYNC_ERROR = "error"
+    PRINTIFY_SYNC_CHOICES = [
+        (SYNC_NOT_SYNCED, "Not synced"),
+        (SYNC_SYNCED, "Synced"),
+        (SYNC_UPDATED, "Updated"),
+        (SYNC_DRAFT, "Draft"),
+        (SYNC_ERROR, "Sync error"),
+    ]
+    printify_sync_status = models.CharField(max_length=16, choices=PRINTIFY_SYNC_CHOICES,
+                                            default=SYNC_NOT_SYNCED)
+    printify_synced_at = models.DateTimeField(blank=True, null=True)
+    printify_sync_error = models.TextField(blank=True, default="")
+
     # --- Premium product detail content (bulleted "More" sections) ---
     composition = models.TextField(blank=True, default="",
                                    help_text="Materials / composition, e.g. '100% organic cotton'")
