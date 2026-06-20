@@ -209,6 +209,21 @@ STATICFILES_DIRS = [
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
+# Optional WhiteNoise: serve static via gunicorn without nginx. No-op if not
+# installed (staging can simply `pip install whitenoise`).
+try:
+    import whitenoise  # noqa: F401
+
+    _sec_mw = "django.middleware.security.SecurityMiddleware"
+    if _sec_mw in MIDDLEWARE and "whitenoise.middleware.WhiteNoiseMiddleware" not in MIDDLEWARE:
+        MIDDLEWARE.insert(MIDDLEWARE.index(_sec_mw) + 1, "whitenoise.middleware.WhiteNoiseMiddleware")
+    STORAGES = {
+        "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+        "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+    }
+except ImportError:
+    pass
+
 
 # --------------------------------------------------------------------------- #
 # Auth redirects

@@ -1,0 +1,5 @@
+# Staging/production extras (install on the server in addition to requirements.txt)
+-r requirements.txt
+gunicorn>=22,<24
+psycopg[binary]>=3.1,<4
+whitenoise>=6.6,<7
