@@ -26,7 +26,34 @@ import stripe
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
-@login_required(login_url="login")
+def _resolve_pending_order(request, order_number):
+    """Find the pending order for the current actor (authed user OR guest session)."""
+    qs = Order.objects.filter(order_number=order_number, is_ordered=False)
+    if request.user.is_authenticated:
+        order = qs.filter(user=request.user).first()
+        if order:
+            return order
+    session_key = request.session.session_key
+    if session_key:
+        return qs.filter(is_guest=True, session_key=session_key).first()
+    return None
+
+
+def _make_payment(order, intent):
+    """Idempotent Payment creation that works for guests (user may be None)."""
+    payment, _created = Payment.objects.get_or_create(
+        payment_id=intent.id,
+        defaults={
+            "user": order.user,
+            "email": order.email,
+            "payment_method": "Stripe",
+            "amount_paid": str(order.order_total),
+            "status": intent.status,
+        },
+    )
+    return payment
+
+
 def stripe_return(request):
     payment_intent_id = request.GET.get("payment_intent")
     if not payment_intent_id:
@@ -46,9 +73,8 @@ def stripe_return(request):
         return redirect("checkout")
 
     # find pending order
-    try:
-        order = Order.objects.get(user=request.user, order_number=order_number, is_ordered=False)
-    except Order.DoesNotExist:
+    order = _resolve_pending_order(request, order_number)
+    if not order:
         messages.error(request, "Order not found or already confirmed.")
         return redirect("checkout")
 
@@ -56,16 +82,7 @@ def stripe_return(request):
         messages.error(request, f"Payment not completed (status: {intent.status}).")
         return redirect("payments")
 
-    # idempotent-ish Payment create
-    payment, _created = Payment.objects.get_or_create(
-        user=request.user,
-        payment_id=intent.id,
-        defaults={
-            "payment_method": "Stripe",
-            "amount_paid": str(order.order_total),
-            "status": intent.status,
-        }
-    )
+    payment = _make_payment(order, intent)
 
     # finalize only if not already ordered
     if not order.is_ordered:
@@ -79,7 +96,6 @@ def stripe_return(request):
     return redirect(f"{reverse('order_complete')}?order_number={order.order_number}&payment_id={payment.payment_id}")
 
 
-@login_required(login_url="login")
 @require_POST
 def stripe_create_intent(request):
     try:
@@ -91,9 +107,8 @@ def stripe_create_intent(request):
     if not order_number:
         return JsonResponse({"error": "Missing order_number"}, status=400)
 
-    try:
-        order = Order.objects.get(user=request.user, order_number=order_number, is_ordered=False)
-    except Order.DoesNotExist:
+    order = _resolve_pending_order(request, order_number)
+    if not order:
         return JsonResponse({"error": "Order not found"}, status=404)
 
     try:
@@ -104,8 +119,12 @@ def stripe_create_intent(request):
     try:
         intent = stripe.PaymentIntent.create(
             amount=amount_cents,
-            currency="eur",
-            metadata={"order_number": order.order_number, "user_id": str(request.user.id)},
+            currency=settings.STRIPE_CURRENCY,
+            metadata={
+                "order_number": order.order_number,
+                "user_id": str(order.user_id or "guest"),
+            },
+            receipt_email=order.email or None,
             automatic_payment_methods={"enabled": True},
         )
     except Exception:
@@ -117,7 +136,6 @@ def stripe_create_intent(request):
     })
 
 
-@login_required(login_url="login")
 @require_POST
 def stripe_confirm(request):
     try:
@@ -133,9 +151,8 @@ def stripe_confirm(request):
         messages.error(request, "Payment data missing. Please try again.")
         return JsonResponse({"error": "missing_fields"}, status=400)
 
-    try:
-        order = Order.objects.get(user=request.user, order_number=order_number, is_ordered=False)
-    except Order.DoesNotExist:
+    order = _resolve_pending_order(request, order_number)
+    if not order:
         messages.error(request, "Order not found or already confirmed.")
         return JsonResponse({"error": "order_not_found"}, status=404)
 
@@ -150,16 +167,7 @@ def stripe_confirm(request):
         messages.error(request, f"Payment not completed (status: {intent.status}).")
         return JsonResponse({"error": f"Payment not succeeded ({intent.status})"}, status=400)
 
-    # idempotent-ish Payment create
-    payment, _created = Payment.objects.get_or_create(
-        user=request.user,
-        payment_id=intent.id,
-        defaults={
-            "payment_method": "Stripe",
-            "amount_paid": str(order.order_total),
-            "status": intent.status,
-        }
-    )
+    payment = _make_payment(order, intent)
 
     # finalize only if needed
     if not order.is_ordered:
@@ -195,8 +203,21 @@ def stripe_webhook(request):
     return HttpResponse(status=200)
 
 
+def _can_access_order(request, order):
+    """Owner (authed), guest who placed it (session match), or staff."""
+    if request.user.is_authenticated:
+        if request.user.is_staff or (order.user_id and order.user_id == request.user.id):
+            return True
+    sk = request.session.session_key
+    if order.is_guest and sk and order.session_key == sk:
+        return True
+    return False
+
+
 def invoice_pdf(request, order_number):
     order = get_object_or_404(Order, order_number=order_number, is_ordered=True)
+    if not _can_access_order(request, order):
+        return HttpResponse("Not authorized", status=403)
     items = OrderProduct.objects.filter(order=order)
 
     response = HttpResponse(content_type="application/pdf")
@@ -272,9 +293,11 @@ def invoice_pdf(request, order_number):
     c.line(x, y, width - x, y)
     y -= 10 * mm
 
-    subtotal = float(order.order_total) - float(order.tax)
+    subtotal = float(order.items_subtotal) or (float(order.order_total) - float(order.tax) - float(order.shipping_cost))
     c.setFont("Helvetica", 10)
     c.drawRightString(width - x, y, f"Subtotal: € {subtotal:.2f}")
+    y -= 6 * mm
+    c.drawRightString(width - x, y, f"Shipping: € {float(order.shipping_cost):.2f}")
     y -= 6 * mm
     c.drawRightString(width - x, y, f"Tax: € {float(order.tax):.2f}")
     y -= 6 * mm
@@ -286,7 +309,6 @@ def invoice_pdf(request, order_number):
     return response
 
 
-@login_required(login_url="login")
 @require_POST
 def payments(request):
     try:
@@ -304,17 +326,17 @@ def payments(request):
         messages.error(request, "Payment data missing. Please try again.")
         return JsonResponse({"error": "missing_fields"}, status=400)
 
-    try:
-        order = Order.objects.get(user=request.user, is_ordered=False, order_number=order_id)
-    except Order.DoesNotExist:
+    order = _resolve_pending_order(request, order_id)
+    if not order:
         messages.error(request, "Order not found or already confirmed.")
         return JsonResponse({"error": "order_not_found"}, status=404)
 
     # idempotent-ish Payment create
     payment, _created = Payment.objects.get_or_create(
-        user=request.user,
         payment_id=trans_id,
         defaults={
+            "user": order.user,
+            "email": order.email,
             "payment_method": method,
             "amount_paid": str(order.order_total),
             "status": status,
@@ -335,95 +357,110 @@ def payments(request):
     })
 
 
-def place_order(request, total=0, quantity=0):
-    current_user = request.user
+def _place_order_cart_items(request):
+    """Active cart for authed user or guest session (creating a session if needed)."""
+    if request.user.is_authenticated:
+        return list(CartItem.objects.filter(user=request.user, is_active=True)), None
+    if not request.session.session_key:
+        request.session.create()
+    from carts.models import Cart
+    cart = Cart.objects.filter(cart_id=request.session.session_key).first()
+    items = list(CartItem.objects.filter(cart=cart, is_active=True)) if cart else []
+    return items, request.session.session_key
 
-    cart_items = CartItem.objects.filter(user=current_user)
-    cart_count = cart_items.count()
-    if cart_count <= 0:
+
+def place_order(request, total=0, quantity=0):
+    from django.utils import translation
+    from orders.totals import compute_cart_totals
+    from shipping.geo import detect_country
+
+    current_user = request.user
+    is_authed = current_user.is_authenticated
+
+    cart_items, session_key = _place_order_cart_items(request)
+    if len(cart_items) <= 0:
         messages.info(request, "Your cart is empty.")
         return redirect("store")
 
-    grand_total = 0
-    tax = 0
-    for cart_item in cart_items:
-        total += (cart_item.product.price * cart_item.quantity)
-        quantity += cart_item.quantity
-    tax = (2 * total) / 100
-    grand_total = total + tax
+    if request.method != "POST":
+        messages.warning(request, "Please complete your billing details to continue.")
+        return redirect("checkout")
 
-    if request.method == "POST":
-        form = OrderForm(request.POST)
-        if form.is_valid():
-            data = Order()
-            data.user = current_user
-            data.first_name = form.cleaned_data["first_name"]
-            data.last_name = form.cleaned_data["last_name"]
-            data.phone = form.cleaned_data["phone"]
-            data.email = form.cleaned_data["email"]
-            data.address_line_1 = form.cleaned_data["address_line_1"]
-            data.address_line_2 = form.cleaned_data["address_line_2"]
-            data.country = form.cleaned_data["country"]
-            data.state = form.cleaned_data["state"]
-            data.postal_code = form.cleaned_data["postal_code"]
-            data.city = form.cleaned_data["city"]
-            data.order_note = form.cleaned_data["order_note"]
-            data.order_total = grand_total
-            data.tax = tax
-            data.ip = request.META.get("REMOTE_ADDR")
-            data.save()
-
-            # Generate order number
-            yr = int(datetime.date.today().strftime("%Y"))
-            dt = int(datetime.date.today().strftime("%d"))
-            mt = int(datetime.date.today().strftime("%m"))
-            d = datetime.date(yr, mt, dt)
-            current_date = d.strftime("%Y%m%d")
-            order_number = current_date + str(data.id)
-            data.order_number = order_number
-            data.save()
-
-            # Save/Update default address
-            save_address = request.POST.get("save_address")  # "on" if checked
-            if save_address and request.user.is_authenticated:
-                payload = dict(
-                    first_name=data.first_name,
-                    last_name=data.last_name,
-                    email=data.email,
-                    phone=data.phone,
-                    address_line_1=data.address_line_1,
-                    address_line_2=data.address_line_2,
-                    city=data.city,
-                    state=data.state,
-                    country=data.country,
-                    postal_code=data.postal_code, 
-                )
-
-                default_addr = Address.objects.filter(user=current_user, is_default=True).first()
-                if default_addr:
-                    for k, v in payload.items():
-                        setattr(default_addr, k, v)
-                    default_addr.save()
-                else:
-                    Address.objects.filter(user=current_user, is_default=True).update(is_default=False)
-                    Address.objects.create(user=current_user, is_default=True, **payload)
-
-            order = Order.objects.get(user=current_user, is_ordered=False, order_number=order_number)
-            context = {
-                "order": order,
-                "cart_items": cart_items,
-                "total": total,
-                "tax": tax,
-                "grand_total": grand_total,
-            }
-            return render(request, "orders/payments.html", context)
-
-        # ❗ form not valid
+    form = OrderForm(request.POST)
+    if not form.is_valid():
         messages.error(request, "Please check your billing details and try again.")
         return redirect("checkout")
 
-    messages.warning(request, "Please complete your billing details to continue.")
-    return redirect("checkout")
+    # Address country has priority over IP for the final quote.
+    country = (form.cleaned_data["country"] or detect_country(request)).upper()
+    totals = compute_cart_totals(cart_items, country)
+    quote = totals.shipping_quote
+
+    if not quote.available:
+        messages.error(request, "We're sorry, we don't ship to the selected country yet.")
+        return redirect("checkout")
+
+    data = Order()
+    if is_authed:
+        data.user = current_user
+    else:
+        data.user = None
+        data.is_guest = True
+        data.session_key = session_key or ""
+    data.first_name = form.cleaned_data["first_name"]
+    data.last_name = form.cleaned_data["last_name"]
+    data.phone = form.cleaned_data["phone"]
+    data.email = form.cleaned_data["email"]
+    data.address_line_1 = form.cleaned_data["address_line_1"]
+    data.address_line_2 = form.cleaned_data["address_line_2"]
+    data.country = country
+    data.state = form.cleaned_data["state"]
+    data.postal_code = form.cleaned_data["postal_code"]
+    data.city = form.cleaned_data["city"]
+    data.order_note = form.cleaned_data["order_note"]
+    data.currency = totals.currency
+    data.items_subtotal = totals.items_subtotal
+    data.shipping_cost = totals.shipping_cost
+    data.tax = totals.tax
+    data.order_total = totals.grand_total
+    data.shipping_country = country[:2]
+    data.shipping_min_days = quote.min_days
+    data.shipping_max_days = quote.max_days
+    data.language_code = (translation.get_language() or "en")[:5]
+    data.ip = request.META.get("REMOTE_ADDR")
+    data.save()
+
+    # Generate order number: YYYYMMDD + id
+    current_date = datetime.date.today().strftime("%Y%m%d")
+    data.order_number = current_date + str(data.id)
+    data.save(update_fields=["order_number"])
+
+    # Save/update default address (authed only)
+    if request.POST.get("save_address") and is_authed:
+        payload = dict(
+            first_name=data.first_name, last_name=data.last_name, email=data.email,
+            phone=data.phone, address_line_1=data.address_line_1,
+            address_line_2=data.address_line_2, city=data.city, state=data.state,
+            country=data.country, postal_code=data.postal_code,
+        )
+        default_addr = Address.objects.filter(user=current_user, is_default=True).first()
+        if default_addr:
+            for k, v in payload.items():
+                setattr(default_addr, k, v)
+            default_addr.save()
+        else:
+            Address.objects.filter(user=current_user, is_default=True).update(is_default=False)
+            Address.objects.create(user=current_user, is_default=True, **payload)
+
+    context = {
+        "order": data,
+        "cart_items": cart_items,
+        "total": totals.items_subtotal,
+        "tax": totals.tax,
+        "shipping_cost": totals.shipping_cost,
+        "grand_total": totals.grand_total,
+    }
+    return render(request, "orders/payments.html", context)
 
 
 def order_complete(request):

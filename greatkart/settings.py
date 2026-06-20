@@ -58,7 +58,7 @@ DEBUG = env_bool("DJANGO_DEBUG", True)
 ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", ["127.0.0.1", "localhost"])
 
 # Brand identity (used across templates and emails)
-SITE_NAME = env("SITE_NAME", "MAISON")
+SITE_NAME = env("SITE_NAME", "Glitchy")
 SITE_TAGLINE = env("SITE_TAGLINE", "Premium fashion, printed on demand")
 SITE_BASE_URL = env("SITE_BASE_URL", "http://127.0.0.1:8000")
 
@@ -115,6 +115,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "category.context_processors.menu_links",
                 "carts.context_processors.counter",
+                "shipping.context_processors.shipping_context",
                 "greatkart.context_processors.site_globals",
             ],
         },
@@ -265,6 +266,10 @@ SHIPPING_FALLBACK_RATES = {
 SHIPPING_DEFAULT_RATE = {"first": 11.90, "additional": 3.90, "min_days": 7, "max_days": 15}
 # Countries we ship to (empty => ship anywhere with default rate)
 SHIPPING_SUPPORTED_COUNTRIES = env_list("SHIPPING_SUPPORTED_COUNTRIES", [])
+# Use live Printify shipping profiles when available (else fallback table)
+SHIPPING_USE_PRINTIFY = env_bool("SHIPPING_USE_PRINTIFY", False)
+# Opt-in external IP→country lookup (off by default to keep requests fast/offline)
+SHIPPING_GEOIP_API = env_bool("SHIPPING_GEOIP_API", False)
 
 
 # --------------------------------------------------------------------------- #

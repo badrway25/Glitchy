@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Return status" %} • #{{ order.order_number }}{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container" style="max-width: 720px;">
+    <h1 class="h3 mb-1">{% trans "Return status" %}</h1>
+    <p class="text-muted">{% trans "Order" %} <strong>#{{ order.order_number }}</strong></p>
+
+    {% with status=rr.status %}
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <span class="text-muted">{% trans "Current status" %}</span>
+          <span class="badge px-3 py-2"
+                style="font-size:.85rem;color:#fff;background:
+                {% if status == 'refunded' %}#16a34a{% elif status == 'rejected' %}#dc2626{% elif status == 'approved' %}#2563eb{% elif status == 'refunding' %}#d97706{% else %}#64748b{% endif %};">
+            {{ rr.get_status_display }}
+          </span>
+        </div>
+
+        <!-- Progress timeline -->
+        <ul class="list-unstyled mb-0">
+          <li class="d-flex mb-2"><i class="fas fa-check-circle text-success mr-2 mt-1"></i><span>{% trans "Return requested" %}</span></li>
+          <li class="d-flex mb-2">
+            <i class="fas {% if status in 'approved,refunding,refunded' %}fa-check-circle text-success{% elif status == 'rejected' %}fa-times-circle text-danger{% else %}fa-circle text-muted{% endif %} mr-2 mt-1"></i>
+            <span>{% if status == 'rejected' %}{% trans "Rejected" %}{% else %}{% trans "Approved" %}{% endif %}</span>
+          </li>
+          <li class="d-flex">
+            <i class="fas {% if status == 'refunded' %}fa-check-circle text-success{% else %}fa-circle text-muted{% endif %} mr-2 mt-1"></i>
+            <span>{% trans "Refunded" %}</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+    {% endwith %}
+
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body">
+        <h2 class="h6 mb-3">{% trans "Items" %}</h2>
+        {% for it in items %}
+          <div class="d-flex justify-content-between border-bottom py-2">
+            <span>{{ it.order_product.product.product_name }}</span>
+            <span class="text-muted">{% trans "Qty" %}: {{ it.quantity }}</span>
+          </div>
+        {% endfor %}
+        {% if rr.refund_amount %}
+          <div class="d-flex justify-content-between pt-3">
+            <strong>{% trans "Refund amount" %}</strong>
+            <strong>{{ CURRENCY_SYMBOL }}{{ rr.refund_amount }}</strong>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if rr.admin_note %}
+      <div class="alert alert-secondary"><strong>{% trans "Note from our team:" %}</strong> {{ rr.admin_note }}</div>
+    {% endif %}
+
+    <a href="{% url 'home' %}" class="btn btn-outline-dark">{% trans "Continue shopping" %}</a>
+  </div>
+</section>
+{% endblock %}

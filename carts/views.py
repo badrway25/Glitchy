@@ -191,57 +191,66 @@ def remove_cart_item(request, product_id, cart_item_id):
     return redirect('cart')
 
 
+def _active_cart_items(request):
+    """Active cart items for an authed user or a guest session."""
+    if request.user.is_authenticated:
+        return CartItem.objects.filter(user=request.user, is_active=True)
+    cart = Cart.objects.filter(cart_id=_cart_id(request)).first()
+    if not cart:
+        return CartItem.objects.none()
+    return CartItem.objects.filter(cart=cart, is_active=True)
+
+
 def cart(request, total=0, quantity=0, cart_items=None):
-    try:
-        tax = 0
-        grand_total = 0
-        if request.user.is_authenticated:
-            cart_items = CartItem.objects.filter(user=request.user, is_active=True)
-        else:
-            cart = Cart.objects.get(cart_id=_cart_id(request))
-            cart_items = CartItem.objects.filter(cart=cart, is_active=True)
+    from orders.totals import compute_cart_totals
+    from shipping.geo import detect_country
 
-        for cart_item in cart_items:
-            total += (cart_item.product.price * cart_item.quantity)
-            quantity += cart_item.quantity
-
-        tax = (2 * total) / 100
-        grand_total = total + tax
-
-    except ObjectDoesNotExist:
-        cart_items = []
-        tax = 0
-        grand_total = 0
+    cart_items = _active_cart_items(request)
+    country = detect_country(request)
+    totals = compute_cart_totals(cart_items, country)
 
     context = {
-        'total': total,
-        'quantity': quantity,
+        'total': totals.items_subtotal,
+        'quantity': totals.quantity,
         'cart_items': cart_items,
-        'tax': tax,
-        'grand_total': grand_total,
+        'tax': totals.tax,
+        'grand_total': totals.grand_total,
+        'shipping_cost': totals.shipping_cost,
+        'shipping_quote': totals.shipping_quote,
     }
     return render(request, 'store/cart.html', context)
 
 
-@login_required(login_url='login')
 def checkout(request, total=0, quantity=0, cart_items=None):
-    try:
-        tax = 0
-        grand_total = 0
+    from orders.totals import compute_cart_totals
+    from shipping.geo import detect_country
 
-        cart_items = CartItem.objects.filter(user=request.user, is_active=True)
+    cart_items = _active_cart_items(request)
+    if not cart_items:
+        messages.info(request, "Your cart is empty.")
+        return redirect("store")
 
-        for cart_item in cart_items:
-            total += (cart_item.product.price * cart_item.quantity)
-            quantity += cart_item.quantity
+    country = detect_country(request)
+    totals = compute_cart_totals(cart_items, country)
+    total = totals.items_subtotal
+    quantity = totals.quantity
+    tax = totals.tax
+    grand_total = totals.grand_total
 
-        tax = (2 * total) / 100
-        grand_total = total + tax
-
-    except ObjectDoesNotExist:
-        cart_items = []
-        tax = 0
-        grand_total = 0
+    # Guests check out without an account; no saved addresses.
+    if not request.user.is_authenticated:
+        prefill = {
+            "first_name": "", "last_name": "", "email": "", "phone": "",
+            "address_line_1": "", "address_line_2": "", "city": "", "state": "",
+            "postal_code": "", "country": country, "order_note": "",
+        }
+        context = {
+            "total": total, "quantity": quantity, "cart_items": cart_items,
+            "tax": tax, "grand_total": grand_total, "shipping_cost": totals.shipping_cost,
+            "shipping_quote": totals.shipping_quote, "prefill": prefill,
+            "addresses": [], "default_addr": None, "is_guest": True,
+        }
+        return render(request, "store/checkout.html", context)
 
     raw_qs = Address.objects.filter(user=request.user).order_by("-is_default", "-updated_at", "-id")
     default_addr = raw_qs.filter(is_default=True).first()
@@ -302,8 +311,11 @@ def checkout(request, total=0, quantity=0, cart_items=None):
         "cart_items": cart_items,
         "tax": tax,
         "grand_total": grand_total,
+        "shipping_cost": totals.shipping_cost,
+        "shipping_quote": totals.shipping_quote,
         "prefill": prefill,
         "addresses": addresses,
         "default_addr": default_addr,
+        "is_guest": False,
     }
     return render(request, "store/checkout.html", context)

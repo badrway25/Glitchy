@@ -1,32 +1,31 @@
-"""
-URL configuration for greatkart project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/6.0/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
-from django.contrib import admin
-from django.urls import path, include
-from . import views
-from django.conf.urls.static import static
+"""URL configuration for the greatkart premium store."""
 from django.conf import settings
+from django.conf.urls.i18n import i18n_patterns
+from django.conf.urls.static import static
+from django.contrib import admin
+from django.urls import include, path
 
+from . import views
+
+# Non-localized routes: admin, language switch, and machine/API endpoints
+# (n8n webhooks must have stable, prefix-free URLs).
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', views.home, name='home'),
-    path('store/', include('store.urls')),
-    path('cart/', include('carts.urls')),
-    path('accounts/', include('accounts.urls')),
+    path("admin/", admin.site.urls),
+    path("i18n/", include("django.conf.urls.i18n")),   # set_language endpoint
+    path("", include("notifications.urls")),           # /api/n8n/... + newsletter
+    path("shipping/", include("shipping.urls")),       # country switcher
+]
 
-    # ORDERS
-    path('orders/', include('orders.urls')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Localized, user-facing routes. English stays prefix-free; IT/FR get /it/, /fr/.
+urlpatterns += i18n_patterns(
+    path("", views.home, name="home"),
+    path("store/", include("store.urls")),
+    path("cart/", include("carts.urls")),
+    path("accounts/", include("accounts.urls")),
+    path("orders/", include("orders.urls")),
+    path("returns/", include("returns.urls")),
+    prefix_default_language=False,
+)
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

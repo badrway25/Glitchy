@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Request a return" %} • #{{ order.order_number }}{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container" style="max-width: 760px;">
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb breadcrumb-clean">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">{% trans "Home" %}</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'returns:policy' %}">{% trans "Returns" %}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">#{{ order.order_number }}</li>
+      </ol>
+    </nav>
+
+    <h1 class="h3 mb-1">{% trans "Request a return" %}</h1>
+    <p class="text-muted">{% trans "Order" %} <strong>#{{ order.order_number }}</strong></p>
+
+    {% if existing %}
+      <div class="alert alert-info">
+        {% trans "There is already an open return for this order." %}
+        <a href="{% url 'returns:status' token=existing.public_token %}" class="alert-link">{% trans "View status" %}</a>
+      </div>
+    {% elif eligibility.eligible %}
+      <div class="alert alert-success d-flex align-items-center" role="alert">
+        <i class="fas fa-shield-alt mr-2"></i>
+        <span>{% blocktrans with d=eligibility.days_left %}You're within the return window — {{ d }} day(s) left.{% endblocktrans %}</span>
+      </div>
+
+      <form method="post" class="card border-0 shadow-sm">
+        {% csrf_token %}
+        <div class="card-body">
+          {% if require_email %}
+            <div class="form-group mb-3">
+              <label class="font-weight-600">{{ form.email.label }}</label>
+              {{ form.email }}
+              {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors.0 }}</div>{% endif %}
+            </div>
+          {% endif %}
+
+          <h2 class="h6 mb-3">{% trans "Select the items to return" %}</h2>
+          <div class="return-items">
+            {% for op in items %}
+              <label class="d-flex align-items-center justify-content-between border rounded p-3 mb-2" style="cursor:pointer;">
+                <span class="d-flex align-items-center">
+                  <input type="checkbox" name="item" value="{{ op.id }}" checked class="mr-3">
+                  <span>
+                    <strong>{{ op.product.product_name }}</strong><br>
+                    <span class="text-muted small">
+                      {% for v in op.variations.all %}{{ v.variation_category|title }}: {{ v.variation_value }}{% if not forloop.last %} · {% endif %}{% endfor %}
+                    </span>
+                  </span>
+                </span>
+                <span class="text-muted small">{% trans "Qty" %}: {{ op.quantity }}</span>
+              </label>
+            {% endfor %}
+          </div>
+
+          <div class="form-group mt-3">
+            <label class="font-weight-600">{{ form.reason.label }}</label>
+            {{ form.reason }}
+          </div>
+        </div>
+        <div class="card-footer bg-white border-0 d-flex justify-content-between align-items-center">
+          <a href="{% url 'returns:policy' %}" class="text-muted small">{% trans "Read our returns policy" %}</a>
+          <button type="submit" class="btn btn-dark">{% trans "Submit return request" %}</button>
+        </div>
+      </form>
+    {% else %}
+      <div class="alert alert-warning" role="alert">
+        {% blocktrans with d=window_days %}This order is outside the {{ d }}-day return window and is no longer eligible for return.{% endblocktrans %}
+      </div>
+      <a href="{% url 'home' %}" class="btn btn-outline-dark">{% trans "Continue shopping" %}</a>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

@@ -5,7 +5,8 @@ from store.models import Product, Variation
 
 
 class Payment(models.Model):
-    user = models.ForeignKey(Account, on_delete=models.CASCADE)
+    user = models.ForeignKey(Account, on_delete=models.CASCADE, null=True, blank=True)
+    email = models.EmailField(blank=True, default="")
     payment_id = models.CharField(max_length=100)
     payment_method = models.CharField(max_length=100)
     amount_paid = models.CharField(max_length=100) # this is the total amount paid
@@ -24,31 +25,58 @@ class Order(models.Model):
         ('Cancelled', 'Cancelled'),
     )
 
-    user = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True, blank=True)
     payment = models.ForeignKey(Payment, on_delete=models.SET_NULL, blank=True, null=True)
     order_number = models.CharField(max_length=20)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     phone = models.CharField(max_length=15)
-    email = models.EmailField(max_length=50)
-    address_line_1 = models.CharField(max_length=50)
-    address_line_2 = models.CharField(max_length=50, blank=True)
+    email = models.EmailField(max_length=100)
+    address_line_1 = models.CharField(max_length=100)
+    address_line_2 = models.CharField(max_length=100, blank=True)
     country = models.CharField(max_length=50)
     state = models.CharField(max_length=50)
     city = models.CharField(max_length=50)
     postal_code = models.CharField(max_length=20, blank=True, default="")
-    order_note = models.CharField(max_length=100, blank=True)
-    order_total = models.FloatField()
+    order_note = models.CharField(max_length=200, blank=True)
+
+    # --- Customer-facing money (all in `currency`) ---
+    currency = models.CharField(max_length=3, default="EUR")
+    items_subtotal = models.FloatField(default=0.0)
+    shipping_cost = models.FloatField(default=0.0)      # charged to customer
+    order_total = models.FloatField()                   # grand total (subtotal + tax + shipping)
     tax = models.FloatField()
+
+    # --- Our costs (for margin tracking) ---
+    cost_production = models.FloatField(default=0.0)     # Printify production cost
+    cost_shipping = models.FloatField(default=0.0)       # Printify shipping cost to us
+    payment_fee = models.FloatField(default=0.0)         # Stripe / PSP fee
+    refunded_amount = models.FloatField(default=0.0)
+
+    # --- Shipping / locale ---
+    shipping_country = models.CharField(max_length=2, blank=True, default="")
+    shipping_min_days = models.PositiveIntegerField(default=0)
+    shipping_max_days = models.PositiveIntegerField(default=0)
+    language_code = models.CharField(max_length=5, default="en")
+
+    # --- Guest checkout ---
+    is_guest = models.BooleanField(default=False)
+    session_key = models.CharField(max_length=64, blank=True, default="")
+
     status = models.CharField(max_length=10, choices=STATUS, default='New')
-    ip = models.CharField(blank=True, max_length=20)
+    ip = models.CharField(blank=True, max_length=40)
     is_ordered = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    # --- Printify fulfilment ---
     printify_order_id = models.CharField(max_length=64, blank=True, null=True)
     printify_status = models.CharField(max_length=32, blank=True, null=True)
     printify_last_error = models.TextField(blank=True, null=True)
-
+    tracking_number = models.CharField(max_length=128, blank=True, default="")
+    tracking_url = models.URLField(blank=True, default="")
+    carrier = models.CharField(max_length=64, blank=True, default="")
+    fulfilled_at = models.DateTimeField(blank=True, null=True)
 
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
@@ -57,20 +85,43 @@ class Order(models.Model):
         return f'{self.address_line_1} {self.address_line_2}'
 
     def __str__(self):
-        return self.first_name
+        return self.order_number or self.first_name
+
+    # ------------------------------------------------------------------ #
+    # Margin helpers (delegate to the tested service in orders.margins)
+    # ------------------------------------------------------------------ #
+    def margins(self):
+        from .margins import compute_margins
+        return compute_margins(self)
+
+    @property
+    def net_margin(self):
+        return self.margins().net_margin
+
+    @property
+    def margin_pct(self):
+        return self.margins().margin_pct
+
+    @property
+    def margin_band(self):
+        return self.margins().band
 
 
 class OrderProduct(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     payment = models.ForeignKey(Payment, on_delete=models.SET_NULL, blank=True, null=True)
-    user = models.ForeignKey(Account, on_delete=models.CASCADE)
+    user = models.ForeignKey(Account, on_delete=models.CASCADE, null=True, blank=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     variations = models.ManyToManyField(Variation, blank=True)
     quantity = models.IntegerField()
     product_price = models.FloatField()
+    production_cost = models.FloatField(default=0.0)   # snapshot at order time
     ordered = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def line_total(self):
+        return float(self.product_price) * int(self.quantity)
 
     def __str__(self):
         return self.product.product_name
