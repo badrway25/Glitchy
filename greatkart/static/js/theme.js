@@ -80,14 +80,20 @@
       let openTimer = null;
       let closeTimer = null;
 
+      // Toggle Bootstrap 4 dropdown state via classes (the jQuery
+      // .dropdown('show'/'hide') methods only exist in Bootstrap 5).
       const open = () => {
         if (!isDesktop()) return;
-        if (window.jQuery) window.jQuery(toggle).dropdown("show");
+        dd.classList.add("show");
+        menu.classList.add("show");
+        toggle.setAttribute("aria-expanded", "true");
       };
 
       const close = () => {
         if (!isDesktop()) return;
-        if (window.jQuery) window.jQuery(toggle).dropdown("hide");
+        dd.classList.remove("show");
+        menu.classList.remove("show");
+        toggle.setAttribute("aria-expanded", "false");
       };
 
       dd.addEventListener("mouseenter", () => {
