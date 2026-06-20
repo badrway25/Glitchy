@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: greatkart 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-20 14:10+0200\n"
+"POT-Creation-Date: 2026-06-20 20:24+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,15 +17,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: .\greatkart\settings.py:165
+#: .\greatkart\settings.py:192
 msgid "English"
 msgstr "Anglais"
 
-#: .\greatkart\settings.py:166
+#: .\greatkart\settings.py:193
 msgid "Italiano"
 msgstr "Italiano"
 
-#: .\greatkart\settings.py:167
+#: .\greatkart\settings.py:194
 msgid "Français"
 msgstr "Français"
 
@@ -137,7 +137,7 @@ msgstr "Événement sortant"
 msgid "Outbound events (Django → n8n)"
 msgstr "Événements sortants (Django → n8n)"
 
-#: .\notifications\models.py:80 .\templates\home.html:88
+#: .\notifications\models.py:80 .\templates\home.html:145
 #: .\templates\store\product_detail.html:72 .\templates\store\store.html:252
 msgid "New"
 msgstr "Nouveau"
@@ -172,9 +172,10 @@ msgstr "Veuillez saisir une adresse e-mail valide."
 
 #: .\notifications\views.py:47
 msgid "Thanks for subscribing! Check your inbox to confirm."
-msgstr "Merci de votre inscription ! Vérifiez votre boîte de réception pour confirmer."
-"Merci de votre inscription ! Consultez votre boîte de réception pour "
-"confirmer."
+msgstr ""
+"Merci de votre inscription ! Vérifiez votre boîte de réception pour "
+"confirmer.Merci de votre inscription ! Consultez votre boîte de réception "
+"pour confirmer."
 
 #: .\orders\admin.py:23
 msgid "Accept order and send to Printify"
@@ -282,8 +283,10 @@ msgstr "Récupérer maintenant les statuts de commande Printify"
 #: .\printify_integration\admin.py:39
 #, python-format
 msgid "Order pull finished: %(u)d updated (errors %(e)d)."
-msgstr "Mise à jour des commandes terminée : %(u)d mises à jour (erreurs %(e)d)."
-"Récupération des commandes terminée : %(u)d mise(s) à jour (erreurs %(e)d)."
+msgstr ""
+"Mise à jour des commandes terminée : %(u)d mises à jour (erreurs "
+"%(e)d).Récupération des commandes terminée : %(u)d mise(s) à jour (erreurs "
+"%(e)d)."
 
 #: .\printify_integration\models.py:13
 msgid "Products sync"
@@ -305,7 +308,7 @@ msgstr "Resynchronisation d'un seul produit"
 msgid "Running"
 msgstr "En cours d'exécution"
 
-#: .\printify_integration\models.py:25 .\templates\base.html:62
+#: .\printify_integration\models.py:25 .\templates\base.html:65
 msgid "Success"
 msgstr "Succès"
 
@@ -313,7 +316,7 @@ msgstr "Succès"
 msgid "Partial"
 msgstr "Partiel"
 
-#: .\printify_integration\models.py:27 .\templates\base.html:63
+#: .\printify_integration\models.py:27 .\templates\base.html:66
 msgid "Error"
 msgstr "Erreur"
 
@@ -378,8 +381,10 @@ msgstr "Motif du retour"
 
 #: .\returns\forms.py:15
 msgid "Tell us why you'd like to return your order (optional)."
-msgstr "Dites-nous pourquoi vous souhaitez retourner votre commande (facultatif)."
-"Indiquez-nous pourquoi vous souhaitez retourner votre commande (facultatif)."
+msgstr ""
+"Dites-nous pourquoi vous souhaitez retourner votre commande "
+"(facultatif).Indiquez-nous pourquoi vous souhaitez retourner votre commande "
+"(facultatif)."
 
 #: .\returns\forms.py:30
 msgid "Please enter the email used for this order."
@@ -424,9 +429,9 @@ msgstr "Cet e-mail ne correspond pas à cette commande."
 
 #: .\returns\views.py:78
 msgid "Your return request has been submitted. We'll be in touch shortly."
-msgstr "Votre demande de retour a été envoyée. Nous vous contacterons sous peu."
-"Votre demande de retour a bien été envoyée. Nous vous recontacterons "
-"prochainement."
+msgstr ""
+"Votre demande de retour a été envoyée. Nous vous contacterons sous peu.Votre "
+"demande de retour a bien été envoyée. Nous vous recontacterons prochainement."
 
 #: .\shipping\constants.py:7
 msgid "Italy"
@@ -561,22 +566,16 @@ msgstr "Se déconnecter"
 
 #: .\templates\accounts\address_form.html:3
 #: .\templates\accounts\address_form.html:33
-#, fuzzy
-#| msgid "Email address"
 msgid "Edit address"
 msgstr "Adresse e-mail"
 
 #: .\templates\accounts\address_form.html:3
 #: .\templates\accounts\address_list.html:23
 #: .\templates\accounts\address_list.html:75
-#, fuzzy
-#| msgid "Email address"
 msgid "Add address"
 msgstr "Adresse e-mail"
 
 #: .\templates\accounts\address_form.html:33
-#, fuzzy
-#| msgid "Use saved address"
 msgid "Add a new address"
 msgstr "Utiliser une adresse enregistrée"
 
@@ -585,33 +584,23 @@ msgid "These details will be used for delivery and billing."
 msgstr "Ces informations seront utilisées pour la livraison et la facturation."
 
 #: .\templates\accounts\address_form.html:39
-#, fuzzy
-#| msgid "Back to orders"
 msgid "Back to addresses"
 msgstr "Retour aux commandes"
 
 #: .\templates\accounts\address_form.html:67
-#, fuzzy
-#| msgid "Save / update my default address"
 msgid "Set as my default address"
 msgstr "Enregistrer / mettre à jour mon adresse par défaut"
 
 #: .\templates\accounts\address_form.html:73
-#, fuzzy
-#| msgid "Use saved address"
 msgid "Save address"
 msgstr "Utiliser une adresse enregistrée"
 
 #: .\templates\accounts\address_form.html:75
-#, fuzzy
-#| msgid "Cancelled"
 msgid "Cancel"
 msgstr "Annulée"
 
 #: .\templates\accounts\address_list.html:3
 #: .\templates\accounts\address_list.html:18
-#, fuzzy
-#| msgid "Email address"
 msgid "My addresses"
 msgstr "Adresse e-mail"
 
@@ -632,8 +621,6 @@ msgid "Set as default"
 msgstr "Définir par défaut"
 
 #: .\templates\accounts\address_list.html:57
-#, fuzzy
-#| msgid "Select an address"
 msgid "Delete this address?"
 msgstr "Sélectionner une adresse"
 
@@ -642,8 +629,6 @@ msgid "Delete"
 msgstr "Supprimer"
 
 #: .\templates\accounts\address_list.html:73
-#, fuzzy
-#| msgid "Use saved address"
 msgid "No saved addresses yet"
 msgstr "Utiliser une adresse enregistrée"
 
@@ -754,8 +739,8 @@ msgstr "Confirmée"
 
 #: .\templates\accounts\dashboard.html:151
 #: .\templates\accounts\my_orders.html:72
-#: .\templates\accounts\transactions.html:142 .\templates\home.html:55
-#: .\templates\home.html:94 .\templates\orders\order_complete.html:286
+#: .\templates\accounts\transactions.html:142 .\templates\home.html:72
+#: .\templates\home.html:151 .\templates\orders\order_complete.html:286
 msgid "Details"
 msgstr "Détails"
 
@@ -1042,66 +1027,147 @@ msgstr "En erreur"
 msgid "To fulfil"
 msgstr "À traiter"
 
-#: .\templates\base.html:64
+#: .\templates\base.html:67
 msgid "Warning"
 msgstr "Avertissement"
 
-#: .\templates\base.html:65
+#: .\templates\base.html:68
 msgid "Info"
 msgstr "Info"
 
 #: .\templates\home.html:14
-msgid "New drops"
-msgstr "Nouveautés"
+msgid "New season"
+msgstr "Nouvelle saison"
 
 #: .\templates\home.html:15
-msgid "Premium print-on-demand"
-msgstr "Impression à la demande premium"
+msgid "Wear something worth keeping."
+msgstr "Portez quelque chose qui en vaut la peine."
 
 #: .\templates\home.html:16
-msgid "Discover bestsellers and latest arrivals."
-msgstr "Découvrez nos meilleures ventes et nos dernières nouveautés."
+msgid ""
+"Considered essentials, made on demand. Premium fabrics, honest pricing, free "
+"14-day returns."
+msgstr ""
+"Des essentiels soigneusement sélectionnés, pensés pour le confort au "
+"quotidien. Qualité premium, livraison rapide, retours simplifiés."
 
-#: .\templates\home.html:18
-msgid "Browse store"
-msgstr "Parcourir la boutique"
+#: .\templates\home.html:19
+msgid "Shop the collection"
+msgstr "Découvrir la collection"
 
-#: .\templates\home.html:31
+#: .\templates\home.html:22
+msgid "New arrivals"
+msgstr "Nouveautés"
+
+#: .\templates\home.html:35
+#, python-format
+msgid "Free shipping over %(t)s"
+msgstr "Livraison gratuite dès %(t)s"
+
+#: .\templates\home.html:36
+#, python-format
+msgid "%(d)s-day free returns"
+msgstr "Retours sous %(d)s jours"
+
+#: .\templates\home.html:37
+msgid "Premium, ethically printed"
+msgstr "Impression à la demande premium"
+
+#: .\templates\home.html:38 .\templates\store\cart.html:129
+msgid "Secure checkout"
+msgstr "Paiement sécurisé"
+
+#: .\templates\home.html:48
 msgid "Popular products"
 msgstr "Produits populaires"
 
-#: .\templates\home.html:32
+#: .\templates\home.html:49
 msgid "Customer favorites and trending items"
 msgstr "Les coups de cœur des clients et les articles tendance"
 
-#: .\templates\home.html:35
+#: .\templates\home.html:52
 msgid "View all"
 msgstr "Tout voir"
 
-#: .\templates\home.html:49
+#: .\templates\home.html:66
 msgid "Top seller"
 msgstr "Meilleure vente"
 
-#: .\templates\home.html:50
+#: .\templates\home.html:67
 #, python-format
 msgid "%(n)s sold"
 msgid_plural "%(n)s sold"
 msgstr[0] "%(n)s vendu"
 msgstr[1] "%(n)s vendus"
 
-#: .\templates\home.html:70
+#: .\templates\home.html:86
+msgid "The Glitchy promise"
+msgstr "La promesse Glitchy"
+
+#: .\templates\home.html:87
+msgid "Designed to be worn, made to last"
+msgstr "Conçus pour être portés, faits pour durer"
+
+#: .\templates\home.html:92
+msgid "Premium fabrics"
+msgstr "Contenu premium"
+
+#: .\templates\home.html:93
+msgid "Heavyweight, soft-touch materials chosen for comfort and longevity."
+msgstr ""
+"Des matières épaisses au toucher doux, sélectionnées pour le confort et la "
+"longévité."
+
+#: .\templates\home.html:97
+msgid "Made on demand"
+msgstr "Fabriqués à la demande"
+
+#: .\templates\home.html:98
+msgid "Printed only when you order — less waste, always fresh."
+msgstr "Imprimés uniquement à la commande — moins de gaspillage, toujours neufs."
+
+#: .\templates\home.html:102 .\templates\store\cart.html:171
+#: .\templates\store\checkout.html:208 .\templates\store\product_detail.html:75
+#, python-format
+msgid "%(d)s-day returns"
+msgstr "Retours sous %(d)s jours"
+
+#: .\templates\home.html:103
+msgid "Changed your mind? Send it back, free and easy."
+msgstr "Vous avez changé d'avis ? Renvoyez-le, gratuitement et en toute simplicité."
+
+#: .\templates\home.html:107
+msgid "Secure & simple"
+msgstr "Paiement sécurisé"
+
+#: .\templates\home.html:108
+msgid "Encrypted checkout, guest-friendly, no account required."
+msgstr "Vous commandez en tant qu'invité. Aucun compte requis."
+
+#: .\templates\home.html:117
+msgid "Our philosophy"
+msgstr "Notre philosophie"
+
+#: .\templates\home.html:118
+msgid ""
+"“Fewer, better things — pieces you reach for again and again, not just once.”"
+msgstr ""
+"“Moins de pièces, mais de meilleures pièces — celles que l'on porte encore et "
+"encore, pas une seule fois.”"
+
+#: .\templates\home.html:127
 msgid "Latest arrivals"
 msgstr "Dernières nouveautés"
 
-#: .\templates\home.html:71
+#: .\templates\home.html:128
 msgid "Freshly added — don’t miss out"
 msgstr "Tout juste ajoutés — à ne pas manquer"
 
-#: .\templates\home.html:74
+#: .\templates\home.html:131
 msgid "See new"
 msgstr "Voir les nouveautés"
 
-#: .\templates\home.html:89 .\templates\store\product_detail.html:73
+#: .\templates\home.html:146 .\templates\store\product_detail.html:73
 msgid "Bestseller"
 msgstr "Meilleure vente"
 
@@ -1306,13 +1372,15 @@ msgstr "Bonne nouvelle — votre commande <strong>#%(n)s</strong> est en route !
 #: .\templates\notifications\email\transactional.html:39
 #, python-format
 msgid "Here is an update on your order <strong>#%(n)s</strong>."
-msgstr "Voici une mise à jour de votre commande <strong>#%(n)s</strong>."
-"Voici une mise à jour concernant votre commande <strong>#%(n)s</strong>."
+msgstr ""
+"Voici une mise à jour de votre commande <strong>#%(n)s</strong>.Voici une "
+"mise à jour concernant votre commande <strong>#%(n)s</strong>."
 
 #: .\templates\notifications\email\transactional.html:45
 msgid "We have received your return request and our team is reviewing it."
-msgstr "Nous avons bien reçu votre demande de retour et notre équipe l'examine."
-"Nous avons bien reçu votre demande de retour et notre équipe l'examine."
+msgstr ""
+"Nous avons bien reçu votre demande de retour et notre équipe l'examine.Nous "
+"avons bien reçu votre demande de retour et notre équipe l'examine."
 
 #: .\templates\notifications\email\transactional.html:46
 msgid ""
@@ -1394,9 +1462,10 @@ msgstr "Voir le statut du retour"
 #: .\templates\notifications\email\transactional.html:116
 #, python-format
 msgid "Not quite right? You can return your order within %(d)s days."
-msgstr "Pas tout à fait ce qu'il vous fallait ? Vous pouvez retourner votre commande sous %(d)s jours."
+msgstr ""
 "Pas tout à fait ce qu'il vous fallait ? Vous pouvez retourner votre commande "
-"sous %(d)s jours."
+"sous %(d)s jours.Pas tout à fait ce qu'il vous fallait ? Vous pouvez "
+"retourner votre commande sous %(d)s jours."
 
 #: .\templates\notifications\email\transactional.html:118
 msgid "Premium fashion, printed on demand."
@@ -1571,14 +1640,16 @@ msgstr "Sélectionnez les articles et indiquez-nous le motif (facultatif)."
 
 #: .\templates\returns\policy.html:35
 msgid "We review your request and email you the next steps."
-msgstr "Nous examinons votre demande et vous envoyons les étapes suivantes par e-mail."
+msgstr ""
 "Nous examinons votre demande et vous envoyons les étapes suivantes par e-"
-"mail."
+"mail.Nous examinons votre demande et vous envoyons les étapes suivantes par "
+"e-mail."
 
 #: .\templates\returns\policy.html:36
 msgid "Once the return is approved and received, we issue your refund."
-msgstr "Une fois le retour approuvé et reçu, nous procédons au remboursement."
-"Une fois le retour approuvé et reçu, nous procédons à votre remboursement."
+msgstr ""
+"Une fois le retour approuvé et reçu, nous procédons au remboursement.Une "
+"fois le retour approuvé et reçu, nous procédons à votre remboursement."
 
 #: .\templates\returns\policy.html:43
 msgid "Refunds"
@@ -1597,9 +1668,10 @@ msgstr ""
 
 #: .\templates\returns\policy.html:51
 msgid "Need help? Contact our support team and we'll be glad to assist."
-msgstr "Besoin d'aide ? Contactez notre équipe d'assistance, nous serons ravis de vous aider."
+msgstr ""
 "Besoin d'aide ? Contactez notre équipe d'assistance, nous serons ravis de "
-"vous aider."
+"vous aider.Besoin d'aide ? Contactez notre équipe d'assistance, nous serons "
+"ravis de vous aider."
 
 #: .\templates\returns\policy.html:55
 msgid "Go to my orders"
@@ -1736,10 +1808,6 @@ msgstr "Options sélectionnées incluses"
 msgid "Order summary"
 msgstr "Récapitulatif de la commande"
 
-#: .\templates\store\cart.html:129
-msgid "Secure checkout"
-msgstr "Paiement sécurisé"
-
 #: .\templates\store\cart.html:131
 msgid "Protected"
 msgstr "Protégé"
@@ -1756,12 +1824,6 @@ msgstr "Commander"
 #: .\templates\store\cart.html:165
 msgid "No account needed — checkout as a guest."
 msgstr "Aucun compte requis — commandez en tant qu'invité."
-
-#: .\templates\store\cart.html:171 .\templates\store\checkout.html:208
-#: .\templates\store\product_detail.html:75
-#, python-format
-msgid "%(d)s-day returns"
-msgstr "Retours sous %(d)s jours"
 
 #: .\templates\store\cart.html:172
 msgid "Secure payments"
@@ -1809,9 +1871,10 @@ msgstr "Sélectionner une adresse"
 
 #: .\templates\store\checkout.html:69
 msgid "Pick one to autofill your billing details."
-msgstr "Sélectionnez-en une pour remplir automatiquement vos informations de facturation."
-"Choisissez-en une pour remplir automatiquement vos informations de "
-"facturation."
+msgstr ""
+"Sélectionnez-en une pour remplir automatiquement vos informations de "
+"facturation.Choisissez-en une pour remplir automatiquement vos informations "
+"de facturation."
 
 #: .\templates\store\checkout.html:83
 msgid "Email"
@@ -1863,8 +1926,9 @@ msgstr "Enregistrer / mettre à jour mon adresse par défaut"
 
 #: .\templates\store\checkout.html:134
 msgid "You can create an account after checkout to track your order."
-msgstr "Vous pouvez créer un compte après la commande pour suivre votre colis."
-"Vous pourrez créer un compte après la commande pour suivre votre commande."
+msgstr ""
+"Vous pouvez créer un compte après la commande pour suivre votre colis.Vous "
+"pourrez créer un compte après la commande pour suivre votre commande."
 
 #: .\templates\store\checkout.html:167
 msgid "each"
@@ -1872,9 +1936,10 @@ msgstr "l'unité"
 
 #: .\templates\store\checkout.html:191
 msgid "We don't ship to this country yet — choose another at checkout."
-msgstr "Nous ne livrons pas encore dans ce pays — choisissez-en un autre lors du paiement."
+msgstr ""
 "Nous ne livrons pas encore dans ce pays — choisissez-en un autre lors du "
-"paiement."
+"paiement.Nous ne livrons pas encore dans ce pays — choisissez-en un autre "
+"lors du paiement."
 
 #: .\templates\store\checkout.html:197
 msgid "Continue to payment"
@@ -2064,3 +2129,12 @@ msgstr "Stock faible"
 #: .\templates\store\store.html:292
 msgid "No products available."
 msgstr "Aucun produit disponible."
+
+#~ msgid "New drops"
+#~ msgstr "Nouveautés"
+
+#~ msgid "Discover bestsellers and latest arrivals."
+#~ msgstr "Découvrez nos meilleures ventes et nos dernières nouveautés."
+
+#~ msgid "Browse store"
+#~ msgstr "Parcourir la boutique"
