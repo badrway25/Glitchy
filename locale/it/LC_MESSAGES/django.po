@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: greatkart 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-20 11:44+0200\n"
+"POT-Creation-Date: 2026-06-20 14:10+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,7 +30,10 @@ msgid "Français"
 msgstr "Francese"
 
 #: .\notifications\admin.py:19 .\printify_integration\admin.py:17
-#: .\returns\admin.py:40
+#: .\returns\admin.py:40 .\templates\accounts\dashboard.html:111
+#: .\templates\accounts\my_orders.html:40
+#: .\templates\accounts\transactions.html:100
+#: .\templates\orders\order_complete.html:186
 msgid "Status"
 msgstr "Stato"
 
@@ -44,6 +47,9 @@ msgid "Re-dispatched %(n)d event(s); %(s)d delivered."
 msgstr "Reinviati %(n)d eventi; %(s)d consegnati."
 
 #: .\notifications\admin.py:49 .\returns\admin.py:36
+#: .\templates\accounts\dashboard.html:110
+#: .\templates\accounts\my_orders.html:38
+#: .\templates\accounts\transactions.html:95
 #: .\templates\returns\request.html:17 .\templates\returns\status.html:9
 msgid "Order"
 msgstr "Ordine"
@@ -102,7 +108,8 @@ msgstr "Abbiamo ricevuto il tuo messaggio"
 msgid "Update from %(brand)s"
 msgstr "Aggiornamento da %(brand)s"
 
-#: .\notifications\models.py:18
+#: .\notifications\models.py:18 .\templates\accounts\dashboard.html:130
+#: .\templates\accounts\order_detail.html:89
 msgid "Pending"
 msgstr "In attesa"
 
@@ -135,7 +142,7 @@ msgstr "Eventi in uscita (Django → n8n)"
 msgid "New"
 msgstr "Novità"
 
-#: .\notifications\models.py:81
+#: .\notifications\models.py:81 .\templates\accounts\dashboard.html:73
 msgid "In progress"
 msgstr "In corso"
 
@@ -165,7 +172,7 @@ msgstr "Inserisci un indirizzo email valido."
 
 #: .\notifications\views.py:47
 msgid "Thanks for subscribing! Check your inbox to confirm."
-msgstr ""
+msgstr "Grazie per l'iscrizione! Controlla la tua casella per confermare."
 "Grazie per l'iscrizione! Controlla la tua casella di posta per confermare."
 
 #: .\orders\admin.py:23
@@ -212,7 +219,10 @@ msgstr "Evasione Printify"
 msgid "Guest"
 msgstr "Ospite"
 
-#: .\orders\admin.py:98 .\templates\notifications\email\transactional.html:91
+#: .\orders\admin.py:98 .\templates\accounts\dashboard.html:112
+#: .\templates\accounts\my_orders.html:41
+#: .\templates\notifications\email\transactional.html:91
+#: .\templates\orders\order_complete.html:198
 msgid "Total"
 msgstr "Totale"
 
@@ -366,7 +376,7 @@ msgstr "Motivo del reso"
 
 #: .\returns\forms.py:15
 msgid "Tell us why you'd like to return your order (optional)."
-msgstr ""
+msgstr "Dicci perché vuoi restituire il tuo ordine (facoltativo)."
 "Indicaci il motivo per cui desideri restituire il tuo ordine (facoltativo)."
 
 #: .\returns\forms.py:30
@@ -521,11 +531,332 @@ msgstr "Risincronizza i prodotti selezionati da Printify"
 msgid "Resynced %(ok)d product(s), %(err)d error(s)."
 msgstr "Risincronizzati %(ok)d prodotti, %(err)d errori."
 
-#: .\templates\accounts\order_detail.html:4
+#: .\templates\accounts\_sidebar.html:14
+#: .\templates\accounts\transactions.html:24
+msgid "Overview"
+msgstr "Panoramica"
+
+#: .\templates\accounts\_sidebar.html:19 .\templates\accounts\my_orders.html:4
+#: .\templates\accounts\my_orders.html:20
+#: .\templates\accounts\transactions.html:27
+#: .\templates\includes\navbar.html:98
+msgid "My orders"
+msgstr "I miei ordini"
+
+#: .\templates\accounts\_sidebar.html:24
+#: .\templates\accounts\transactions.html:4
+#: .\templates\accounts\transactions.html:30
+#: .\templates\accounts\transactions.html:46
+msgid "Transactions"
+msgstr "Transazioni"
+
+#: .\templates\accounts\_sidebar.html:30
+#: .\templates\accounts\transactions.html:36
+msgid "Log out"
+msgstr "Esci"
+
+#: .\templates\accounts\address_form.html:3
+#: .\templates\accounts\address_form.html:33
 #, fuzzy
-#| msgid "Orders"
+#| msgid "Email address"
+msgid "Edit address"
+msgstr "Indirizzo email"
+
+#: .\templates\accounts\address_form.html:3
+#: .\templates\accounts\address_list.html:23
+#: .\templates\accounts\address_list.html:75
+#, fuzzy
+#| msgid "Email address"
+msgid "Add address"
+msgstr "Indirizzo email"
+
+#: .\templates\accounts\address_form.html:33
+#, fuzzy
+#| msgid "Use saved address"
+msgid "Add a new address"
+msgstr "Usa indirizzo salvato"
+
+#: .\templates\accounts\address_form.html:35
+msgid "These details will be used for delivery and billing."
+msgstr "Questi dati saranno usati per spedizione e fatturazione."
+
+#: .\templates\accounts\address_form.html:39
+#, fuzzy
+#| msgid "Back to orders"
+msgid "Back to addresses"
+msgstr "Torna agli ordini"
+
+#: .\templates\accounts\address_form.html:67
+#, fuzzy
+#| msgid "Save / update my default address"
+msgid "Set as my default address"
+msgstr "Salva / aggiorna il mio indirizzo predefinito"
+
+#: .\templates\accounts\address_form.html:73
+#, fuzzy
+#| msgid "Use saved address"
+msgid "Save address"
+msgstr "Usa indirizzo salvato"
+
+#: .\templates\accounts\address_form.html:75
+#, fuzzy
+#| msgid "Cancelled"
+msgid "Cancel"
+msgstr "Annullato"
+
+#: .\templates\accounts\address_list.html:3
+#: .\templates\accounts\address_list.html:18
+#, fuzzy
+#| msgid "Email address"
+msgid "My addresses"
+msgstr "Indirizzo email"
+
+#: .\templates\accounts\address_list.html:19
+msgid "Manage your saved delivery addresses."
+msgstr "Gestisci i tuoi indirizzi di spedizione salvati."
+
+#: .\templates\accounts\address_list.html:36 .\templates\store\checkout.html:64
+msgid "Default"
+msgstr "Predefinito"
+
+#: .\templates\accounts\address_list.html:46
+msgid "Edit"
+msgstr "Modifica"
+
+#: .\templates\accounts\address_list.html:52
+msgid "Set as default"
+msgstr "Imposta come predefinito"
+
+#: .\templates\accounts\address_list.html:57
+#, fuzzy
+#| msgid "Select an address"
+msgid "Delete this address?"
+msgstr "Seleziona un indirizzo"
+
+#: .\templates\accounts\address_list.html:60
+msgid "Delete"
+msgstr "Elimina"
+
+#: .\templates\accounts\address_list.html:73
+#, fuzzy
+#| msgid "Use saved address"
+msgid "No saved addresses yet"
+msgstr "Usa indirizzo salvato"
+
+#: .\templates\accounts\address_list.html:74
+msgid "Add an address to speed up your next checkout."
+msgstr "Aggiungi un indirizzo per velocizzare il prossimo checkout."
+
+#: .\templates\accounts\dashboard.html:4 .\templates\includes\navbar.html:97
+msgid "Dashboard"
+msgstr "Dashboard"
+
+#: .\templates\accounts\dashboard.html:26
+msgid "Account overview"
+msgstr "Panoramica account"
+
+#: .\templates\accounts\dashboard.html:27
+msgid "Track your orders, payments and deliveries."
+msgstr "Tieni traccia dei tuoi ordini, pagamenti e consegne."
+
+#: .\templates\accounts\dashboard.html:32
+#: .\templates\accounts\my_orders.html:25
+#: .\templates\accounts\transactions.html:51
+#: .\templates\includes\footer.html:36
+msgid "Shop"
+msgstr "Shop"
+
+#: .\templates\accounts\dashboard.html:35
+msgid "View all orders"
+msgstr "Vedi tutti gli ordini"
+
+#: .\templates\accounts\dashboard.html:47
+msgid "Quick stats"
+msgstr "Statistiche rapide"
+
+#: .\templates\accounts\dashboard.html:48
+msgid "All time overview"
+msgstr "Panoramica di sempre"
+
+#: .\templates\accounts\dashboard.html:55
+msgid "Total orders"
+msgstr "Ordini totali"
+
+#: .\templates\accounts\dashboard.html:59
+#: .\templates\accounts\dashboard.html:68
+msgid "All time"
+msgstr "Da sempre"
+
+#: .\templates\accounts\dashboard.html:64
+msgid "Spent"
+msgstr "Speso"
+
+#: .\templates\accounts\dashboard.html:77
+msgid "New / Accepted"
+msgstr "Nuovi / Accettati"
+
+#: .\templates\accounts\dashboard.html:82
+#: .\templates\accounts\dashboard.html:137
+#: .\templates\accounts\my_orders.html:59
+#: .\templates\accounts\order_detail.html:26
+msgid "Completed"
+msgstr "Completato"
+
+#: .\templates\accounts\dashboard.html:86
+msgid "Delivered"
+msgstr "Consegnato"
+
+#: .\templates\accounts\dashboard.html:96
+msgid "Recent orders"
+msgstr "Ordini recenti"
+
+#: .\templates\accounts\dashboard.html:97
+msgid "Last 5 orders"
+msgstr "Ultimi 5 ordini"
+
+#: .\templates\accounts\dashboard.html:100
+msgid "See all"
+msgstr "Vedi tutti"
+
+#: .\templates\accounts\dashboard.html:113
+#: .\templates\accounts\my_orders.html:42
+#: .\templates\accounts\transactions.html:101
+msgid "Action"
+msgstr "Azione"
+
+#: .\templates\accounts\dashboard.html:139
+#: .\templates\accounts\my_orders.html:61
+#: .\templates\accounts\order_detail.html:28
+#: .\templates\orders\order_complete.html:104
+#: .\templates\orders\order_complete.html:140
+msgid "Cancelled"
+msgstr "Annullato"
+
+#: .\templates\accounts\dashboard.html:141
+#: .\templates\accounts\my_orders.html:63
+#: .\templates\accounts\order_detail.html:30
+#: .\templates\orders\order_complete.html:88
+#: .\templates\orders\order_complete.html:124
+msgid "Packed"
+msgstr "Preparato"
+
+#: .\templates\accounts\dashboard.html:143
+#: .\templates\accounts\my_orders.html:65
+#: .\templates\accounts\order_detail.html:32
+#: .\templates\orders\order_complete.html:80
+#: .\templates\orders\order_complete.html:116
+msgid "Confirmed"
+msgstr "Confermato"
+
+#: .\templates\accounts\dashboard.html:151
+#: .\templates\accounts\my_orders.html:72
+#: .\templates\accounts\transactions.html:142 .\templates\home.html:55
+#: .\templates\home.html:94 .\templates\orders\order_complete.html:286
+msgid "Details"
+msgstr "Dettagli"
+
+#: .\templates\accounts\dashboard.html:162
+#: .\templates\accounts\my_orders.html:108
+msgid "No orders yet"
+msgstr "Nessun ordine"
+
+#: .\templates\accounts\dashboard.html:163
+#: .\templates\accounts\my_orders.html:109
+msgid "Start shopping to see your orders here."
+msgstr "Inizia a fare acquisti per vedere qui i tuoi ordini."
+
+#: .\templates\accounts\dashboard.html:164
+#: .\templates\accounts\my_orders.html:110
+#: .\templates\accounts\transactions.html:186 .\templates\store\cart.html:37
+msgid "Browse products"
+msgstr "Esplora i prodotti"
+
+#: .\templates\accounts\forgotPassword.html:16
+msgid "Forgot Password"
+msgstr "Password dimenticata"
+
+#: .\templates\accounts\forgotPassword.html:21
+#: .\templates\accounts\login.html:29 .\templates\accounts\register.html:32
+msgid "Email Address"
+msgstr "Indirizzo email"
+
+#: .\templates\accounts\forgotPassword.html:25
+msgid "Got password? Login"
+msgstr "Hai la password? Accedi"
+
+#: .\templates\accounts\forgotPassword.html:29
+msgid "Submit"
+msgstr "Invia"
+
+#: .\templates\accounts\forgotPassword.html:35
+#: .\templates\accounts\login.html:46
+#: .\templates\accounts\resetPassword.html:35
+msgid "Don't have account?"
+msgstr "Non hai un account?"
+
+#: .\templates\accounts\forgotPassword.html:35
+#: .\templates\accounts\login.html:46 .\templates\accounts\register.html:13
+#: .\templates\accounts\resetPassword.html:35
+msgid "Sign up"
+msgstr "Registrati"
+
+#: .\templates\accounts\login.html:14
+#, python-format
+msgid ""
+"Thank you for registering with us. We have sent you a verification email to "
+"your email address [%(email)s]"
+msgstr ""
+"Grazie per esserti registrato. Ti abbiamo inviato un'email di verifica al "
+"tuo indirizzo email [%(email)s]"
+
+#: .\templates\accounts\login.html:16
+msgid "Already verified?"
+msgstr "Già verificato?"
+
+#: .\templates\accounts\login.html:16 .\templates\accounts\login.html:40
+#: .\templates\includes\navbar.html:103
+msgid "Login"
+msgstr "Accedi"
+
+#: .\templates\accounts\login.html:24
+msgid "Sign in"
+msgstr "Accedi"
+
+#: .\templates\accounts\login.html:32
+msgid "Password"
+msgstr "Password"
+
+#: .\templates\accounts\login.html:36
+msgid "Forgot password?"
+msgstr "Password dimenticata?"
+
+#: .\templates\accounts\my_orders.html:21
+msgid "All your completed purchases."
+msgstr "Tutti i tuoi acquisti completati."
+
+#: .\templates\accounts\my_orders.html:39
+#: .\templates\accounts\transactions.html:96
+msgid "Date"
+msgstr "Data"
+
+#: .\templates\accounts\my_orders.html:51
+msgid "Payment pending"
+msgstr "Pagamento in attesa"
+
+#: .\templates\accounts\order_detail.html:4
 msgid "Order details"
-msgstr "Ordini"
+msgstr "Dettagli ordine"
+
+#: .\templates\accounts\order_detail.html:23
+#: .\templates\orders\order_complete.html:41
+#, python-format
+msgid "Order #%(n)s"
+msgstr "Ordine #%(n)s"
+
+#: .\templates\accounts\order_detail.html:37
+#, python-format
+msgid "Placed on %(d)s"
+msgstr "Effettuato il %(d)s"
 
 #: .\templates\accounts\order_detail.html:47
 msgid "PDF invoice"
@@ -537,10 +868,155 @@ msgid "Request a return"
 msgstr "Richiedi un reso"
 
 #: .\templates\accounts\order_detail.html:55
-#, fuzzy
-#| msgid "Back to home"
 msgid "Back to orders"
-msgstr "Torna alla home"
+msgstr "Torna agli ordini"
+
+#: .\templates\accounts\order_detail.html:67
+msgid "Delivery"
+msgstr "Consegna"
+
+#: .\templates\accounts\order_detail.html:83
+#: .\templates\orders\order_complete.html:164
+#: .\templates\orders\payments.html:4
+msgid "Payment"
+msgstr "Pagamento"
+
+#: .\templates\accounts\order_detail.html:87
+#, python-format
+msgid "Transaction: %(id)s"
+msgstr "Transazione: %(id)s"
+
+#: .\templates\accounts\order_detail.html:90
+msgid "No payment attached."
+msgstr "Nessun pagamento associato."
+
+#: .\templates\accounts\order_detail.html:97
+#: .\templates\notifications\email\transactional.html:88
+#: .\templates\orders\order_complete.html:230
+#: .\templates\orders\payments.html:114 .\templates\store\cart.html:51
+#: .\templates\store\cart.html:135 .\templates\store\checkout.html:176
+msgid "Subtotal"
+msgstr "Subtotale"
+
+#: .\templates\accounts\order_detail.html:101
+#: .\templates\notifications\email\transactional.html:90
+#: .\templates\orders\order_complete.html:234
+#: .\templates\orders\payments.html:116 .\templates\store\cart.html:140
+#: .\templates\store\checkout.html:181
+msgid "Tax"
+msgstr "IVA"
+
+#: .\templates\accounts\order_detail.html:105
+#: .\templates\orders\order_complete.html:238
+#: .\templates\orders\payments.html:117 .\templates\store\cart.html:141
+#: .\templates\store\checkout.html:182
+msgid "Grand total"
+msgstr "Totale complessivo"
+
+#: .\templates\accounts\order_detail.html:119
+msgid "Item"
+msgstr "Articolo"
+
+#: .\templates\accounts\order_detail.html:120
+#: .\templates\orders\order_complete.html:197
+#: .\templates\returns\request.html:54 .\templates\returns\status.html:45
+#: .\templates\store\checkout.html:167
+msgid "Qty"
+msgstr "Qtà"
+
+#: .\templates\accounts\order_detail.html:121
+msgid "Price"
+msgstr "Prezzo"
+
+#: .\templates\accounts\register.html:20 .\templates\store\checkout.html:75
+msgid "First name"
+msgstr "Nome"
+
+#: .\templates\accounts\register.html:24 .\templates\store\checkout.html:79
+msgid "Last name"
+msgstr "Cognome"
+
+#: .\templates\accounts\register.html:36
+msgid "Phone Number"
+msgstr "Numero di telefono"
+
+#: .\templates\accounts\register.html:42
+msgid "Create password"
+msgstr "Crea password"
+
+#: .\templates\accounts\register.html:46
+msgid "Repeat password"
+msgstr "Ripeti password"
+
+#: .\templates\accounts\register.html:51 .\templates\includes\navbar.html:104
+msgid "Register"
+msgstr "Registrati"
+
+#: .\templates\accounts\register.html:58
+msgid "Have an account?"
+msgstr "Hai già un account?"
+
+#: .\templates\accounts\register.html:58
+msgid "Log In"
+msgstr "Accedi"
+
+#: .\templates\accounts\resetPassword.html:16
+msgid "Reset Password"
+msgstr "Reimposta password"
+
+#: .\templates\accounts\resetPassword.html:21
+msgid "Create Password"
+msgstr "Crea password"
+
+#: .\templates\accounts\resetPassword.html:24
+msgid "Confirm Password"
+msgstr "Conferma password"
+
+#: .\templates\accounts\resetPassword.html:29
+#: .\templates\accounts\transactions.html:87 .\templates\store\store.html:137
+msgid "Reset"
+msgstr "Reimposta"
+
+#: .\templates\accounts\transactions.html:47
+msgid "Your payments and transaction history."
+msgstr "I tuoi pagamenti e lo storico delle transazioni."
+
+#: .\templates\accounts\transactions.html:67
+msgid "Search Order # or Payment ID"
+msgstr "Cerca n. ordine o ID pagamento"
+
+#: .\templates\accounts\transactions.html:73
+msgid "All status"
+msgstr "Tutti gli stati"
+
+#: .\templates\accounts\transactions.html:80
+msgid "All methods"
+msgstr "Tutti i metodi"
+
+#: .\templates\accounts\transactions.html:86 .\templates\store\store.html:224
+msgid "Apply"
+msgstr "Applica"
+
+#: .\templates\accounts\transactions.html:97
+msgid "Method"
+msgstr "Metodo"
+
+#: .\templates\accounts\transactions.html:98
+msgid "Payment ID"
+msgstr "ID pagamento"
+
+#: .\templates\accounts\transactions.html:99
+#: .\templates\accounts\transactions.html:132
+msgid "Paid"
+msgstr "Pagato"
+
+#: .\templates\accounts\transactions.html:184
+msgid "No transactions yet"
+msgstr "Nessuna transazione"
+
+#: .\templates\accounts\transactions.html:185
+msgid "When you pay for an order, it will appear here."
+msgstr "Quando paghi un ordine, comparirà qui."
 
 #: .\templates\admin\orders\order_changelist.html:5
 msgid "Orders"
@@ -609,10 +1085,6 @@ msgid_plural "%(n)s sold"
 msgstr[0] "%(n)s venduto"
 msgstr[1] "%(n)s venduti"
 
-#: .\templates\home.html:55 .\templates\home.html:94
-msgid "Details"
-msgstr "Dettagli"
-
 #: .\templates\home.html:70
 msgid "Latest arrivals"
 msgstr "Ultimi arrivi"
@@ -645,10 +1117,6 @@ msgid ""
 msgstr ""
 "Essenziali selezionati, pensati per il comfort di ogni giorno. Qualità "
 "premium, spedizione rapida, resi facili."
-
-#: .\templates\includes\footer.html:36
-msgid "Shop"
-msgstr "Shop"
 
 #: .\templates\includes\footer.html:38
 msgid "All Products"
@@ -800,25 +1268,9 @@ msgstr "Tema"
 msgid "Account"
 msgstr "Account"
 
-#: .\templates\includes\navbar.html:97
-msgid "Dashboard"
-msgstr "Dashboard"
-
-#: .\templates\includes\navbar.html:98
-msgid "My orders"
-msgstr "I miei ordini"
-
 #: .\templates\includes\navbar.html:99
 msgid "Logout"
 msgstr "Esci"
-
-#: .\templates\includes\navbar.html:103
-msgid "Login"
-msgstr "Accedi"
-
-#: .\templates\includes\navbar.html:104
-msgid "Register"
-msgstr "Registrati"
 
 #: .\templates\includes\navbar.html:108
 msgid "Cart"
@@ -854,7 +1306,7 @@ msgstr "Ecco un aggiornamento sul tuo ordine <strong>#%(n)s</strong>."
 
 #: .\templates\notifications\email\transactional.html:45
 msgid "We have received your return request and our team is reviewing it."
-msgstr ""
+msgstr "Abbiamo ricevuto la tua richiesta di reso e il nostro team la sta esaminando."
 "Abbiamo ricevuto la tua richiesta di reso e il nostro team la sta esaminando."
 
 #: .\templates\notifications\email\transactional.html:46
@@ -912,18 +1364,6 @@ msgstr ""
 msgid "Here is an update from our team."
 msgstr "Ecco un aggiornamento dal nostro team."
 
-#: .\templates\notifications\email\transactional.html:88
-#: .\templates\orders\payments.html:114 .\templates\store\cart.html:51
-#: .\templates\store\cart.html:135 .\templates\store\checkout.html:176
-msgid "Subtotal"
-msgstr "Subtotale"
-
-#: .\templates\notifications\email\transactional.html:90
-#: .\templates\orders\payments.html:116 .\templates\store\cart.html:140
-#: .\templates\store\checkout.html:181
-msgid "Tax"
-msgstr "IVA"
-
 #: .\templates\notifications\email\transactional.html:98
 #, python-format
 msgid "Estimated delivery: %(a)s–%(b)s business days."
@@ -948,7 +1388,7 @@ msgstr "Vedi lo stato del reso"
 #: .\templates\notifications\email\transactional.html:116
 #, python-format
 msgid "Not quite right? You can return your order within %(d)s days."
-msgstr ""
+msgstr "Non è quello che cercavi? Puoi restituire il tuo ordine entro %(d)s giorni."
 "Non è proprio quello che cercavi? Puoi restituire il tuo ordine entro %(d)s "
 "giorni."
 
@@ -956,21 +1396,131 @@ msgstr ""
 msgid "Premium fashion, printed on demand."
 msgstr "Moda premium, stampata on demand."
 
-#: .\templates\orders\payments.html:4
-#, fuzzy
-#| msgid "Payments"
-msgid "Payment"
-msgstr "Pagamenti"
+#: .\templates\orders\order_complete.html:4
+msgid "Order complete"
+msgstr "Ordine completato"
+
+#: .\templates\orders\order_complete.html:25
+msgid "Order cancelled"
+msgstr "Ordine annullato"
+
+#: .\templates\orders\order_complete.html:27
+msgid "Payment successful"
+msgstr "Pagamento riuscito"
+
+#: .\templates\orders\order_complete.html:33
+msgid ""
+"This order was cancelled. If you believe this is a mistake, please contact "
+"support."
+msgstr ""
+"Questo ordine è stato annullato. Se ritieni che si tratti di un errore, "
+"contatta l'assistenza."
+
+#: .\templates\orders\order_complete.html:35
+msgid "Thanks! Your order has been confirmed and is now being processed."
+msgstr "Grazie! Il tuo ordine è stato confermato ed è ora in elaborazione."
+
+#: .\templates\orders\order_complete.html:44
+#, python-format
+msgid "Transaction %(t)s"
+msgstr "Transazione %(t)s"
+
+#: .\templates\orders\order_complete.html:54
+msgid "Download PDF invoice"
+msgstr "Scarica fattura PDF"
+
+#: .\templates\orders\order_complete.html:59
+msgid "Shop more"
+msgstr "Continua a fare acquisti"
+
+#: .\templates\orders\order_complete.html:81
+#: .\templates\orders\order_complete.html:117
+msgid "Order received"
+msgstr "Ordine ricevuto"
+
+#: .\templates\orders\order_complete.html:89
+#: .\templates\orders\order_complete.html:125
+msgid "Preparing shipment"
+msgstr "Preparazione della spedizione"
+
+#: .\templates\orders\order_complete.html:96
+#: .\templates\orders\order_complete.html:132
+msgid "Shipped"
+msgstr "Spedito"
+
+#: .\templates\orders\order_complete.html:97
+#: .\templates\orders\order_complete.html:133
+msgid "On the way"
+msgstr "In viaggio"
+
+#: .\templates\orders\order_complete.html:105
+msgid "This order has been cancelled"
+msgstr "Questo ordine è stato annullato"
+
+#: .\templates\orders\order_complete.html:141
+msgid "Only if payment fails or you cancel"
+msgstr "Solo se il pagamento non riesce o annulli"
+
+#: .\templates\orders\order_complete.html:153
+msgid "Invoice"
+msgstr "Fattura"
+
+#: .\templates\orders\order_complete.html:154
+msgid "Order details & receipt"
+msgstr "Dettagli ordine e ricevuta"
+
+#: .\templates\orders\order_complete.html:160
+msgid "Order date"
+msgstr "Data dell'ordine"
+
+#: .\templates\orders\order_complete.html:172
+msgid "Invoiced to"
+msgstr "Fatturato a"
+
+#: .\templates\orders\order_complete.html:182
+msgid "Order info"
+msgstr "Informazioni ordine"
+
+#: .\templates\orders\order_complete.html:184
+msgid "Order #"
+msgstr "N. ordine"
+
+#: .\templates\orders\order_complete.html:185
+msgid "Transaction"
+msgstr "Transazione"
+
+#: .\templates\orders\order_complete.html:196 .\templates\store\cart.html:49
+msgid "Product"
+msgstr "Prodotto"
+
+#: .\templates\orders\order_complete.html:244
+msgid ""
+"Thank you for shopping with us — if you need help, contact support with your "
+"order number."
+msgstr ""
+"Grazie per aver acquistato da noi — se hai bisogno di aiuto, contatta "
+"l'assistenza indicando il numero del tuo ordine."
+
+#: .\templates\orders\order_complete.html:253
+msgid "Recommended for you"
+msgstr "Consigliati per te"
+
+#: .\templates\orders\order_complete.html:254
+msgid "Based on your purchase"
+msgstr "In base al tuo acquisto"
+
+#: .\templates\orders\order_complete.html:258
+msgid "Browse all"
+msgstr "Esplora tutto"
+
+#: .\templates\orders\order_complete.html:285 .\templates\store\store.html:282
+msgid "View"
+msgstr "Vedi"
 
 #: .\templates\orders\payments.html:115 .\templates\store\cart.html:138
 #: .\templates\store\checkout.html:179
 msgid "Free"
 msgstr "Gratuita"
-
-#: .\templates\orders\payments.html:117 .\templates\store\cart.html:141
-#: .\templates\store\checkout.html:182
-msgid "Grand total"
-msgstr "Totale complessivo"
 
 #: .\templates\returns\policy.html:10 .\templates\returns\request.html:10
 #: .\templates\store\product_detail.html:13 .\templates\store\store.html:22
@@ -1015,7 +1565,7 @@ msgstr "Seleziona gli articoli e indicaci il motivo (facoltativo)."
 
 #: .\templates\returns\policy.html:35
 msgid "We review your request and email you the next steps."
-msgstr ""
+msgstr "Esaminiamo la tua richiesta e ti inviamo i passaggi successivi via email."
 "Esaminiamo la tua richiesta e ti inviamo via email i passaggi successivi."
 
 #: .\templates\returns\policy.html:36
@@ -1039,7 +1589,7 @@ msgstr ""
 
 #: .\templates\returns\policy.html:51
 msgid "Need help? Contact our support team and we'll be glad to assist."
-msgstr ""
+msgstr "Hai bisogno di aiuto? Contatta il nostro team di supporto, saremo lieti di aiutarti."
 "Hai bisogno di aiuto? Contatta il nostro team di assistenza, saremo lieti di "
 "aiutarti."
 
@@ -1059,11 +1609,6 @@ msgstr "Sei ancora nei termini per il reso — %(d)s giorni rimasti."
 #: .\templates\returns\request.html:41
 msgid "Select the items to return"
 msgstr "Seleziona gli articoli da restituire"
-
-#: .\templates\returns\request.html:54 .\templates\returns\status.html:45
-#: .\templates\store\checkout.html:167
-msgid "Qty"
-msgstr "Qtà"
 
 #: .\templates\returns\request.html:65
 msgid "Read our returns policy"
@@ -1139,17 +1684,9 @@ msgstr "Il tuo carrello è vuoto"
 msgid "Browse products and add your favorites to the cart."
 msgstr "Esplora i prodotti e aggiungi i tuoi preferiti al carrello."
 
-#: .\templates\store\cart.html:37
-msgid "Browse products"
-msgstr "Esplora i prodotti"
-
 #: .\templates\store\cart.html:38
 msgid "Back to home"
 msgstr "Torna alla home"
-
-#: .\templates\store\cart.html:49
-msgid "Product"
-msgstr "Prodotto"
 
 #: .\templates\store\cart.html:50 .\templates\store\cart.html:95
 msgid "Quantity"
@@ -1262,22 +1799,10 @@ msgstr "Predefinito:"
 msgid "Select an address"
 msgstr "Seleziona un indirizzo"
 
-#: .\templates\store\checkout.html:64
-msgid "Default"
-msgstr "Predefinito"
-
 #: .\templates\store\checkout.html:69
 msgid "Pick one to autofill your billing details."
-msgstr ""
+msgstr "Selezionane uno per compilare automaticamente i dati di fatturazione."
 "Selezionane uno per compilare automaticamente i tuoi dati di fatturazione."
-
-#: .\templates\store\checkout.html:75
-msgid "First name"
-msgstr "Nome"
-
-#: .\templates\store\checkout.html:79
-msgid "Last name"
-msgstr "Cognome"
 
 #: .\templates\store\checkout.html:83
 msgid "Email"
@@ -1337,7 +1862,7 @@ msgstr "cad."
 
 #: .\templates\store\checkout.html:191
 msgid "We don't ship to this country yet — choose another at checkout."
-msgstr ""
+msgstr "Non spediamo ancora in questo paese — scegline un altro al checkout."
 "Non spediamo ancora in questo Paese — scegline un altro al momento del "
 "pagamento."
 
@@ -1494,10 +2019,6 @@ msgstr "Più recenti"
 msgid "Sort: recommended"
 msgstr "Ordina: consigliati"
 
-#: .\templates\store\store.html:137
-msgid "Reset"
-msgstr "Reimposta"
-
 #: .\templates\store\store.html:188
 msgid "Price range"
 msgstr "Fascia di prezzo"
@@ -1518,10 +2039,6 @@ msgstr "Disponibilità"
 msgid "In stock only"
 msgstr "Solo disponibili"
 
-#: .\templates\store\store.html:224
-msgid "Apply"
-msgstr "Applica"
-
 #: .\templates\store\store.html:225
 msgid "Clear"
 msgstr "Cancella"
@@ -1533,10 +2050,6 @@ msgstr "Esaurito"
 #: .\templates\store\store.html:248
 msgid "Low stock"
 msgstr "Scorte limitate"
-
-#: .\templates\store\store.html:282
-msgid "View"
-msgstr "Vedi"
 
 #: .\templates\store\store.html:292
 msgid "No products available."
