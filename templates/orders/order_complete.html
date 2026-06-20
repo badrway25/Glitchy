@@ -1,0 +1,296 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Order complete{% endblock %}
+
+{% block content %}
+
+  <section class="section-conten padding-y">
+  <div class="container-fluid">
+  <div class="container" style="max-width: 1280px;">
+
+    <!-- ===== Success hero ===== -->
+    <div class="oc-hero">
+      <div class="oc-icon {% if order.status == 'Cancelled' %}is-danger{% else %}is-success{% endif %}">
+        {% if order.status == 'Cancelled' %}
+          <i class="fas fa-xmark"></i>
+        {% else %}
+          <i class="fas fa-check"></i>
+        {% endif %}
+      </div>
+
+      <div class="oc-hero-body">
+        <h1 class="oc-title">
+          {% if order.status == 'Cancelled' %}
+            Order cancelled
+          {% else %}
+            Payment successful
+          {% endif %}
+        </h1>
+
+        <p class="oc-subtitle text-muted mb-0">
+          {% if order.status == 'Cancelled' %}
+            This order was cancelled. If you believe this is a mistake, please contact support.
+          {% else %}
+            Thanks! Your order has been confirmed and is now being processed.
+          {% endif %}
+        </p>
+
+        <div class="oc-chips">
+          <span class="meta-chip">
+            <i class="fa fa-receipt"></i> Order #{{ order_number }}
+          </span>
+          <span class="meta-chip">
+            <i class="fa fa-fingerprint"></i> Transaction {{ transID }}
+          </span>
+          <span class="meta-chip">
+            <i class="fa fa-circle-check"></i> {{ payment.status }}
+          </span>
+        </div>
+      </div>
+
+      <div class="oc-hero-actions">
+        <a href="{% url 'invoice_pdf' order_number %}" class="btn btn-soft btn-block">
+          <i class="fa fa-file-pdf mr-2"></i>Download PDF invoice
+        </a>
+
+
+        <a href="{% url 'store' %}" class="btn btn-primary btn-block">
+          Shop more <i class="fa fa-arrow-right ml-2"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- ===== Premium Timeline (4 steps) ===== -->
+    {% comment %}
+      Status mapping:
+      New       -> Confirmed
+      Accepted  -> Packed
+      Completed -> Shipped
+      Cancelled -> Cancelled
+    {% endcomment %}
+
+    {% if order.status == 'Cancelled' %}
+      {# Cancelled state: only show red cancelled step #}
+      <div class="oc-timeline oc-timeline--cancelled">
+        <div class="oc-step is-muted">
+          <div class="dot"></div>
+          <div class="label">
+            <div class="title">Confirmed</div>
+            <div class="sub text-muted">Order received</div>
+          </div>
+        </div>
+
+        <div class="oc-step is-muted">
+          <div class="dot"></div>
+          <div class="label">
+            <div class="title">Packed</div>
+            <div class="sub text-muted">Preparing shipment</div>
+          </div>
+        </div>
+
+        <div class="oc-step is-muted">
+          <div class="dot"></div>
+          <div class="label">
+            <div class="title">Shipped</div>
+            <div class="sub text-muted">On the way</div>
+          </div>
+        </div>
+
+        <div class="oc-step is-danger done">
+          <div class="dot"></div>
+          <div class="label">
+            <div class="title">Cancelled</div>
+            <div class="sub">This order has been cancelled</div>
+          </div>
+        </div>
+      </div>
+
+    {% else %}
+      {# Normal progress state #}
+      <div class="oc-timeline">
+        <div class="oc-step done">
+          <div class="dot"></div>
+          <div class="label">
+            <div class="title">Confirmed</div>
+            <div class="sub text-muted">Order received</div>
+          </div>
+        </div>
+
+        <div class="oc-step {% if order.status == 'Accepted' or order.status == 'Completed' %}done{% endif %}">
+          <div class="dot"></div>
+          <div class="label">
+            <div class="title">Packed</div>
+            <div class="sub text-muted">Preparing shipment</div>
+          </div>
+        </div>
+
+        <div class="oc-step {% if order.status == 'Completed' %}done{% endif %}">
+          <div class="dot"></div>
+          <div class="label">
+            <div class="title">Shipped</div>
+            <div class="sub text-muted">On the way</div>
+          </div>
+        </div>
+
+        <div class="oc-step is-muted">
+          <div class="dot"></div>
+          <div class="label">
+            <div class="title">Cancelled</div>
+            <div class="sub text-muted">Only if payment fails or you cancel</div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- ===== Invoice card ===== -->
+    <div class="oc-card">
+      <div class="oc-card-head">
+        <div class="oc-brand">
+          <img src="{% static 'images/logo.png' %}" alt="Logo">
+          <div class="oc-brand-text">
+            <div class="oc-brand-name">Invoice</div>
+            <div class="oc-brand-meta text-muted">Order details & receipt</div>
+          </div>
+        </div>
+
+        <div class="oc-meta">
+          <div class="oc-meta-row">
+            <span class="text-muted">Order date</span>
+            <span>{{ order.created_at }}</span>
+          </div>
+          <div class="oc-meta-row">
+            <span class="text-muted">Payment</span>
+            <span style="font-weight:800;">{{ payment.payment_method }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="oc-split">
+        <div class="oc-box">
+          <div class="oc-box-title">Invoiced to</div>
+          <div class="oc-box-body">
+            <div style="font-weight:800;">{{ order.full_name }}</div>
+            <div class="text-muted">{{ order.full_address }}</div>
+            <div class="text-muted">{{ order.city }}, {{ order.state }}, {{ order.postal_code }}</div>
+            <div class="text-muted">{{ order.country }}</div>
+          </div>
+        </div>
+
+        <div class="oc-box">
+          <div class="oc-box-title">Order info</div>
+          <div class="oc-box-body">
+            <div class="oc-kv"><span class="text-muted">Order #</span><span>{{ order_number }}</span></div>
+            <div class="oc-kv"><span class="text-muted">Transaction</span><span>{{ transID }}</span></div>
+            <div class="oc-kv"><span class="text-muted">Status</span><span style="font-weight:800;">{{ payment.status }}</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Items -->
+      <div class="oc-table-wrap">
+        <table class="table oc-table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th class="text-center" style="width: 90px;">Qty</th>
+              <th class="text-right" style="width: 140px;">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in ordered_products %}
+              <tr>
+                <td>
+                  <div class="oc-item-title">{{ item.product.product_name }}</div>
+
+                  {% if item.variations.all %}
+  <div class="oc-item-variants">
+    {% for i in item.variations.all %}
+      <span class="variant-pill variant-{{ i.variation_category|lower }}">
+        <span class="variant-k">{{ i.variation_category|capfirst }}</span>
+        <span class="variant-v">{{ i.variation_value|capfirst }}</span>
+      </span>
+    {% endfor %}
+  </div>
+{% endif %}
+                </td>
+
+                <td class="text-center">{{ item.quantity }}</td>
+                <td class="text-right">€ {{ item.product_price }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Totals -->
+      <div class="oc-totals">
+        <div class="oc-total-row">
+          <span class="text-muted">Subtotal</span>
+          <span>€ {{ subtotal }}</span>
+        </div>
+        <div class="oc-total-row">
+          <span class="text-muted">Tax</span>
+          <span>€ {{ order.tax }}</span>
+        </div>
+        <div class="oc-total-row oc-grand">
+          <span>Grand total</span>
+          <span>€ {{ order.order_total }}</span>
+        </div>
+      </div>
+
+      <div class="oc-footer text-muted">
+        Thank you for shopping with us — if you need help, contact support with your order number.
+      </div>
+    </div>
+
+    {# ===== Recommended products (Premium section) ===== #}
+{% if recommended_products %}
+  <section class="oc-rec">
+    <div class="oc-rec-head">
+      <div class="oc-rec-title">
+        <h3 class="m-0">Recommended for you</h3>
+        <div class="text-muted">Based on your purchase</div>
+      </div>
+
+      <a href="{% url 'store' %}" class="btn btn-soft oc-rec-cta">
+        Browse all <i class="fa fa-arrow-right ml-2"></i>
+      </a>
+    </div>
+
+    <div class="oc-rec-grid">
+      {% for p in recommended_products %}
+        <article class="oc-rec-item">
+          <div class="card product-card">
+            <div class="media-skeleton">
+              <a href="{{ p.get_url }}" class="d-block">
+                <img data-skeleton src="{{ p.images.url }}" alt="{{ p.product_name }}">
+              </a>
+
+              {# opzionale: badge #}
+              {# <span class="badge-corner badge-new">New</span> #}
+            </div>
+
+            <div class="info">
+              <a href="{{ p.get_url }}" class="product-title d-block">{{ p.product_name }}</a>
+
+              <div class="product-meta">
+                <div class="price">€ {{ p.price }}</div>
+                {# opzionale pill: categoria/brand #}
+                {# <span class="pill"><i class="fa fa-star"></i> Top</span> #}
+              </div>
+
+              <div class="product-actions">
+                <a href="{{ p.get_url }}" class="btn btn-primary">View</a>
+                <a href="{{ p.get_url }}" class="btn btn-soft">Details</a>
+              </div>
+            </div>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+
+{% endif %}
+</div>
+  </section>
+  {% endblock %}

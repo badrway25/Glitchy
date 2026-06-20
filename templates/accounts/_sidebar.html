@@ -1,0 +1,32 @@
+<div class="acc-card acc-sticky">
+  <div class="acc-head">
+    <div class="acc-avatar">{{ request.user.first_name|default:"U"|slice:":1" }}</div>
+    <div>
+      <div class="acc-name">{{ request.user.full_name|default:request.user.email }}</div>
+      <div class="acc-email text-muted">{{ request.user.email }}</div>
+    </div>
+  </div>
+
+  <nav class="acc-nav">
+    <a class="acc-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+       href="{% url 'dashboard' %}">
+      <i class="fa fa-home"></i> Overview
+    </a>
+
+    <a class="acc-link {% if request.resolver_match.url_name == 'my_orders' or request.resolver_match.url_name == 'order_detail' %}active{% endif %}"
+       href="{% url 'my_orders' %}">
+      <i class="fa fa-box"></i> My orders
+    </a>
+
+    <a class="acc-link {% if request.resolver_match.url_name == 'transactions' %}active{% endif %}"
+       href="{% url 'transactions' %}">
+      <i class="fa fa-credit-card"></i> Transactions
+    </a>
+  </nav>
+
+  <div class="acc-footer">
+    <a class="btn btn-soft btn-block" href="{% url 'logout' %}">
+      <i class="fa fa-power-off mr-2"></i>Log out
+    </a>
+  </div>
+</div>

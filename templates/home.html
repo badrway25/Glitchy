@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- HERO -->
+<section class="section-intro padding-y-sm">
+  <div class="container" style="max-width:1280px;">
+    <div class="intro-banner-wrap hero-banner">
+      <img src="{% static 'images/banners/cover.jpg' %}" class="img-fluid hero-img" alt="Banner">
+      <div class="hero-overlay">
+        <div class="hero-copy">
+          <div class="hero-kicker">New drops</div>
+          <h1 class="hero-title">Premium print-on-demand</h1>
+          <p class="hero-sub">Discover bestsellers and latest arrivals.</p>
+          <a href="{% url 'store' %}" class="btn btn-primary btn-icontext">
+            <span>Browse store</span> <i class="fa fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- POPULAR -->
+<section class="home-section">
+  <div class="container" style="max-width:1280px;">
+    <div class="section-head">
+      <div>
+        <h3 class="section-title mb-1">Popular products</h3>
+        <div class="text-muted section-sub">Customer favorites and trending items</div>
+      </div>
+      <a href="{% url 'store' %}" class="btn btn-soft btn-icontext">
+        <span>View all</span> <i class="fa fa-arrow-right"></i>
+      </a>
+    </div>
+
+    <div class="row g-3 g-md-4">
+      {% for product in popular_products %}
+        <div class="col-6 col-md-3 d-flex mb-5">
+          <div class="p-card h-100">
+            <a href="{{ product.get_url }}" class="p-media">
+              <img src="{{ product.images.url }}" alt="{{ product.product_name }}">
+            </a>
+			<div class="p-body">
+  <div class="p-badges">
+    {% if forloop.first and product.total_sold %}
+      <span class="p-chip p-chip-top"><i class="fa fa-star"></i> Top seller</span>
+    {% endif %}
+    {% if product.total_sold %}
+      <span class="p-chip"> 🔥{{ product.total_sold }} sold</span>
+    {% endif %}
+  </div>
+
+  <a href="{{ product.get_url }}" class="p-title">{{ product.product_name }}</a>
+
+  <div class="p-meta">
+    <div class="p-price">€ {{ product.price }}</div>
+    <a href="{{ product.get_url }}" class="p-link">Details <i class="fa fa-angle-right"></i></a>
+  </div>
+</div>
+
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- LATEST -->
+<section class="home-section home-section-muted">
+  <div class="container" style="max-width:1280px;">
+    <div class="section-head">
+      <div>
+        <h3 class="section-title mb-1">Latest arrivals</h3>
+        <div class="text-muted section-sub">Freshly added — don’t miss out</div>
+      </div>
+      <a href="{% url 'store' %}?sort=new" class="btn btn-soft btn-icontext">
+        <span>See new</span> <i class="fa fa-arrow-right"></i>
+      </a>
+    </div>
+
+    <div class="row g-3 g-md-4">
+      {% for product in latest_products %}
+        <div class="col-6 col-md-3 d-flex">
+          <div class="p-card h-100">
+            <a href="{{ product.get_url }}" class="p-media">
+              <img src="{{ product.images.url }}" alt="{{ product.product_name }}">
+            </a>
+            <div class="p-body">
+              <a href="{{ product.get_url }}" class="p-title">{{ product.product_name }}</a>
+              <div class="p-meta">
+                <div class="p-price">€ {{ product.price }}</div>
+                <a href="{{ product.get_url }}" class="p-link">Details <i class="fa fa-angle-right"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% endblock %}

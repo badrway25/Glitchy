@@ -1,0 +1,387 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="section-conten padding-y">
+  <div class="container-fluid">
+  <div class="container" style="max-width: 1280px;">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb breadcrumb-clean" style="background:transparent; padding:0; margin:0;">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'store' %}">Store</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ single_product.product_name }}</li>
+      </ol>
+    </nav>
+
+    <!-- Product -->
+    <div class="pdp-card">
+      <div class="row no-gutters">
+
+        <aside class="col-md-6 pdp-media">
+
+  {% with gallery_qs=single_product.gallery.all %}
+    {% with main_src="" %}
+      {% if gallery_qs and gallery_qs.0.image %}
+        {% with main_src=gallery_qs.0.image.url %}{% endwith %}
+      {% elif single_product.images %}
+        {% with main_src=single_product.images.url %}{% endwith %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="pdp-gallery">
+      <a class="pdp-image d-block" href="#"
+         data-toggle="modal" data-target="#pdpLightbox"
+         aria-label="Open image">
+        <img id="pdpMainImg"
+             src="{% if gallery_qs and gallery_qs.0.image %}{{ gallery_qs.0.image.url }}{% elif single_product.images %}{{ single_product.images.url }}{% else %}{% static 'images/placeholder.png' %}{% endif %}"
+             alt="{{ single_product.product_name }}">
+      </a>
+
+      {% if gallery_qs %}
+        <div class="pdp-thumbs">
+          {% for img in gallery_qs|slice:":8" %}
+            {% if img.image %}
+              <button type="button"
+                      class="pdp-thumb {% if forloop.first %}active{% endif %}"
+                      data-img="{{ img.image.url }}"
+                      aria-label="Thumbnail {{ forloop.counter }}">
+                <img src="{{ img.image.url }}" alt="thumb">
+              </button>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+  {% endwith %}
+
+</aside>
+
+
+
+        <main class="col-md-6">
+          <form action="{% url 'add_cart' single_product.id %}" method="POST">
+            {% csrf_token %}
+
+            <div class="pdp-body pdp-sticky">
+              <h1 class="pdp-title">{{ single_product.product_name }}</h1>
+
+              <!-- rating + reviews + stock -->
+              <div class="pdp-meta">
+
+  <!-- Rating -->
+  <span class="pdp-pill pdp-pill--rating">
+    <span class="stars" aria-label="Rating">
+      <i class="{% if single_product.averageReview >= 1 %}fas{% else %}far{% endif %} fa-star"></i>
+      <i class="{% if single_product.averageReview >= 2 %}fas{% else %}far{% endif %} fa-star"></i>
+      <i class="{% if single_product.averageReview >= 3 %}fas{% else %}far{% endif %} fa-star"></i>
+      <i class="{% if single_product.averageReview >= 4 %}fas{% else %}far{% endif %} fa-star"></i>
+      <i class="{% if single_product.averageReview >= 5 %}fas{% else %}far{% endif %} fa-star"></i>
+    </span>
+    <span class="pdp-pill-text">{{ single_product.averageReview|floatformat:1 }}</span>
+  </span>
+
+  <!-- Reviews count -->
+  <span class="pdp-pill pdp-pill--reviews">
+    <i class="far fa-comment"></i>
+    <span class="pdp-pill-text">{{ single_product.countReview }} reviews</span>
+  </span>
+
+  <!-- Stock -->
+  {% if single_product.stock > 0 and single_product.is_available %}
+    <span class="pdp-pill pdp-pill--stock is-in">
+      <i class="fas fa-check-circle"></i>
+      <span class="pdp-pill-text">In stock</span>
+      <span class="pdp-pill-count">({{ single_product.stock }})</span>
+    </span>
+  {% else %}
+    <span class="pdp-pill pdp-pill--stock is-out">
+      <i class="fas fa-times-circle"></i>
+      <span class="pdp-pill-text">Out of stock</span>
+    </span>
+  {% endif %}
+
+</div>
+
+
+              <div class="pdp-price">€ {{ single_product.price }}</div>
+
+              {% if single_product.description %}
+                <p class="pdp-muted mb-0">{{ single_product.description }}</p>
+              {% endif %}
+
+              <div class="pdp-divider"></div>
+
+              <!-- variations -->
+              <!-- variations (custom dropdowns) -->
+<div class="pdp-options">
+
+  <!-- Color -->
+  <div>
+    <label class="mb-2" style="font-weight:700;">Color</label>
+
+    {% if single_product.variation_set.colors %}
+      <input type="hidden" name="color" id="colorInput" required>
+
+      <div class="dropdown custom-select-dd">
+        <button class="btn custom-select-btn dropdown-toggle"
+                type="button"
+                id="colorDropdown"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false">
+          <span id="colorLabel">Select color</span>
+        </button>
+
+        <div class="dropdown-menu" aria-labelledby="colorDropdown">
+          {% for i in single_product.variation_set.colors %}
+            <button class="dropdown-item" type="button"
+                    data-target-input="colorInput"
+                    data-target-label="colorLabel"
+                    data-value="{{ i.variation_value|lower }}">
+              {{ i.variation_value|capfirst }}
+            </button>
+          {% endfor %}
+        </div>
+      </div>
+    {% else %}
+      <div class="text-muted"><small>No color options</small></div>
+    {% endif %}
+  </div>
+
+  <!-- Size -->
+  <div>
+    <label class="mb-2" style="font-weight:700;">Size</label>
+
+    {% if single_product.variation_set.sizes %}
+      <input type="hidden" name="size" id="sizeInput" required>
+
+      <div class="dropdown custom-select-dd">
+        <button class="btn custom-select-btn dropdown-toggle"
+                type="button"
+                id="sizeDropdown"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false">
+          <span id="sizeLabel">Select size</span>
+        </button>
+
+        <div class="dropdown-menu" aria-labelledby="sizeDropdown">
+          {% for i in single_product.variation_set.sizes %}
+            <button class="dropdown-item" type="button"
+                    data-target-input="sizeInput"
+                    data-target-label="sizeLabel"
+                    data-value="{{ i.variation_value|lower }}">
+              {{ i.variation_value|capfirst }}
+            </button>
+          {% endfor %}
+        </div>
+      </div>
+    {% else %}
+      <div class="text-muted"><small>No size options</small></div>
+    {% endif %}
+  </div>
+
+</div>
+
+
+              <!-- actions -->
+              <div class="pdp-actions">
+                <button type="button" class="btn btn-soft" onclick="window.location='#reviews'" title="Reviews">
+                  <i class="fas fa-star"></i>
+                </button>
+
+                {% if single_product.stock <= 0 or not single_product.is_available %}
+                  <button type="button" class="btn btn-primary" disabled>Out of stock</button>
+                {% else %}
+                  <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-shopping-cart mr-2"></i> Add to Cart
+                  </button>
+                {% endif %}
+              </div>
+
+            </div>
+          </form>
+        </main>
+
+      </div>
+    </div>
+
+    <!-- Reviews -->
+<section id="reviews" class="reviews-wrap mt-4">
+  <div class="reviews-card">
+    <div class="reviews-head">
+      <div class="reviews-head-left">
+        <h3 class="reviews-title">Reviews</h3>
+        <p class="reviews-subtitle">Share your experience and help others choose.</p>
+      </div>
+
+      <div class="reviews-head-right">
+        <div class="reviews-score">
+          <div class="score-value">{{ single_product.averageReview|floatformat:1 }}</div>
+          <div class="score-meta">
+            <div class="score-stars score-stars--pill" aria-label="Average rating">
+  <i class="{% if single_product.averageReview >= 1 %}fas{% else %}far{% endif %} fa-star"></i>
+  <i class="{% if single_product.averageReview >= 2 %}fas{% else %}far{% endif %} fa-star"></i>
+  <i class="{% if single_product.averageReview >= 3 %}fas{% else %}far{% endif %} fa-star"></i>
+  <i class="{% if single_product.averageReview >= 4 %}fas{% else %}far{% endif %} fa-star"></i>
+  <i class="{% if single_product.averageReview >= 5 %}fas{% else %}far{% endif %} fa-star"></i>
+</div>
+            <div class="score-count">{{ single_product.countReview }} review{{ single_product.countReview|pluralize }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="reviews-grid">
+      <!-- LEFT: Write a review -->
+      <aside class="reviews-panel">
+        <div class="panel-head">
+          <div class="panel-title">Write a review</div>
+
+        </div>
+
+        <form class="review-form" action="{% url 'submit_review' single_product.id %}" method="POST">
+          {% csrf_token %}
+
+          <!-- Rating -->
+          <div class="rf-group">
+            <label class="rf-label">How would you rate this product?</label>
+            <div class="rate rate-lg rate-whole" aria-label="Rating selector">
+  <input type="radio" name="rating" id="star5" value="5" required>
+  <label for="star5" title="5 stars"></label>
+
+  <input type="radio" name="rating" id="star4" value="4">
+  <label for="star4" title="4 stars"></label>
+
+  <input type="radio" name="rating" id="star3" value="3">
+  <label for="star3" title="3 stars"></label>
+
+  <input type="radio" name="rating" id="star2" value="2">
+  <label for="star2" title="2 stars"></label>
+
+  <input type="radio" name="rating" id="star1" value="1">
+  <label for="star1" title="1 star"></label>
+</div>
+
+          </div>
+
+          <!-- Title -->
+          <div class="rf-group">
+            <label class="rf-label" for="reviewTitle">Title</label>
+            <input id="reviewTitle" type="text" class="form-control rf-input" name="subject" placeholder="Short summary">
+          </div>
+
+          <!-- Body -->
+          <div class="rf-group">
+            <label class="rf-label" for="reviewBody">Review</label>
+            <textarea id="reviewBody" name="review" rows="4" class="form-control rf-input" placeholder="Write your experience"></textarea>
+          </div>
+
+          {% if user.is_authenticated %}
+            {% if orderproduct %}
+              <button type="submit" class="btn btn-primary btn-block rf-submit">
+                Submit review
+              </button>
+    
+            {% else %}
+              <div class="rf-callout rf-callout-warn">
+                <div class="rf-callout-icon"><i class="fas fa-lock"></i></div>
+                <div>
+                  <div class="rf-callout-title">Verified purchase required</div>
+                  <div class="rf-callout-text">You need to purchase this product before posting a review.</div>
+                </div>
+              </div>
+            {% endif %}
+          {% else %}
+            <div class="rf-callout">
+              <div class="rf-callout-icon"><i class="far fa-user"></i></div>
+              <div>
+                <div class="rf-callout-title">Sign in to write a review</div>
+                <div class="rf-callout-text">
+                  Please <a href="{% url 'login' %}">log in</a> to share your feedback.
+                </div>
+              </div>
+            </div>
+          {% endif %}
+
+          {% include 'includes/alerts.html' %}
+        </form>
+      </aside>
+
+      <!-- RIGHT: Customer reviews -->
+      <div class="reviews-panel">
+        <div class="panel-head">
+          <div class="panel-title">Customer reviews</div>
+        </div>
+
+        {% if reviews %}
+          <div class="reviews-list">
+            {% for review in reviews %}
+              <article class="review-item">
+                <div class="review-top">
+                  <div class="review-author">
+                    <div class="review-avatar" aria-hidden="true">
+                      {{ review.user.full_name|default:review.user.email|slice:":1"|upper }}
+                    </div>
+                    <div>
+                      <div class="review-name">{{ review.user.full_name }}</div>
+                      <div class="review-date">{{ review.updated_at }}</div>
+                    </div>
+                  </div>
+
+                  <div class="review-rating" aria-label="User rating">
+                    <i class="{% if review.rating >= 1 %}fas{% else %}far{% endif %} fa-star"></i>
+                    <i class="{% if review.rating >= 2 %}fas{% else %}far{% endif %} fa-star"></i>
+                    <i class="{% if review.rating >= 3 %}fas{% else %}far{% endif %} fa-star"></i>
+                    <i class="{% if review.rating >= 4 %}fas{% else %}far{% endif %} fa-star"></i>
+                    <i class="{% if review.rating >= 5 %}fas{% else %}far{% endif %} fa-star"></i>
+                  </div>
+                </div>
+
+                <div class="review-body">
+                  <div class="review-subject">{{ review.subject }}</div>
+                  <p class="review-text">{{ review.review }}</p>
+                </div>
+              </article>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="reviews-empty">
+            <div class="empty-icon"><i class="far fa-star"></i></div>
+            <div class="empty-title">No reviews yet</div>
+            <div class="empty-text">Be the first to share your thoughts about this product.</div>
+            <button type="button" class="btn btn-soft empty-cta" onclick="document.getElementById('reviewTitle')?.focus();">
+              Write the first review
+            </button>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Lightbox Modal (Bootstrap) -->
+<div class="modal fade pdp-modal" id="pdpLightbox" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <img id="pdpLightboxImg"
+     src="{% if single_product.gallery.first and single_product.gallery.first.image %}{{ single_product.gallery.first.image.url }}{% elif single_product.images %}{{ single_product.images.url }}{% else %}{% static 'images/placeholder.png' %}{% endif %}"
+     alt="{{ single_product.product_name }}">
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>  <!-- /container -->
+</div>  <!-- /container-fluid -->
+</section>
+
+{% endblock %}

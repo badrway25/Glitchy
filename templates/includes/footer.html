@@ -1,0 +1,107 @@
+{% load static %}
+
+<footer class="section-footer footer-premium mt-5">
+  <div class="container">
+
+    <!-- Top -->
+    <div class="footer-top">
+      <div class="row">
+
+        <!-- Brand -->
+        <div class="col-lg-4 mb-4 mb-lg-0">
+          <a class="footer-brand" href="{% url 'home' %}">
+            <img src="{% static 'images/logo.png' %}" alt="Glitchy" class="footer-logo">
+            
+            <span class="footer-badge">Store</span>
+          </a>
+
+          <p class="footer-desc">
+            Curated essentials, designed for everyday comfort. Premium quality, fast shipping, easy returns.
+          </p>
+
+          <div class="footer-social">
+            <a class="social-btn" href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+<a class="social-btn" href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+<a class="social-btn" href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+<a class="social-btn" href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          </div>
+        </div>
+
+        <!-- Links -->
+        <div class="col-6 col-md-4 col-lg-2 mb-4 mb-lg-0">
+          <div class="footer-title">Shop</div>
+          <ul class="footer-list">
+            <li><a class="footer-link" href="{% url 'store' %}">All Products</a></li>
+            <li><a class="footer-link" href="{% url 'store' %}">New Arrivals</a></li>
+            <li><a class="footer-link" href="{% url 'store' %}">Best Sellers</a></li>
+            <li><a class="footer-link" href="{% url 'store' %}">Gift Cards</a></li>
+          </ul>
+        </div>
+
+        <div class="col-6 col-md-4 col-lg-2 mb-4 mb-lg-0">
+          <div class="footer-title">Company</div>
+          <ul class="footer-list">
+            <li><a class="footer-link" href="#">About</a></li>
+            <li><a class="footer-link" href="#">Careers</a></li>
+            <li><a class="footer-link" href="#">Press</a></li>
+            <li><a class="footer-link" href="#">Sustainability</a></li>
+          </ul>
+        </div>
+
+        <div class="col-6 col-md-4 col-lg-2 mb-4 mb-lg-0">
+          <div class="footer-title">Support</div>
+          <ul class="footer-list">
+            <li><a class="footer-link" href="#">Contact</a></li>
+            <li><a class="footer-link" href="#">Shipping</a></li>
+            <li><a class="footer-link" href="#">Returns</a></li>
+            <li><a class="footer-link" href="#">FAQ</a></li>
+          </ul>
+        </div>
+
+        <!-- Newsletter -->
+        <div class="col-lg-2">
+          <div class="footer-title">Newsletter</div>
+
+
+          <form class="footer-newsletter" method="post" action="#">
+            {% csrf_token %}
+            <div class="newsletter-wrap">
+              <input class="form-control newsletter-input" type="email" name="email" placeholder="Email address" required>
+              <button class="btn btn-primary newsletter-btn" type="submit" aria-label="Subscribe">
+                <i class="fa fa-arrow-right"></i>
+              </button>
+            </div>
+            <div class="footer-legal-hint">
+              By subscribing, you agree to our <a class="footer-link" href="#">Privacy Policy</a>.
+            </div>
+          </form>
+        </div>
+
+      </div>
+
+      <!-- Trust chips -->
+      <div class="footer-trust" aria-label="Store benefits">
+        <div class="trust-chip"><i class="fa fa-truck"></i> Fast Shipping</div>
+        <div class="trust-chip"><i class="fa fa-undo"></i> 30-Day Returns</div>
+        <div class="trust-chip"><i class="fa fa-lock"></i> Secure Checkout</div>
+        <div class="trust-chip"><i class="fa fa-headset"></i> Support 7/7</div>
+      </div>
+    </div>
+
+    <!-- Bottom -->
+    <div class="footer-bottom">
+      <div class="footer-bottom-left">
+        <span>© {% now "Y" %} Glitchy. All rights reserved.</span>
+      </div>
+
+      <div class="footer-bottom-right">
+        <a class="footer-link" href="#">Terms</a>
+        <span class="dot-sep">•</span>
+        <a class="footer-link" href="#">Privacy</a>
+        <span class="dot-sep">•</span>
+        <a class="footer-link" href="#">Cookies</a>
+      </div>
+    </div>
+
+  </div>
+</footer>

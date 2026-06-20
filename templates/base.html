@@ -1,0 +1,106 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="pragma" content="no-cache" />
+  <meta http-equiv="cache-control" content="max-age=604800" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <title>{% block title %}Glitchy{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}Online shopping platform{% endblock %}">
+
+  <link href="{% static 'images/favicon.ico' %}" rel="shortcut icon" type="image/x-icon">
+
+  <!-- Fonts (modern) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap -->
+  <link href="{% static 'css/bootstrap.css' %}" rel="stylesheet" type="text/css"/>
+
+  <!-- Font Awesome 5 (keep ONE) -->
+  <link rel="stylesheet" href="{% static 'fonts/fontawesome/css/all.min.css' %}">
+
+  <!-- Theme base -->
+  <link href="{% static 'css/ui.css' %}" rel="stylesheet" type="text/css"/>
+  <link href="{% static 'css/responsive.css' %}" rel="stylesheet" media="only screen and (max-width: 1200px)" />
+  <link href="{% static 'css/custom.css' %}" rel="stylesheet" type="text/css"/>
+
+  <!-- Your premium overrides -->
+  <link href="{% static 'css/theme.css' %}" rel="stylesheet" type="text/css"/>
+
+  {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+  {% include 'includes/navbar.html' %}
+
+  {% block content %}{% endblock %}
+
+  {% include 'includes/footer.html' %}
+
+  <!-- JS at end (faster page render) -->
+  <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+  <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'js/script.js' %}"></script>
+  <script src="{% static 'js/theme.js' %}"></script>
+
+  {% block extra_js %}{% endblock %}
+
+  {# Toast notifications (Django messages) #}
+<div class="toast-wrap" aria-live="polite" aria-atomic="true">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="toast toast-{{ message.tags|default:'info' }}" role="status" data-autoclose="4200">
+        <div class="toast-icon" aria-hidden="true"></div>
+        <div class="toast-body">
+          <div class="toast-title">
+            {% if 'success' in message.tags %}Success
+            {% elif 'error' in message.tags %}Error
+            {% elif 'warning' in message.tags %}Warning
+            {% else %}Info{% endif %}
+          </div>
+          <div class="toast-text">{{ message }}</div>
+        </div>
+        <button type="button" class="toast-close" aria-label="Close">×</button>
+        <div class="toast-bar" aria-hidden="true"></div>
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
+<script>
+(function(){
+  const toasts = document.querySelectorAll('.toast-wrap .toast');
+  if(!toasts.length) return;
+
+  toasts.forEach(t => {
+    // animate in
+    requestAnimationFrame(() => t.classList.add('is-in'));
+
+    const close = () => {
+      t.classList.remove('is-in');
+      t.classList.add('is-out');
+      setTimeout(() => t.remove(), 240);
+    };
+
+    // close button
+    const btn = t.querySelector('.toast-close');
+    if(btn) btn.addEventListener('click', close);
+
+    // autoclose + progress bar
+    const ms = parseInt(t.getAttribute('data-autoclose') || '4200', 10);
+    const bar = t.querySelector('.toast-bar');
+    if(bar){
+      bar.style.transition = `transform ${ms}ms linear`;
+      requestAnimationFrame(() => bar.style.transform = 'scaleX(0)');
+    }
+    setTimeout(close, ms);
+  });
+})();
+</script>
+
+</body>
+</html>

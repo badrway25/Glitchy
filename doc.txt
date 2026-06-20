@@ -1,0 +1,19 @@
+PROJECT NOTES
+=============
+
+Secrets are NOT stored in this file anymore.
+All credentials (Django SECRET_KEY, Printify API token, Stripe keys,
+email password, n8n shared secret) live in the untracked `.env` file.
+See `.env.example` for the list of required variables.
+
+If you need to rotate the Printify token, update PRINTIFY_API_TOKEN in `.env`.
+
+Original feature wishlist (kept for reference):
+- "More" button with bulleted product info (composition, fit, care).
+- Guest checkout.
+- Printify shipping price/time based on IP / shipping address.
+- Customer chatbot.
+- Supplier payment / resume Printify fulfilment.
+- Backend order view with margin: paid - Printify cost = remaining margin.
+- 14-day returns / refunds.
+- n8n-driven email + automation workflows.

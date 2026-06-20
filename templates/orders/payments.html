@@ -1,0 +1,445 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment{% endblock %}
+
+{% block content %}
+<section class="section-content padding-y">
+  <div class="container" style="max-width:1280px;">
+
+    <div class="cart-header">
+      <div>
+        <h1 class="cart-title">Payment</h1>
+        <div class="cart-subtitle">Review your order, then securely pay.</div>
+      </div>
+      <a href="{% url 'checkout' %}" class="btn btn-soft">
+        <i class="fa fa-arrow-left mr-2"></i>Edit billing
+      </a>
+    </div>
+
+    <div class="row">
+
+      <!-- Left -->
+      <aside class="col-lg-8 mb-4">
+
+        <div class="summary-card mb-3">
+          <div class="summary-head">
+            <h5 class="m-0" style="font-weight:800;">Billing details</h5>
+            <span class="summary-chip"><i class="fa fa-receipt mr-1"></i> Order #{{ order.order_number }}</span>
+          </div>
+
+          <div class="pay-billing">
+            <div class="pay-bill-block">
+              <div class="pay-label">Name</div>
+              <div class="pay-value">{{ order.full_name }}</div>
+            </div>
+
+            <div class="pay-bill-block">
+              <div class="pay-label">Address</div>
+              <div class="pay-value">
+                {{ order.full_address }}<br>
+                {{ order.city }}, {{ order.state }}, {{ order.postal_code }}<br>
+                {{ order.country }}
+              </div>
+            </div>
+
+            <div class="pay-bill-block">
+              <div class="pay-label">Contact</div>
+              <div class="pay-value">
+                {{ order.email }}<br>
+                {{ order.phone }}
+              </div>
+            </div>
+
+            {% if order.order_note %}
+              <div class="pay-note">
+                <div class="pay-label">Order note</div>
+                <div class="pay-value">{{ order.order_note }}</div>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="summary-card">
+          <div class="summary-head">
+            <h5 class="m-0" style="font-weight:800;">Items</h5>
+            <span class="summary-chip">{{ cart_items|length }} item{% if cart_items|length != 1 %}s{% endif %}</span>
+          </div>
+
+          <div class="mini-items">
+            {% for cart_item in cart_items %}
+              <div class="mini-row">
+                <a class="mini-thumb" href="{{ cart_item.product.get_url }}">
+                  <img src="{{ cart_item.product.images.url }}" alt="{{ cart_item.product.product_name }}">
+                </a>
+
+                <div class="mini-info">
+                  <a href="{{ cart_item.product.get_url }}" class="mini-title">{{ cart_item.product.product_name }}</a>
+
+                  {% if cart_item.variations.all %}
+  <div class="mini-variants">
+    {% for item in cart_item.variations.all %}
+      <span class="variant-pill variant-{{ item.variation_category|lower }}">
+        <span class="variant-k">{{ item.variation_category|capfirst }}</span>
+        <span class="variant-v">{{ item.variation_value|capfirst }}</span>
+      </span>
+    {% endfor %}
+  </div>
+{% endif %}
+
+
+                  <div class="mini-meta text-muted">
+                    Qty: <strong>{{ cart_item.quantity }}</strong> • € {{ cart_item.product.price }} each
+                  </div>
+                </div>
+
+                <div class="mini-price">€ {{ cart_item.sub_total }}</div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- Right -->
+      <aside class="col-lg-4">
+
+        <div class="summary-card checkout-summary">
+          <div class="summary-head">
+            <h5 class="m-0" style="font-weight:800;">Pay now</h5>
+            <span class="summary-chip"><i class="fa fa-lock mr-1"></i> Encrypted</span>
+          </div>
+
+          <div class="summary-lines">
+            <div class="line"><span>Total</span><span>€ {{ total }}</span></div>
+            <div class="line"><span>Tax</span><span>€ {{ tax }}</span></div>
+            <div class="line grand"><span>Grand total</span><span>€ {{ grand_total }}</span></div>
+          </div>
+
+          <div class="pay-method">
+            <div class="pay-method-left">
+              <div class="pay-label">Payment method</div>
+              <div class="pay-value text-muted" style="font-size:13px;">Choose one</div>
+            </div>
+            <div class="pay-method-right mb-3">
+              <img src="{% static 'images/misc/payments.png' %}" alt="Payments" height="22">
+            </div>
+          </div>
+
+          <div class="pay-cta">
+
+            <div class="pay-switch">
+              <button type="button" class="pay-tab active" data-paytab="paypal">
+                <i class="fa fa-paypal mr-2"></i> PayPal
+              </button>
+              <button type="button" class="pay-tab" data-paytab="stripe">
+                <i class="fa fa-credit-card mr-2"></i> Card
+              </button>
+            </div>
+
+            <div class="pay-panels mt-3">
+              <div id="payPanelPaypal" class="pay-panel is-active">
+                <div id="paypal-button-container"></div>
+                <small class="text-muted d-block mt-2" style="font-size:13px;">
+                  After payment, your order will be confirmed automatically.
+                </small>
+              </div>
+
+              <div id="payPanelStripe" class="pay-panel">
+				<form id="stripeForm">
+					<div id="stripe-payment-element"></div>
+
+					<button id="stripePayBtn" type="submit" class="btn btn-primary btn-block mt-3">
+					Pay € {{ grand_total }}
+					</button>
+
+					<div id="stripeMsg" class="text-muted mt-2" style="font-size:13px;"></div>
+				</form>
+				</div>
+
+          </div>
+
+          <div class="trust-box">
+            <div class="trust-item">
+              <i class="fa fa-lock"></i> Secure payment&ensp;
+              <i class="fa fa-undo"></i> 30-day returns
+            </div>
+          </div>
+        </div>
+
+      </aside>
+    </div>
+  </div>
+</section>
+
+<script src="https://www.paypal.com/sdk/js?client-id=AUIKvs_bE9ru_ivBkYfrV27fsmk1iT8o_4noVrvc4o-nuJwK-qoyvtX10ocmyT4hWjapFm0A4BAQyZaQ&currency=EUR&components=buttons"></script>
+<script>
+  window.__STRIPE_CREATE_INTENT_URL = "{% url 'stripe_create_intent' %}";
+  window.__STRIPE_CONFIRM_URL = "{% url 'stripe_confirm' %}";
+  window.__ORDER_NUMBER = "{{ order.order_number }}";
+
+  window.__REDIRECT_URL = "{% url 'order_complete' %}";
+</script>
+<script src="https://js.stripe.com/v3/"></script>
+
+<script>
+  // simple tab switch (no re-render of paypal)
+  document.addEventListener("click", (e) => {
+    const tab = e.target.closest(".pay-tab[data-paytab]");
+    if (!tab) return;
+
+    document.querySelectorAll(".pay-tab").forEach(b => b.classList.remove("active"));
+    tab.classList.add("active");
+
+    const show = tab.getAttribute("data-paytab");
+    document.getElementById("payPanelPaypal").classList.toggle("is-active", show === "paypal");
+    document.getElementById("payPanelStripe").classList.toggle("is-active", show === "stripe");
+  });
+
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  var amount = "{{ grand_total }}";
+  var url = "{% url 'payments' %}";
+  var csrftoken = getCookie('csrftoken');
+  var orderID = "{{ order.order_number }}";
+  var payment_method = 'PayPal';
+  var redirect_url = "{% url 'order_complete' %}";
+
+  // ✅ render once
+  paypal.Buttons({
+    style: { shape: 'rect', label: 'pay', height: 44 },
+
+    createOrder: function(data, actions) {
+      return actions.order.create({
+        purchase_units: [{ amount: { value: String(amount) } }]
+      });
+    },
+
+    onApprove: function(data, actions) {
+      return actions.order.capture().then(function(details) {
+        return fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-type": "application/json",
+            "X-CSRFToken": csrftoken,
+          },
+          body: JSON.stringify({
+            orderID: orderID,
+            transID: details.id,
+            payment_method: payment_method,
+            status: details.status,
+          }),
+        })
+        .then((response) => response.json())
+        .then((data) => {
+          window.location.href = redirect_url + '?order_number=' + data.order_number + '&payment_id=' + data.transID;
+        });
+      });
+    }
+  }).render('#paypal-button-container');
+</script>
+
+
+
+<script src="https://js.stripe.com/v3/"></script>
+
+<script>
+(function(){
+  let stripe = null;
+  let elements = null;
+  let mounted = false;
+
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  function csrf(){ return getCookie('csrftoken'); }
+
+  async function safeJson(res){
+    const text = await res.text();
+    try { return JSON.parse(text); }
+    catch { throw new Error("Server returned non-JSON: " + text.slice(0, 180)); }
+  }
+
+  async function createIntent(){
+    const res = await fetch(window.__STRIPE_CREATE_INTENT_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type":"application/json",
+        "X-CSRFToken": csrf(),
+      },
+      credentials: "same-origin",
+      body: JSON.stringify({ order_number: window.__ORDER_NUMBER }),
+    });
+
+    const data = await safeJson(res);
+    if(!res.ok) throw new Error(data.error || ("Stripe intent error (" + res.status + ")"));
+
+    // cache PK se non presente
+    if (!window.__STRIPE_PK && data.publishableKey) window.__STRIPE_PK = data.publishableKey;
+
+    return data; // {clientSecret, publishableKey}
+  }
+
+  async function confirmServer(paymentIntentId){
+    const res = await fetch(window.__STRIPE_CONFIRM_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type":"application/json",
+        "X-CSRFToken": csrf(),
+      },
+      credentials: "same-origin",
+      body: JSON.stringify({
+        order_number: window.__ORDER_NUMBER,
+        payment_intent_id: paymentIntentId
+      }),
+    });
+
+    const data = await safeJson(res);
+    if(!res.ok) throw new Error(data.error || ("Could not confirm order (" + res.status + ")"));
+    return data; // {order_number, transID}
+  }
+
+  async function mountStripe(){
+    if(mounted) return;
+
+    const form = document.getElementById("stripeForm");
+    const msg  = document.getElementById("stripeMsg");
+    const btn  = document.getElementById("stripePayBtn");
+    if(!form) return;
+
+    msg.textContent = "Loading secure payment form…";
+
+    const data = await createIntent();
+
+    stripe = Stripe(data.publishableKey);
+    elements = stripe.elements({ clientSecret: data.clientSecret });
+
+    elements.create("payment").mount("#stripe-payment-element");
+
+    mounted = true;
+    msg.textContent = "";
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      btn.disabled = true;
+      msg.textContent = "Processing payment…";
+
+      const { error, paymentIntent } = await stripe.confirmPayment({
+        elements,
+        redirect: "if_required",
+        confirmParams: {
+          // torna su questa pagina (senza query), così possiamo finalizzare lato server
+          return_url: window.location.origin + "{% url 'stripe_return' %}"
+        }
+      });
+
+      if (error) {
+        btn.disabled = false;
+        msg.textContent = error.message || "Payment failed.";
+        return;
+      }
+
+      // ✅ se non serve redirect (nessun 3DS), qui abbiamo l’oggetto PI
+      if (paymentIntent && paymentIntent.status === "succeeded") {
+        try {
+          const data2 = await confirmServer(paymentIntent.id);
+          window.location.href =
+            window.__REDIRECT_URL +
+            "?order_number=" + encodeURIComponent(data2.order_number) +
+            "&payment_id=" + encodeURIComponent(data2.transID);
+        } catch (err) {
+          btn.disabled = false;
+          msg.textContent = err.message || "Could not confirm order.";
+        }
+        return;
+      }
+
+      // ⚠️ altri stati: requires_action (3DS) → Stripe farà redirect automatico
+      // se processing: il tuo backend oggi non lo accetta (controlla intent.status != succeeded)
+      btn.disabled = false;
+      msg.textContent = "Authorizing… If you are not redirected, refresh this page.";
+    });
+  }
+
+  // ✅ quando torni dal 3DS, Stripe aggiunge payment_intent_client_secret in query
+  async function handleReturnFrom3DS(){
+    const params = new URLSearchParams(window.location.search);
+    const clientSecret = params.get("payment_intent_client_secret");
+    if(!clientSecret) return;
+
+    const msg = document.getElementById("stripeMsg");
+    if(msg) msg.textContent = "Finalizing payment…";
+
+    try{
+      // ✅ NON chiamare createIntent qui (evita nuovo PaymentIntent!)
+      if(!window.__STRIPE_PK){
+        throw new Error("Missing Stripe publishable key on page. Passala come stripe_publishable_key nel context della view.");
+      }
+
+      const s = Stripe(window.__STRIPE_PK);
+      const { paymentIntent } = await s.retrievePaymentIntent(clientSecret);
+
+      if(paymentIntent && paymentIntent.status === "succeeded"){
+        const data2 = await confirmServer(paymentIntent.id);
+        window.location.href =
+          window.__REDIRECT_URL +
+          "?order_number=" + encodeURIComponent(data2.order_number) +
+          "&payment_id=" + encodeURIComponent(data2.transID);
+      } else {
+        if(msg) msg.textContent = "Payment status: " + (paymentIntent ? paymentIntent.status : "unknown");
+      }
+    } catch(err){
+      if(msg) msg.textContent = err.message || "Could not finalize payment.";
+    } finally {
+      // pulisci query per evitare loop al refresh
+      if (window.history && window.history.replaceState) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
+  }
+
+  // quando clicchi tab Stripe, inizializza (una sola volta)
+  document.addEventListener("click", (e) => {
+    const tab = e.target.closest(".pay-tab[data-paytab]");
+    if(!tab) return;
+    if(tab.dataset.paytab === "stripe"){
+      setTimeout(() => mountStripe().catch(err => {
+        const msg = document.getElementById("stripeMsg");
+        if(msg) msg.textContent = err.message || "Stripe init failed.";
+      }), 80);
+    }
+  });
+
+  document.addEventListener("DOMContentLoaded", handleReturnFrom3DS);
+})();
+</script>
+
+
+
+{% endblock %}

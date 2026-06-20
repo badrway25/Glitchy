@@ -1,0 +1,128 @@
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Product, ReviewRating
+from category.models import Category
+from carts.models import CartItem
+from django.db.models import Q
+
+from carts.views import _cart_id
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.http import HttpResponse
+from .forms import ReviewForm
+from django.contrib import messages
+from orders.models import OrderProduct
+
+
+def store(request, category_slug=None):
+    category = None
+    products = Product.objects.filter(is_available=True)
+
+    # Categories for sidebar
+    all_categories = Category.objects.all().order_by("category_name")
+
+    if category_slug:
+        category = get_object_or_404(Category, slug=category_slug)
+        products = products.filter(category=category)
+
+    sort = request.GET.get("sort", "")
+    if sort == "price_asc":
+        products = products.order_by("price")
+    elif sort == "price_desc":
+        products = products.order_by("-price")
+    elif sort == "name_asc":
+        products = products.order_by("product_name")
+    elif sort == "name_desc":
+        products = products.order_by("-product_name")
+    elif sort == "newest":
+        products = products.order_by("-created_date")
+    else:
+        products = products.order_by("-created_date")
+
+    paginator = Paginator(products, 9)
+    page = request.GET.get("page")
+    paged_products = paginator.get_page(page)
+
+    context = {
+        "category": category,
+        "categories": all_categories,   # ✅ important
+        "products": paged_products,
+        "product_count": products.count(),
+        "sort": sort,
+    }
+    return render(request, "store/store.html", context)
+
+def product_detail(request, category_slug, product_slug):
+    try:
+        single_product = Product.objects.get(category__slug=category_slug, slug=product_slug)
+        in_cart = CartItem.objects.filter(cart__cart_id=_cart_id(request), product=single_product).exists()
+    except Exception as e:
+        raise e
+
+    if request.user.is_authenticated:
+        try:
+            orderproduct = OrderProduct.objects.filter(user=request.user, product_id=single_product.id).exists()
+        except OrderProduct.DoesNotExist:
+            orderproduct = None
+    else:
+        orderproduct = None
+
+    # Get the reviews
+    reviews = ReviewRating.objects.filter(product_id=single_product.id, status=True)
+    gallery = single_product.gallery.all()
+
+    context = {
+        'single_product': single_product,
+        'in_cart'       : in_cart,
+        'orderproduct': orderproduct,
+        'reviews': reviews,
+        
+    }
+    return render(request, 'store/product_detail.html', context)
+
+
+def search(request):
+    keyword = request.GET.get("keyword", "").strip()
+    products = Product.objects.filter(is_available=True)
+
+    all_categories = Category.objects.all().order_by("category_name")  # ✅
+
+    if keyword:
+        products = products.filter(
+            Q(description__icontains=keyword) | Q(product_name__icontains=keyword)
+        )
+
+    products = products.order_by("-created_date")
+
+    paginator = Paginator(products, 9)
+    page = request.GET.get("page")
+    paged_products = paginator.get_page(page)
+
+    context = {
+        "categories": all_categories,   # ✅
+        "products": paged_products,
+        "product_count": products.count(),
+    }
+    return render(request, "store/store.html", context)
+
+
+def submit_review(request, product_id):
+    url = request.META.get('HTTP_REFERER')
+    if request.method == 'POST':
+        try:
+            reviews = ReviewRating.objects.get(user__id=request.user.id, product__id=product_id)
+            form = ReviewForm(request.POST, instance=reviews)
+            form.save()
+            messages.success(request, 'Thank you! Your review has been updated.')
+            return redirect(url)
+        except ReviewRating.DoesNotExist:
+            form = ReviewForm(request.POST)
+            if form.is_valid():
+                data = ReviewRating()
+                data.subject = form.cleaned_data['subject']
+                data.rating = form.cleaned_data['rating']
+                data.review = form.cleaned_data['review']
+                data.ip = request.META.get('REMOTE_ADDR')
+                data.product_id = product_id
+                data.user_id = request.user.id
+                data.save()
+                messages.success(request, 'Thank you! Your review has been submitted.')
+                return redirect(url)

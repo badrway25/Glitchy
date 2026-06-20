@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<section class="section-content padding-y">
+  <div class="container" style="max-width: 1280px;">
+    {% include 'includes/alerts.html' %}
+
+    <div class="row g-4">
+
+      <!-- SIDEBAR -->
+      <aside class="col-lg-3">
+        {% include 'accounts/_sidebar.html' %}
+      </aside>
+
+      <!-- MAIN -->
+      <main class="col-lg-9">
+
+        <div class="acc-layout">
+
+          <!-- Header row -->
+          <div class="dash-top">
+            <div>
+              <h1 class="dash-title">Account overview</h1>
+              <div class="text-muted">Track your orders, payments and deliveries.</div>
+            </div>
+            <div class="dash-actions">
+              <a href="{% url 'store' %}" class="btn btn-soft btn-icontext">
+				<i class="fa fa-shopping-bag" aria-hidden="true"></i>
+				<span>Shop</span>
+				</a>
+              <a href="{% url 'my_orders' %}" class="btn btn-primary btn-icontext">
+				<span>View all orders</span>
+				<i class="fa fa-arrow-right" aria-hidden="true"></i>
+				</a>
+
+            </div>
+          </div>
+
+          <!-- KPI cards -->
+          <div class="dash-card">
+            <div class="dash-card-body">
+              <div class="dash-card-headless">
+                <div>
+                  <div class="dash-card-title">Quick stats</div>
+                  <div class="text-muted dash-small">All time overview</div>
+                </div>
+              </div>
+
+              <div class="dash-kpi">
+                <div class="kpi-card kpi-a">
+                  <div class="kpi-top">
+                    <div class="kpi-label">Total orders</div>
+                    <div class="kpi-icon"><i class="fa fa-shopping-bag"></i></div>
+                  </div>
+                  <div class="kpi-value">{{ total_orders }}</div>
+                  <div class="kpi-sub text-muted">All time</div>
+                </div>
+
+                <div class="kpi-card kpi-b">
+                  <div class="kpi-top">
+                    <div class="kpi-label">Spent</div>
+                    <div class="kpi-icon"><i class="fa fa-credit-card"></i></div>
+                  </div>
+                  <div class="kpi-value">€ {{ total_spent|floatformat:2 }}</div>
+                  <div class="kpi-sub text-muted">All time</div>
+                </div>
+
+                <div class="kpi-card kpi-c">
+                  <div class="kpi-top">
+                    <div class="kpi-label">In progress</div>
+                    <div class="kpi-icon"><i class="fa fa-clock"></i></div>
+                  </div>
+                  <div class="kpi-value">{{ in_progress }}</div>
+                  <div class="kpi-sub text-muted">New / Accepted</div>
+                </div>
+
+                <div class="kpi-card kpi-d">
+                  <div class="kpi-top">
+                    <div class="kpi-label">Completed</div>
+                    <div class="kpi-icon"><i class="fa fa-check-circle"></i></div>
+                  </div>
+                  <div class="kpi-value">{{ completed }}</div>
+                  <div class="kpi-sub text-muted">Delivered</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Orders table -->
+          <div class="dash-card">
+            <div class="dash-card-head">
+              <div>
+                <div class="dash-card-title">Recent orders</div>
+                <div class="text-muted dash-small">Last 5 orders</div>
+              </div>
+              <a class="btn btn-soft btn-sm" href="{% url 'my_orders' %}">
+                See all <i class="fa fa-arrow-right ms-2"></i>
+              </a>
+            </div>
+
+            <div class="dash-card-body">
+              {% if orders %}
+                <div class="table-responsive">
+                  <table class="table dash-table">
+                    <thead>
+                      <tr>
+                        <th>Order</th>
+                        <th>Status</th>
+                        <th class="text-end">Total</th>
+                        <th class="text-end">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for o in orders %}
+                        <tr>
+                          <td>
+                            <div class="ord-id">#{{ o.order_number }}</div>
+
+                            <div class="ord-meta">
+                              <span class="meta-chip-sm">
+                                <i class="fa fa-calendar-o me-1"></i>
+                                {{ o.created_at|date:"M d, Y" }}
+                              </span>
+
+                              <span class="meta-chip-sm">
+                                <i class="fa fa-credit-card me-1"></i>
+                                {% if o.payment %}{{ o.payment.payment_method }}{% else %}Pending{% endif %}
+                              </span>
+                            </div>
+                          </td>
+
+                          <td>
+                            {% if o.status == 'Completed' %}
+                              <span class="badge-soft badge-soft-success">Completed</span>
+                            {% elif o.status == 'Cancelled' %}
+                              <span class="badge-soft badge-soft-danger">Cancelled</span>
+                            {% elif o.status == 'Accepted' %}
+                              <span class="badge-soft badge-soft-info">Packed</span>
+                            {% else %}
+                              <span class="badge-soft badge-soft-warning">Confirmed</span>
+                            {% endif %}
+                          </td>
+
+                          <td class="text-end td-amount">€ {{ o.order_total|floatformat:2 }}</td>
+
+                          <td class="text-end">
+                            <a href="{% url 'order_detail' o.order_number %}" class="btn btn-soft btn-sm">
+                              Details
+                            </a>
+                          </td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              {% else %}
+                <div class="dash-empty">
+                  <div class="dash-empty-icon"><i class="fa fa-archive"></i></div>
+                  <h4>No orders yet</h4>
+                  <p class="text-muted mb-3">Start shopping to see your orders here.</p>
+                  <a href="{% url 'store' %}" class="btn btn-primary">Browse products</a>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+
+        </div>
+      </main>
+
+    </div>
+  </div>
+</section>
+{% endblock %}

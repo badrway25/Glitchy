@@ -1,0 +1,12 @@
+bottone more, per elenco puntato maggiori informazion composizione
+aquisto come ospite
+printify spedizione dove posso si opp? per la spedizione.
+mostrare in base a l'indirizzo ip la spedizione prezzo e tempo. 
+chatbot per cliente
+pagamento fornitore.
+riprendere spedizione da printify
+nel backend avere con margine tra
+ordini: pagato costo printyfy margine rimasto.
+rimborso(reso) 14 giorni. reso
+
+
