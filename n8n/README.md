@@ -288,3 +288,37 @@ How a Webhook node exposes the raw body varies by n8n version:
 - [ ] Decide whether `order.in_production` needs its own copy/workflow.
 - [ ] **Save and Activate** all 10 workflows so production webhook URLs go live.
 ```
+
+---
+
+## 9. Authentication model (Phase 4 update)
+
+**Primary enforcement = n8n native Header Auth.** Django sends a static
+`X-N8N-AUTH` header (`N8N_HEADER_AUTH_SECRET`) on every call; each webhook node
+uses `authentication: headerAuth` bound to the **`Glitchy n8n Header Auth`**
+credential. Requests without a valid header are rejected with **403 by n8n core**
+before the workflow runs. See [`EMAIL_SETUP.md`](./EMAIL_SETUP.md) §1.
+
+**`X-Signature` HMAC = observability / defense-in-depth only.** The in-workflow
+HMAC recompute is unreliable on n8n 1.108 (the Code node cannot reproduce
+Django's exact raw bytes), so it is **not** the gate — it is a best-effort
+`_signature_valid` flag. The Django side signs correctly (verified via a
+controlled receiver: `sig_valid=true`). Do not rely on it as the only control.
+
+## 10. Event → webhook path (underscores are preserved)
+
+Django maps `event_type` → path by replacing **dots with hyphens only**.
+Underscores are kept. So:
+
+| Event | Webhook path |
+|---|---|
+| `order.paid` | `order-paid` |
+| `order.tracking_available` | `order-tracking_available` |
+| `order.in_production` | `order-in_production` |
+
+`order.tracking_available` now has its **own dedicated workflow**
+(`order-tracking.json`, single webhook = reliable registration). `shipping-update`
+handles `order-shipped` only. This fixes the Phase-3 404 (which was a path
+mismatch: hyphen vs underscore). `order.in_production` shares the order-confirmation
+email contract — add an `order-in_production` webhook node there if/when the app
+emits that event.
