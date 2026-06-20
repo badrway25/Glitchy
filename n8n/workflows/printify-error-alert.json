@@ -8,7 +8,8 @@
         "responseMode": "responseNode",
         "options": {
           "rawBody": true
-        }
+        },
+        "authentication": "headerAuth"
       },
       "id": "wh-printify-error",
       "name": "Webhook printify.error",
@@ -18,7 +19,12 @@
         200,
         320
       ],
-      "webhookId": "glitchy-printify-error"
+      "webhookId": "glitchy-printify-error",
+      "credentials": {
+        "httpHeaderAuth": {
+          "name": "Glitchy n8n Header Auth"
+        }
+      }
     },
     {
       "parameters": {
@@ -78,7 +84,8 @@
         "options": {
           "responseCode": 200
         },
-        "responseMode": "responseNode"
+        "responseMode": "responseNode",
+        "authentication": "headerAuth"
       },
       "id": "respond-200",
       "name": "Respond 200",
@@ -87,7 +94,12 @@
       "position": [
         1180,
         320
-      ]
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "name": "Glitchy n8n Header Auth"
+        }
+      }
     }
   ],
   "connections": {

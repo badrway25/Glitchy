@@ -8,7 +8,8 @@
         "responseMode": "responseNode",
         "options": {
           "rawBody": true
-        }
+        },
+        "authentication": "headerAuth"
       },
       "id": "wh-cart-abandoned",
       "name": "Webhook cart.abandoned",
@@ -18,7 +19,12 @@
         180,
         320
       ],
-      "webhookId": "glitchy-cart-abandoned"
+      "webhookId": "glitchy-cart-abandoned",
+      "credentials": {
+        "httpHeaderAuth": {
+          "name": "Glitchy n8n Header Auth"
+        }
+      }
     },
     {
       "parameters": {
@@ -111,7 +117,8 @@
         "options": {
           "responseCode": 200
         },
-        "responseMode": "responseNode"
+        "responseMode": "responseNode",
+        "authentication": "headerAuth"
       },
       "id": "respond-sent",
       "name": "Respond 200 (sent)",
@@ -120,7 +127,12 @@
       "position": [
         1380,
         220
-      ]
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "name": "Glitchy n8n Header Auth"
+        }
+      }
     },
     {
       "parameters": {
@@ -129,7 +141,8 @@
         "options": {
           "responseCode": 200
         },
-        "responseMode": "responseNode"
+        "responseMode": "responseNode",
+        "authentication": "headerAuth"
       },
       "id": "respond-skipped",
       "name": "Respond 200 (skipped)",
@@ -138,7 +151,12 @@
       "position": [
         900,
         440
-      ]
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "name": "Glitchy n8n Header Auth"
+        }
+      }
     }
   ],
   "connections": {

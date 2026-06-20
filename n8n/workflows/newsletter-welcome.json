@@ -8,7 +8,8 @@
         "responseMode": "responseNode",
         "options": {
           "rawBody": true
-        }
+        },
+        "authentication": "headerAuth"
       },
       "id": "wh-newsletter",
       "name": "Webhook newsletter.subscribed",
@@ -18,7 +19,12 @@
         180,
         320
       ],
-      "webhookId": "glitchy-newsletter-subscribed"
+      "webhookId": "glitchy-newsletter-subscribed",
+      "credentials": {
+        "httpHeaderAuth": {
+          "name": "Glitchy n8n Header Auth"
+        }
+      }
     },
     {
       "parameters": {
@@ -90,7 +96,8 @@
         "options": {
           "responseCode": 200
         },
-        "responseMode": "responseNode"
+        "responseMode": "responseNode",
+        "authentication": "headerAuth"
       },
       "id": "respond-200",
       "name": "Respond 200",
@@ -99,7 +106,12 @@
       "position": [
         1360,
         320
-      ]
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "name": "Glitchy n8n Header Auth"
+        }
+      }
     }
   ],
   "connections": {

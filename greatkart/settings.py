@@ -57,6 +57,9 @@ DEBUG = env_bool("DJANGO_DEBUG", True)
 
 ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", ["127.0.0.1", "localhost"])
 
+# Required for HTTPS POST/CSRF behind a domain (e.g. https://shop.example.com)
+CSRF_TRUSTED_ORIGINS = env_list("CSRF_TRUSTED_ORIGINS", [])
+
 # Brand identity (used across templates and emails)
 SITE_NAME = env("SITE_NAME", "Glitchy")
 SITE_TAGLINE = env("SITE_TAGLINE", "Premium fashion, printed on demand")
@@ -128,14 +131,38 @@ AUTH_USER_MODEL = "accounts.Account"
 
 
 # --------------------------------------------------------------------------- #
-# Database
+# Database — SQLite by default; set DATABASE_URL (postgres://...) in production.
 # --------------------------------------------------------------------------- #
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+def _database_from_url(url):
+    """Minimal postgres/sqlite DATABASE_URL parser (no extra dependency)."""
+    from urllib.parse import urlparse, unquote
+
+    p = urlparse(url)
+    if p.scheme in ("postgres", "postgresql", "psql"):
+        return {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": unquote((p.path or "/").lstrip("/")),
+            "USER": unquote(p.username or ""),
+            "PASSWORD": unquote(p.password or ""),
+            "HOST": p.hostname or "",
+            "PORT": str(p.port or ""),
+            "CONN_MAX_AGE": env_int("DB_CONN_MAX_AGE", 60),
+        }
+    if p.scheme == "sqlite":
+        return {"ENGINE": "django.db.backends.sqlite3", "NAME": p.path or str(BASE_DIR / "db.sqlite3")}
+    raise ValueError(f"Unsupported DATABASE_URL scheme: {p.scheme}")
+
+
+_DATABASE_URL = env("DATABASE_URL", "")
+if _DATABASE_URL:
+    DATABASES = {"default": _database_from_url(_DATABASE_URL)}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
     }
-}
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -290,11 +317,41 @@ RETURN_WINDOW_DAYS = env_int("RETURN_WINDOW_DAYS", 14)
 # --------------------------------------------------------------------------- #
 N8N_ENABLED = env_bool("N8N_ENABLED", False)
 N8N_WEBHOOK_BASE_URL = env("N8N_WEBHOOK_BASE_URL", "")
+# Primary enforcement: a static shared header validated by n8n native Header Auth.
+N8N_HEADER_AUTH_NAME = env("N8N_HEADER_AUTH_NAME", "X-N8N-AUTH")
+N8N_HEADER_AUTH_SECRET = env("N8N_HEADER_AUTH_SECRET", "")
+# Optional application-level signature (observability / defense-in-depth).
 N8N_SHARED_SECRET = env("N8N_SHARED_SECRET", "")
 N8N_TIMEOUT = env_int("N8N_TIMEOUT", 15)
 N8N_MAX_RETRIES = env_int("N8N_MAX_RETRIES", 3)
 # When SMTP should be used as a fallback if an n8n dispatch fails
 EMAIL_SMTP_FALLBACK = env_bool("EMAIL_SMTP_FALLBACK", True)
+
+
+# --------------------------------------------------------------------------- #
+# Logging — console handler; level from env. Never logs secrets (we log status
+# codes + truncated errors only). Stripe/Printify/n8n webhook secrets are never
+# written to logs anywhere in the codebase.
+# --------------------------------------------------------------------------- #
+LOG_LEVEL = env("DJANGO_LOG_LEVEL", "INFO").upper()
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "standard": {"format": "[{asctime}] {levelname} {name}: {message}", "style": "{"},
+    },
+    "handlers": {
+        "console": {"class": "logging.StreamHandler", "formatter": "standard"},
+    },
+    "root": {"handlers": ["console"], "level": LOG_LEVEL},
+    "loggers": {
+        "django": {"handlers": ["console"], "level": LOG_LEVEL, "propagate": False},
+        "django.request": {"handlers": ["console"], "level": "ERROR", "propagate": False},
+        "notifications": {"handlers": ["console"], "level": LOG_LEVEL, "propagate": False},
+        "orders": {"handlers": ["console"], "level": LOG_LEVEL, "propagate": False},
+        "printify": {"handlers": ["console"], "level": LOG_LEVEL, "propagate": False},
+    },
+}
 
 
 # --------------------------------------------------------------------------- #
@@ -304,9 +361,11 @@ if not DEBUG:
     SECURE_SSL_REDIRECT = env_bool("SECURE_SSL_REDIRECT", True)
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
     SECURE_HSTS_SECONDS = env_int("SECURE_HSTS_SECONDS", 31536000)
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SECURE_REFERRER_POLICY = "same-origin"
     X_FRAME_OPTIONS = "DENY"

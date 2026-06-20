@@ -8,7 +8,8 @@
         "responseMode": "responseNode",
         "options": {
           "rawBody": true
-        }
+        },
+        "authentication": "headerAuth"
       },
       "id": "wh-internal-alert",
       "name": "Webhook internal.alert",
@@ -18,7 +19,12 @@
         200,
         260
       ],
-      "webhookId": "glitchy-internal-alert"
+      "webhookId": "glitchy-internal-alert",
+      "credentials": {
+        "httpHeaderAuth": {
+          "name": "Glitchy n8n Header Auth"
+        }
+      }
     },
     {
       "parameters": {
@@ -27,7 +33,8 @@
         "responseMode": "responseNode",
         "options": {
           "rawBody": true
-        }
+        },
+        "authentication": "headerAuth"
       },
       "id": "wh-margin-negative",
       "name": "Webhook margin.negative",
@@ -37,7 +44,12 @@
         200,
         440
       ],
-      "webhookId": "glitchy-margin-negative"
+      "webhookId": "glitchy-margin-negative",
+      "credentials": {
+        "httpHeaderAuth": {
+          "name": "Glitchy n8n Header Auth"
+        }
+      }
     },
     {
       "parameters": {
@@ -97,7 +109,8 @@
         "options": {
           "responseCode": 200
         },
-        "responseMode": "responseNode"
+        "responseMode": "responseNode",
+        "authentication": "headerAuth"
       },
       "id": "respond-200",
       "name": "Respond 200",
@@ -106,7 +119,12 @@
       "position": [
         1200,
         360
-      ]
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "name": "Glitchy n8n Header Auth"
+        }
+      }
     }
   ],
   "connections": {

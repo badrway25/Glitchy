@@ -15,6 +15,50 @@ from notifications.models import OutboundEvent, SupportMessage
 from orders.models import Order
 
 
+class HeaderAuthDispatchTests(TestCase):
+    """Django must send the primary X-N8N-AUTH header (+ observability X-Signature)."""
+
+    @override_settings(
+        N8N_ENABLED=True, N8N_WEBHOOK_BASE_URL="http://n8n.local/webhook",
+        N8N_HEADER_AUTH_NAME="X-N8N-AUTH", N8N_HEADER_AUTH_SECRET="hdr-secret",
+        N8N_SHARED_SECRET="sig-secret",
+    )
+    def test_dispatch_includes_header_auth(self):
+        from unittest.mock import patch, MagicMock
+
+        captured = {}
+
+        def fake_post(url, data=None, headers=None, timeout=None):
+            captured["headers"] = headers
+            resp = MagicMock(); resp.status_code = 200
+            return resp
+
+        with patch("notifications.dispatcher.requests.post", side_effect=fake_post):
+            dispatch_event(ev.ORDER_PAID, {"order_number": "H1"}, recipient_email="a@b.com")
+
+        self.assertEqual(captured["headers"].get("X-N8N-AUTH"), "hdr-secret")
+        self.assertIn("X-Signature", captured["headers"])   # observability still present
+        self.assertEqual(captured["headers"].get("X-Event-Type"), "order.paid")
+
+    @override_settings(
+        N8N_ENABLED=True, N8N_WEBHOOK_BASE_URL="http://n8n.local/webhook",
+        N8N_HEADER_AUTH_SECRET="",  # not configured
+    )
+    def test_dispatch_omits_header_when_unset(self):
+        from unittest.mock import patch, MagicMock
+
+        captured = {}
+
+        def fake_post(url, data=None, headers=None, timeout=None):
+            captured["headers"] = headers
+            resp = MagicMock(); resp.status_code = 200
+            return resp
+
+        with patch("notifications.dispatcher.requests.post", side_effect=fake_post):
+            dispatch_event(ev.ORDER_PAID, {"order_number": "H2"}, recipient_email="a@b.com")
+        self.assertNotIn("X-N8N-AUTH", captured["headers"])
+
+
 class HmacTests(TestCase):
     def test_sign_and_verify_roundtrip(self):
         body = b'{"hello":"world"}'

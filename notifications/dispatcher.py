@@ -72,8 +72,14 @@ def _post_to_n8n(event: OutboundEvent) -> tuple[bool, int | None, str]:
     headers = {
         "Content-Type": "application/json",
         "X-Event-Type": event.event_type,
+        # Application signature — observability / defense-in-depth (not the primary gate).
         "X-Signature": compute_signature(secret, body),
     }
+    # PRIMARY auth: static shared header enforced by n8n native Header Auth.
+    auth_name = getattr(settings, "N8N_HEADER_AUTH_NAME", "X-N8N-AUTH")
+    auth_secret = getattr(settings, "N8N_HEADER_AUTH_SECRET", "") or ""
+    if auth_secret:
+        headers[auth_name] = auth_secret
     timeout = int(getattr(settings, "N8N_TIMEOUT", 15))
     try:
         resp = requests.post(url, data=body, headers=headers, timeout=timeout)
