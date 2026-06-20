@@ -117,6 +117,13 @@ def push_order_to_printify(order, *, auto_send=True):
     if order.printify_order_id:
         return order.printify_order_id
 
+    # Safety guard: skip real Printify order creation during dry-runs.
+    if not getattr(settings, "PRINTIFY_PUSH_ENABLED", True):
+        order.printify_status = "push_disabled"
+        order.save(update_fields=["printify_status"])
+        logger.info("Printify push disabled — skipped for order %s", order.order_number)
+        return None
+
     ops = (
         OrderProduct.objects
         .select_related("product")

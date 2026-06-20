@@ -221,6 +221,9 @@ ADMIN_NOTIFY_EMAIL = env("ADMIN_NOTIFY_EMAIL", EMAIL_HOST_USER or "")
 # --------------------------------------------------------------------------- #
 PRINTIFY_API_TOKEN = env("PRINTIFY_API_TOKEN", "")
 PRINTIFY_SHOP_ID = env("PRINTIFY_SHOP_ID", "")
+# Safety switch: when False, orders are NOT pushed to the real Printify shop
+# (used for integration dry-runs so no real Printify order is created).
+PRINTIFY_PUSH_ENABLED = env_bool("PRINTIFY_PUSH_ENABLED", True)
 PRINTIFY_BLUEPRINT_CATEGORY_MAP = {
     145: "t-shirt",
     706: "t-shirt",
