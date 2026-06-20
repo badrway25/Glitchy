@@ -44,3 +44,10 @@ _n8n_tmp/
 
 # Rebrand QA screenshots
 rebrand-*.png
+
+# Pexels API key (never commit)
+.glitchy_pexels.key
+
+# Visual polish screenshots
+polish-*.png
+deep-*.png

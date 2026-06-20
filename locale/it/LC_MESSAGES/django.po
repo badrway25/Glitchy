@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: greatkart 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-20 20:24+0200\n"
+"POT-Creation-Date: 2026-06-20 21:36+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -137,7 +137,7 @@ msgstr "Evento in uscita"
 msgid "Outbound events (Django → n8n)"
 msgstr "Eventi in uscita (Django → n8n)"
 
-#: .\notifications\models.py:80 .\templates\home.html:145
+#: .\notifications\models.py:80 .\templates\home.html:163
 #: .\templates\store\product_detail.html:72 .\templates\store\store.html:252
 msgid "New"
 msgstr "Novità"
@@ -172,7 +172,7 @@ msgstr "Inserisci un indirizzo email valido."
 
 #: .\notifications\views.py:47
 msgid "Thanks for subscribing! Check your inbox to confirm."
-msgstr ""
+msgstr "Grazie per l'iscrizione! Controlla la tua casella per confermare."
 "Grazie per l'iscrizione! Controlla la tua casella per confermare.Grazie per "
 "l'iscrizione! Controlla la tua casella di posta per confermare."
 
@@ -377,7 +377,7 @@ msgstr "Motivo del reso"
 
 #: .\returns\forms.py:15
 msgid "Tell us why you'd like to return your order (optional)."
-msgstr ""
+msgstr "Dicci perché vuoi restituire il tuo ordine (facoltativo)."
 "Dicci perché vuoi restituire il tuo ordine (facoltativo).Indicaci il motivo "
 "per cui desideri restituire il tuo ordine (facoltativo)."
 
@@ -733,7 +733,7 @@ msgstr "Confermato"
 #: .\templates\accounts\dashboard.html:151
 #: .\templates\accounts\my_orders.html:72
 #: .\templates\accounts\transactions.html:142 .\templates\home.html:72
-#: .\templates\home.html:151 .\templates\orders\order_complete.html:286
+#: .\templates\home.html:169 .\templates\orders\order_complete.html:286
 msgid "Details"
 msgstr "Dettagli"
 
@@ -1028,6 +1028,10 @@ msgstr "Avviso"
 msgid "Info"
 msgstr "Informazione"
 
+#: .\templates\home.html:11
+msgid "Editorial fashion — premium tailoring"
+msgstr "Moda editoriale — sartoria premium"
+
 #: .\templates\home.html:14
 msgid "New season"
 msgstr "Nuova stagione"
@@ -1107,7 +1111,7 @@ msgstr "Tessuti premium"
 
 #: .\templates\home.html:93
 msgid "Heavyweight, soft-touch materials chosen for comfort and longevity."
-msgstr ""
+msgstr "Materiali pesanti e dal tatto morbido, scelti per comfort e durata nel tempo."
 "Materiali pesanti e dal tatto morbido, scelti per comfort e durata nel tempo."
 
 #: .\templates\home.html:97
@@ -1147,19 +1151,45 @@ msgstr ""
 "“Meno cose, ma migliori — capi che indossi ancora e ancora, non una volta "
 "sola.”"
 
-#: .\templates\home.html:127
+#: .\templates\home.html:128
+#, fuzzy
+#| msgid "Premium, ethically printed"
+msgid "Premium fabrics, carefully finished"
+msgstr "Premium, stampa etica"
+
+#: .\templates\home.html:131
+msgid "Crafted, not churned"
+msgstr "Curato, non prodotto in serie"
+
+#: .\templates\home.html:132
+msgid "Quality you can feel"
+msgstr "Una qualità che si sente"
+
+#: .\templates\home.html:133
+msgid ""
+"Considered cuts, durable fabrics and a finish made to last — pieces designed "
+"to stay in rotation, season after season."
+msgstr ""
+
+#: .\templates\home.html:134
+#, fuzzy
+#| msgid "Shop the collection"
+msgid "Explore the collection"
+msgstr "Scopri la collezione"
+
+#: .\templates\home.html:145
 msgid "Latest arrivals"
 msgstr "Ultimi arrivi"
 
-#: .\templates\home.html:128
+#: .\templates\home.html:146
 msgid "Freshly added — don’t miss out"
 msgstr "Appena aggiunti — da non perdere"
 
-#: .\templates\home.html:131
+#: .\templates\home.html:149
 msgid "See new"
 msgstr "Scopri le novità"
 
-#: .\templates\home.html:146 .\templates\store\product_detail.html:73
+#: .\templates\home.html:164 .\templates\store\product_detail.html:73
 msgid "Bestseller"
 msgstr "Bestseller"
 
@@ -1368,7 +1398,7 @@ msgstr "Ecco un aggiornamento sul tuo ordine <strong>#%(n)s</strong>."
 
 #: .\templates\notifications\email\transactional.html:45
 msgid "We have received your return request and our team is reviewing it."
-msgstr ""
+msgstr "Abbiamo ricevuto la tua richiesta di reso e il nostro team la sta esaminando."
 "Abbiamo ricevuto la tua richiesta di reso e il nostro team la sta "
 "esaminando.Abbiamo ricevuto la tua richiesta di reso e il nostro team la sta "
 "esaminando."
@@ -1452,7 +1482,7 @@ msgstr "Vedi lo stato del reso"
 #: .\templates\notifications\email\transactional.html:116
 #, python-format
 msgid "Not quite right? You can return your order within %(d)s days."
-msgstr ""
+msgstr "Non è quello che cercavi? Puoi restituire il tuo ordine entro %(d)s giorni."
 "Non è quello che cercavi? Puoi restituire il tuo ordine entro %(d)s "
 "giorni.Non è proprio quello che cercavi? Puoi restituire il tuo ordine entro "
 "%(d)s giorni."
@@ -1630,7 +1660,7 @@ msgstr "Seleziona gli articoli e indicaci il motivo (facoltativo)."
 
 #: .\templates\returns\policy.html:35
 msgid "We review your request and email you the next steps."
-msgstr ""
+msgstr "Esaminiamo la tua richiesta e ti inviamo i passaggi successivi via email."
 "Esaminiamo la tua richiesta e ti inviamo i passaggi successivi via "
 "email.Esaminiamo la tua richiesta e ti inviamo via email i passaggi "
 "successivi."
@@ -1656,7 +1686,7 @@ msgstr ""
 
 #: .\templates\returns\policy.html:51
 msgid "Need help? Contact our support team and we'll be glad to assist."
-msgstr ""
+msgstr "Hai bisogno di aiuto? Contatta il nostro team di supporto, saremo lieti di aiutarti."
 "Hai bisogno di aiuto? Contatta il nostro team di supporto, saremo lieti di "
 "aiutarti.Hai bisogno di aiuto? Contatta il nostro team di assistenza, saremo "
 "lieti di aiutarti."
@@ -1859,7 +1889,7 @@ msgstr "Seleziona un indirizzo"
 
 #: .\templates\store\checkout.html:69
 msgid "Pick one to autofill your billing details."
-msgstr ""
+msgstr "Selezionane uno per compilare automaticamente i dati di fatturazione."
 "Selezionane uno per compilare automaticamente i dati di "
 "fatturazione.Selezionane uno per compilare automaticamente i tuoi dati di "
 "fatturazione."
@@ -1922,7 +1952,7 @@ msgstr "cad."
 
 #: .\templates\store\checkout.html:191
 msgid "We don't ship to this country yet — choose another at checkout."
-msgstr ""
+msgstr "Non spediamo ancora in questo paese — scegline un altro al checkout."
 "Non spediamo ancora in questo paese — scegline un altro al checkout.Non "
 "spediamo ancora in questo Paese — scegline un altro al momento del pagamento."
 
