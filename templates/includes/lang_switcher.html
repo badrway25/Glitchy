@@ -1,0 +1,24 @@
+{% load i18n %}
+{% get_current_language as CUR_LANG %}
+{% get_available_languages as ALL_LANGS %}
+<div class="dropdown lang-switcher">
+  <button class="nav-icon dropdown-toggle" type="button" id="langDrop" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false" title="{% trans 'Language' %}">
+    <i class="fa fa-globe"></i>
+    <span class="lang-code">{{ CUR_LANG|upper }}</span>
+  </button>
+  <div class="dropdown-menu dropdown-menu-right" aria-labelledby="langDrop">
+    <div class="dropdown-header px-3 py-2">{% trans "Language" %}</div>
+    {% for code, name in ALL_LANGS %}
+      <form action="{% url 'set_language' %}" method="post" class="m-0">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button type="submit" name="language" value="{{ code }}"
+                class="dropdown-item {% if code == CUR_LANG %}active{% endif %}">
+          {{ name }} <span class="text-muted">({{ code|upper }})</span>
+          {% if code == CUR_LANG %}<i class="fa fa-check ml-2"></i>{% endif %}
+        </button>
+      </form>
+    {% endfor %}
+  </div>
+</div>

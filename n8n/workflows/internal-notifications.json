@@ -1,0 +1,109 @@
+{
+  "name": "Glitchy - Internal Notifications",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "internal-alert",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "id": "wh-internal-alert",
+      "name": "Webhook internal.alert",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 260],
+      "webhookId": "glitchy-internal-alert"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "margin-negative",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "id": "wh-margin-negative",
+      "name": "Webhook margin.negative",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 440],
+      "webhookId": "glitchy-margin-negative"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Verify X-Signature = HMAC-SHA256(N8N_SHARED_SECRET, raw request body).\nconst crypto = require('crypto');\nconst secret = $env.N8N_SHARED_SECRET;\nif (!secret) { throw new Error('N8N_SHARED_SECRET is not set'); }\nconst item = $input.first();\nconst headers = item.json.headers || {};\nconst sig = headers['x-signature'] || headers['X-Signature'];\nlet rawBody = item.binary && item.binary.data\n  ? Buffer.from(item.binary.data.data, 'base64').toString('utf8')\n  : (typeof item.json.body === 'string' ? item.json.body : JSON.stringify(item.json.body));\nconst expected = crypto.createHmac('sha256', secret).update(rawBody, 'utf8').digest('hex');\nif (!sig || expected !== sig) { throw new Error('invalid signature'); }\nconst payload = typeof item.json.body === 'string' ? JSON.parse(item.json.body) : item.json.body;\nreturn [{ json: payload }];"
+      },
+      "id": "code-verify",
+      "name": "Verify HMAC",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 360]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Internal alert email (English). Handles internal.alert and margin.negative.\nconst p = $input.first().json;\nconst d = p.data || {};\nconst ev = p.event || 'internal.alert';\nconst sym = { EUR: '€', USD: '$', GBP: '£' }[d.currency] || (d.currency ? d.currency + ' ' : '');\n\nlet subject, bodyRows;\nif (ev === 'margin.negative') {\n  subject = `[Negative Margin] ${d.subject || ('Order ' + (d.order_number || ''))}`;\n  const margin = (d.net_margin != null) ? sym + Number(d.net_margin).toFixed(2) : '-';\n  bodyRows = `<li><strong>Order:</strong> ${d.order_number || '-'}</li>\n<li><strong>Net margin:</strong> <span style=\"color:#b00020\">${margin}</span></li>`;\n} else {\n  subject = `[Internal Alert] ${d.subject || 'Glitchy'}`;\n  // Render any extra fields generically (never secrets — keys are operational).\n  bodyRows = Object.keys(d).filter(k => k !== 'subject').map(k => `<li><strong>${k}:</strong> ${typeof d[k] === 'object' ? JSON.stringify(d[k]) : d[k]}</li>`).join('') || '<li>(no additional data)</li>';\n}\n\nconst html = `<div style=\"font-family:Arial,Helvetica,sans-serif;max-width:640px;color:#222\">\n<h2 style=\"color:#111\">${subject}</h2>\n<ul>${bodyRows}</ul>\n<p style=\"color:#666\">Automated internal notification from Glitchy.</p>\n</div>`;\n\nreturn [{ json: { to: $env.ADMIN_NOTIFY_EMAIL, subject, html } }];"
+      },
+      "id": "code-build-email",
+      "name": "Build Internal Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [720, 360]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.to }}",
+        "subject": "={{ $json.subject }}",
+        "emailType": "html",
+        "message": "={{ $json.html }}",
+        "options": {}
+      },
+      "id": "gmail-send",
+      "name": "Send Email (Ops)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [960, 360],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_GMAIL_CREDENTIAL_ID",
+          "name": "Glitchy Gmail"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"ok\": true } }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "respond-200",
+      "name": "Respond 200",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1200, 360]
+    }
+  ],
+  "connections": {
+    "Webhook internal.alert": {
+      "main": [[{ "node": "Verify HMAC", "type": "main", "index": 0 }]]
+    },
+    "Webhook margin.negative": {
+      "main": [[{ "node": "Verify HMAC", "type": "main", "index": 0 }]]
+    },
+    "Verify HMAC": {
+      "main": [[{ "node": "Build Internal Email", "type": "main", "index": 0 }]]
+    },
+    "Build Internal Email": {
+      "main": [[{ "node": "Send Email (Ops)", "type": "main", "index": 0 }]]
+    },
+    "Send Email (Ops)": {
+      "main": [[{ "node": "Respond 200", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {}
+}

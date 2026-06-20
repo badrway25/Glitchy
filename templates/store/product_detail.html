@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static i18n %}
+{% block title %}{{ single_product.product_name }} • {{ SITE_NAME }}{% endblock %}
 
 {% block content %}
 <section class="section-conten padding-y">
@@ -9,8 +10,8 @@
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-3">
       <ol class="breadcrumb breadcrumb-clean" style="background:transparent; padding:0; margin:0;">
-        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
-        <li class="breadcrumb-item"><a href="{% url 'store' %}">Store</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">{% trans "Home" %}</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'store' %}">{% trans "Store" %}</a></li>
         <li class="breadcrumb-item active" aria-current="page">{{ single_product.product_name }}</li>
       </ol>
     </nav>
@@ -65,6 +66,15 @@
             {% csrf_token %}
 
             <div class="pdp-body pdp-sticky">
+
+              <!-- Badges -->
+              <div class="pdp-badges mb-2">
+                {% if single_product.is_new_arrival %}<span class="badge badge-pill" style="background:#0f172a;color:#fff;">{% trans "New" %}</span>{% endif %}
+                {% if single_product.is_bestseller %}<span class="badge badge-pill" style="background:#b45309;color:#fff;">{% trans "Bestseller" %}</span>{% endif %}
+                {% if single_product.on_sale %}<span class="badge badge-pill" style="background:#dc2626;color:#fff;">{% trans "Sale" %}</span>{% endif %}
+                <span class="badge badge-pill" style="background:#ecfdf5;color:#047857;border:1px solid #a7f3d0;"><i class="fa fa-undo mr-1"></i>{% blocktrans with d=RETURN_WINDOW_DAYS %}{{ d }}-day returns{% endblocktrans %}</span>
+              </div>
+
               <h1 class="pdp-title">{{ single_product.product_name }}</h1>
 
               <!-- rating + reviews + stock -->
@@ -85,31 +95,42 @@
   <!-- Reviews count -->
   <span class="pdp-pill pdp-pill--reviews">
     <i class="far fa-comment"></i>
-    <span class="pdp-pill-text">{{ single_product.countReview }} reviews</span>
+    <span class="pdp-pill-text">{% blocktrans count counter=single_product.countReview %}{{ counter }} review{% plural %}{{ counter }} reviews{% endblocktrans %}</span>
   </span>
 
   <!-- Stock -->
   {% if single_product.stock > 0 and single_product.is_available %}
     <span class="pdp-pill pdp-pill--stock is-in">
       <i class="fas fa-check-circle"></i>
-      <span class="pdp-pill-text">In stock</span>
+      <span class="pdp-pill-text">{% trans "In stock" %}</span>
       <span class="pdp-pill-count">({{ single_product.stock }})</span>
     </span>
   {% else %}
     <span class="pdp-pill pdp-pill--stock is-out">
       <i class="fas fa-times-circle"></i>
-      <span class="pdp-pill-text">Out of stock</span>
+      <span class="pdp-pill-text">{% trans "Out of stock" %}</span>
     </span>
   {% endif %}
 
 </div>
 
 
-              <div class="pdp-price">€ {{ single_product.price }}</div>
+              <div class="pdp-price">
+                {{ CURRENCY_SYMBOL }} {{ single_product.price }}
+                {% if single_product.on_sale %}
+                  <span class="pdp-compare text-muted" style="text-decoration:line-through;font-size:1rem;margin-left:8px;">{{ CURRENCY_SYMBOL }} {{ single_product.compare_at_price }}</span>
+                {% endif %}
+              </div>
 
               {% if single_product.description %}
                 <p class="pdp-muted mb-0">{{ single_product.description }}</p>
               {% endif %}
+
+              <!-- Shipping + returns reassurance -->
+              <div class="pdp-trust mt-3 mb-1" style="display:flex;flex-wrap:wrap;gap:14px;font-size:.86rem;color:#475569;">
+                <span><i class="fa fa-truck mr-1"></i>{% blocktrans with c=ship_country_name %}Ships to {{ c }}{% endblocktrans %}{% if shipping_quote %} · {% if shipping_quote.free %}{% trans "Free shipping" %}{% else %}{{ CURRENCY_SYMBOL }}{{ shipping_quote.cost }}{% endif %} · {{ shipping_quote.eta_label }}{% endif %}</span>
+                <span><i class="fa fa-undo mr-1"></i>{% blocktrans with d=RETURN_WINDOW_DAYS %}Free {{ d }}-day returns{% endblocktrans %}</span>
+              </div>
 
               <div class="pdp-divider"></div>
 
@@ -119,7 +140,7 @@
 
   <!-- Color -->
   <div>
-    <label class="mb-2" style="font-weight:700;">Color</label>
+    <label class="mb-2" style="font-weight:700;">{% trans "Color" %}</label>
 
     {% if single_product.variation_set.colors %}
       <input type="hidden" name="color" id="colorInput" required>
@@ -131,7 +152,7 @@
                 data-toggle="dropdown"
                 aria-haspopup="true"
                 aria-expanded="false">
-          <span id="colorLabel">Select color</span>
+          <span id="colorLabel">{% trans "Select color" %}</span>
         </button>
 
         <div class="dropdown-menu" aria-labelledby="colorDropdown">
@@ -146,13 +167,13 @@
         </div>
       </div>
     {% else %}
-      <div class="text-muted"><small>No color options</small></div>
+      <div class="text-muted"><small>{% trans "No color options" %}</small></div>
     {% endif %}
   </div>
 
   <!-- Size -->
   <div>
-    <label class="mb-2" style="font-weight:700;">Size</label>
+    <label class="mb-2" style="font-weight:700;">{% trans "Size" %}</label>
 
     {% if single_product.variation_set.sizes %}
       <input type="hidden" name="size" id="sizeInput" required>
@@ -164,7 +185,7 @@
                 data-toggle="dropdown"
                 aria-haspopup="true"
                 aria-expanded="false">
-          <span id="sizeLabel">Select size</span>
+          <span id="sizeLabel">{% trans "Select size" %}</span>
         </button>
 
         <div class="dropdown-menu" aria-labelledby="sizeDropdown">
@@ -179,7 +200,7 @@
         </div>
       </div>
     {% else %}
-      <div class="text-muted"><small>No size options</small></div>
+      <div class="text-muted"><small>{% trans "No size options" %}</small></div>
     {% endif %}
   </div>
 
@@ -188,17 +209,49 @@
 
               <!-- actions -->
               <div class="pdp-actions">
-                <button type="button" class="btn btn-soft" onclick="window.location='#reviews'" title="Reviews">
+                <button type="button" class="btn btn-soft" onclick="window.location='#reviews'" title="{% trans 'Reviews' %}">
                   <i class="fas fa-star"></i>
                 </button>
 
                 {% if single_product.stock <= 0 or not single_product.is_available %}
-                  <button type="button" class="btn btn-primary" disabled>Out of stock</button>
+                  <button type="button" class="btn btn-primary" disabled>{% trans "Out of stock" %}</button>
                 {% else %}
                   <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-shopping-cart mr-2"></i> Add to Cart
+                    <i class="fas fa-shopping-cart mr-2"></i> {% trans "Add to Cart" %}
                   </button>
                 {% endif %}
+              </div>
+
+              <!-- "More" — expandable product details -->
+              <div class="pdp-more mt-4">
+                <button type="button" class="btn btn-link p-0 pdp-more-toggle" data-toggle="collapse"
+                        data-target="#pdpMore" aria-expanded="false" aria-controls="pdpMore"
+                        style="font-weight:600;text-decoration:none;">
+                  <i class="fas fa-circle-info mr-1"></i> {% trans "More information" %}
+                  <i class="fas fa-chevron-down ml-1 small"></i>
+                </button>
+                <div class="collapse mt-3" id="pdpMore">
+                  <ul class="pdp-more-list list-unstyled" style="font-size:.9rem;color:#475569;">
+                    {% if single_product.composition %}
+                      <li class="mb-2"><strong>{% trans "Composition" %}:</strong> {{ single_product.composition }}</li>
+                    {% else %}
+                      <li class="mb-2"><strong>{% trans "Composition" %}:</strong> {% trans "Premium quality materials." %}</li>
+                    {% endif %}
+                    {% if single_product.fit_notes %}
+                      <li class="mb-2"><strong>{% trans "Fit" %}:</strong> {{ single_product.fit_notes }}</li>
+                    {% endif %}
+                    {% if single_product.care_instructions %}
+                      <li class="mb-2"><strong>{% trans "Care" %}:</strong> {{ single_product.care_instructions }}</li>
+                    {% else %}
+                      <li class="mb-2"><strong>{% trans "Care" %}:</strong> {% trans "Machine wash cold, do not tumble dry." %}</li>
+                    {% endif %}
+                    <li class="mb-2"><strong>{% trans "Sizes" %}:</strong>
+                      {% for s in single_product.variation_set.sizes %}{{ s.variation_value|upper }}{% if not forloop.last %}, {% endif %}{% empty %}{% trans "One size" %}{% endfor %}
+                    </li>
+                    <li class="mb-2"><strong>{% trans "Shipping" %}:</strong> {% blocktrans with c=ship_country_name %}Calculated at checkout for {{ c }}.{% endblocktrans %}{% if shipping_quote %} {{ shipping_quote.eta_label }}.{% endif %}</li>
+                    <li><strong>{% trans "Returns" %}:</strong> <a href="{% url 'returns:policy' %}">{% blocktrans with d=RETURN_WINDOW_DAYS %}Free returns within {{ d }} days{% endblocktrans %}</a></li>
+                  </ul>
+                </div>
               </div>
 
             </div>

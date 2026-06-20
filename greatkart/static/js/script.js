@@ -27,7 +27,7 @@ $(document).ready(function() {
            // item.find('.radio').find('span').text('Add');
 
         } else {
-            item.removeClass('active');
+            $(this).closest('.js-check').removeClass('active');
             // item.find('.radio').find('span').text('Unselect');
         }
     });

@@ -1,0 +1,128 @@
+{
+  "name": "Glitchy - Return Decision",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "return-approved",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "id": "wh-return-approved",
+      "name": "Webhook return.approved",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [180, 220],
+      "webhookId": "glitchy-return-approved"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "return-rejected",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "id": "wh-return-rejected",
+      "name": "Webhook return.rejected",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [180, 380],
+      "webhookId": "glitchy-return-rejected"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "refund-completed",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "id": "wh-refund-completed",
+      "name": "Webhook refund.completed",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [180, 540],
+      "webhookId": "glitchy-refund-completed"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Verify X-Signature = HMAC-SHA256(N8N_SHARED_SECRET, raw request body).\nconst crypto = require('crypto');\nconst secret = $env.N8N_SHARED_SECRET;\nif (!secret) { throw new Error('N8N_SHARED_SECRET is not set'); }\nconst item = $input.first();\nconst headers = item.json.headers || {};\nconst sig = headers['x-signature'] || headers['X-Signature'];\nlet rawBody = item.binary && item.binary.data\n  ? Buffer.from(item.binary.data.data, 'base64').toString('utf8')\n  : (typeof item.json.body === 'string' ? item.json.body : JSON.stringify(item.json.body));\nconst expected = crypto.createHmac('sha256', secret).update(rawBody, 'utf8').digest('hex');\nif (!sig || expected !== sig) { throw new Error('invalid signature'); }\nconst payload = typeof item.json.body === 'string' ? JSON.parse(item.json.body) : item.json.body;\nreturn [{ json: payload }];"
+      },
+      "id": "code-verify",
+      "name": "Verify HMAC",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 380]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Multilingual decision email; branches on the event (approved / rejected / refund.completed).\nconst p = $input.first().json;\nconst lang = (p.language || 'en').toLowerCase();\nconst d = p.data || {};\nconst ev = p.event || 'return.approved';\nconst sym = { EUR: '€', USD: '$', GBP: '£' }[d.currency] || (d.currency ? d.currency + ' ' : '');\nconst money = (v) => sym + Number(v || 0).toFixed(2);\n\nconst dict = {\n  en: {\n    approved: { subject: `Your return for order ${d.order_number} was approved`, body: 'Good news — your return request has been approved. Please follow the instructions to send the item back.' },\n    rejected: { subject: `Update on your return for order ${d.order_number}`, body: 'After review, we are unable to approve this return request.' },\n    refund: { subject: `Refund issued for order ${d.order_number}`, body: `Your refund of ${money(d.refund_amount)} has been processed and should appear on your statement within a few business days.` },\n    hi: `Hi ${d.first_name || ''},`, note: 'Note', view: 'View your return', thanks: 'Thank you — Glitchy.'\n  },\n  it: {\n    approved: { subject: `Il tuo reso per l’ordine ${d.order_number} è stato approvato`, body: 'Buone notizie — la tua richiesta di reso è stata approvata. Segui le istruzioni per rispedire l’articolo.' },\n    rejected: { subject: `Aggiornamento sul tuo reso per l’ordine ${d.order_number}`, body: 'Dopo una verifica, non possiamo approvare questa richiesta di reso.' },\n    refund: { subject: `Rimborso effettuato per l’ordine ${d.order_number}`, body: `Il tuo rimborso di ${money(d.refund_amount)} è stato elaborato e comparirà sul tuo estratto conto entro pochi giorni lavorativi.` },\n    hi: `Ciao ${d.first_name || ''},`, note: 'Nota', view: 'Vedi il tuo reso', thanks: 'Grazie — Glitchy.'\n  },\n  fr: {\n    approved: { subject: `Votre retour pour la commande ${d.order_number} a été approuvé`, body: 'Bonne nouvelle — votre demande de retour a été approuvée. Veuillez suivre les instructions pour renvoyer l’article.' },\n    rejected: { subject: `Mise à jour de votre retour pour la commande ${d.order_number}`, body: 'Après examen, nous ne pouvons pas approuver cette demande de retour.' },\n    refund: { subject: `Remboursement effectué pour la commande ${d.order_number}`, body: `Votre remboursement de ${money(d.refund_amount)} a été traité et apparaîtra sur votre relevé sous quelques jours ouvrés.` },\n    hi: `Bonjour ${d.first_name || ''},`, note: 'Remarque', view: 'Voir votre retour', thanks: 'Merci — Glitchy.'\n  }\n};\nconst L = dict[lang] || dict.en;\nconst branch = ev === 'return.rejected' ? L.rejected : (ev === 'refund.completed' ? L.refund : L.approved);\n\nconst btn = d.return_url ? `<p style=\"margin:18px 0\"><a href=\"${d.return_url}\" style=\"background:#111;color:#fff;padding:10px 18px;text-decoration:none;border-radius:6px;display:inline-block\">${L.view}</a></p>` : '';\nconst html = `<div style=\"font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:auto;color:#222\">\n<h2 style=\"color:#111\">${branch.subject}</h2>\n<p>${L.hi}</p>\n<p>${branch.body}</p>\n${d.admin_note ? `<p><strong>${L.note}:</strong> ${d.admin_note}</p>` : ''}\n${btn}\n<p style=\"margin-top:20px;color:#666\">${L.thanks}</p>\n</div>`;\n\nreturn [{ json: { to: p.recipient, subject: branch.subject, html } }];"
+      },
+      "id": "code-build-email",
+      "name": "Build Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 380]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.to }}",
+        "subject": "={{ $json.subject }}",
+        "emailType": "html",
+        "message": "={{ $json.html }}",
+        "options": {}
+      },
+      "id": "gmail-send",
+      "name": "Send Email (Gmail)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [940, 380],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_GMAIL_CREDENTIAL_ID",
+          "name": "Glitchy Gmail"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"ok\": true } }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "respond-200",
+      "name": "Respond 200",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1180, 380]
+    }
+  ],
+  "connections": {
+    "Webhook return.approved": {
+      "main": [[{ "node": "Verify HMAC", "type": "main", "index": 0 }]]
+    },
+    "Webhook return.rejected": {
+      "main": [[{ "node": "Verify HMAC", "type": "main", "index": 0 }]]
+    },
+    "Webhook refund.completed": {
+      "main": [[{ "node": "Verify HMAC", "type": "main", "index": 0 }]]
+    },
+    "Verify HMAC": {
+      "main": [[{ "node": "Build Email", "type": "main", "index": 0 }]]
+    },
+    "Build Email": {
+      "main": [[{ "node": "Send Email (Gmail)", "type": "main", "index": 0 }]]
+    },
+    "Send Email (Gmail)": {
+      "main": [[{ "node": "Respond 200", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {}
+}

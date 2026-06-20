@@ -51,30 +51,31 @@ def store(request, category_slug=None):
     return render(request, "store/store.html", context)
 
 def product_detail(request, category_slug, product_slug):
-    try:
-        single_product = Product.objects.get(category__slug=category_slug, slug=product_slug)
-        in_cart = CartItem.objects.filter(cart__cart_id=_cart_id(request), product=single_product).exists()
-    except Exception as e:
-        raise e
+    single_product = get_object_or_404(Product, category__slug=category_slug, slug=product_slug)
 
     if request.user.is_authenticated:
-        try:
-            orderproduct = OrderProduct.objects.filter(user=request.user, product_id=single_product.id).exists()
-        except OrderProduct.DoesNotExist:
-            orderproduct = None
+        in_cart = CartItem.objects.filter(user=request.user, product=single_product).exists()
+        orderproduct = OrderProduct.objects.filter(
+            user=request.user, product_id=single_product.id).exists()
     else:
+        in_cart = CartItem.objects.filter(
+            cart__cart_id=_cart_id(request), product=single_product).exists()
         orderproduct = None
 
-    # Get the reviews
     reviews = ReviewRating.objects.filter(product_id=single_product.id, status=True)
-    gallery = single_product.gallery.all()
+
+    # Single-item shipping estimate for the detected country.
+    from shipping.geo import detect_country
+    from shipping.services import fallback_quote
+    shipping_quote = fallback_quote(detect_country(request), total_quantity=1,
+                                    subtotal=single_product.price)
 
     context = {
         'single_product': single_product,
-        'in_cart'       : in_cart,
+        'in_cart': in_cart,
         'orderproduct': orderproduct,
         'reviews': reviews,
-        
+        'shipping_quote': shipping_quote,
     }
     return render(request, 'store/product_detail.html', context)
 
@@ -106,6 +107,13 @@ def search(request):
 
 def submit_review(request, product_id):
     url = request.META.get('HTTP_REFERER')
+    if not request.user.is_authenticated:
+        messages.error(request, 'Please sign in to write a review.')
+        return redirect('login')
+    # Only verified buyers may review.
+    if not OrderProduct.objects.filter(user=request.user, product_id=product_id, ordered=True).exists():
+        messages.error(request, 'Only verified buyers can review this product.')
+        return redirect(url or 'store')
     if request.method == 'POST':
         try:
             reviews = ReviewRating.objects.get(user__id=request.user.id, product__id=product_id)

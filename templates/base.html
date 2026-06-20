@@ -1,14 +1,15 @@
-{% load static %}
+{% load static i18n %}
+{% get_current_language as LANGUAGE_CODE %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ LANGUAGE_CODE|default:'en' }}">
 <head>
   <meta charset="utf-8">
   <meta http-equiv="pragma" content="no-cache" />
   <meta http-equiv="cache-control" content="max-age=604800" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-  <title>{% block title %}Glitchy{% endblock %}</title>
-  <meta name="description" content="{% block meta_description %}Online shopping platform{% endblock %}">
+  <title>{% block title %}{{ SITE_NAME }} — {{ SITE_TAGLINE }}{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}{{ SITE_TAGLINE }}{% endblock %}">
 
   <link href="{% static 'images/favicon.ico' %}" rel="shortcut icon" type="image/x-icon">
 
@@ -58,10 +59,10 @@
         <div class="toast-icon" aria-hidden="true"></div>
         <div class="toast-body">
           <div class="toast-title">
-            {% if 'success' in message.tags %}Success
-            {% elif 'error' in message.tags %}Error
-            {% elif 'warning' in message.tags %}Warning
-            {% else %}Info{% endif %}
+            {% if 'success' in message.tags %}{% trans "Success" %}
+            {% elif 'error' in message.tags %}{% trans "Error" %}
+            {% elif 'warning' in message.tags %}{% trans "Warning" %}
+            {% else %}{% trans "Info" %}{% endif %}
           </div>
           <div class="toast-text">{{ message }}</div>
         </div>

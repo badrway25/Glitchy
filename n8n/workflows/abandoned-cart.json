@@ -1,0 +1,140 @@
+{
+  "name": "Glitchy - Abandoned Cart",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "cart-abandoned",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "id": "wh-cart-abandoned",
+      "name": "Webhook cart.abandoned",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [180, 320],
+      "webhookId": "glitchy-cart-abandoned"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Verify X-Signature = HMAC-SHA256(N8N_SHARED_SECRET, raw request body).\nconst crypto = require('crypto');\nconst secret = $env.N8N_SHARED_SECRET;\nif (!secret) { throw new Error('N8N_SHARED_SECRET is not set'); }\nconst item = $input.first();\nconst headers = item.json.headers || {};\nconst sig = headers['x-signature'] || headers['X-Signature'];\nlet rawBody = item.binary && item.binary.data\n  ? Buffer.from(item.binary.data.data, 'base64').toString('utf8')\n  : (typeof item.json.body === 'string' ? item.json.body : JSON.stringify(item.json.body));\nconst expected = crypto.createHmac('sha256', secret).update(rawBody, 'utf8').digest('hex');\nif (!sig || expected !== sig) { throw new Error('invalid signature'); }\nconst payload = typeof item.json.body === 'string' ? JSON.parse(item.json.body) : item.json.body;\n// Consent flag: only email customers who opted into marketing.\n// Django may pass data.marketing_consent; default false to be safe.\npayload._consent = !!(payload.data && (payload.data.marketing_consent === true || payload.data.consent === true)) && !!(payload.data && payload.data.email);\nreturn [{ json: payload }];"
+      },
+      "id": "code-verify",
+      "name": "Verify HMAC",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [420, 320]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "consent-true",
+              "leftValue": "={{ $json._consent }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-consent",
+      "name": "IF consent",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [660, 320]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Multilingual cart-recovery email.\nconst p = $input.first().json;\nconst lang = (p.language || 'en').toLowerCase();\nconst d = p.data || {};\n\nconst t = {\n  en: { subject: 'You left something behind 👀', hi: `Hi ${d.first_name || ''},`, intro: 'Your cart is waiting for you. Complete your order before these items sell out!', items: 'Your items', cta: 'Return to my cart', thanks: 'See you soon — Glitchy.' },\n  it: { subject: 'Hai dimenticato qualcosa 👀', hi: `Ciao ${d.first_name || ''},`, intro: 'Il tuo carrello ti aspetta. Completa l’ordine prima che questi articoli finiscano!', items: 'I tuoi articoli', cta: 'Torna al carrello', thanks: 'A presto — Glitchy.' },\n  fr: { subject: 'Vous avez oublié quelque chose 👀', hi: `Bonjour ${d.first_name || ''},`, intro: 'Votre panier vous attend. Finalisez votre commande avant que ces articles ne partent !', items: 'Vos articles', cta: 'Retour à mon panier', thanks: 'À bientôt — Glitchy.' }\n}[lang];\nconst L = t || { subject: 'You left something behind 👀', hi: `Hi ${d.first_name || ''},`, intro: 'Your cart is waiting for you.', items: 'Your items', cta: 'Return to my cart', thanks: 'See you soon — Glitchy.' };\n\nconst list = (d.items || []).map(it => `<li>${it.name}${it.variant ? ' – ' + it.variant : ''}${it.qty ? ' ×' + it.qty : ''}</li>`).join('');\nconst btn = d.cart_url ? `<p style=\"margin:18px 0\"><a href=\"${d.cart_url}\" style=\"background:#111;color:#fff;padding:10px 18px;text-decoration:none;border-radius:6px;display:inline-block\">${L.cta}</a></p>` : '';\nconst html = `<div style=\"font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:auto;color:#222\">\n<h2 style=\"color:#111\">${L.subject}</h2>\n<p>${L.hi}</p>\n<p>${L.intro}</p>\n${list ? `<p><strong>${L.items}:</strong></p><ul>${list}</ul>` : ''}\n${btn}\n<p style=\"margin-top:20px;color:#666\">${L.thanks}</p>\n</div>`;\n\nreturn [{ json: { to: p.recipient || d.email, subject: L.subject, html } }];"
+      },
+      "id": "code-build-email",
+      "name": "Build Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 220]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.to }}",
+        "subject": "={{ $json.subject }}",
+        "emailType": "html",
+        "message": "={{ $json.html }}",
+        "options": {}
+      },
+      "id": "gmail-send",
+      "name": "Send Email (Gmail)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [1140, 220],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_GMAIL_CREDENTIAL_ID",
+          "name": "Glitchy Gmail"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"ok\": true, \"sent\": true } }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "respond-sent",
+      "name": "Respond 200 (sent)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1380, 220]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"ok\": true, \"sent\": false, \"reason\": \"no_consent\" } }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "respond-skipped",
+      "name": "Respond 200 (skipped)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [900, 440]
+    }
+  ],
+  "connections": {
+    "Webhook cart.abandoned": {
+      "main": [[{ "node": "Verify HMAC", "type": "main", "index": 0 }]]
+    },
+    "Verify HMAC": {
+      "main": [[{ "node": "IF consent", "type": "main", "index": 0 }]]
+    },
+    "IF consent": {
+      "main": [
+        [{ "node": "Build Email", "type": "main", "index": 0 }],
+        [{ "node": "Respond 200 (skipped)", "type": "main", "index": 0 }]
+      ]
+    },
+    "Build Email": {
+      "main": [[{ "node": "Send Email (Gmail)", "type": "main", "index": 0 }]]
+    },
+    "Send Email (Gmail)": {
+      "main": [[{ "node": "Respond 200 (sent)", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {}
+}

@@ -181,8 +181,10 @@
       return;
     }
 
-    document.getElementById("postalCodeInput").value = addr.postal_code || "";
-document.getElementById("countryInput").value = (addr.country || "").toUpperCase();
+    const pcEl = document.getElementById("postalCodeInput");
+    if (pcEl) pcEl.value = data.postal_code || "";
+    const cEl = document.getElementById("countryInput");
+    if (cEl) cEl.value = (data.country || "").toUpperCase();
 
 
     const map = {

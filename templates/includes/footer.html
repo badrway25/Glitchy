@@ -1,4 +1,4 @@
-{% load static %}
+{% load static i18n %}
 
 <footer class="section-footer footer-premium mt-5">
   <div class="container">
@@ -10,69 +10,69 @@
         <!-- Brand -->
         <div class="col-lg-4 mb-4 mb-lg-0">
           <a class="footer-brand" href="{% url 'home' %}">
-            <img src="{% static 'images/logo.png' %}" alt="Glitchy" class="footer-logo">
-            
-            <span class="footer-badge">Store</span>
+            <img src="{% static 'images/logo.png' %}" alt="{{ SITE_NAME }}" class="footer-logo"
+                 onerror="this.style.display='none'">
+            <span class="footer-badge">{{ SITE_NAME }}</span>
           </a>
 
           <p class="footer-desc">
-            Curated essentials, designed for everyday comfort. Premium quality, fast shipping, easy returns.
+            {% trans "Curated essentials, designed for everyday comfort. Premium quality, fast shipping, easy returns." %}
           </p>
 
           <div class="footer-social">
             <a class="social-btn" href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-<a class="social-btn" href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-<a class="social-btn" href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
-<a class="social-btn" href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a class="social-btn" href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <a class="social-btn" href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+            <a class="social-btn" href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          </div>
+
+          <div class="mt-3">
+            {% include 'includes/country_switcher.html' %}
           </div>
         </div>
 
         <!-- Links -->
         <div class="col-6 col-md-4 col-lg-2 mb-4 mb-lg-0">
-          <div class="footer-title">Shop</div>
+          <div class="footer-title">{% trans "Shop" %}</div>
           <ul class="footer-list">
-            <li><a class="footer-link" href="{% url 'store' %}">All Products</a></li>
-            <li><a class="footer-link" href="{% url 'store' %}">New Arrivals</a></li>
-            <li><a class="footer-link" href="{% url 'store' %}">Best Sellers</a></li>
-            <li><a class="footer-link" href="{% url 'store' %}">Gift Cards</a></li>
+            <li><a class="footer-link" href="{% url 'store' %}">{% trans "All Products" %}</a></li>
+            <li><a class="footer-link" href="{% url 'store' %}?sort=newest">{% trans "New Arrivals" %}</a></li>
+            <li><a class="footer-link" href="{% url 'store' %}">{% trans "Best Sellers" %}</a></li>
           </ul>
         </div>
 
         <div class="col-6 col-md-4 col-lg-2 mb-4 mb-lg-0">
-          <div class="footer-title">Company</div>
+          <div class="footer-title">{% trans "Company" %}</div>
           <ul class="footer-list">
-            <li><a class="footer-link" href="#">About</a></li>
-            <li><a class="footer-link" href="#">Careers</a></li>
-            <li><a class="footer-link" href="#">Press</a></li>
-            <li><a class="footer-link" href="#">Sustainability</a></li>
+            <li><a class="footer-link" href="#">{% trans "About" %}</a></li>
+            <li><a class="footer-link" href="#">{% trans "Sustainability" %}</a></li>
+            <li><a class="footer-link" href="#">{% trans "Press" %}</a></li>
           </ul>
         </div>
 
         <div class="col-6 col-md-4 col-lg-2 mb-4 mb-lg-0">
-          <div class="footer-title">Support</div>
+          <div class="footer-title">{% trans "Support" %}</div>
           <ul class="footer-list">
-            <li><a class="footer-link" href="#">Contact</a></li>
-            <li><a class="footer-link" href="#">Shipping</a></li>
-            <li><a class="footer-link" href="#">Returns</a></li>
-            <li><a class="footer-link" href="#">FAQ</a></li>
+            <li><a class="footer-link" href="mailto:{{ SUPPORT_EMAIL }}">{% trans "Contact" %}</a></li>
+            <li><a class="footer-link" href="{% url 'returns:policy' %}">{% trans "Returns & refunds" %}</a></li>
+            <li><a class="footer-link" href="{% url 'returns:policy' %}">{% trans "Shipping" %}</a></li>
           </ul>
         </div>
 
         <!-- Newsletter -->
         <div class="col-lg-2">
-          <div class="footer-title">Newsletter</div>
-
-
-          <form class="footer-newsletter" method="post" action="#">
+          <div class="footer-title">{% trans "Newsletter" %}</div>
+          <form class="footer-newsletter" method="post" action="{% url 'newsletter_subscribe' %}">
             {% csrf_token %}
             <div class="newsletter-wrap">
-              <input class="form-control newsletter-input" type="email" name="email" placeholder="Email address" required>
-              <button class="btn btn-primary newsletter-btn" type="submit" aria-label="Subscribe">
+              <input class="form-control newsletter-input" type="email" name="email"
+                     placeholder="{% trans 'Email address' %}" required>
+              <button class="btn btn-primary newsletter-btn" type="submit" aria-label="{% trans 'Subscribe' %}">
                 <i class="fa fa-arrow-right"></i>
               </button>
             </div>
             <div class="footer-legal-hint">
-              By subscribing, you agree to our <a class="footer-link" href="#">Privacy Policy</a>.
+              {% trans "By subscribing, you agree to our" %} <a class="footer-link" href="#">{% trans "Privacy Policy" %}</a>.
             </div>
           </form>
         </div>
@@ -80,26 +80,26 @@
       </div>
 
       <!-- Trust chips -->
-      <div class="footer-trust" aria-label="Store benefits">
-        <div class="trust-chip"><i class="fa fa-truck"></i> Fast Shipping</div>
-        <div class="trust-chip"><i class="fa fa-undo"></i> 30-Day Returns</div>
-        <div class="trust-chip"><i class="fa fa-lock"></i> Secure Checkout</div>
-        <div class="trust-chip"><i class="fa fa-headset"></i> Support 7/7</div>
+      <div class="footer-trust" aria-label="{% trans 'Store benefits' %}">
+        <div class="trust-chip"><i class="fa fa-truck"></i> {% trans "Fast Shipping" %}</div>
+        <div class="trust-chip"><i class="fa fa-undo"></i> {% blocktrans with d=RETURN_WINDOW_DAYS %}{{ d }}-Day Returns{% endblocktrans %}</div>
+        <div class="trust-chip"><i class="fa fa-lock"></i> {% trans "Secure Checkout" %}</div>
+        <div class="trust-chip"><i class="fa fa-headset"></i> {% trans "Support 7/7" %}</div>
       </div>
     </div>
 
     <!-- Bottom -->
     <div class="footer-bottom">
       <div class="footer-bottom-left">
-        <span>© {% now "Y" %} Glitchy. All rights reserved.</span>
+        <span>© {% now "Y" %} {{ SITE_NAME }}. {% trans "All rights reserved." %}</span>
       </div>
 
       <div class="footer-bottom-right">
-        <a class="footer-link" href="#">Terms</a>
+        <a class="footer-link" href="#">{% trans "Terms" %}</a>
         <span class="dot-sep">•</span>
-        <a class="footer-link" href="#">Privacy</a>
+        <a class="footer-link" href="#">{% trans "Privacy" %}</a>
         <span class="dot-sep">•</span>
-        <a class="footer-link" href="#">Cookies</a>
+        <a class="footer-link" href="{% url 'returns:policy' %}">{% trans "Returns" %}</a>
       </div>
     </div>
 

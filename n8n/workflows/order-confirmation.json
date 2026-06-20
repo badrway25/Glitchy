@@ -1,0 +1,109 @@
+{
+  "name": "Glitchy - Order Confirmation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "order-paid",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "id": "wh-order-paid",
+      "name": "Webhook order.paid",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 240],
+      "webhookId": "glitchy-order-paid"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "order-created",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "id": "wh-order-created",
+      "name": "Webhook order.created",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 440],
+      "webhookId": "glitchy-order-created"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Verify X-Signature = HMAC-SHA256(N8N_SHARED_SECRET, raw request body).\n// Django sends compact JSON (separators ',' ':'), so prefer the RAW body.\nconst crypto = require('crypto');\nconst secret = $env.N8N_SHARED_SECRET;\nif (!secret) { throw new Error('N8N_SHARED_SECRET is not set'); }\n\nconst item = $input.first();\nconst headers = item.json.headers || {};\nconst sig = headers['x-signature'] || headers['X-Signature'];\n\n// Prefer the exact raw body bytes captured by the webhook (rawBody:true).\nlet rawBody = item.binary && item.binary.data\n  ? Buffer.from(item.binary.data.data, 'base64').toString('utf8')\n  : (typeof item.json.body === 'string' ? item.json.body : JSON.stringify(item.json.body));\n\nconst expected = crypto.createHmac('sha256', secret).update(rawBody, 'utf8').digest('hex');\nif (!sig || expected !== sig) {\n  throw new Error('invalid signature');\n}\n\n// Parse the verified payload for downstream nodes.\nconst payload = typeof item.json.body === 'string' ? JSON.parse(item.json.body) : item.json.body;\nreturn [{ json: payload }];"
+      },
+      "id": "code-verify",
+      "name": "Verify HMAC",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 340]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build a multilingual HTML order-confirmation email.\nconst p = $input.first().json;\nconst lang = (p.language || 'en').toLowerCase();\nconst d = p.data || {};\nconst sym = { EUR: '€', USD: '$', GBP: '£' }[d.currency] || (d.currency ? d.currency + ' ' : '');\nconst money = (v) => sym + Number(v || 0).toFixed(2);\n\nconst t = {\n  en: { subject: `Order ${d.order_number} confirmed`, hi: `Hi ${d.first_name || ''},`, intro: 'Thanks for your order! We have received your payment and are getting it ready.', items: 'Items', subtotal: 'Subtotal', shipping: 'Shipping', tax: 'Tax', total: 'Total', ship_to: 'Shipping to', eta: 'Estimated delivery', days: 'business days', thanks: 'Thank you for shopping with Glitchy.' },\n  it: { subject: `Ordine ${d.order_number} confermato`, hi: `Ciao ${d.first_name || ''},`, intro: 'Grazie per il tuo ordine! Abbiamo ricevuto il pagamento e lo stiamo preparando.', items: 'Articoli', subtotal: 'Subtotale', shipping: 'Spedizione', tax: 'IVA', total: 'Totale', ship_to: 'Spedizione a', eta: 'Consegna stimata', days: 'giorni lavorativi', thanks: 'Grazie per aver acquistato da Glitchy.' },\n  fr: { subject: `Commande ${d.order_number} confirmée`, hi: `Bonjour ${d.first_name || ''},`, intro: 'Merci pour votre commande ! Nous avons reçu votre paiement et la préparons.', items: 'Articles', subtotal: 'Sous-total', shipping: 'Livraison', tax: 'TVA', total: 'Total', ship_to: 'Livraison à', eta: 'Livraison estimée', days: 'jours ouvrés', thanks: 'Merci d’avoir choisi Glitchy.' }\n}[lang] || null;\nconst L = t || ({\n  subject: `Order ${d.order_number} confirmed`, hi: `Hi ${d.first_name || ''},`, intro: 'Thanks for your order!', items: 'Items', subtotal: 'Subtotal', shipping: 'Shipping', tax: 'Tax', total: 'Total', ship_to: 'Shipping to', eta: 'Estimated delivery', days: 'business days', thanks: 'Thank you for shopping with Glitchy.'\n});\n\nconst rows = (d.items || []).map(it => `<tr><td style=\"padding:6px 8px;border-bottom:1px solid #eee\">${it.name}${it.variant ? ' – ' + it.variant : ''}</td><td style=\"padding:6px 8px;border-bottom:1px solid #eee;text-align:center\">${it.qty}</td><td style=\"padding:6px 8px;border-bottom:1px solid #eee;text-align:right\">${money(it.line_total)}</td></tr>`).join('');\nconst a = d.address || {};\nconst ship = d.shipping || {};\nconst eta = (ship.min_days != null && ship.max_days != null) ? `${ship.min_days}–${ship.max_days} ${L.days}` : '';\n\nconst html = `<div style=\"font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:auto;color:#222\">\n<h2 style=\"color:#111\">${L.subject}</h2>\n<p>${L.hi}</p>\n<p>${L.intro}</p>\n<table style=\"width:100%;border-collapse:collapse;margin:12px 0\"><thead><tr><th style=\"text-align:left;padding:6px 8px\">${L.items}</th><th style=\"padding:6px 8px\">Qty</th><th style=\"text-align:right;padding:6px 8px\">${L.total}</th></tr></thead><tbody>${rows}</tbody></table>\n<table style=\"width:100%;margin:8px 0\">\n<tr><td>${L.subtotal}</td><td style=\"text-align:right\">${money(d.items_subtotal)}</td></tr>\n<tr><td>${L.shipping}</td><td style=\"text-align:right\">${money(d.shipping_cost)}</td></tr>\n<tr><td>${L.tax}</td><td style=\"text-align:right\">${money(d.tax)}</td></tr>\n<tr><td><strong>${L.total}</strong></td><td style=\"text-align:right\"><strong>${money(d.order_total)}</strong></td></tr>\n</table>\n<p><strong>${L.ship_to}:</strong><br>${[a.line1, a.line2, [a.postal_code, a.city].filter(Boolean).join(' '), a.state, a.country].filter(Boolean).join('<br>')}</p>\n${eta ? `<p><strong>${L.eta}:</strong> ${eta}</p>` : ''}\n<p style=\"margin-top:20px;color:#666\">${L.thanks}</p>\n</div>`;\n\nreturn [{ json: { to: p.recipient, subject: L.subject, html } }];"
+      },
+      "id": "code-build-email",
+      "name": "Build Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 340]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.to }}",
+        "subject": "={{ $json.subject }}",
+        "emailType": "html",
+        "message": "={{ $json.html }}",
+        "options": {}
+      },
+      "id": "gmail-send",
+      "name": "Send Email (Gmail)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [940, 340],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_GMAIL_CREDENTIAL_ID",
+          "name": "Glitchy Gmail"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"ok\": true } }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "respond-200",
+      "name": "Respond 200",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1180, 340]
+    }
+  ],
+  "connections": {
+    "Webhook order.paid": {
+      "main": [[{ "node": "Verify HMAC", "type": "main", "index": 0 }]]
+    },
+    "Webhook order.created": {
+      "main": [[{ "node": "Verify HMAC", "type": "main", "index": 0 }]]
+    },
+    "Verify HMAC": {
+      "main": [[{ "node": "Build Email", "type": "main", "index": 0 }]]
+    },
+    "Build Email": {
+      "main": [[{ "node": "Send Email (Gmail)", "type": "main", "index": 0 }]]
+    },
+    "Send Email (Gmail)": {
+      "main": [[{ "node": "Respond 200", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {}
+}

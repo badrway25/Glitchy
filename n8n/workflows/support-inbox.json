@@ -1,0 +1,75 @@
+{
+  "name": "Glitchy - Support Inbox Ingest",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {},
+        "options": {
+          "downloadAttachments": false
+        }
+      },
+      "id": "gmail-trigger",
+      "name": "Gmail Trigger (Support Inbox)",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1,
+      "position": [200, 320],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_SUPPORT_MAILBOX_CREDENTIAL_ID",
+          "name": "Glitchy Support Mailbox"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Normalise an inbound support email into the Django /api/n8n/incoming-email/ shape\n// and compute the X-Signature over the EXACT JSON string we will POST.\nconst crypto = require('crypto');\nconst secret = $env.N8N_SHARED_SECRET;\nif (!secret) { throw new Error('N8N_SHARED_SECRET is not set'); }\n\nconst out = [];\nfor (const item of $input.all()) {\n  const m = item.json || {};\n  // Gmail node field names vary slightly by version; cover common shapes.\n  const headers = m.headers || {};\n  const fromRaw = m.from || m.From || headers.from || (m.payload && m.payload.from) || '';\n  const fromMatch = /<([^>]+)>/.exec(fromRaw);\n  const fromEmail = (fromMatch ? fromMatch[1] : fromRaw).trim();\n  const subject = m.subject || m.Subject || headers.subject || '';\n  const bodyText = m.text || m.textPlain || m.snippet || '';\n  const bodyHtml = m.html || m.textHtml || '';\n  const messageId = m.id || m.messageId || headers['message-id'] || '';\n  const threadId = m.threadId || m.thread_id || '';\n\n  // Best-effort language hint from the subject/body (default en).\n  const blob = (subject + ' ' + bodyText).toLowerCase();\n  let language = 'en';\n  if (/\\b(merci|bonjour|commande|remboursement)\\b/.test(blob)) language = 'fr';\n  else if (/\\b(grazie|ciao|ordine|rimborso)\\b/.test(blob)) language = 'it';\n\n  const payload = {\n    from_email: fromEmail,\n    to_email: m.to || $env.SUPPORT_EMAIL || '',\n    subject,\n    body_text: bodyText,\n    body_html: bodyHtml,\n    message_id: messageId,\n    thread_id: threadId,\n    language,\n    attachments: [],\n    auto_reply: true\n  };\n\n  // IMPORTANT: sign the EXACT serialized string we send as the HTTP body.\n  const bodyString = JSON.stringify(payload);\n  const signature = crypto.createHmac('sha256', secret).update(bodyString, 'utf8').digest('hex');\n\n  out.push({ json: { bodyString, signature } });\n}\nreturn out;"
+      },
+      "id": "code-build-request",
+      "name": "Build Signed Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 320]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.DJANGO_BASE_URL }}/api/n8n/incoming-email/",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "X-Signature", "value": "={{ $json.signature }}" }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ $json.bodyString }}",
+        "options": {}
+      },
+      "id": "http-to-django",
+      "name": "POST incoming-email",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [720, 320]
+    }
+  ],
+  "connections": {
+    "Gmail Trigger (Support Inbox)": {
+      "main": [[{ "node": "Build Signed Request", "type": "main", "index": 0 }]]
+    },
+    "Build Signed Request": {
+      "main": [[{ "node": "POST incoming-email", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {}
+}

@@ -1,0 +1,109 @@
+{
+  "name": "Glitchy - Shipping Update",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "order-shipped",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "id": "wh-order-shipped",
+      "name": "Webhook order.shipped",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 240],
+      "webhookId": "glitchy-order-shipped"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "order-tracking-available",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "id": "wh-tracking-available",
+      "name": "Webhook order.tracking_available",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 440],
+      "webhookId": "glitchy-order-tracking-available"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Verify X-Signature = HMAC-SHA256(N8N_SHARED_SECRET, raw request body).\nconst crypto = require('crypto');\nconst secret = $env.N8N_SHARED_SECRET;\nif (!secret) { throw new Error('N8N_SHARED_SECRET is not set'); }\nconst item = $input.first();\nconst headers = item.json.headers || {};\nconst sig = headers['x-signature'] || headers['X-Signature'];\nlet rawBody = item.binary && item.binary.data\n  ? Buffer.from(item.binary.data.data, 'base64').toString('utf8')\n  : (typeof item.json.body === 'string' ? item.json.body : JSON.stringify(item.json.body));\nconst expected = crypto.createHmac('sha256', secret).update(rawBody, 'utf8').digest('hex');\nif (!sig || expected !== sig) { throw new Error('invalid signature'); }\nconst payload = typeof item.json.body === 'string' ? JSON.parse(item.json.body) : item.json.body;\nreturn [{ json: payload }];"
+      },
+      "id": "code-verify",
+      "name": "Verify HMAC",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 340]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Multilingual shipping/tracking email.\nconst p = $input.first().json;\nconst lang = (p.language || 'en').toLowerCase();\nconst d = p.data || {};\nconst isTracking = (p.event === 'order.tracking_available');\n\nconst t = {\n  en: { subjShip: `Your order ${d.order_number} has shipped`, subjTrack: `Tracking available for order ${d.order_number}`, hi: `Hi ${d.first_name || ''},`, shipped: 'Good news — your order is on its way!', tracking: 'Your tracking details are now available.', track_btn: 'Track your parcel', track_no: 'Tracking number', eta: 'Estimated delivery', days: 'business days', thanks: 'Thank you for shopping with Glitchy.' },\n  it: { subjShip: `Il tuo ordine ${d.order_number} è stato spedito`, subjTrack: `Tracking disponibile per l’ordine ${d.order_number}`, hi: `Ciao ${d.first_name || ''},`, shipped: 'Buone notizie — il tuo ordine è in viaggio!', tracking: 'I dettagli di tracciamento sono ora disponibili.', track_btn: 'Traccia il pacco', track_no: 'Numero di tracking', eta: 'Consegna stimata', days: 'giorni lavorativi', thanks: 'Grazie per aver acquistato da Glitchy.' },\n  fr: { subjShip: `Votre commande ${d.order_number} a été expédiée`, subjTrack: `Suivi disponible pour la commande ${d.order_number}`, hi: `Bonjour ${d.first_name || ''},`, shipped: 'Bonne nouvelle — votre commande est en route !', tracking: 'Les informations de suivi sont maintenant disponibles.', track_btn: 'Suivre mon colis', track_no: 'Numéro de suivi', eta: 'Livraison estimée', days: 'jours ouvrés', thanks: 'Merci d’avoir choisi Glitchy.' }\n}[lang];\nconst L = t || { subjShip: `Your order ${d.order_number} has shipped`, subjTrack: `Tracking available for order ${d.order_number}`, hi: `Hi ${d.first_name || ''},`, shipped: 'Good news — your order is on its way!', tracking: 'Your tracking details are now available.', track_btn: 'Track your parcel', track_no: 'Tracking number', eta: 'Estimated delivery', days: 'business days', thanks: 'Thank you for shopping with Glitchy.' };\n\nconst subject = isTracking ? L.subjTrack : L.subjShip;\nconst lead = isTracking ? L.tracking : L.shipped;\nconst ship = d.shipping || {};\nconst eta = (ship.min_days != null && ship.max_days != null) ? `${ship.min_days}–${ship.max_days} ${L.days}` : '';\nconst btn = d.tracking_url ? `<p style=\"margin:18px 0\"><a href=\"${d.tracking_url}\" style=\"background:#111;color:#fff;padding:10px 18px;text-decoration:none;border-radius:6px;display:inline-block\">${L.track_btn}</a></p>` : '';\nconst tno = d.tracking_number ? `<p><strong>${L.track_no}:</strong> ${d.tracking_number}</p>` : '';\n\nconst html = `<div style=\"font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:auto;color:#222\">\n<h2 style=\"color:#111\">${subject}</h2>\n<p>${L.hi}</p>\n<p>${lead}</p>\n${tno}\n${btn}\n${eta ? `<p><strong>${L.eta}:</strong> ${eta}</p>` : ''}\n<p style=\"margin-top:20px;color:#666\">${L.thanks}</p>\n</div>`;\n\nreturn [{ json: { to: p.recipient, subject, html } }];"
+      },
+      "id": "code-build-email",
+      "name": "Build Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 340]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.to }}",
+        "subject": "={{ $json.subject }}",
+        "emailType": "html",
+        "message": "={{ $json.html }}",
+        "options": {}
+      },
+      "id": "gmail-send",
+      "name": "Send Email (Gmail)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [940, 340],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_GMAIL_CREDENTIAL_ID",
+          "name": "Glitchy Gmail"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"ok\": true } }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "respond-200",
+      "name": "Respond 200",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1180, 340]
+    }
+  ],
+  "connections": {
+    "Webhook order.shipped": {
+      "main": [[{ "node": "Verify HMAC", "type": "main", "index": 0 }]]
+    },
+    "Webhook order.tracking_available": {
+      "main": [[{ "node": "Verify HMAC", "type": "main", "index": 0 }]]
+    },
+    "Verify HMAC": {
+      "main": [[{ "node": "Build Email", "type": "main", "index": 0 }]]
+    },
+    "Build Email": {
+      "main": [[{ "node": "Send Email (Gmail)", "type": "main", "index": 0 }]]
+    },
+    "Send Email (Gmail)": {
+      "main": [[{ "node": "Respond 200", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {}
+}

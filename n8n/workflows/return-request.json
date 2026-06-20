@@ -1,0 +1,113 @@
+{
+  "name": "Glitchy - Return Request",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "return-requested",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "id": "wh-return-requested",
+      "name": "Webhook return.requested",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 320],
+      "webhookId": "glitchy-return-requested"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Verify X-Signature = HMAC-SHA256(N8N_SHARED_SECRET, raw request body).\nconst crypto = require('crypto');\nconst secret = $env.N8N_SHARED_SECRET;\nif (!secret) { throw new Error('N8N_SHARED_SECRET is not set'); }\nconst item = $input.first();\nconst headers = item.json.headers || {};\nconst sig = headers['x-signature'] || headers['X-Signature'];\nlet rawBody = item.binary && item.binary.data\n  ? Buffer.from(item.binary.data.data, 'base64').toString('utf8')\n  : (typeof item.json.body === 'string' ? item.json.body : JSON.stringify(item.json.body));\nconst expected = crypto.createHmac('sha256', secret).update(rawBody, 'utf8').digest('hex');\nif (!sig || expected !== sig) { throw new Error('invalid signature'); }\nconst payload = typeof item.json.body === 'string' ? JSON.parse(item.json.body) : item.json.body;\nreturn [{ json: payload }];"
+      },
+      "id": "code-verify",
+      "name": "Verify HMAC",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 320]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Multilingual return-request acknowledgement (customer) + internal ops alert.\nconst p = $input.first().json;\nconst lang = (p.language || 'en').toLowerCase();\nconst d = p.data || {};\nconst sym = { EUR: '€', USD: '$', GBP: '£' }[d.currency] || (d.currency ? d.currency + ' ' : '');\nconst money = (v) => sym + Number(v || 0).toFixed(2);\n\nconst t = {\n  en: { subject: `We received your return request for order ${d.order_number}`, hi: `Hi ${d.first_name || ''},`, intro: 'We have received your return request and our team is reviewing it. We will email you with the decision shortly.', reason: 'Reason', view: 'View your return', thanks: 'Thank you for your patience — Glitchy.' },\n  it: { subject: `Abbiamo ricevuto la tua richiesta di reso per l’ordine ${d.order_number}`, hi: `Ciao ${d.first_name || ''},`, intro: 'Abbiamo ricevuto la tua richiesta di reso e il nostro team la sta esaminando. Ti scriveremo a breve con la decisione.', reason: 'Motivo', view: 'Vedi il tuo reso', thanks: 'Grazie per la pazienza — Glitchy.' },\n  fr: { subject: `Nous avons reçu votre demande de retour pour la commande ${d.order_number}`, hi: `Bonjour ${d.first_name || ''},`, intro: 'Nous avons bien reçu votre demande de retour et notre équipe l’examine. Nous vous informerons de la décision sous peu.', reason: 'Motif', view: 'Voir votre retour', thanks: 'Merci de votre patience — Glitchy.' }\n}[lang];\nconst L = t || { subject: `We received your return request for order ${d.order_number}`, hi: `Hi ${d.first_name || ''},`, intro: 'We have received your return request and our team is reviewing it.', reason: 'Reason', view: 'View your return', thanks: 'Thank you for your patience — Glitchy.' };\n\nconst btn = d.return_url ? `<p style=\"margin:18px 0\"><a href=\"${d.return_url}\" style=\"background:#111;color:#fff;padding:10px 18px;text-decoration:none;border-radius:6px;display:inline-block\">${L.view}</a></p>` : '';\nconst customerHtml = `<div style=\"font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:auto;color:#222\">\n<h2 style=\"color:#111\">${L.subject}</h2>\n<p>${L.hi}</p>\n<p>${L.intro}</p>\n${d.reason ? `<p><strong>${L.reason}:</strong> ${d.reason}</p>` : ''}\n${btn}\n<p style=\"margin-top:20px;color:#666\">${L.thanks}</p>\n</div>`;\n\n// Internal ops email (always English, operational).\nconst opsSubject = `[Return Requested] Order ${d.order_number}`;\nconst opsHtml = `<div style=\"font-family:Arial,Helvetica,sans-serif;max-width:640px;color:#222\">\n<h3>New return request</h3>\n<ul>\n<li><strong>Order:</strong> ${d.order_number}</li>\n<li><strong>Customer:</strong> ${d.first_name || ''} &lt;${p.recipient}&gt;</li>\n<li><strong>Status:</strong> ${d.status || 'requested'}</li>\n<li><strong>Refund amount:</strong> ${money(d.refund_amount)}</li>\n<li><strong>Reason:</strong> ${d.reason || '-'}</li>\n<li><strong>Admin note:</strong> ${d.admin_note || '-'}</li>\n</ul>\n${d.return_url ? `<p><a href=\"${d.return_url}\">Open in admin</a></p>` : ''}\n</div>`;\n\nreturn [{ json: {\n  customer_to: p.recipient,\n  customer_subject: L.subject,\n  customer_html: customerHtml,\n  ops_to: $env.ADMIN_NOTIFY_EMAIL,\n  ops_subject: opsSubject,\n  ops_html: opsHtml\n} }];"
+      },
+      "id": "code-build-email",
+      "name": "Build Emails",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 320]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.customer_to }}",
+        "subject": "={{ $json.customer_subject }}",
+        "emailType": "html",
+        "message": "={{ $json.customer_html }}",
+        "options": {}
+      },
+      "id": "gmail-send-customer",
+      "name": "Send Email (Customer)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [940, 220],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_GMAIL_CREDENTIAL_ID",
+          "name": "Glitchy Gmail"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.ops_to }}",
+        "subject": "={{ $json.ops_subject }}",
+        "emailType": "html",
+        "message": "={{ $json.ops_html }}",
+        "options": {}
+      },
+      "id": "gmail-send-ops",
+      "name": "Send Email (Internal Ops)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [940, 420],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_GMAIL_CREDENTIAL_ID",
+          "name": "Glitchy Gmail"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"ok\": true } }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "respond-200",
+      "name": "Respond 200",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1180, 320]
+    }
+  ],
+  "connections": {
+    "Webhook return.requested": {
+      "main": [[{ "node": "Verify HMAC", "type": "main", "index": 0 }]]
+    },
+    "Verify HMAC": {
+      "main": [[{ "node": "Build Emails", "type": "main", "index": 0 }]]
+    },
+    "Build Emails": {
+      "main": [[
+        { "node": "Send Email (Customer)", "type": "main", "index": 0 },
+        { "node": "Send Email (Internal Ops)", "type": "main", "index": 0 }
+      ]]
+    },
+    "Send Email (Customer)": {
+      "main": [[{ "node": "Respond 200", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {}
+}
