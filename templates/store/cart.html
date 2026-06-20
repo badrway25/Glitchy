@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static i18n %}
 
-{% block title %}Cart{% endblock %}
+{% block title %}{% trans "Shopping cart" %} • {{ SITE_NAME }}{% endblock %}
 
 {% block content %}
 <section class="section-content padding-y">
@@ -10,231 +10,174 @@
     <!-- Header -->
     <div class="cart-topbar">
       <div class="cart-topbar-left">
-        <h1 class="cart-title">Shopping cart</h1>
+        <h1 class="cart-title">{% trans "Shopping cart" %}</h1>
         <div class="cart-meta">
           <span class="cart-chip">
-            {% if cart_items %}
-              {{ cart_items|length }} item{{ cart_items|length|pluralize }}
-            {% else %}
-              0 items
-            {% endif %}
+            {% if cart_items %}{% blocktrans count c=cart_items|length %}{{ c }} item{% plural %}{{ c }} items{% endblocktrans %}
+            {% else %}{% trans "0 items" %}{% endif %}
           </span>
           <span class="cart-dot">•</span>
-          <span class="cart-muted">Review items before checkout</span>
+          <span class="cart-muted">{% trans "Review items before checkout" %}</span>
         </div>
       </div>
 
       <a href="{% url 'store' %}" class="btn btn-soft cart-back">
-        <i class="fa fa-arrow-left mr-2"></i>Continue shopping
+        <i class="fa fa-arrow-left mr-2"></i>{% trans "Continue shopping" %}
       </a>
     </div>
 
     {% if not cart_items %}
-
       <!-- Empty state -->
       <div class="cart-empty">
         <div class="cart-empty-card">
-          <div class="cart-empty-icon">
-            <i class="fa fa-shopping-bag"></i>
-          </div>
-          <h3 class="cart-empty-title">Your cart is empty</h3>
-          <p class="cart-empty-text">
-            Browse products and add your favorites to the cart.
-          </p>
+          <div class="cart-empty-icon"><i class="fa fa-shopping-bag"></i></div>
+          <h3 class="cart-empty-title">{% trans "Your cart is empty" %}</h3>
+          <p class="cart-empty-text">{% trans "Browse products and add your favorites to the cart." %}</p>
           <div class="cart-empty-actions">
-            <a href="{% url 'store' %}" class="btn btn-primary">
-              Browse products
-            </a>
-            <a href="{% url 'home' %}" class="btn btn-soft">
-              Back to home
-            </a>
+            <a href="{% url 'store' %}" class="btn btn-primary">{% trans "Browse products" %}</a>
+            <a href="{% url 'home' %}" class="btn btn-soft">{% trans "Back to home" %}</a>
           </div>
         </div>
       </div>
-
     {% else %}
 
     <div class="row">
-
       <!-- Items -->
       <aside class="col-lg-7 mb-4">
         <div class="cart-card">
-
           <div class="cart-card-head d-none d-md-grid">
-            <div>Product</div>
-            <div class="text-center">Quantity</div>
-            <div class="text-right">Subtotal</div>
+            <div>{% trans "Product" %}</div>
+            <div class="text-center">{% trans "Quantity" %}</div>
+            <div class="text-right">{% trans "Subtotal" %}</div>
             <div class="text-right"></div>
           </div>
 
           {% for cart_item in cart_items %}
           <div class="cart-item">
-
-            <!-- Product -->
             <div class="cart-prod">
-              <a class="cart-thumb" href="{{ cart_item.product.get_url }}" aria-label="Open product">
+              <a class="cart-thumb" href="{{ cart_item.product.get_url }}" aria-label="{% trans 'Open product' %}">
                 {% if cart_item.product.images %}
                   <img src="{{ cart_item.product.images.url }}" alt="{{ cart_item.product.product_name }}">
                 {% else %}
-                  <img src="{% static 'images/placeholder.png' %}" alt="No image">
+                  <img src="{% static 'images/placeholder.png' %}" alt="{% trans 'No image' %}">
                 {% endif %}
               </a>
 
               <div class="cart-prod-info">
-                <a href="{{ cart_item.product.get_url }}" class="cart-prod-title">
-                  {{ cart_item.product.product_name }}
-                </a>
+                <a href="{{ cart_item.product.get_url }}" class="cart-prod-title">{{ cart_item.product.product_name }}</a>
 
                 {% if cart_item.variations.all %}
                 <div class="cart-variants">
                   {% for item in cart_item.variations.all %}
                     <span class="variant-pill variant-{{ item.variation_category|lower }}">
-  <span class="variant-k">{{ item.variation_category|capfirst }}</span>
-  <span class="variant-v">{{ item.variation_value|capfirst }}</span>
-</span>
-
+                      <span class="variant-k">{{ item.variation_category|capfirst }}</span>
+                      <span class="variant-v">{{ item.variation_value|capfirst }}</span>
+                    </span>
                   {% endfor %}
                 </div>
                 {% endif %}
 
-                <!-- Mobile actions -->
                 <div class="cart-actions-mobile d-md-none">
                   <a href="{% url 'remove_cart_item' cart_item.product.id cart_item.id %}"
-   onclick="return confirm('Remove this item from your cart?')"
-   class="btn btn-remove btn-remove-sm">
-  <i class="fa fa-trash"></i>
-  <span>Remove</span>
-</a>
+                     onclick="return confirm('{% trans 'Remove this item from your cart?' %}')"
+                     class="btn btn-remove btn-remove-sm">
+                    <i class="fa fa-trash"></i><span>{% trans "Remove" %}</span>
+                  </a>
                 </div>
               </div>
             </div>
 
-            <!-- Quantity -->
             <div class="cart-qty">
-              <div class="qty-control" role="group" aria-label="Quantity controls">
-
-                <a href="{% url 'remove_cart' cart_item.product.id cart_item.id %}"
-                   class="qty-btn" aria-label="Decrease quantity">
+              <div class="qty-control" role="group" aria-label="{% trans 'Quantity controls' %}">
+                <a href="{% url 'remove_cart' cart_item.product.id cart_item.id %}" class="qty-btn" aria-label="{% trans 'Decrease quantity' %}">
                   <i class="fa fa-minus"></i>
                 </a>
-
-                <input class="qty-input" type="text" value="{{ cart_item.quantity }}" readonly aria-label="Quantity">
-
+                <input class="qty-input" type="text" value="{{ cart_item.quantity }}" readonly aria-label="{% trans 'Quantity' %}">
                 <form action="{% url 'add_cart' cart_item.product.id %}" method="POST" class="m-0">
                   {% csrf_token %}
                   {% for item in cart_item.variations.all %}
                     <input type="hidden" name="{{ item.variation_category|lower }}" value="{{ item.variation_value|capfirst }}">
                   {% endfor %}
-                  <button class="qty-btn" type="submit" aria-label="Increase quantity">
-                    <i class="fa fa-plus"></i>
-                  </button>
+                  <button class="qty-btn" type="submit" aria-label="{% trans 'Increase quantity' %}"><i class="fa fa-plus"></i></button>
                 </form>
-
               </div>
             </div>
 
-            <!-- Subtotal -->
             <div class="cart-subtotal">
-              <div class="cart-subprice">€ {{ cart_item.sub_total }}</div>
-              <div class="cart-subhint">Includes selected options</div>
+              <div class="cart-subprice">{{ CURRENCY_SYMBOL }} {{ cart_item.sub_total }}</div>
+              <div class="cart-subhint">{% trans "Includes selected options" %}</div>
             </div>
 
-            <!-- Desktop remove -->
             <div class="cart-remove d-none d-md-flex">
               <a href="{% url 'remove_cart_item' cart_item.product.id cart_item.id %}"
-   onclick="return confirm('Remove this item from your cart?')"
-   class="btn btn-remove">
-  <i class="fa fa-trash"></i>
-  <span>Remove</span>
-</a>
+                 onclick="return confirm('{% trans 'Remove this item from your cart?' %}')"
+                 class="btn btn-remove">
+                <i class="fa fa-trash"></i><span>{% trans "Remove" %}</span>
+              </a>
             </div>
-
           </div>
           {% endfor %}
-
         </div>
-
       </aside>
 
       <!-- Summary -->
       <aside class="col-lg-5">
         <div class="summary-card">
-
           <div class="summary-head">
             <div>
-              <div class="summary-title">Order summary</div>
-              <div class="summary-subtitle">Secure checkout</div>
+              <div class="summary-title">{% trans "Order summary" %}</div>
+              <div class="summary-subtitle">{% trans "Secure checkout" %}</div>
             </div>
-            <span class="summary-chip"><i class="fa fa-lock mr-2"></i>Protected</span>
+            <span class="summary-chip"><i class="fa fa-lock mr-2"></i>{% trans "Protected" %}</span>
           </div>
 
-          <!-- Totals -->
           <div class="summary-lines">
+            <div class="line"><span>{% trans "Subtotal" %}</span><span>{{ CURRENCY_SYMBOL }} {{ total }}</span></div>
             <div class="line">
-              <span>Subtotal</span>
-              <span>€ {{ total }}</span>
+              <span>{% trans "Shipping" %} <small class="text-muted">({{ ship_country_name }})</small></span>
+              <span>{% if shipping_cost %}{{ CURRENCY_SYMBOL }} {{ shipping_cost }}{% else %}{% trans "Free" %}{% endif %}</span>
             </div>
-            <div class="line">
-              <span>Tax</span>
-              <span>€ {{ tax }}</span>
-            </div>
-            <div class="line grand">
-              <span>Grand total</span>
-              <span>€ {{ grand_total }}</span>
-            </div>
+            <div class="line"><span>{% trans "Tax" %}</span><span>{{ CURRENCY_SYMBOL }} {{ tax }}</span></div>
+            <div class="line grand"><span>{% trans "Grand total" %}</span><span>{{ CURRENCY_SYMBOL }} {{ grand_total }}</span></div>
           </div>
 
-          <!-- Shipping -->
           <div class="shipping-box shipping-inline">
-  <div class="ship-chip">
-    <i class="fa fa-truck"></i>
-    <span class="ship-label">Shipping</span>
-    <span class="ship-sep">·</span>
-    <span class="ship-value">Calculated at checkout</span>
-  </div>
-
-  <div class="ship-chip">
-    <i class="fa fa-clock"></i>
-    <span class="ship-label">Estimated delivery</span>
-    <span class="ship-sep">·</span>
-    <span class="ship-value"><strong>2–4 business days</strong></span>
-  </div>
-</div>
-
-
-          <!-- Promo (visual only) -->
-          <div class="promo-box">
-            <div class="promo-label">Promo code</div>
-            <div class="promo-input">
-              <input type="text" class="form-control" placeholder="Enter code">
-              <button type="button" class="btn btn-soft">Apply</button>
+            <div class="ship-chip">
+              <i class="fa fa-truck"></i>
+              <span class="ship-label">{% trans "Ship to" %}</span>
+              <span class="ship-sep">·</span>
+              <span class="ship-value">{{ ship_country_name }}</span>
             </div>
-            <div class="promo-hint">You can apply a promo code at checkout.</div>
+            {% if shipping_quote %}
+            <div class="ship-chip">
+              <i class="fa fa-clock"></i>
+              <span class="ship-label">{% trans "Estimated delivery" %}</span>
+              <span class="ship-sep">·</span>
+              <span class="ship-value"><strong>{{ shipping_quote.eta_label }}</strong></span>
+            </div>
+            {% endif %}
+            <div class="mt-2">{% include 'includes/country_switcher.html' %}</div>
           </div>
 
-          <!-- Actions -->
           <div class="summary-actions">
-            <a href="{% url 'checkout' %}" class="btn btn-primary btn-block summary-cta">
-              Checkout
-            </a>
-            <a href="{% url 'store' %}" class="btn btn-soft btn-block">
-              Continue shopping
-            </a>
+            <a href="{% url 'checkout' %}" class="btn btn-primary btn-block summary-cta">{% trans "Checkout" %}</a>
+            {% if not user.is_authenticated %}
+              <div class="text-center text-muted my-2" style="font-size:13px;">{% trans "No account needed — checkout as a guest." %}</div>
+            {% endif %}
+            <a href="{% url 'store' %}" class="btn btn-soft btn-block">{% trans "Continue shopping" %}</a>
           </div>
 
-          <!-- Trust -->
           <div class="summary-trust">
-            <div class="trust-row"><i class="fa fa-undo"></i> 30-day returns</div>
-            <div class="trust-row"><i class="fa fa-shield-alt"></i> Secure payments</div>
-            <div class="trust-row"><i class="fa fa-headset"></i> Support 7/7</div>
+            <div class="trust-row"><i class="fa fa-undo"></i> {% blocktrans with d=RETURN_WINDOW_DAYS %}{{ d }}-day returns{% endblocktrans %}</div>
+            <div class="trust-row"><i class="fa fa-shield-alt"></i> {% trans "Secure payments" %}</div>
+            <div class="trust-row"><i class="fa fa-headset"></i> {% trans "Support 7/7" %}</div>
           </div>
 
           <div class="summary-payments">
-            <img src="{% static 'images/misc/payments.png' %}" alt="Payments" height="24">
+            <img src="{% static 'images/misc/payments.png' %}" alt="{% trans 'Payments' %}" height="24" onerror="this.style.display='none'">
           </div>
         </div>
       </aside>
-
     </div>
     {% endif %}
 

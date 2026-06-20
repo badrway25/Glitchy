@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static i18n %}
 
 {% block content %}
 
@@ -7,14 +7,15 @@
 <section class="section-intro padding-y-sm">
   <div class="container" style="max-width:1280px;">
     <div class="intro-banner-wrap hero-banner">
-      <img src="{% static 'images/banners/cover.jpg' %}" class="img-fluid hero-img" alt="Banner">
+      <img src="{% static 'images/banners/cover.jpg' %}" class="img-fluid hero-img" alt="{{ SITE_NAME }}"
+           onerror="this.style.display='none'">
       <div class="hero-overlay">
         <div class="hero-copy">
-          <div class="hero-kicker">New drops</div>
-          <h1 class="hero-title">Premium print-on-demand</h1>
-          <p class="hero-sub">Discover bestsellers and latest arrivals.</p>
+          <div class="hero-kicker">{% trans "New drops" %}</div>
+          <h1 class="hero-title">{% trans "Premium print-on-demand" %}</h1>
+          <p class="hero-sub">{% trans "Discover bestsellers and latest arrivals." %}</p>
           <a href="{% url 'store' %}" class="btn btn-primary btn-icontext">
-            <span>Browse store</span> <i class="fa fa-arrow-right"></i>
+            <span>{% trans "Browse store" %}</span> <i class="fa fa-arrow-right"></i>
           </a>
         </div>
       </div>
@@ -27,11 +28,11 @@
   <div class="container" style="max-width:1280px;">
     <div class="section-head">
       <div>
-        <h3 class="section-title mb-1">Popular products</h3>
-        <div class="text-muted section-sub">Customer favorites and trending items</div>
+        <h3 class="section-title mb-1">{% trans "Popular products" %}</h3>
+        <div class="text-muted section-sub">{% trans "Customer favorites and trending items" %}</div>
       </div>
       <a href="{% url 'store' %}" class="btn btn-soft btn-icontext">
-        <span>View all</span> <i class="fa fa-arrow-right"></i>
+        <span>{% trans "View all" %}</span> <i class="fa fa-arrow-right"></i>
       </a>
     </div>
 
@@ -40,26 +41,20 @@
         <div class="col-6 col-md-3 d-flex mb-5">
           <div class="p-card h-100">
             <a href="{{ product.get_url }}" class="p-media">
-              <img src="{{ product.images.url }}" alt="{{ product.product_name }}">
+              {% if product.cover_image %}<img src="{{ product.cover_image }}" alt="{{ product.product_name }}">
+              {% else %}<img src="{% static 'images/placeholder.png' %}" alt="{{ product.product_name }}">{% endif %}
             </a>
-			<div class="p-body">
-  <div class="p-badges">
-    {% if forloop.first and product.total_sold %}
-      <span class="p-chip p-chip-top"><i class="fa fa-star"></i> Top seller</span>
-    {% endif %}
-    {% if product.total_sold %}
-      <span class="p-chip"> 🔥{{ product.total_sold }} sold</span>
-    {% endif %}
-  </div>
-
-  <a href="{{ product.get_url }}" class="p-title">{{ product.product_name }}</a>
-
-  <div class="p-meta">
-    <div class="p-price">€ {{ product.price }}</div>
-    <a href="{{ product.get_url }}" class="p-link">Details <i class="fa fa-angle-right"></i></a>
-  </div>
-</div>
-
+            <div class="p-body">
+              <div class="p-badges">
+                {% if forloop.first and product.total_sold %}<span class="p-chip p-chip-top"><i class="fa fa-star"></i> {% trans "Top seller" %}</span>{% endif %}
+                {% if product.total_sold %}<span class="p-chip"> 🔥{% blocktrans count n=product.total_sold %}{{ n }} sold{% plural %}{{ n }} sold{% endblocktrans %}</span>{% endif %}
+              </div>
+              <a href="{{ product.get_url }}" class="p-title">{{ product.product_name }}</a>
+              <div class="p-meta">
+                <div class="p-price">{{ CURRENCY_SYMBOL }} {{ product.price }}</div>
+                <a href="{{ product.get_url }}" class="p-link">{% trans "Details" %} <i class="fa fa-angle-right"></i></a>
+              </div>
+            </div>
           </div>
         </div>
       {% endfor %}
@@ -72,11 +67,11 @@
   <div class="container" style="max-width:1280px;">
     <div class="section-head">
       <div>
-        <h3 class="section-title mb-1">Latest arrivals</h3>
-        <div class="text-muted section-sub">Freshly added — don’t miss out</div>
+        <h3 class="section-title mb-1">{% trans "Latest arrivals" %}</h3>
+        <div class="text-muted section-sub">{% trans "Freshly added — don’t miss out" %}</div>
       </div>
-      <a href="{% url 'store' %}?sort=new" class="btn btn-soft btn-icontext">
-        <span>See new</span> <i class="fa fa-arrow-right"></i>
+      <a href="{% url 'store' %}?sort=newest" class="btn btn-soft btn-icontext">
+        <span>{% trans "See new" %}</span> <i class="fa fa-arrow-right"></i>
       </a>
     </div>
 
@@ -85,13 +80,18 @@
         <div class="col-6 col-md-3 d-flex">
           <div class="p-card h-100">
             <a href="{{ product.get_url }}" class="p-media">
-              <img src="{{ product.images.url }}" alt="{{ product.product_name }}">
+              {% if product.cover_image %}<img src="{{ product.cover_image }}" alt="{{ product.product_name }}">
+              {% else %}<img src="{% static 'images/placeholder.png' %}" alt="{{ product.product_name }}">{% endif %}
             </a>
             <div class="p-body">
+              <div class="p-badges">
+                {% if product.is_new_arrival %}<span class="p-chip p-chip-top">{% trans "New" %}</span>{% endif %}
+                {% if product.is_bestseller %}<span class="p-chip">{% trans "Bestseller" %}</span>{% endif %}
+              </div>
               <a href="{{ product.get_url }}" class="p-title">{{ product.product_name }}</a>
               <div class="p-meta">
-                <div class="p-price">€ {{ product.price }}</div>
-                <a href="{{ product.get_url }}" class="p-link">Details <i class="fa fa-angle-right"></i></a>
+                <div class="p-price">{{ CURRENCY_SYMBOL }} {{ product.price }}</div>
+                <a href="{{ product.get_url }}" class="p-link">{% trans "Details" %} <i class="fa fa-angle-right"></i></a>
               </div>
             </div>
           </div>

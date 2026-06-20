@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static i18n %}
 
-{% block title %}Store{% endblock %}
+{% block title %}{% if category %}{{ category.category_name }}{% else %}{% trans "Store" %}{% endif %} • {{ SITE_NAME }}{% endblock %}
 
 {% block content %}
 <section class="section-conten padding-y">
@@ -19,18 +19,18 @@
         <div>
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb breadcrumb-clean">
-  <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'home' %}">{% trans "Home" %}</a></li>
 
   <li class="breadcrumb-item">
-    <a href="{% url 'store' %}">Store</a>
+    <a href="{% url 'store' %}">{% trans "Store" %}</a>
   </li>
 
   {% if category %}
     <li class="breadcrumb-item active" aria-current="page">{{ category.category_name }}</li>
   {% elif request.GET.keyword %}
-    <li class="breadcrumb-item active" aria-current="page">Search: “{{ request.GET.keyword }}”</li>
+    <li class="breadcrumb-item active" aria-current="page">{% trans "Search:" %} “{{ request.GET.keyword }}”</li>
   {% else %}
-    <li class="breadcrumb-item active" aria-current="page">All products</li>
+    <li class="breadcrumb-item active" aria-current="page">{% trans "All products" %}</li>
   {% endif %}
   
 </ol>
@@ -41,7 +41,7 @@
           <div class="store-submeta">
             <span class="meta-chip">
               <i class="fa fa-box"></i>
-              {% if product_count %}{{ product_count }} products found{% else %}No products found{% endif %}
+              {% if product_count %}{% blocktrans count n=product_count %}{{ n }} product found{% plural %}{{ n }} products found{% endblocktrans %}{% else %}{% trans "No products found" %}{% endif %}
             </span>
 
             {% if request.GET.keyword %}
@@ -80,12 +80,12 @@
             aria-expanded="false">
       <i class="fa fa-sort mr-2"></i>
       <span id="sortLabel">
-        {% if request.GET.sort == "price_asc" %}Price: low to high
-        {% elif request.GET.sort == "price_desc" %}Price: high to low
-        {% elif request.GET.sort == "name_asc" %}Name: A → Z
-        {% elif request.GET.sort == "name_desc" %}Name: Z → A
-        {% elif request.GET.sort == "newest" %}Newest
-        {% else %}Sort: recommended{% endif %}
+        {% if request.GET.sort == "price_asc" %}{% trans "Price: low to high" %}
+        {% elif request.GET.sort == "price_desc" %}{% trans "Price: high to low" %}
+        {% elif request.GET.sort == "name_asc" %}{% trans "Name: A → Z" %}
+        {% elif request.GET.sort == "name_desc" %}{% trans "Name: Z → A" %}
+        {% elif request.GET.sort == "newest" %}{% trans "Newest" %}
+        {% else %}{% trans "Sort: recommended" %}{% endif %}
       </span>
     </button>
 
@@ -93,37 +93,37 @@
 
   <button class="dropdown-item d-flex align-items-center justify-content-between {% if not request.GET.sort %}active{% endif %}"
           type="button" data-sort="">
-    <span>Sort: recommended</span>
+    <span>{% trans "Sort: recommended" %}</span>
     {% if not request.GET.sort %}<i class="fa fa-check"></i>{% endif %}
   </button>
 
   <button class="dropdown-item d-flex align-items-center justify-content-between {% if request.GET.sort == 'price_asc' %}active{% endif %}"
           type="button" data-sort="price_asc">
-    <span>Price: low to high</span>
+    <span>{% trans "Price: low to high" %}</span>
     {% if request.GET.sort == 'price_asc' %}<i class="fa fa-check"></i>{% endif %}
   </button>
 
   <button class="dropdown-item d-flex align-items-center justify-content-between {% if request.GET.sort == 'price_desc' %}active{% endif %}"
           type="button" data-sort="price_desc">
-    <span>Price: high to low</span>
+    <span>{% trans "Price: high to low" %}</span>
     {% if request.GET.sort == 'price_desc' %}<i class="fa fa-check"></i>{% endif %}
   </button>
 
   <button class="dropdown-item d-flex align-items-center justify-content-between {% if request.GET.sort == 'name_asc' %}active{% endif %}"
           type="button" data-sort="name_asc">
-    <span>Name: A → Z</span>
+    <span>{% trans "Name: A → Z" %}</span>
     {% if request.GET.sort == 'name_asc' %}<i class="fa fa-check"></i>{% endif %}
   </button>
 
   <button class="dropdown-item d-flex align-items-center justify-content-between {% if request.GET.sort == 'name_desc' %}active{% endif %}"
           type="button" data-sort="name_desc">
-    <span>Name: Z → A</span>
+    <span>{% trans "Name: Z → A" %}</span>
     {% if request.GET.sort == 'name_desc' %}<i class="fa fa-check"></i>{% endif %}
   </button>
 
   <button class="dropdown-item d-flex align-items-center justify-content-between {% if request.GET.sort == 'newest' %}active{% endif %}"
           type="button" data-sort="newest">
-    <span>Newest</span>
+    <span>{% trans "Newest" %}</span>
     {% if request.GET.sort == 'newest' %}<i class="fa fa-check"></i>{% endif %}
   </button>
 
@@ -134,7 +134,7 @@
 
 
           <a class="btn btn-soft" href="{% url 'store' %}">
-            <i class="fa fa-undo mr-2"></i>Reset
+            <i class="fa fa-undo mr-2"></i>{% trans "Reset" %}
           </a>
         </div>
 
@@ -153,13 +153,13 @@
     <!-- Categories -->
     <div class="filter-section">
       <div class="filter-head">
-        <h6>Categories</h6>
+        <h6>{% trans "Categories" %}</h6>
         <span class="filter-chip">{% if product_count %}{{ product_count }}{% else %}0{% endif %}</span>
       </div>
 
       <div class="cat-list">
         <a class="cat-item" href="{% url 'store' %}">
-          <span>All products</span>
+          <span>{% trans "All products" %}</span>
           <span class="text-muted">→</span>
         </a>
 
@@ -185,7 +185,7 @@
     <!-- Price -->
     <div class="filter-section">
       <div class="filter-head">
-        <h6>Price range</h6>
+        <h6>{% trans "Price range" %}</h6>
         <span class="filter-chip">€ <span id="priceMinText">0</span> – € <span id="priceMaxText">0</span></span>
       </div>
 
@@ -194,8 +194,8 @@
         <input id="priceRange" name="price_range" type="range" class="range-slider" min="0" value="0">
 
         <div class="range-label">
-          <span>Min</span>
-          <span>Max</span>
+          <span>{% trans "Min" %}</span>
+          <span>{% trans "Max" %}</span>
         </div>
 
         <div class="range-row">
@@ -208,21 +208,21 @@
     <!-- Availability -->
     <div class="filter-section">
       <div class="filter-head">
-        <h6>Availability</h6>
+        <h6>{% trans "Availability" %}</h6>
         <span class="filter-chip" id="stockChip">All</span>
       </div>
 
       <div class="custom-control custom-checkbox">
         <input type="checkbox" name="instock" class="custom-control-input" id="inStockOnly" checked>
-        <label class="custom-control-label" for="inStockOnly">In stock only</label>
+        <label class="custom-control-label" for="inStockOnly">{% trans "In stock only" %}</label>
       </div>
     </div>
 
     <!-- Actions -->
 
       <div class="filter-actions">
-  <button id="applyFilters" class="btn btn-primary" type="button">Apply</button>
-  <button id="clearFilters" class="btn btn-soft" type="button">Clear</button>
+  <button id="applyFilters" class="btn btn-primary" type="button">{% trans "Apply" %}</button>
+  <button id="clearFilters" class="btn btn-soft" type="button">{% trans "Clear" %}</button>
 </div>
 
 
@@ -243,18 +243,18 @@
                 <div class="media-skeleton">
   <div class="badge-stack">
     {% if not product.is_available or product.stock <= 0 %}
-      <span class="badge-corner badge-out">Sold out</span>
+      <span class="badge-corner badge-out">{% trans "Sold out" %}</span>
     {% elif product.stock <= 5 %}
-      <span class="badge-corner badge-low">Low stock</span>
+      <span class="badge-corner badge-low">{% trans "Low stock" %}</span>
     {% endif %}
 
     {% if product.countReview == 0 %}
-      <span class="badge-corner badge-new">New</span>
+      <span class="badge-corner badge-new">{% trans "New" %}</span>
     {% endif %}
   </div>
 
   <a href="{{ product.get_url }}">
-    <img data-skeleton src="{{ product.images.url }}" alt="{{ product.product_name }}">
+    <img data-skeleton src="{% if product.cover_image %}{{ product.cover_image }}{% else %}{% static 'images/placeholder.png' %}{% endif %}" alt="{{ product.product_name }}">
   </a>
 </div>
 
@@ -265,7 +265,7 @@
                   </a>
 
                   <div class="product-meta">
-                    <div class="price">€ {{ product.price }}</div>
+                    <div class="price">{{ CURRENCY_SYMBOL }} {{ product.price }}</div>
 
 
                     {% if product.countReview %}
@@ -279,8 +279,8 @@
                   </div>
 
                   <div class="product-actions">
-					<a href="{{ product.get_url }}" class="btn btn-primary">View</a>
-					<a href="{{ product.get_url }}#reviews" class="btn btn-soft">Reviews</a>
+					<a href="{{ product.get_url }}" class="btn btn-primary">{% trans "View" %}</a>
+					<a href="{{ product.get_url }}#reviews" class="btn btn-soft">{% trans "Reviews" %}</a>
 				</div>
 
                 </div>
@@ -289,7 +289,7 @@
             </div>
           {% empty %}
             <div class="col-12">
-              <div class="alert alert-info mb-0">No products available.</div>
+              <div class="alert alert-info mb-0">{% trans "No products available." %}</div>
             </div>
           {% endfor %}
         </div>

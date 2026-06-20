@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
-{% load static %}
-{% block title %}Checkout{% endblock %}
+{% load static i18n %}
+{% block title %}{% trans "Checkout" %} • {{ SITE_NAME }}{% endblock %}
 
 {% block content %}
 <section class="section-content padding-y">
@@ -9,13 +9,23 @@
     <!-- Header -->
     <div class="cart-header">
       <div>
-        <h1 class="cart-title">Checkout</h1>
-        <div class="cart-subtitle">Enter your billing details, then continue to payment.</div>
+        <h1 class="cart-title">{% trans "Checkout" %}</h1>
+        <div class="cart-subtitle">{% trans "Enter your billing details, then continue to payment." %}</div>
       </div>
       <a href="{% url 'cart' %}" class="btn btn-soft">
-        <i class="fa fa-arrow-left mr-2"></i>Back to cart
+        <i class="fa fa-arrow-left mr-2"></i>{% trans "Back to cart" %}
       </a>
     </div>
+
+    {% if is_guest %}
+    <div class="alert d-flex align-items-center justify-content-between" role="alert"
+         style="background:#f1f5f9;border:1px solid #e2e8f0;border-radius:12px;">
+      <span><i class="fa fa-user-clock mr-2"></i>{% trans "You're checking out as a guest. No account needed." %}</span>
+      <a href="{% url 'login' %}?next={% url 'checkout' %}" class="btn btn-sm btn-outline-dark">
+        {% trans "Have an account? Sign in" %}
+      </a>
+    </div>
+    {% endif %}
 
     <form action="{% url 'place_order' %}" method="POST">
       {% csrf_token %}
@@ -25,123 +35,103 @@
         <aside class="col-lg-7 mb-4">
           <div class="summary-card checkout-card">
             <div class="summary-head">
-              <h5 class="m-0" style="font-weight:800;">Billing address</h5>
-              <span class="summary-chip"><i class="fa fa-lock mr-1"></i> Secure</span>
+              <h5 class="m-0" style="font-weight:800;">{% trans "Billing address" %}</h5>
+              <span class="summary-chip"><i class="fa fa-lock mr-1"></i> {% trans "Secure" %}</span>
             </div>
 
-            <!-- Saved addresses dropdown (optional) -->
             {% if user.is_authenticated and addresses %}
             <div class="mb-3">
-              <label class="checkout-label">Use saved address</label>
+              <label class="checkout-label">{% trans "Use saved address" %}</label>
               <div class="dropdown custom-select-dd w-100">
                 <button class="btn custom-select-btn dropdown-toggle w-100 d-flex align-items-center justify-content-between"
                         type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   <span class="d-flex align-items-center">
                     <i class="fa fa-map-marker mr-2"></i>
                     <span id="addrLabel">
-                      {% if default_addr %}
-                        Default: {{ default_addr.address_line_1 }}, {{ default_addr.city }}
-                      {% else %}
-                        Select an address
-                      {% endif %}
+                      {% if default_addr %}{% trans "Default:" %} {{ default_addr.address_line_1 }}, {{ default_addr.city }}
+                      {% else %}{% trans "Select an address" %}{% endif %}
                     </span>
                   </span>
                 </button>
-
                 <div class="dropdown-menu w-100">
                   {% for a in addresses %}
                   <button class="dropdown-item d-flex align-items-start justify-content-between" type="button"
                           data-addr='{"first_name":"{{ a.first_name|escapejs }}","last_name":"{{ a.last_name|escapejs }}","email":"{{ a.email|escapejs }}","phone":"{{ a.phone|escapejs }}","address_line_1":"{{ a.address_line_1|escapejs }}","address_line_2":"{{ a.address_line_2|escapejs }}","city":"{{ a.city|escapejs }}","state":"{{ a.state|escapejs }}","postal_code":"{{ a.postal_code|escapejs }}","country":"{{ a.country|escapejs }}"}'>
                     <span class="addr-item">
-                      <span class="addr-line1">
-                        {{ a.address_line_1 }}{% if a.address_line_2 %}, {{ a.address_line_2 }}{% endif %}
-                      </span>
-                      <span class="addr-line2 text-muted">
-                        {{ a.city }} • {{ a.state }} • {{ a.country }}
-                      </span>
+                      <span class="addr-line1">{{ a.address_line_1 }}{% if a.address_line_2 %}, {{ a.address_line_2 }}{% endif %}</span>
+                      <span class="addr-line2 text-muted">{{ a.city }} • {{ a.state }} • {{ a.country }}</span>
                     </span>
-                    {% if a.is_default %}
-                      <span class="badge badge-soft-success">Default</span>
-                    {% endif %}
+                    {% if a.is_default %}<span class="badge badge-soft-success">{% trans "Default" %}</span>{% endif %}
                   </button>
                   {% endfor %}
                 </div>
               </div>
-              <small class="text-muted">Pick one to autofill your billing details.</small>
+              <small class="text-muted">{% trans "Pick one to autofill your billing details." %}</small>
             </div>
             {% endif %}
 
             <div class="checkout-grid">
               <div class="form-group mb-0">
-                <label>First name</label>
+                <label>{% trans "First name" %}</label>
                 <input type="text" name="first_name" class="form-control" value="{{ prefill.first_name }}" required>
               </div>
               <div class="form-group mb-0">
-                <label>Last name</label>
+                <label>{% trans "Last name" %}</label>
                 <input type="text" name="last_name" class="form-control" value="{{ prefill.last_name }}" required>
               </div>
               <div class="form-group mb-0">
-                <label>Email</label>
+                <label>{% trans "Email" %}</label>
                 <input type="email" name="email" class="form-control" value="{{ prefill.email }}" required>
               </div>
               <div class="form-group mb-0">
-                <label>Phone</label>
+                <label>{% trans "Phone" %}</label>
                 <input type="text" name="phone" class="form-control" value="{{ prefill.phone }}" required>
               </div>
               <div class="form-group mb-0">
-                <label>Address line 1</label>
+                <label>{% trans "Address line 1" %}</label>
                 <input type="text" name="address_line_1" class="form-control" value="{{ prefill.address_line_1 }}" required>
               </div>
               <div class="form-group mb-0">
-                <label>Address line 2</label>
+                <label>{% trans "Address line 2" %}</label>
                 <input type="text" name="address_line_2" class="form-control" value="{{ prefill.address_line_2 }}">
               </div>
               <div class="form-group mb-0">
-                <label>City</label>
+                <label>{% trans "City" %}</label>
                 <input type="text" name="city" class="form-control" value="{{ prefill.city }}" required>
               </div>
               <div class="form-group mb-0">
-                <label>State</label>
+                <label>{% trans "State" %}</label>
                 <input type="text" name="state" class="form-control" value="{{ prefill.state }}" required>
               </div>
               <div class="form-group mb-0">
-  <label>Postal code</label>
-  <input type="text" name="postal_code" id="postalCodeInput"
-         class="form-control" value="{{ prefill.postal_code }}" required>
-</div>
+                <label>{% trans "Postal code" %}</label>
+                <input type="text" name="postal_code" id="postalCodeInput" class="form-control" value="{{ prefill.postal_code }}" required>
+              </div>
               <div class="form-group mb-0">
-  <label>Country</label>
-  <select name="country" id="countryInput" class="form-control" required>
-    <option value="">Select country</option>
-    <option value="IT" {% if prefill.country == "IT" %}selected{% endif %}>Italy</option>
-    <option value="FR" {% if prefill.country == "FR" %}selected{% endif %}>France</option>
-    <option value="DE" {% if prefill.country == "DE" %}selected{% endif %}>Germany</option>
-    <option value="ES" {% if prefill.country == "ES" %}selected{% endif %}>Spain</option>
-    <option value="NL" {% if prefill.country == "NL" %}selected{% endif %}>Netherlands</option>
-    <option value="BE" {% if prefill.country == "BE" %}selected{% endif %}>Belgium</option>
-    <option value="CH" {% if prefill.country == "CH" %}selected{% endif %}>Switzerland</option>
-    <option value="AT" {% if prefill.country == "AT" %}selected{% endif %}>Austria</option>
-    <option value="GB" {% if prefill.country == "GB" %}selected{% endif %}>United Kingdom</option>
-    <option value="US" {% if prefill.country == "US" %}selected{% endif %}>United States</option>
-  </select>
-</div>
-
+                <label>{% trans "Country" %}</label>
+                <select name="country" id="countryInput" class="form-control" required>
+                  <option value="">{% trans "Select country" %}</option>
+                  {% for code, name in ship_countries %}
+                    <option value="{{ code }}" {% if prefill.country == code %}selected{% endif %}>{{ name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
             </div>
 
             <div class="checkout-note">
-              <label>Order note (optional)</label>
+              <label>{% trans "Order note (optional)" %}</label>
               <textarea name="order_note" rows="3" class="form-control"
-                        placeholder="Delivery instructions, notes for the seller...">{{ prefill.order_note }}</textarea>
+                        placeholder="{% trans 'Delivery instructions, notes for the seller...' %}">{{ prefill.order_note }}</textarea>
             </div>
 
-            <!-- Save address -->
             {% if user.is_authenticated %}
             <div class="custom-control custom-checkbox mt-3">
               <input type="checkbox" class="custom-control-input" id="saveAddress" name="save_address" checked>
-              <label class="custom-control-label" for="saveAddress"> Save / update my default address </label>
+              <label class="custom-control-label" for="saveAddress"> {% trans "Save / update my default address" %} </label>
             </div>
-            <div class="text-muted mt-2" style="font-size:13px;">
-              You can manage saved addresses in your account settings.
+            {% else %}
+            <div class="text-muted mt-3" style="font-size:13px;">
+              <i class="fa fa-info-circle mr-1"></i>{% trans "You can create an account after checkout to track your order." %}
             </div>
             {% endif %}
           </div>
@@ -151,26 +141,21 @@
         <aside class="col-lg-5">
           <div class="summary-card checkout-summary">
             <div class="summary-head">
-              <h5 class="m-0" style="font-weight:800;">Order summary</h5>
-              <span class="summary-chip">
-                {{ cart_items|length }} item{% if cart_items|length != 1 %}s{% endif %}
-              </span>
+              <h5 class="m-0" style="font-weight:800;">{% trans "Order summary" %}</h5>
+              <span class="summary-chip">{% blocktrans count c=cart_items|length %}{{ c }} item{% plural %}{{ c }} items{% endblocktrans %}</span>
             </div>
 
             <div class="mini-items">
               {% for cart_item in cart_items %}
               <div class="mini-row">
                 <a class="mini-thumb" href="{{ cart_item.product.get_url }}">
-                  <img src="{{ cart_item.product.images.url }}" alt="{{ cart_item.product.product_name }}">
+                  {% if cart_item.product.images %}<img src="{{ cart_item.product.images.url }}" alt="{{ cart_item.product.product_name }}">{% endif %}
                 </a>
-
                 <div class="mini-info">
                   <a href="{{ cart_item.product.get_url }}" class="mini-title">{{ cart_item.product.product_name }}</a>
-
                   {% if cart_item.variations.all %}
                   <div class="mini-variants">
                     {% for item in cart_item.variations.all %}
-                      <!-- ✅ STESSO STILE/CLASSI DELLA CART -->
                       <span class="variant-pill variant-{{ item.variation_category|lower }}">
                         <span class="variant-k">{{ item.variation_category|capfirst }}</span>
                         <span class="variant-v">{{ item.variation_value|capfirst }}</span>
@@ -178,53 +163,49 @@
                     {% endfor %}
                   </div>
                   {% endif %}
-
                   <div class="mini-meta text-muted">
-                    Qty: <strong>{{ cart_item.quantity }}</strong> • € {{ cart_item.product.price }} each
+                    {% trans "Qty" %}: <strong>{{ cart_item.quantity }}</strong> • {{ CURRENCY_SYMBOL }} {{ cart_item.product.price }} {% trans "each" %}
                   </div>
                 </div>
-
-                <div class="mini-price">€ {{ cart_item.sub_total }}</div>
+                <div class="mini-price">{{ CURRENCY_SYMBOL }} {{ cart_item.sub_total }}</div>
               </div>
               {% endfor %}
             </div>
 
             <div class="summary-lines">
+              <div class="line"><span>{% trans "Subtotal" %}</span><span>{{ CURRENCY_SYMBOL }} {{ total }}</span></div>
               <div class="line">
-                <span>Total</span>
-                <span>€ {{ total }}</span>
+                <span>{% trans "Shipping" %}</span>
+                <span>{% if shipping_cost %}{{ CURRENCY_SYMBOL }} {{ shipping_cost }}{% else %}{% trans "Free" %}{% endif %}</span>
               </div>
-              <div class="line">
-                <span>Tax</span>
-                <span>€ {{ tax }}</span>
-              </div>
-              <div class="line grand">
-                <span>Grand total</span>
-                <span>€ {{ grand_total }}</span>
-              </div>
+              <div class="line"><span>{% trans "Tax" %}</span><span>{{ CURRENCY_SYMBOL }} {{ tax }}</span></div>
+              <div class="line grand"><span>{% trans "Grand total" %}</span><span>{{ CURRENCY_SYMBOL }} {{ grand_total }}</span></div>
             </div>
 
             <div class="shipping-box">
               <div class="ship-line">
-                <span>Shipping</span>
-                <span class="text-muted">Calculated at checkout</span>
+                <span><i class="fa fa-truck mr-1"></i>{% trans "Ship to" %} {{ ship_country_name }}</span>
+                <span class="text-muted">{% if shipping_quote %}{{ shipping_quote.eta_label }}{% endif %}</span>
               </div>
-              <div class="ship-hint">Estimated delivery: <strong>2–4 business days</strong></div>
+              {% if shipping_quote and not shipping_quote.available %}
+                <div class="ship-hint text-danger">{% trans "We don't ship to this country yet — choose another at checkout." %}</div>
+              {% endif %}
             </div>
 
             <div class="summary-actions">
               <button type="submit" name="submit" class="btn btn-primary btn-block">
-                Continue to payment <i class="fa fa-arrow-right ml-2"></i>
+                {% trans "Continue to payment" %} <i class="fa fa-arrow-right ml-2"></i>
               </button>
-              <a href="{% url 'store' %}" class="btn btn-soft btn-block">Continue shopping</a>
+              <a href="{% url 'store' %}" class="btn btn-soft btn-block">{% trans "Continue shopping" %}</a>
             </div>
 
             <div class="summary-payments">
-              <img src="{% static 'images/misc/payments.png' %}" alt="Payments" height="24">
+              <img src="{% static 'images/misc/payments.png' %}" alt="{% trans 'Payments' %}" height="24"
+                   onerror="this.style.display='none'">
             </div>
 
             <div class="trust-box">
-              <div class="trust-item"><i class="fa fa-lock"></i> Secure payment&ensp;<i class="fa fa-undo"></i> 30-day returns</div>
+              <div class="trust-item"><i class="fa fa-lock"></i> {% trans "Secure payment" %}&ensp;<i class="fa fa-undo"></i> {% blocktrans with d=RETURN_WINDOW_DAYS %}{{ d }}-day returns{% endblocktrans %}</div>
             </div>
           </div>
         </aside>
