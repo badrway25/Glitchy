@@ -54,7 +54,7 @@
     </div>
 
     <div class="row g-3 g-md-4">
-      {% for product in popular_products %}
+      {% for product in popular_products|slice:":4" %}
         <div class="col-6 col-md-3 d-flex mb-5">
           <div class="p-card h-100">
             <a href="{{ product.get_url }}" class="p-media">
@@ -151,7 +151,7 @@
     </div>
 
     <div class="row g-3 g-md-4">
-      {% for product in latest_products %}
+      {% for product in latest_products|slice:":4" %}
         <div class="col-6 col-md-3 d-flex">
           <div class="p-card h-100">
             <a href="{{ product.get_url }}" class="p-media">
