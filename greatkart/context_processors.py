@@ -1,10 +1,25 @@
 """Project-wide template context."""
+import os
 from django.conf import settings
+
+_ASSET_BASE = os.path.join(os.path.dirname(__file__), "static")
+
+
+def _asset_version():
+    """Cache-busting token = newest mtime of the premium css/js assets."""
+    latest = 0
+    for rel in ("css/premium.css", "js/premium.js"):
+        try:
+            latest = max(latest, int(os.path.getmtime(os.path.join(_ASSET_BASE, rel))))
+        except OSError:
+            pass
+    return str(latest or 1)
 
 
 def site_globals(request):
     """Expose brand identity and currency to every template."""
     return {
+        "ASSET_VERSION": _asset_version(),
         "SITE_NAME": getattr(settings, "SITE_NAME", "MAISON"),
         "SITE_TAGLINE": getattr(settings, "SITE_TAGLINE", ""),
         "CURRENCY_SYMBOL": getattr(settings, "STORE_CURRENCY_SYMBOL", "€"),

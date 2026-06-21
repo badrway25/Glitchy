@@ -15,7 +15,7 @@
   <!-- Fonts (modern) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Bootstrap -->
   <link href="{% static 'css/bootstrap.css' %}" rel="stylesheet" type="text/css"/>
@@ -32,7 +32,7 @@
   <link href="{% static 'css/theme.css' %}" rel="stylesheet" type="text/css"/>
 
   <!-- Premium fashion rebrand layer (loads last, overrides via tokens) -->
-  <link href="{% static 'css/premium.css' %}" rel="stylesheet" type="text/css"/>
+  <link href="{% static 'css/premium.css' %}?v={{ ASSET_VERSION }}" rel="stylesheet" type="text/css"/>
 
   {% block extra_css %}{% endblock %}
 </head>
@@ -50,7 +50,7 @@
   <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
   <script src="{% static 'js/script.js' %}"></script>
   <script src="{% static 'js/theme.js' %}"></script>
-  <script src="{% static 'js/premium.js' %}"></script>
+  <script src="{% static 'js/premium.js' %}?v={{ ASSET_VERSION }}"></script>
 
   {% block extra_js %}{% endblock %}
 
