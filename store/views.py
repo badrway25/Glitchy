@@ -194,10 +194,17 @@ def autocomplete(request):
 def faq(request):
     """Site-wide General FAQ page, grouped by category and localised."""
     from collections import OrderedDict
+    from django.utils.translation import gettext as _
     from store.models import GeneralFAQ
     lang = (getattr(request, "LANGUAGE_CODE", "en") or "en")[:2]
+    # Translatable category labels (model choices are plain strings).
+    cat_labels = {
+        "shipping": _("Shipping & delivery"), "returns": _("Returns & refunds"),
+        "payments": _("Payments & security"), "orders": _("Orders & tracking"),
+        "account": _("Account & wishlist"), "sizing": _("Sizing & products"),
+        "coupons": _("Coupons & offers"), "support": _("Support & assistant"),
+    }
     groups = OrderedDict()
-    cat_labels = dict(GeneralFAQ.CATEGORY_CHOICES)
     for f in GeneralFAQ.objects.filter(is_active=True):
         groups.setdefault(f.category, {"label": cat_labels.get(f.category, f.category), "items": []})
         groups[f.category]["items"].append({"q": f.question_for(lang), "a": f.answer_for(lang)})
