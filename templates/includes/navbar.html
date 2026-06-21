@@ -103,6 +103,13 @@
             <a class="btn btn-primary mr-2" href="{% url 'register' %}">{% trans "Register" %}</a>
           {% endif %}
 
+          <!-- Wishlist -->
+          <a class="nav-icon mr-1" href="{% url 'wishlist:saved' %}" title="{% trans 'Saved items' %}">
+            <i class="fa fa-heart"></i>
+            <span class="badge badge-pill badge-danger" data-wishlist-count
+                  {% if not WISHLIST_COUNT %}style="display:none"{% endif %}>{{ WISHLIST_COUNT }}</span>
+          </a>
+
           <!-- Cart -->
           <a class="nav-icon" href="{% url 'cart' %}" title="{% trans 'Cart' %}">
             <i class="fa fa-shopping-cart"></i>

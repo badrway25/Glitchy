@@ -267,6 +267,13 @@
     {% endif %}
   </div>
 
+  <button type="button" class="wish-btn {% if product.id in WISHLIST_IDS %}is-active{% endif %}"
+          data-wishlist-toggle data-product-id="{{ product.id }}"
+          aria-pressed="{% if product.id in WISHLIST_IDS %}true{% else %}false{% endif %}"
+          aria-label="{% trans 'Save to wishlist' %}" title="{% trans 'Save to wishlist' %}">
+    <i class="fa fa-heart"></i>
+  </button>
+
   <a href="{{ product.get_url }}">
     <img data-skeleton src="{% if product.cover_image %}{{ product.cover_image }}{% else %}{% static 'images/placeholder.png' %}{% endif %}" alt="{{ product.product_name }}">
     {% with hover=product.hover_image %}{% if hover %}<img class="p-img-2" src="{{ hover }}" alt="" loading="lazy" aria-hidden="true">{% endif %}{% endwith %}

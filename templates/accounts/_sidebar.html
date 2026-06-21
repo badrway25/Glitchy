@@ -19,6 +19,12 @@
       <i class="fa fa-box"></i> {% trans "My orders" %}
     </a>
 
+    <a class="acc-link {% if request.resolver_match.url_name == 'saved' %}active{% endif %}"
+       href="{% url 'wishlist:saved' %}">
+      <i class="fa fa-heart"></i> {% trans "Saved items" %}
+      {% if WISHLIST_COUNT %}<span class="acc-badge">{{ WISHLIST_COUNT }}</span>{% endif %}
+    </a>
+
     <a class="acc-link {% if request.resolver_match.url_name == 'transactions' %}active{% endif %}"
        href="{% url 'transactions' %}">
       <i class="fa fa-credit-card"></i> {% trans "Transactions" %}

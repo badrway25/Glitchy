@@ -49,6 +49,14 @@ class AnalyticsEvent(models.Model):
         ("assistant_question", "assistant_question"),
         ("search_no_results", "search_no_results"),
         ("size_guide_open", "size_guide_open"),
+        ("wishlist_add", "wishlist_add"),
+        ("wishlist_remove", "wishlist_remove"),
+        ("coupon_apply", "coupon_apply"),
+        ("coupon_fail", "coupon_fail"),
+        ("cart_save_for_later", "cart_save_for_later"),
+        ("review_submit", "review_submit"),
+        ("search_query", "search_query"),
+        ("support_order_help", "support_order_help"),
     ]
 
     name = models.CharField(max_length=32, db_index=True)

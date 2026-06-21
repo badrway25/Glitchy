@@ -16,6 +16,8 @@ urlpatterns = [
     path("shipping/", include("shipping.urls")),       # country switcher
     path("assistant/", include("assistant.urls")),     # contextual AI assistant API
     path("storefront/", include("storefront.urls")),   # first-party analytics beacon
+    path("wishlist/", include("wishlist.urls")),        # wishlist / save-for-later
+    path("coupon/", include("promotions.urls")),        # coupon apply/remove
 ]
 
 # Localized, user-facing routes. English stays prefix-free; IT/FR get /it/, /fr/.

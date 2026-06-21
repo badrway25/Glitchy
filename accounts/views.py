@@ -290,7 +290,13 @@ def login(request):
                                 item.save()
             except:
                 pass
+            _guest_sk = request.session.session_key
             auth.login(request, user)
+            try:
+                from wishlist.services import merge_session_to_user
+                merge_session_to_user(request, user, session_key=_guest_sk)
+            except Exception:
+                pass
             messages.success(request, 'You are now logged in.')
             url = request.META.get('HTTP_REFERER')
             try:
