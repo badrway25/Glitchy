@@ -860,3 +860,10 @@ body.has-sticky-cta .ai-assistant{bottom:78px;}
 .recently-viewed{margin-top:2.5rem;}
 .rv-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;}
 @media (max-width:768px){.rv-grid{grid-template-columns:repeat(2,1fr);}}
+
+/* Premium empty / no-results state */
+.store-empty{text-align:center;padding:3.5rem 1.5rem;background:var(--surface);border:var(--border);
+  border-radius:var(--radius);box-shadow:var(--shadow-soft);}
+.store-empty-ic{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;margin:0 auto 1rem;
+  background:var(--surface-2);color:var(--accent-2);}
+.store-empty h3{font-size:1.4rem;}

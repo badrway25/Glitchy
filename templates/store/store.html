@@ -311,7 +311,17 @@
             </div>
           {% empty %}
             <div class="col-12">
-              <div class="alert alert-info mb-0">{% trans "No products available." %}</div>
+              <div class="store-empty" {% if request.GET.keyword %}data-track-no-results="{{ request.GET.keyword }}"{% endif %}>
+                <div class="store-empty-ic">{% icon "search" "ic" 30 %}</div>
+                {% if request.GET.keyword %}
+                  <h3 class="mb-2">{% blocktrans with q=request.GET.keyword %}No results for “{{ q }}”{% endblocktrans %}</h3>
+                  <p class="text-muted mb-4">{% trans "Try a different search, or browse the full collection." %}</p>
+                {% else %}
+                  <h3 class="mb-2">{% trans "Nothing here yet" %}</h3>
+                  <p class="text-muted mb-4">{% trans "There are no products in this view right now." %}</p>
+                {% endif %}
+                <a href="{% url 'store' %}" class="btn btn-primary">{% trans "Browse all products" %}</a>
+              </div>
             </div>
           {% endfor %}
         </div>
