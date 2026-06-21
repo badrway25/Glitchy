@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static i18n uikit %}
+{% block title %}{% trans "Saved items" %} • {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<section class="section-content padding-y">
+  <div class="container" style="max-width:1280px;">
+
+    <div class="dash-top mb-4">
+      <div>
+        <h1 class="dash-title mb-1">{% trans "Saved items" %}</h1>
+        <div class="text-muted">{% trans "Your wishlist and items saved for later." %}</div>
+      </div>
+      <a href="{% url 'store' %}" class="btn btn-soft">{% trans "Continue shopping" %}</a>
+    </div>
+
+    {% if not user.is_authenticated %}
+      <div class="alert alert-info mb-4" style="font-size:.9rem;">
+        {% trans "You're browsing as a guest — your saved items are kept on this device." %}
+        <a href="{% url 'login' %}">{% trans "Log in" %}</a> {% trans "to keep them on your account." %}
+      </div>
+    {% endif %}
+
+    {% if wishlist_items or saved_for_later %}
+      <div class="rv-grid">
+        {% for it in wishlist_items %}{% include 'wishlist/_saved_card.html' with p=it.product %}{% endfor %}
+        {% for it in saved_for_later %}{% include 'wishlist/_saved_card.html' with p=it.product saved=1 %}{% endfor %}
+      </div>
+    {% else %}
+      <div class="store-empty">
+        <div class="store-empty-ic">{% icon "heart" "ic" 30 %}</div>
+        <h3 class="mb-2">{% trans "No saved items yet" %}</h3>
+        <p class="text-muted mb-4">{% trans "Tap the heart on any product to save it here for later." %}</p>
+        <a href="{% url 'store' %}" class="btn btn-primary">{% trans "Browse products" %}</a>
+      </div>
+    {% endif %}
+
+  </div>
+</section>
+{% endblock %}
