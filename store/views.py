@@ -63,7 +63,24 @@ def product_detail(request, category_slug, product_slug):
             cart__cart_id=_cart_id(request), product=single_product).exists()
         orderproduct = None
 
-    reviews = ReviewRating.objects.filter(product_id=single_product.id, status=True)
+    reviews = list(ReviewRating.objects.filter(product_id=single_product.id, status=True)
+                   .select_related("user").order_by("-created_at"))
+    # Verified purchase: the reviewer actually ordered this product.
+    buyer_ids = set(OrderProduct.objects.filter(product_id=single_product.id, ordered=True)
+                    .values_list("user_id", flat=True))
+    for r in reviews:
+        r.verified = r.user_id in buyer_ids
+    # Rating summary + star distribution (approved reviews only, real data).
+    review_count = len(reviews)
+    review_avg = round(sum(r.rating for r in reviews) / review_count, 1) if review_count else 0
+    dist = {s: 0 for s in (5, 4, 3, 2, 1)}
+    for r in reviews:
+        b = int(round(r.rating))
+        if b in dist:
+            dist[b] += 1
+    review_dist = [{"stars": s, "count": dist[s],
+                    "pct": int(dist[s] / review_count * 100) if review_count else 0}
+                   for s in (5, 4, 3, 2, 1)]
 
     # Single-item shipping estimate for the detected country.
     from shipping.geo import detect_country
@@ -100,6 +117,9 @@ def product_detail(request, category_slug, product_slug):
         'in_cart': in_cart,
         'orderproduct': orderproduct,
         'reviews': reviews,
+        'review_count': review_count,
+        'review_avg': review_avg,
+        'review_dist': review_dist,
         'shipping_quote': shipping_quote,
         'related_products': related,
         'recently_viewed': recently_viewed,

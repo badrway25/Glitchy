@@ -1033,3 +1033,43 @@ body.has-sticky-cta .ai-assistant{bottom:78px;}
   .faq-hero{padding:1.5rem .5rem 1rem;}
   .faq-q{padding:.95rem 1rem;font-size:.9rem;}
 }
+
+/* ============================================================================
+   PHASE 19 — verified reviews, rating distribution, search autocomplete
+   ============================================================================ */
+
+/* Verified purchase badge */
+.verified-badge{display:inline-flex;align-items:center;gap:.25rem;background:rgba(63,107,78,.1);
+  color:var(--success);font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;
+  padding:.12rem .45rem;border-radius:var(--radius-pill);margin-left:.4rem;vertical-align:middle;}
+.verified-badge .ic{color:var(--success);}
+
+/* Rating distribution */
+.review-dist{margin-top:1rem;min-width:200px;}
+.dist-row{display:flex;align-items:center;gap:.6rem;margin-bottom:.35rem;}
+.dist-label{display:inline-flex;align-items:center;gap:.2rem;font-size:.78rem;color:var(--muted);width:32px;flex:0 0 auto;}
+.dist-label i{color:var(--accent);font-size:.7rem;}
+.dist-bar{flex:1;height:7px;border-radius:999px;background:rgba(28,26,23,.08);overflow:hidden;}
+.dist-bar span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent-2));}
+.dist-count{font-size:.74rem;color:var(--muted);width:20px;text-align:right;flex:0 0 auto;}
+
+/* Search autocomplete dropdown */
+.ac-wrap{position:relative;}
+.ac-panel{position:absolute;top:calc(100% + 8px);left:0;right:0;z-index:1400;background:var(--surface);
+  border:var(--border);border-radius:var(--radius);box-shadow:var(--shadow-lg);overflow:hidden;
+  max-height:70vh;overflow-y:auto;display:none;}
+.ac-panel.is-open{display:block;animation:ac-in .18s var(--ease);}
+@keyframes ac-in{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.ac-item{display:flex;align-items:center;gap:.8rem;padding:.7rem .9rem;text-decoration:none;color:var(--text);
+  border-bottom:1px solid rgba(28,26,23,.05);transition:background var(--tr);}
+.ac-item:last-of-type{border-bottom:0;}
+.ac-item:hover,.ac-item.is-active{background:var(--surface-2);}
+.ac-thumb{width:44px;height:44px;border-radius:var(--radius-sm);object-fit:cover;background:var(--surface-2);flex:0 0 auto;}
+.ac-meta{flex:1;min-width:0;}
+.ac-name{font-weight:600;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ac-cat{font-size:.72rem;color:var(--muted);}
+.ac-price{font-weight:700;font-size:.85rem;color:var(--accent-2);flex:0 0 auto;}
+.ac-all{display:block;text-align:center;padding:.75rem;font-weight:600;font-size:.82rem;color:var(--accent-2);
+  text-decoration:none;background:var(--surface-2);}
+.ac-all:hover{color:var(--accent);}
+.ac-empty{padding:1.4rem;text-align:center;color:var(--muted);font-size:.85rem;}

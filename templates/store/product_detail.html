@@ -338,9 +338,20 @@
   <i class="{% if single_product.averageReview >= 4 %}fas{% else %}far{% endif %} fa-star"></i>
   <i class="{% if single_product.averageReview >= 5 %}fas{% else %}far{% endif %} fa-star"></i>
 </div>
-            <div class="score-count">{{ single_product.countReview }} review{{ single_product.countReview|pluralize }}</div>
+            <div class="score-count">{{ review_count }} {% blocktrans count c=review_count %}review{% plural %}reviews{% endblocktrans %}</div>
           </div>
         </div>
+        {% if review_count %}
+        <div class="review-dist" aria-label="{% trans 'Rating distribution' %}">
+          {% for row in review_dist %}
+          <div class="dist-row">
+            <span class="dist-label">{{ row.stars }}<i class="fas fa-star"></i></span>
+            <span class="dist-bar"><span style="width:{{ row.pct }}%"></span></span>
+            <span class="dist-count">{{ row.count }}</span>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
       </div>
     </div>
 
@@ -436,7 +447,9 @@
                       {{ review.user.full_name|default:review.user.email|slice:":1"|upper }}
                     </div>
                     <div>
-                      <div class="review-name">{{ review.user.full_name }}</div>
+                      <div class="review-name">{{ review.user.full_name }}
+                        {% if review.verified %}<span class="verified-badge">{% icon "check" "ic" 12 %} {% trans "Verified purchase" %}</span>{% endif %}
+                      </div>
                       <div class="review-date">{{ review.updated_at }}</div>
                     </div>
                   </div>
@@ -554,7 +567,14 @@
     "price": "{{ single_product.price }}",
     "priceCurrency": "{{ STRIPE_CURRENCY|default:'EUR'|upper }}",
     "availability": "{% if single_product.stock > 0 and single_product.is_available %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}"
-  }
+  }{% if review_count %},
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "{{ review_avg }}",
+    "reviewCount": "{{ review_count }}",
+    "bestRating": "5",
+    "worstRating": "1"
+  }{% endif %}
 }
 </script>
 <script type="application/ld+json">
