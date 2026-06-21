@@ -129,6 +129,51 @@ def order_detail(request, order_number):
     }
     return render(request, "accounts/order_detail.html", context)
 
+
+@login_required(login_url="login")
+def order_help(request, order_number):
+    """'Need help with this order?' — owner-only support handoff. Never exposes
+    other users' orders (the queryset is scoped to request.user)."""
+    order = get_object_or_404(Order, user=request.user, order_number=order_number, is_ordered=True)
+    if request.method != "POST":
+        return redirect("order_detail", order_number=order_number)
+
+    topic = (request.POST.get("topic") or "general")[:40]
+    note = (request.POST.get("note") or "").strip()[:1500]
+    body = (f"Order help request for order #{order.order_number} (topic: {topic}).\n\n"
+            f"{note or 'No additional details provided.'}")
+
+    # analytics (no sensitive data — just the order number + topic)
+    try:
+        from storefront.models import AnalyticsEvent
+        if not request.session.session_key:
+            request.session.save()
+        AnalyticsEvent.objects.create(name="support_order_help", path=request.path[:255],
+                                      session_key=request.session.session_key or "",
+                                      meta={"order": order.order_number, "topic": topic})
+    except Exception:
+        pass
+
+    try:
+        from notifications.models import SupportMessage
+        sm = SupportMessage.objects.create(
+            from_email=request.user.email, subject=f"Order help — #{order.order_number}",
+            body_text=body, account=request.user)
+        try:
+            from notifications.dispatcher import dispatch_event
+            from django.conf import settings as _s
+            dispatch_event("support.order_help",
+                           {"order_number": order.order_number, "topic": topic,
+                            "from_email": request.user.email, "source": "order_help"},
+                           recipient_email=getattr(_s, "SUPPORT_EMAIL", "") or request.user.email)
+        except Exception:
+            pass
+    except Exception:
+        pass
+
+    messages.success(request, "Thanks — our team has your request and will email you shortly.")
+    return redirect("order_detail", order_number=order_number)
+
 @login_required(login_url="login")
 def address_list(request):
     addresses = Address.objects.filter(user=request.user).order_by("-is_default", "-updated_at")

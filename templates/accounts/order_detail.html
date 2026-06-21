@@ -51,9 +51,45 @@
                   <i class="fa fa-undo mr-2"></i>{% trans "Request a return" %}
                 </a>
               {% endif %}
+              <button type="button" class="btn btn-soft" onclick="var p=document.getElementById('orderHelp');p.hidden=!p.hidden;if(!p.hidden)p.scrollIntoView({behavior:'smooth',block:'center'});">
+                <i class="fa fa-headset mr-2"></i>{% trans "Need help with this order?" %}
+              </button>
               <a href="{% url 'my_orders' %}" class="btn btn-primary">
                 {% trans "Back to orders" %}
               </a>
+            </div>
+          </div>
+
+          <!-- Order help (owner-only support handoff) -->
+          <div id="orderHelp" class="dash-card order-help-card" hidden>
+            <div class="dash-card-body">
+              <h3 class="mb-1">{% trans "Need help with this order?" %}</h3>
+              <p class="text-muted mb-3" style="font-size:.9rem;">{% trans "Tell us what's wrong and our team will email you. You can also ask our assistant." %}</p>
+              <form method="post" action="{% url 'order_help' order.order_number %}">
+                {% csrf_token %}
+                <div class="form-row" style="gap:.7rem;">
+                  <div class="form-group col-md-5 mb-2">
+                    <label class="rf-label" for="helpTopic">{% trans "Topic" %}</label>
+                    <select id="helpTopic" name="topic" class="form-control">
+                      <option value="delivery">{% trans "Delivery / tracking" %}</option>
+                      <option value="return">{% trans "Return or refund" %}</option>
+                      <option value="wrong_item">{% trans "Wrong or damaged item" %}</option>
+                      <option value="general">{% trans "Something else" %}</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group mb-3">
+                  <label class="rf-label" for="helpNote">{% trans "Details" %}</label>
+                  <textarea id="helpNote" name="note" class="form-control" rows="3" maxlength="1500"
+                            placeholder="{% trans 'Describe the issue (optional)…' %}"></textarea>
+                </div>
+                <div class="d-flex" style="gap:.6rem;flex-wrap:wrap;">
+                  <button type="submit" class="btn btn-primary">{% trans "Send to support" %}</button>
+                  <button type="button" class="btn btn-soft" onclick="document.getElementById('aiToggle')?.click()">
+                    <i class="fa fa-headset mr-2"></i>{% trans "Ask the assistant" %}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
 
