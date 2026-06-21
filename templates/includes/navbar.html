@@ -60,13 +60,17 @@
         </ul>
 
         <!-- Center: search -->
-        <form action="{% url 'search' %}" method="GET" class="mx-lg-auto my-2 my-lg-0 w-100" style="max-width:520px;">
+        <form action="{% url 'search' %}" method="GET" class="mx-lg-auto my-2 my-lg-0 w-100 ac-wrap" style="max-width:520px;"
+              data-autocomplete data-ac-url="{% url 'autocomplete' %}" data-ac-viewall="{% trans 'View all results' %}"
+              data-ac-empty="{% trans 'No matches — try another term.' %}" autocomplete="off">
           <div class="searchbar">
             <span class="icon"><i class="fa fa-search"></i></span>
-            <input class="form-control" type="text" name="keyword"
+            <input class="form-control" type="text" name="keyword" role="combobox" aria-expanded="false"
+                   aria-autocomplete="list" aria-label="{% trans 'Search products' %}"
                    placeholder="{% trans 'Search products, categories…' %}"
                    value="{{ request.GET.keyword|default:'' }}">
           </div>
+          <div class="ac-panel" role="listbox"></div>
         </form>
 
         <!-- Right: actions -->
