@@ -630,3 +630,96 @@ img{max-width:100%;}
   .news-btn{flex:1 1 100%;justify-content:center;}
   .footer-premium .footer-social{justify-content:flex-start;}
 }
+
+/* ============================================================================
+   PHASE 11 — customer order detail: softer surfaces, icons, product thumbs
+   (was 'aggressive white bg, harsh text'). Warm it up, ease the weights.
+   ============================================================================ */
+.acc-layout .dash-card{background:var(--surface);border:var(--border);
+  border-radius:var(--radius);box-shadow:var(--shadow-soft);}
+.od-box-premium{background:#faf7f0!important;border:1px solid rgba(28,26,23,.10)!important;
+  border-radius:var(--radius)!important;padding:18px!important;backdrop-filter:none!important;}
+:root[data-theme="dark"] .od-box-premium{background:rgba(255,255,255,.04)!important;
+  border-color:rgba(243,238,228,.12)!important;}
+.od-title{display:flex;align-items:center;gap:.5rem;font-family:var(--font-ui)!important;
+  font-size:.72rem!important;letter-spacing:.12em!important;text-transform:uppercase;
+  color:var(--muted)!important;font-weight:700;margin-bottom:.85rem!important;}
+.od-title .ic{color:var(--accent-2);}
+.od-strong{font-weight:700!important;color:var(--text);font-size:1rem;}
+.od-muted{color:var(--muted)!important;font-size:.9rem;line-height:1.6;}
+.od-lines .line{display:flex;justify-content:space-between;padding:.3rem 0;font-size:.92rem;color:var(--text);}
+.od-lines .line.grand{font-family:var(--font-display);font-weight:800;font-size:1.05rem;
+  border-top:var(--border);margin-top:.4rem;padding-top:.7rem;}
+.dash-divider{height:1px;background:rgba(28,26,23,.08);margin:.9rem 0;border:0;}
+
+/* product rows with thumbnail */
+.od-item{display:flex;align-items:center;gap:14px;}
+.od-thumb{flex:0 0 auto;width:64px;height:64px;border-radius:var(--radius-sm);overflow:hidden;
+  border:var(--border);background:var(--surface-2);display:block;}
+.od-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.od-item-body .ord-id{font-family:var(--font-ui)!important;font-weight:600!important;
+  color:var(--text)!important;text-decoration:none;font-size:.95rem;}
+.od-item-body .ord-id:hover{color:var(--accent-2)!important;}
+.dash-table thead th{font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.08em;
+  font-size:.68rem;color:var(--muted);border-bottom:var(--border)!important;}
+.dash-table tbody td{border-top:var(--border)!important;color:var(--text);}
+.dash-table tbody td.text-right{font-family:var(--font-display)!important;font-weight:700!important;}
+.dash-table tbody tr:hover{background:rgba(166,130,76,.04)!important;}
+.variant-pill{background:var(--surface-2);border:var(--border);border-radius:var(--radius-pill);
+  font-size:.72rem;color:var(--muted);padding:.2rem .6rem;}
+
+@media (max-width:575.98px){
+  .od-thumb{width:54px;height:54px;}
+  .dash-actions{display:flex;flex-wrap:wrap;gap:.5rem;}
+  .dash-actions .btn{flex:1 1 auto;}
+}
+
+/* ============================================================================
+   PHASE 11 — visible, refined motion (gated behind .js-anim; reduced-motion safe)
+   ============================================================================ */
+
+/* Hero entrance: staggered fade-up on load (clearly visible) */
+@keyframes lux-rise{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:none;}}
+.js-anim .hero-copy > *{opacity:0;animation:lux-rise .7s var(--ease) both;}
+.js-anim .hero-copy > *:nth-child(1){animation-delay:.08s;}
+.js-anim .hero-copy > *:nth-child(2){animation-delay:.20s;}
+.js-anim .hero-copy > *:nth-child(3){animation-delay:.32s;}
+.js-anim .hero-copy > *:nth-child(4){animation-delay:.44s;}
+
+/* Stronger, more visible scroll reveal */
+.js-anim [data-reveal]{opacity:0;transform:translateY(26px);
+  transition:opacity .7s var(--ease),transform .7s var(--ease);}
+.js-anim [data-reveal].is-visible{opacity:1;transform:none;}
+
+/* Buttons: visible lift + arrow nudge */
+.btn-primary,.btn-soft,.btn-outline-primary{transition:transform var(--tr),background var(--tr),
+  color var(--tr),box-shadow var(--tr),border-color var(--tr);}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(28,26,23,.18)!important;}
+.btn-icontext .fa-arrow-right,.btn .fa-arrow-right,.news-btn .ic{transition:transform var(--tr);}
+.btn-icontext:hover .fa-arrow-right,.news-btn:hover .ic{transform:translateX(4px);}
+
+/* Card hover: a touch more lift + image zoom already present */
+.p-card,.product-card,.lux-feature,.ymal-card,.dash-card{transition:transform var(--tr),
+  box-shadow var(--tr),border-color var(--tr);}
+.lux-feature:hover{transform:translateY(-5px);box-shadow:var(--shadow);}
+
+/* Newsletter field: focus glow + lift */
+.news-field{transition:box-shadow var(--tr),transform var(--tr);}
+.news-field:focus-within{box-shadow:0 14px 34px rgba(0,0,0,.28),0 0 0 2px var(--accent);transform:translateY(-1px);}
+
+/* Footer link + social: visible motion already added; nav underline grows */
+.footer-premium .footer-link{transition:color var(--tr),transform var(--tr);}
+
+/* Cart badge pop when present */
+@keyframes badge-pop{0%{transform:scale(.6);}60%{transform:scale(1.15);}100%{transform:scale(1);}}
+.js-anim .nav-icon .badge-pill{animation:badge-pop .4s var(--ease);}
+
+/* Reveal helper for sections that aren't auto-tagged */
+.lux-split,.summary-card,.reviews-card,.filter-card{transition:transform var(--tr),box-shadow var(--tr);}
+
+@media (prefers-reduced-motion:reduce){
+  .js-anim .hero-copy > *{animation:none!important;opacity:1!important;}
+  .js-anim [data-reveal]{opacity:1!important;transform:none!important;transition:none!important;}
+  .js-anim .nav-icon .badge-pill{animation:none!important;}
+  *{scroll-behavior:auto!important;}
+}

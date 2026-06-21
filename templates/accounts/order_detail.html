@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static i18n %}
+{% load static i18n uikit %}
 
 {% block title %}{% trans "Order details" %} • {{ SITE_NAME }}{% endblock %}
 
@@ -64,7 +64,7 @@
               <div class="od-grid od-grid-premium">
                 <!-- Delivery -->
                 <div class="od-box od-box-premium">
-                  <div class="od-title">{% trans "Delivery" %}</div>
+                  <div class="od-title">{% icon "truck" "ic" 16 %} {% trans "Delivery" %}</div>
                   <div class="od-strong">{{ order.full_name }}</div>
 
                   <div class="od-muted">{{ order.full_address }}</div>
@@ -80,7 +80,7 @@
 
                 <!-- Payment -->
                 <div class="od-box od-box-premium">
-                  <div class="od-title">{% trans "Payment" %}</div>
+                  <div class="od-title">{% icon "card" "ic" 16 %} {% trans "Payment" %}</div>
 
                   {% if order.payment %}
                     <div class="od-strong">{{ order.payment.payment_method }}</div>
@@ -125,15 +125,22 @@
                     {% for it in items %}
                       <tr>
                         <td>
-                          <div class="ord-id">{{ it.product.product_name }}</div>
-
-                          {% if it.variations.all %}
-                            <div class="mt-2" style="display:flex; gap:6px; flex-wrap:wrap;">
-                              {% for v in it.variations.all %}
-                                <span class="variant-pill">{{ v.variation_category|capfirst }}: {{ v.variation_value|capfirst }}</span>
-                              {% endfor %}
+                          <div class="od-item">
+                            <a href="{{ it.product.get_url }}" class="od-thumb">
+                              <img src="{% if it.product.cover_image %}{{ it.product.cover_image }}{% else %}{% static 'images/placeholder.png' %}{% endif %}"
+                                   alt="{{ it.product.product_name }}" loading="lazy" decoding="async">
+                            </a>
+                            <div class="od-item-body">
+                              <a href="{{ it.product.get_url }}" class="ord-id">{{ it.product.product_name }}</a>
+                              {% if it.variations.all %}
+                                <div class="mt-2" style="display:flex; gap:6px; flex-wrap:wrap;">
+                                  {% for v in it.variations.all %}
+                                    <span class="variant-pill">{{ v.variation_category|capfirst }}: {{ v.variation_value|capfirst }}</span>
+                                  {% endfor %}
+                                </div>
+                              {% endif %}
                             </div>
-                          {% endif %}
+                          </div>
                         </td>
 
                         <td class="text-center">{{ it.quantity }}</td>
