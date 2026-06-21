@@ -38,6 +38,26 @@ python -c "import secrets; open('/tmp/k','w').write(secrets.token_urlsafe(64))"
 # then paste the file contents into .env, then shred /tmp/k
 ```
 
+## OpenAI assistant key (`AI_API_KEY`) — treat as EXPOSED
+The contextual AI assistant uses an OpenAI key in `AI_API_KEY`. During development
+this key was shared over a chat channel, so it **must be considered exposed** even
+though it is not in git, not in `.env.example`, and never logged by the code.
+
+**Before staging/production you MUST rotate it:**
+1. Go to https://platform.openai.com/api-keys → **revoke** the current key.
+2. **Create a new** secret key (ideally project-scoped, with a usage limit).
+3. Put the new value in `.env` only: `AI_API_KEY=sk-...` (never commit it).
+4. Restart the app; verify the assistant answers a shipping question and declines
+   an off-topic one.
+
+Operational guardrails already enforced in code:
+- Key read from env only; never hardcoded, never logged (only HTTP status is logged).
+- `AI_RATE_LIMIT` (per session/hour), `AI_MAX_INPUT_CHARS`, `AI_MAX_TOKENS`,
+  `AI_TIMEOUT_SECONDS` cap abuse and cost; off-topic questions are declined WITHOUT
+  an API call.
+- Set a **hard spending limit** in the OpenAI dashboard as a backstop.
+- To disable the assistant entirely without code changes: `AI_ASSISTANT_ENABLED=False`.
+
 ## Pre-deploy checklist
 - [ ] `.env` is NOT committed (`git ls-files | grep -x .env` → empty).
 - [ ] `.env.example` contains placeholders only (no real values).
