@@ -63,3 +63,6 @@ final-*.png
 regression-*.png
 bug-*.png
 fixed-*.png
+
+# Phase 12 acceptance screenshots
+acceptance-*.png
