@@ -546,3 +546,87 @@ img{max-width:100%;}
 
 /* Consistent home product card bottom spacing (4-up grid) */
 .home-section .p-card{margin-bottom:0;}
+
+/* ============================================================================
+   PHASE 11 — BLOCKING FIX: mobile menu clickability
+   The .navbar has backdrop-filter -> own stacking context, trapping the drawer's
+   z-index. The body-level .nav-backdrop (z-index 1190) then painted OVER the
+   drawer links. Raise the header's stacking context above the backdrop at mobile
+   so the drawer (and its links) sit above the dim layer and stay clickable.
+   ============================================================================ */
+@media (max-width:991px){
+  .section-header{position:relative;z-index:1300;}
+  #navbarMain{z-index:1301!important;}
+  .nav-backdrop{z-index:1290!important;}
+  .filter-backdrop{z-index:1290!important;}
+  .shop-aside{z-index:1305!important;}
+  /* guarantee drawer contents receive pointer events */
+  #navbarMain,#navbarMain *{pointer-events:auto;}
+}
+
+/* Bootstrap 5 gutter classes (g-3 / g-md-4) don't exist in BS4 -> no vertical
+   gap between stacked cards. Polyfill row gutters so 'Designed to be worn'
+   features (and popular/latest/you-may-like grids) aren't glued together. */
+.row.g-2{row-gap:.75rem;}
+.row.g-3{row-gap:1.5rem;}
+.row.g-md-4{row-gap:1.5rem;}
+@media (min-width:768px){
+  .row.g-md-4{row-gap:2rem;}
+}
+
+/* ============================================================================
+   PHASE 11 — reported visual bugs (footer social, hero badge, card buttons)
+   ============================================================================ */
+
+/* --- Footer social buttons: base rule gave them a WHITE bg -> light icon was
+   invisible. Force a dark translucent surface + bright icon + gold hover. --- */
+.footer-premium .social-btn{
+  width:44px;height:44px;border-radius:var(--radius-pill);
+  background:rgba(255,255,255,.09)!important;
+  border:1px solid rgba(255,255,255,.30)!important;
+  color:#f4efe6!important;box-shadow:none!important;font-size:1.02rem;}
+.footer-premium .social-btn i{color:#f4efe6!important;}
+.footer-premium .social-btn:hover{
+  background:var(--accent)!important;border-color:var(--accent)!important;
+  color:#fff!important;transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.3)!important;}
+.footer-premium .social-btn:hover i{color:#fff!important;}
+.footer-premium .social-btn:focus-visible{outline:none;box-shadow:0 0 0 .18rem rgba(202,165,106,.55)!important;}
+
+/* --- Hero kicker "New season": gold-on-taupe was too low-contrast. Make it a
+   small elegant glass pill with a gold dot so it reads on the image. --- */
+.hero-kicker{display:inline-flex;align-items:center;gap:.5rem;
+  background:rgba(28,26,23,.42);border:1px solid rgba(255,255,255,.30);
+  color:#fff;padding:.36rem .9rem;border-radius:var(--radius-pill);
+  -webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);
+  font-size:.66rem;letter-spacing:.2em;font-weight:700;}
+.hero-kicker::before{content:"";width:6px;height:6px;border-radius:50%;
+  background:var(--accent);box-shadow:0 0 0 3px rgba(166,130,76,.3);flex:0 0 auto;}
+
+/* --- Store product-card buttons: uppercase + flex:1 squeezed the text in the
+   narrow mobile card. Make them sentence-case, tidy, and stack on small. --- */
+#productGrid .product-actions .btn,
+.p-card .product-actions .btn,
+.product-actions .btn{
+  text-transform:none!important;letter-spacing:.01em!important;
+  font-size:.8rem!important;font-weight:600!important;
+  padding:.58rem .7rem!important;white-space:nowrap;line-height:1.1;}
+#productGrid .product-card .info{padding:14px 16px 16px!important;}
+@media (max-width:575.98px){
+  #productGrid .product-actions{flex-direction:column;gap:8px;}
+  #productGrid .product-actions .btn{width:100%;}
+}
+
+/* --- Footer responsive safety: keep newsletter form + columns tidy on tablet/
+   small without overflow. --- */
+@media (max-width:991.98px){
+  .footer-premium .footer-top{padding:2.2rem 0 1.2rem;}
+  .footer-news-band{padding:2rem 0;}
+}
+@media (max-width:575.98px){
+  .footer-news-title{font-size:1.25rem;}
+  .news-field{flex-wrap:wrap;gap:8px;padding:10px;}
+  .news-field .news-icon{display:none;}
+  .news-input{flex:1 1 100%;text-align:center;padding:.55rem .5rem;}
+  .news-btn{flex:1 1 100%;justify-content:center;}
+  .footer-premium .footer-social{justify-content:flex-start;}
+}
