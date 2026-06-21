@@ -209,14 +209,33 @@ def cart(request, total=0, quantity=0, cart_items=None):
     country = detect_country(request)
     totals = compute_cart_totals(cart_items, country)
 
+    # Coupon (re-validated against the current subtotal).
+    from decimal import Decimal
+    from django.conf import settings
+    from promotions.services import applied_coupon
+    coupon, discount = applied_coupon(request, totals.items_subtotal)
+    grand_total = max(Decimal("0"), Decimal(str(totals.grand_total)) - discount)
+
+    # Free-shipping progress bar.
+    threshold = Decimal(str(getattr(settings, "SHIPPING_FREE_THRESHOLD", 0) or 0))
+    sub = Decimal(str(totals.items_subtotal))
+    free_remaining = max(Decimal("0"), threshold - sub) if threshold else Decimal("0")
+    free_progress = min(100, int(sub / threshold * 100)) if threshold else 0
+
     context = {
         'total': totals.items_subtotal,
         'quantity': totals.quantity,
         'cart_items': cart_items,
         'tax': totals.tax,
-        'grand_total': totals.grand_total,
+        'grand_total': grand_total,
         'shipping_cost': totals.shipping_cost,
         'shipping_quote': totals.shipping_quote,
+        'coupon': coupon,
+        'discount': discount,
+        'free_shipping_threshold': threshold,
+        'free_shipping_remaining': free_remaining,
+        'free_shipping_progress': free_progress,
+        'free_shipping_reached': threshold and sub >= threshold,
     }
     return render(request, 'store/cart.html', context)
 

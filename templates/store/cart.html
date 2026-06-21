@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static i18n %}
+{% load static i18n uikit %}
 
 {% block title %}{% trans "Shopping cart" %} • {{ SITE_NAME }}{% endblock %}
 
@@ -108,12 +108,16 @@
               <div class="cart-subhint">{% trans "Includes selected options" %}</div>
             </div>
 
-            <div class="cart-remove d-none d-md-flex">
+            <div class="cart-remove d-none d-md-flex" style="flex-direction:column;gap:.4rem;align-items:flex-end;">
               <a href="{% url 'remove_cart_item' cart_item.product.id cart_item.id %}"
                  onclick="return confirm('{% trans 'Remove this item from your cart?' %}')"
                  class="btn btn-remove">
                 <i class="fa fa-trash"></i><span>{% trans "Remove" %}</span>
               </a>
+              <form method="post" action="{% url 'wishlist:save_for_later' %}" class="m-0">{% csrf_token %}
+                <input type="hidden" name="product_id" value="{{ cart_item.product.id }}">
+                <button type="submit" class="btn-save-later"><i class="fa fa-heart"></i> {% trans "Save for later" %}</button>
+              </form>
             </div>
           </div>
           {% endfor %}
@@ -131,8 +135,42 @@
             <span class="summary-chip"><i class="fa fa-lock mr-2"></i>{% trans "Protected" %}</span>
           </div>
 
+          {% if free_shipping_threshold %}
+          <div class="free-ship {% if free_shipping_reached %}is-reached{% endif %}">
+            <div class="free-ship-text">
+              {% if free_shipping_reached %}
+                {% icon "truck" "ic" 16 %} {% trans "You've unlocked free shipping!" %}
+              {% else %}
+                {% icon "truck" "ic" 16 %} {% blocktrans with a=CURRENCY_SYMBOL r=free_shipping_remaining %}You're {{ a }}{{ r }} away from free shipping{% endblocktrans %}
+              {% endif %}
+            </div>
+            <div class="free-ship-bar"><span style="width:{{ free_shipping_progress }}%"></span></div>
+          </div>
+          {% endif %}
+
+          <!-- Coupon -->
+          <div class="coupon-box">
+            {% if coupon %}
+              <div class="coupon-applied">
+                <span>{% icon "tag" "ic" 15 %} <strong>{{ coupon.code }}</strong> {% trans "applied" %}</span>
+                <form method="post" action="{% url 'promotions:remove' %}" class="m-0">{% csrf_token %}
+                  <button class="coupon-remove" type="submit">{% trans "Remove" %}</button>
+                </form>
+              </div>
+            {% else %}
+              <form method="post" action="{% url 'promotions:apply' %}" class="coupon-form">{% csrf_token %}
+                <input type="text" name="code" class="coupon-input" maxlength="32"
+                       placeholder="{% trans 'Promo code' %}" aria-label="{% trans 'Promo code' %}">
+                <button class="btn btn-soft coupon-apply" type="submit">{% trans "Apply" %}</button>
+              </form>
+            {% endif %}
+          </div>
+
           <div class="summary-lines">
             <div class="line"><span>{% trans "Subtotal" %}</span><span>{{ CURRENCY_SYMBOL }} {{ total }}</span></div>
+            {% if discount %}
+            <div class="line line-discount"><span>{% trans "Discount" %} {% if coupon %}({{ coupon.code }}){% endif %}</span><span>− {{ CURRENCY_SYMBOL }} {{ discount }}</span></div>
+            {% endif %}
             <div class="line">
               <span>{% trans "Shipping" %} <small class="text-muted">({{ ship_country_name }})</small></span>
               <span>{% if shipping_cost %}{{ CURRENCY_SYMBOL }} {{ shipping_cost }}{% else %}{% trans "Free" %}{% endif %}</span>
