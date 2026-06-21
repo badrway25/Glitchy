@@ -84,7 +84,10 @@
     }
     openers.forEach(function(o){ o && o.addEventListener("click", function(e){ e.preventDefault(); open(); }); });
     backdrop.addEventListener("click", close);
-    panel.querySelectorAll("[data-drawer-close]").forEach(function(b){ b.addEventListener("click", close); });
+    // Delegated: works for close buttons added AFTER makeDrawer (e.g. the X).
+    panel.addEventListener("click", function(e){
+      if (e.target.closest && e.target.closest("[data-drawer-close]")) { e.preventDefault(); close(); }
+    });
     document.addEventListener("keydown", function(e){ if(e.key==="Escape") close(); });
     return { open: open, close: close };
   }
