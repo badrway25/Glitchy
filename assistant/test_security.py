@@ -144,3 +144,19 @@ class CostControlTests(TestCase):
                              data=json.dumps({"message": "shipping " * 200}),
                              content_type="application/json")
         self.assertEqual(r.status_code, 200)  # truncated, not errored
+
+
+@override_settings(AI_API_KEY="", AI_PROVIDER="mock", AI_ASSISTANT_ENABLED=True)
+class ProductFaqContextTests(TestCase):
+    def test_assistant_uses_product_faq_as_context(self):
+        from store.models import ProductFAQ
+        ProductFAQ.objects.create(
+            question="Do your tees shrink?", answer="Our tees are pre-shrunk and hold their shape.",
+            is_active=True)
+        c = Client(enforce_csrf_checks=False)
+        d = c.post(reverse("assistant:chat"),
+                   data=json.dumps({"message": "do your tees shrink after washing?"}),
+                   content_type="application/json").json()
+        # offline fallback returns the grounded FAQ answer
+        self.assertTrue(d["grounded"])
+        self.assertIn("pre-shrunk", d["answer"])

@@ -214,8 +214,13 @@
 
               <!-- actions -->
               <div class="pdp-actions">
-                <button type="button" class="btn btn-soft" onclick="window.location='#reviews'" title="{% trans 'Reviews' %}">
-                  <i class="fas fa-star"></i>
+                <button type="button" class="btn btn-soft wish-btn wish-btn-pdp {% if single_product.id in WISHLIST_IDS %}is-active{% endif %}"
+                        data-wishlist-toggle data-product-id="{{ single_product.id }}"
+                        data-label-on="{% trans 'Saved' %}" data-label-off="{% trans 'Save' %}"
+                        aria-pressed="{% if single_product.id in WISHLIST_IDS %}true{% else %}false{% endif %}"
+                        title="{% trans 'Save to wishlist' %}">
+                  <i class="fas fa-heart"></i>
+                  <span data-wishlist-label>{% if single_product.id in WISHLIST_IDS %}{% trans "Saved" %}{% else %}{% trans "Save" %}{% endif %}</span>
                 </button>
 
                 {% if single_product.stock <= 0 or not single_product.is_available %}
@@ -285,6 +290,31 @@
         {% endfor %}
       </div>
     </section>
+    {% endif %}
+
+    <!-- Product FAQ -->
+    {% if product_faqs %}
+    <section class="pdp-faq-wrap mt-4">
+      <div class="pdp-faq-card">
+        <div class="lux-eyebrow mb-1">{% trans "Good to know" %}</div>
+        <h3 class="section-title mb-3">{% trans "Frequently asked questions" %}</h3>
+        <div class="faq-list">
+          {% for f in product_faqs %}
+            <div class="faq-item">
+              <button type="button" class="faq-q" aria-expanded="false">
+                <span>{{ f.q }}</span>{% icon "chevron-down" "ic" 18 %}
+              </button>
+              <div class="faq-a"><p>{{ f.a }}</p></div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+    <script>
+    (function(){document.querySelectorAll('.pdp-faq-wrap .faq-q').forEach(function(b){
+      b.addEventListener('click',function(){var open=b.getAttribute('aria-expanded')==='true';
+        b.setAttribute('aria-expanded',String(!open));b.closest('.faq-item').classList.toggle('is-open',!open);});});})();
+    </script>
     {% endif %}
 
     <!-- Reviews -->
