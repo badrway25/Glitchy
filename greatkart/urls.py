@@ -14,6 +14,7 @@ urlpatterns = [
     path("i18n/", include("django.conf.urls.i18n")),   # set_language endpoint
     path("", include("notifications.urls")),           # /api/n8n/... + newsletter
     path("shipping/", include("shipping.urls")),       # country switcher
+    path("assistant/", include("assistant.urls")),     # contextual AI assistant API
 ]
 
 # Localized, user-facing routes. English stays prefix-free; IT/FR get /it/, /fr/.

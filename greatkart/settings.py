@@ -87,6 +87,7 @@ INSTALLED_APPS = [
     "shipping",
     "returns",
     "notifications",
+    "assistant",
     # Third party
     "stripe",
 ]
@@ -341,6 +342,22 @@ N8N_TIMEOUT = env_int("N8N_TIMEOUT", 15)
 N8N_MAX_RETRIES = env_int("N8N_MAX_RETRIES", 3)
 # When SMTP should be used as a fallback if an n8n dispatch fails
 EMAIL_SMTP_FALLBACK = env_bool("EMAIL_SMTP_FALLBACK", True)
+
+
+# --------------------------------------------------------------------------- #
+# Contextual AI shopping assistant
+# --------------------------------------------------------------------------- #
+# The assistant answers ONLY from site context (catalog + curated knowledge).
+# With no API key it gracefully falls back to keyword retrieval over the KB.
+AI_ASSISTANT_ENABLED = env_bool("AI_ASSISTANT_ENABLED", True)
+AI_PROVIDER = env("AI_PROVIDER", "openai")          # openai | mock
+AI_MODEL = env("AI_MODEL", "gpt-4o-mini")
+AI_API_KEY = env("AI_API_KEY", "")                  # never hardcode; from env only
+AI_MAX_TOKENS = env_int("AI_MAX_TOKENS", 500)
+AI_TIMEOUT_SECONDS = env_int("AI_TIMEOUT_SECONDS", 20)
+AI_RATE_LIMIT = env_int("AI_RATE_LIMIT", 20)        # messages per session per hour
+AI_CONTEXT_ONLY = env_bool("AI_CONTEXT_ONLY", True)
+AI_MAX_INPUT_CHARS = env_int("AI_MAX_INPUT_CHARS", 600)
 
 
 # --------------------------------------------------------------------------- #
