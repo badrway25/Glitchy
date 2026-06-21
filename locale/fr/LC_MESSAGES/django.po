@@ -1084,7 +1084,7 @@ msgstr "Retours sous %(d)s jours"
 
 #: .\templates\home.html:37
 msgid "Premium, ethically printed"
-msgstr "Impression à la demande premium"
+msgstr "Premium, imprimé de façon éthique"
 
 #: .\templates\home.html:38 .\templates\store\cart.html:129
 msgid "Secure checkout"
@@ -1123,7 +1123,7 @@ msgstr "Conçus pour être portés, faits pour durer"
 
 #: .\templates\home.html:92
 msgid "Premium fabrics"
-msgstr "Contenu premium"
+msgstr "Tissus premium"
 
 #: .\templates\home.html:93
 msgid "Heavyweight, soft-touch materials chosen for comfort and longevity."
@@ -1161,7 +1161,7 @@ msgstr "Vous avez changé d'avis ? Renvoyez-le, gratuitement et en toute simplic
 
 #: .\templates\home.html:107
 msgid "Secure & simple"
-msgstr "Paiement sécurisé"
+msgstr "Sûr et simple"
 
 #: .\templates\home.html:108
 msgid "Encrypted checkout, guest-friendly, no account required."
