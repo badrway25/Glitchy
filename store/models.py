@@ -206,3 +206,44 @@ class ProductFAQ(models.Model):
         return cls.objects.filter(is_active=True).filter(
             Q(product=product) | Q(category=product.category, product__isnull=True)
             | Q(product__isnull=True, category__isnull=True))
+
+
+class GeneralFAQ(models.Model):
+    """Site-wide FAQ shown on the dedicated /faq/ page, grouped by category and
+    used as assistant context. Separate from product-specific ProductFAQ."""
+    CATEGORY_CHOICES = [
+        ("shipping", "Shipping & delivery"),
+        ("returns", "Returns & refunds"),
+        ("payments", "Payments & security"),
+        ("orders", "Orders & tracking"),
+        ("account", "Account & wishlist"),
+        ("sizing", "Sizing & products"),
+        ("coupons", "Coupons & offers"),
+        ("support", "Support & assistant"),
+    ]
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default="support")
+
+    question = models.CharField(max_length=200)
+    question_it = models.CharField(max_length=200, blank=True, default="")
+    question_fr = models.CharField(max_length=200, blank=True, default="")
+    answer = models.TextField()
+    answer_it = models.TextField(blank=True, default="")
+    answer_fr = models.TextField(blank=True, default="")
+
+    order = models.IntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["category", "order", "id"]
+        verbose_name = "General FAQ"
+        verbose_name_plural = "General FAQs"
+
+    def __str__(self):
+        return f"[{self.category}] {self.question}"
+
+    def question_for(self, lang):
+        return {"it": self.question_it, "fr": self.question_fr}.get(lang) or self.question
+
+    def answer_for(self, lang):
+        return {"it": self.answer_it, "fr": self.answer_fr}.get(lang) or self.answer

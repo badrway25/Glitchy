@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
-from .models import (Product, ProductFAQ, ProductImage, ReviewRating, Variation)
+from .models import (GeneralFAQ, Product, ProductFAQ, ProductImage, ReviewRating, Variation)
 
 
 class ProductImageInline(admin.TabularInline):
@@ -107,6 +107,20 @@ class ProductFAQAdmin(admin.ModelAdmin):
     raw_id_fields = ("product",)
     fieldsets = (
         (None, {"fields": ("product", "category", "order", "is_active")}),
+        ("English", {"fields": ("question", "answer")}),
+        ("Italiano", {"fields": ("question_it", "answer_it")}),
+        ("Français", {"fields": ("question_fr", "answer_fr")}),
+    )
+
+
+@admin.register(GeneralFAQ)
+class GeneralFAQAdmin(admin.ModelAdmin):
+    list_display = ("question", "category", "order", "is_active")
+    list_filter = ("category", "is_active")
+    list_editable = ("order", "is_active")
+    search_fields = ("question", "answer")
+    fieldsets = (
+        (None, {"fields": ("category", "order", "is_active")}),
         ("English", {"fields": ("question", "answer")}),
         ("Italiano", {"fields": ("question_it", "answer_it")}),
         ("Français", {"fields": ("question_fr", "answer_fr")}),

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static i18n uikit %}
+{% block title %}{% trans "Help & FAQ" %} • {{ SITE_NAME }}{% endblock %}
+{% block meta_description %}{% trans "Answers about shipping, returns, payments, sizing, orders and more." %}{% endblock %}
+
+{% block content %}
+<section class="faq-page">
+  <div class="container" style="max-width:1080px;">
+
+    <!-- Hero -->
+    <div class="faq-hero">
+      <div class="faq-hero-eyebrow">{% icon "headset" "ic" 16 %} {% trans "Help centre" %}</div>
+      <h1 class="faq-hero-title">{% trans "How can we help?" %}</h1>
+      <p class="faq-hero-sub">{% trans "Find quick answers about shipping, returns, payments, sizing and your account." %}</p>
+      <div class="faq-search">
+        {% icon "search" "ic" 18 %}
+        <input type="text" id="faqSearch" placeholder="{% trans 'Search the FAQ…' %}" aria-label="{% trans 'Search the FAQ' %}">
+      </div>
+    </div>
+
+    <!-- Categories -->
+    {% for key, group in faq_groups.items %}
+    <section class="faq-group" data-faq-group data-faq>
+      <div class="faq-group-head">
+        <span class="faq-group-ic">
+          {% if key == 'shipping' %}{% icon "truck" "ic" 18 %}{% elif key == 'returns' %}{% icon "returns" "ic" 18 %}
+          {% elif key == 'payments' %}{% icon "card" "ic" 18 %}{% elif key == 'orders' %}{% icon "box" "ic" 18 %}
+          {% elif key == 'account' %}{% icon "user" "ic" 18 %}{% elif key == 'sizing' %}{% icon "ruler" "ic" 18 %}
+          {% elif key == 'coupons' %}{% icon "tag" "ic" 18 %}{% else %}{% icon "headset" "ic" 18 %}{% endif %}
+        </span>
+        <h2 class="faq-group-title">{{ group.label }}</h2>
+      </div>
+      <div class="faq-list">
+        {% for it in group.items %}
+        <div class="faq-item" data-faq-item data-faq-text="{{ it.q|lower }} {{ it.a|lower }}">
+          <button type="button" class="faq-q" aria-expanded="false">
+            <span class="gtk-q-text">{{ it.q }}</span>
+            <span class="gtk-chev">{% icon "chevron-down" "ic" 18 %}</span>
+          </button>
+          <div class="faq-a"><p>{{ it.a }}</p></div>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endfor %}
+
+    <!-- CTA -->
+    <div class="faq-cta">
+      <h3>{% trans "Still need help?" %}</h3>
+      <p>{% trans "Our assistant answers instantly, or reach our team directly." %}</p>
+      <div class="faq-cta-btns">
+        <button type="button" class="btn btn-primary" onclick="document.getElementById('aiToggle')?.click()">
+          {% icon "headset" "ic" 16 %} {% trans "Ask the assistant" %}
+        </button>
+        <a href="mailto:{{ SUPPORT_EMAIL }}" class="btn btn-soft">{% trans "Email support" %}</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- FAQPage structured data (only the real, visible FAQs) -->
+{% if faq_groups %}
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{% for key, group in faq_groups.items %}{% for it in group.items %}{"@type":"Question","name":"{{ it.q|escapejs }}","acceptedAnswer":{"@type":"Answer","text":"{{ it.a|escapejs }}"}}{% if not forloop.parentloop.last or not forloop.last %},{% endif %}
+{% endfor %}{% endfor %}]}
+</script>
+{% endif %}
+{% endblock %}

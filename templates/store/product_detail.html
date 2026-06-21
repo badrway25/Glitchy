@@ -292,29 +292,30 @@
     </section>
     {% endif %}
 
-    <!-- Product FAQ -->
+    <!-- Good to know (premium product FAQ) -->
     {% if product_faqs %}
-    <section class="pdp-faq-wrap mt-4">
-      <div class="pdp-faq-card">
-        <div class="lux-eyebrow mb-1">{% trans "Good to know" %}</div>
-        <h3 class="section-title mb-3">{% trans "Frequently asked questions" %}</h3>
-        <div class="faq-list">
+    <section class="gtk-wrap mt-5">
+      <div class="gtk-grid">
+        <aside class="gtk-aside">
+          <div class="gtk-eyebrow">{% icon "spark" "ic" 15 %} {% trans "Good to know" %}</div>
+          <h3 class="gtk-title">{% trans "Everything you need, before you buy" %}</h3>
+          <p class="gtk-intro">{% trans "The details that matter — materials, fit, care, shipping and our easy returns." %}</p>
+          <a href="{% url 'faq' %}" class="gtk-all">{% trans "See all FAQs" %} {% icon "arrow-right" "ic" 14 %}</a>
+        </aside>
+        <div class="gtk-list faq-list" data-faq>
           {% for f in product_faqs %}
-            <div class="faq-item">
-              <button type="button" class="faq-q" aria-expanded="false">
-                <span>{{ f.q }}</span>{% icon "chevron-down" "ic" 18 %}
+            <div class="faq-item gtk-item">
+              <button type="button" class="faq-q gtk-q" aria-expanded="false">
+                <span class="gtk-q-ic">{% icon "info" "ic" 17 %}</span>
+                <span class="gtk-q-text">{{ f.q }}</span>
+                <span class="gtk-chev">{% icon "chevron-down" "ic" 18 %}</span>
               </button>
-              <div class="faq-a"><p>{{ f.a }}</p></div>
+              <div class="faq-a gtk-a"><p>{{ f.a }}</p></div>
             </div>
           {% endfor %}
         </div>
       </div>
     </section>
-    <script>
-    (function(){document.querySelectorAll('.pdp-faq-wrap .faq-q').forEach(function(b){
-      b.addEventListener('click',function(){var open=b.getAttribute('aria-expanded')==='true';
-        b.setAttribute('aria-expanded',String(!open));b.closest('.faq-item').classList.toggle('is-open',!open);});});})();
-    </script>
     {% endif %}
 
     <!-- Reviews -->

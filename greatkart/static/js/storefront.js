@@ -48,6 +48,31 @@
     window.addEventListener("analytics:assistant_open", function () { window.gkTrack("assistant_open", {}); });
     window.addEventListener("analytics:assistant_question", function () { window.gkTrack("assistant_question", {}); });
 
+    // FAQ accordions (PDP 'Good to know' + general FAQ page)
+    document.querySelectorAll("[data-faq] .faq-q").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var open = btn.getAttribute("aria-expanded") === "true";
+        btn.setAttribute("aria-expanded", String(!open));
+        btn.closest(".faq-item").classList.toggle("is-open", !open);
+      });
+    });
+
+    // FAQ page search filter
+    var faqSearch = document.getElementById("faqSearch");
+    if (faqSearch) {
+      faqSearch.addEventListener("input", function () {
+        var q = faqSearch.value.trim().toLowerCase();
+        document.querySelectorAll("[data-faq-item]").forEach(function (it) {
+          var hit = it.getAttribute("data-faq-text").indexOf(q) !== -1;
+          it.style.display = hit ? "" : "none";
+        });
+        document.querySelectorAll("[data-faq-group]").forEach(function (g) {
+          var any = g.querySelectorAll('[data-faq-item]:not([style*="none"])').length;
+          g.style.display = any ? "" : "none";
+        });
+      });
+    }
+
     // announcement dismiss (remember per id)
     var bar = document.getElementById("announceBar");
     if (bar) {

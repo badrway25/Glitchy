@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.conf import settings
 from .models import Product, ReviewRating
 from category.models import Category
 from carts.models import CartItem
@@ -120,6 +121,12 @@ def search(request):
 
     products = products.order_by("-created_date")
 
+    count = products.count()
+    if keyword:
+        _track_event(request, "search_query", {"q": keyword[:60]})
+        if count == 0:
+            _track_event(request, "search_no_results", {"q": keyword[:60]})
+
     paginator = Paginator(products, 9)
     page = request.GET.get("page")
     paged_products = paginator.get_page(page)
@@ -127,9 +134,54 @@ def search(request):
     context = {
         "categories": all_categories,   # ✅
         "products": paged_products,
-        "product_count": products.count(),
+        "product_count": count,
     }
     return render(request, "store/store.html", context)
+
+
+def _track_event(request, name, meta=None):
+    try:
+        from storefront.models import AnalyticsEvent
+        if not request.session.session_key:
+            request.session.save()
+        AnalyticsEvent.objects.create(name=name, path=request.path[:255],
+                                      session_key=request.session.session_key or "", meta=meta or {})
+    except Exception:
+        pass
+
+
+def autocomplete(request):
+    """JSON product suggestions for the search bar. Sanitised, limited, no 500."""
+    from django.http import JsonResponse
+    q = (request.GET.get("q") or "").strip()[:60]
+    if len(q) < 2:
+        return JsonResponse({"query": q, "results": []})
+    products = (Product.objects.filter(is_available=True)
+                .filter(Q(product_name__icontains=q) | Q(description__icontains=q)
+                        | Q(category__category_name__icontains=q))
+                .select_related("category")[:6])
+    sym = getattr(settings, "STORE_CURRENCY_SYMBOL", "€")
+    results = [{
+        "name": p.product_name,
+        "url": p.get_url(),
+        "price": f"{sym} {p.price}",
+        "category": p.category.category_name if p.category_id else "",
+        "image": p.cover_image() or "",
+    } for p in products]
+    return JsonResponse({"query": q, "results": results, "view_all": f"/store/search/?keyword={q}"})
+
+
+def faq(request):
+    """Site-wide General FAQ page, grouped by category and localised."""
+    from collections import OrderedDict
+    from store.models import GeneralFAQ
+    lang = (getattr(request, "LANGUAGE_CODE", "en") or "en")[:2]
+    groups = OrderedDict()
+    cat_labels = dict(GeneralFAQ.CATEGORY_CHOICES)
+    for f in GeneralFAQ.objects.filter(is_active=True):
+        groups.setdefault(f.category, {"label": cat_labels.get(f.category, f.category), "items": []})
+        groups[f.category]["items"].append({"q": f.question_for(lang), "a": f.answer_for(lang)})
+    return render(request, "store/faq.html", {"faq_groups": groups})
 
 
 def submit_review(request, product_id):

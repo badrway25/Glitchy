@@ -6,6 +6,7 @@ from django.contrib import admin
 from django.urls import include, path
 
 from . import views
+from store.views import faq as faq_view
 
 # Non-localized routes: admin, language switch, and machine/API endpoints
 # (n8n webhooks must have stable, prefix-free URLs).
@@ -23,6 +24,7 @@ urlpatterns = [
 # Localized, user-facing routes. English stays prefix-free; IT/FR get /it/, /fr/.
 urlpatterns += i18n_patterns(
     path("", views.home, name="home"),
+    path("faq/", faq_view, name="faq"),
     path("store/", include("store.urls")),
     path("cart/", include("carts.urls")),
     path("accounts/", include("accounts.urls")),
