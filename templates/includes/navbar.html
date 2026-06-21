@@ -5,9 +5,8 @@
     <div class="container">
 
       <!-- Brand -->
-      <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
-        <img src="{% static 'images/logo.png' %}" alt="{{ SITE_NAME }}" style="height:34px; width:auto;"
-             onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<span style=&quot;font-weight:700;font-size:1.25rem;letter-spacing:.5px&quot;>{{ SITE_NAME }}</span>')">
+      <a class="navbar-brand brand-word" href="{% url 'home' %}">
+        <span class="brand-mark" aria-hidden="true"></span>{{ SITE_NAME }}
       </a>
 
       <!-- Toggler -->

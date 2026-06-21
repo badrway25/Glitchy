@@ -2,7 +2,7 @@
 {% get_current_language as CUR_LANG %}
 {% get_available_languages as ALL_LANGS %}
 <div class="dropdown lang-switcher">
-  <button class="nav-icon dropdown-toggle" type="button" id="langDrop" data-toggle="dropdown"
+  <button class="lang-pill dropdown-toggle" type="button" id="langDrop" data-toggle="dropdown"
           aria-haspopup="true" aria-expanded="false" title="{% trans 'Language' %}">
     <i class="fa fa-globe"></i>
     <span class="lang-code">{{ CUR_LANG|upper }}</span>
