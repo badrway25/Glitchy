@@ -58,3 +58,8 @@ audit-*.png
 
 # Phase 10 final review screenshots
 final-*.png
+
+# Phase 11 screenshots
+regression-*.png
+bug-*.png
+fixed-*.png
