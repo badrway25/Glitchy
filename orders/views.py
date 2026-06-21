@@ -482,6 +482,19 @@ def place_order(request, total=0, quantity=0):
     data.order_number = current_date + str(data.id)
     data.save(update_fields=["order_number"])
 
+    # Apply a session coupon (re-validated at checkout, anti-abuse enforced).
+    try:
+        from promotions.services import record_redemption, SESSION_KEY
+        code = request.session.get(SESSION_KEY)
+        discount = record_redemption(request, data, totals.items_subtotal)
+        if discount and discount > 0:
+            data.discount = float(discount)
+            data.coupon_code = (code or "")[:32]
+            data.order_total = max(0.0, float(totals.grand_total) - float(discount))
+            data.save(update_fields=["discount", "coupon_code", "order_total"])
+    except Exception:
+        pass
+
     # Save/update default address (authed only)
     if request.POST.get("save_address") and is_authed:
         payload = dict(
@@ -505,7 +518,9 @@ def place_order(request, total=0, quantity=0):
         "total": totals.items_subtotal,
         "tax": totals.tax,
         "shipping_cost": totals.shipping_cost,
-        "grand_total": totals.grand_total,
+        "discount": data.discount,
+        "coupon_code": data.coupon_code,
+        "grand_total": data.order_total,
     }
     return render(request, "orders/payments.html", context)
 

@@ -6,7 +6,7 @@ from .models import Coupon, CouponRedemption
 @admin.register(Coupon)
 class CouponAdmin(admin.ModelAdmin):
     list_display = ("code", "discount_type", "value", "is_active", "min_order_amount",
-                    "used_count", "usage_limit", "valid_to")
+                    "used_count", "usage_limit", "per_user_limit", "valid_to")
     list_filter = ("is_active", "discount_type")
     search_fields = ("code", "description")
     readonly_fields = ("used_count", "created_at")

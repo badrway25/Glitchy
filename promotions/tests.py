@@ -77,3 +77,55 @@ class CouponServiceTests(TestCase):
         # re-validates from session
         coupon, disc = applied_coupon(req, 100)
         self.assertEqual(disc, Decimal("10.00"))
+
+
+class CouponPerUserTests(TestCase):
+    def setUp(self):
+        from django.contrib.auth import get_user_model
+        self.User = get_user_model()
+        Coupon.objects.create(code="ONCE", discount_type="percent", value=Decimal("10"),
+                              per_user_limit=1)
+
+    def _user_req(self, email="u@example.com"):
+        from django.contrib.sessions.backends.db import SessionStore
+        u = self.User.objects.create_user(email=email, first_name="U", last_name="U",
+                                           username=email.split("@")[0], password="pw12345!")
+        u.is_active = True; u.save()
+
+        class Req:
+            user = u
+            session = SessionStore()
+        return Req()
+
+    def test_one_time_per_user_blocks_second_use(self):
+        from .models import CouponRedemption
+        from .services import apply
+        req = self._user_req()
+        # first use ok
+        self.assertTrue(apply(req, "ONCE", 100)["ok"])
+        # record a redemption for this user
+        c = Coupon.objects.get(code="ONCE")
+        CouponRedemption.objects.create(coupon=c, user=req.user, amount=Decimal("10"))
+        # second use rejected (already used)
+        r = apply(req, "ONCE", 100)
+        self.assertFalse(r["ok"])
+        self.assertIn("already used", r["message"].lower())
+
+    def test_guest_session_one_time(self):
+        from django.contrib.sessions.backends.db import SessionStore
+        from .models import CouponRedemption
+        from .services import apply
+
+        class Anon:
+            is_authenticated = False
+
+        class Req:
+            user = Anon()
+            session = SessionStore()
+        req = Req()
+        req.session.save()
+        c = Coupon.objects.get(code="ONCE")
+        self.assertTrue(apply(req, "ONCE", 100)["ok"])
+        CouponRedemption.objects.create(coupon=c, session_key=req.session.session_key,
+                                        amount=Decimal("10"))
+        self.assertFalse(apply(req, "ONCE", 100)["ok"])

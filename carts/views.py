@@ -254,7 +254,12 @@ def checkout(request, total=0, quantity=0, cart_items=None):
     total = totals.items_subtotal
     quantity = totals.quantity
     tax = totals.tax
-    grand_total = totals.grand_total
+
+    # Re-validate the session coupon against the live subtotal (anti-abuse + min order).
+    from decimal import Decimal
+    from promotions.services import applied_coupon
+    coupon, discount = applied_coupon(request, totals.items_subtotal)
+    grand_total = float(max(Decimal("0"), Decimal(str(totals.grand_total)) - discount))
 
     # Guests check out without an account; no saved addresses.
     if not request.user.is_authenticated:
@@ -268,6 +273,7 @@ def checkout(request, total=0, quantity=0, cart_items=None):
             "tax": tax, "grand_total": grand_total, "shipping_cost": totals.shipping_cost,
             "shipping_quote": totals.shipping_quote, "prefill": prefill,
             "addresses": [], "default_addr": None, "is_guest": True,
+            "coupon": coupon, "discount": discount,
         }
         return render(request, "store/checkout.html", context)
 
@@ -336,5 +342,6 @@ def checkout(request, total=0, quantity=0, cart_items=None):
         "addresses": addresses,
         "default_addr": default_addr,
         "is_guest": False,
+        "coupon": coupon, "discount": discount,
     }
     return render(request, "store/checkout.html", context)

@@ -44,7 +44,9 @@ class Order(models.Model):
     currency = models.CharField(max_length=3, default="EUR")
     items_subtotal = models.FloatField(default=0.0)
     shipping_cost = models.FloatField(default=0.0)      # charged to customer
-    order_total = models.FloatField()                   # grand total (subtotal + tax + shipping)
+    discount = models.FloatField(default=0.0)           # coupon discount applied
+    coupon_code = models.CharField(max_length=32, blank=True, default="")
+    order_total = models.FloatField()                   # grand total (subtotal + tax + shipping − discount)
     tax = models.FloatField()
 
     # --- Our costs (for margin tracking) ---
