@@ -624,10 +624,14 @@ img{max-width:100%;}
 }
 @media (max-width:575.98px){
   .footer-news-title{font-size:1.25rem;}
-  .news-field{flex-wrap:wrap;gap:8px;padding:10px;}
+  /* Decompose the white pill: input is its own clean field, the SUBSCRIBE button
+     is a separate full-width button BELOW it (not inside the input). */
+  .news-field{flex-direction:column;align-items:stretch;gap:10px;
+    background:transparent!important;box-shadow:none!important;padding:0!important;border-radius:0!important;}
   .news-field .news-icon{display:none;}
-  .news-input{flex:1 1 100%;text-align:center;padding:.55rem .5rem;}
-  .news-btn{flex:1 1 100%;justify-content:center;}
+  .news-input{width:100%;background:#fff;border:1px solid rgba(0,0,0,.1);
+    border-radius:var(--radius-sm);text-align:left;padding:.85rem 1rem;font-size:.95rem;}
+  .news-btn{width:100%;justify-content:center;border-radius:var(--radius-sm);padding:.85rem;}
   .footer-premium .footer-social{justify-content:flex-start;}
 }
 
@@ -867,3 +871,13 @@ body.has-sticky-cta .ai-assistant{bottom:78px;}
 .store-empty-ic{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;margin:0 auto 1rem;
   background:var(--surface-2);color:var(--accent-2);}
 .store-empty h3{font-size:1.4rem;}
+
+/* Store toolbar: keep Sort + Reset compact & horizontal on mobile (Reset was
+   wrapping icon-over-text and rendering oversized). */
+@media (max-width:575.98px){
+  .store-actions{align-items:center;gap:.5rem;flex-wrap:wrap;}
+  .store-actions .btn,.store-actions .sort-btn{height:44px;padding:0 .9rem!important;
+    font-size:.78rem;white-space:nowrap;display:inline-flex!important;align-items:center;
+    justify-content:center;line-height:1;}
+  .store-actions .btn .fa,.store-actions .sort-btn .fa{margin-right:.4rem;}
+}
