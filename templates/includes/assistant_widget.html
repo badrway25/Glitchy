@@ -1,0 +1,62 @@
+{% load i18n static uikit %}
+{% if AI_ASSISTANT_ENABLED %}
+<div id="aiAssistant" class="ai-assistant" data-csrf="{{ csrf_token }}" aria-live="polite">
+
+  <!-- Floating button -->
+  <button id="aiToggle" class="ai-fab" type="button" aria-haspopup="dialog" aria-expanded="false"
+          aria-label="{% trans 'Open shopping assistant' %}">
+    <span class="ai-fab-icon ai-icon-chat">{% icon "headset" "ic" 22 %}</span>
+    <span class="ai-fab-icon ai-icon-close">{% icon "close" "ic" 22 %}</span>
+    <span class="ai-fab-badge">{% trans "Ask" %}</span>
+  </button>
+
+  <!-- Chat panel -->
+  <div id="aiPanel" class="ai-panel" role="dialog" aria-modal="false"
+       aria-label="{% trans 'Shopping assistant' %}" hidden>
+    <div class="ai-head">
+      <div class="ai-head-brand">
+        <span class="ai-head-dot"></span>
+        <div>
+          <div class="ai-head-title">{{ SITE_NAME }} {% trans "Assistant" %}</div>
+          <div class="ai-head-sub">{% trans "Answers from our store & policies" %}</div>
+        </div>
+      </div>
+      <button class="ai-head-close" type="button" data-ai-close aria-label="{% trans 'Close' %}">
+        {% icon "close" "ic" 18 %}
+      </button>
+    </div>
+
+    <div id="aiMessages" class="ai-messages"></div>
+
+    <div id="aiQuick" class="ai-quick" hidden></div>
+
+    <form id="aiForm" class="ai-input" autocomplete="off">
+      <input id="aiText" type="text" maxlength="600"
+             placeholder="{% trans 'Ask about shipping, returns, sizes…' %}"
+             aria-label="{% trans 'Your question' %}" required>
+      <button class="ai-send" type="submit" aria-label="{% trans 'Send' %}">
+        {% icon "arrow-right" "ic" 18 %}
+      </button>
+    </form>
+
+    <div class="ai-foot">
+      {% trans "AI answers may be imperfect — verify important details." %}
+    </div>
+  </div>
+
+  <!-- localized strings for JS -->
+  <script type="application/json" id="aiI18n">{
+    "thinking": "{% trans 'Thinking…' %}",
+    "error": "{% trans 'Something went wrong. Please try again.' %}",
+    "helpful": "{% trans 'Was this helpful?' %}",
+    "yes": "{% trans 'Yes' %}",
+    "no": "{% trans 'No' %}",
+    "thanks": "{% trans 'Thanks for your feedback.' %}",
+    "contactSupport": "{% trans 'Contact support' %}",
+    "supportSent": "{% trans 'Your request was sent. Our team will get back to you.' %}",
+    "emailPrompt": "{% trans 'Leave your email and we will get back to you:' %}",
+    "send": "{% trans 'Send' %}"
+  }</script>
+</div>
+<script src="{% static 'js/assistant.js' %}?v={{ ASSET_VERSION }}" defer></script>
+{% endif %}

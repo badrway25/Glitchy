@@ -729,3 +729,88 @@ img{max-width:100%;}
 @media (max-width:991.98px){
   html,body{overflow-x:hidden;max-width:100%;}
 }
+
+/* ============================================================================
+   CONTEXTUAL AI ASSISTANT WIDGET (Phase 15)
+   ============================================================================ */
+.ai-assistant{position:fixed;right:20px;bottom:20px;z-index:1150;font-family:var(--font-ui);}
+
+/* Floating button */
+.ai-fab{position:relative;display:inline-flex;align-items:center;gap:.5rem;height:56px;
+  padding:0 18px 0 16px;border:none;border-radius:var(--radius-pill);cursor:pointer;
+  background:var(--primary);color:#fff;box-shadow:0 14px 34px rgba(28,26,23,.30);
+  transition:transform var(--tr),background var(--tr),box-shadow var(--tr);}
+.ai-fab:hover{transform:translateY(-2px);background:var(--accent);box-shadow:0 18px 40px rgba(166,130,76,.35);}
+.ai-fab:focus-visible{outline:none;box-shadow:0 0 0 .2rem rgba(202,165,106,.55);}
+.ai-fab-icon{display:inline-flex;transition:opacity .2s var(--ease),transform .2s var(--ease);}
+.ai-fab .ai-icon-close{position:absolute;left:16px;opacity:0;transform:scale(.6) rotate(-30deg);}
+.ai-assistant.is-open .ai-icon-chat{opacity:0;transform:scale(.6);}
+.ai-assistant.is-open .ai-icon-close{opacity:1;transform:none;}
+.ai-fab-badge{font-weight:700;font-size:.82rem;letter-spacing:.05em;text-transform:uppercase;}
+.ai-assistant.is-open .ai-fab-badge{opacity:0;width:0;overflow:hidden;}
+@keyframes ai-fab-in{from{opacity:0;transform:translateY(16px) scale(.9);}to{opacity:1;transform:none;}}
+.js-anim .ai-fab{animation:ai-fab-in .5s var(--ease) both;}
+
+/* Panel */
+.ai-panel{position:absolute;right:0;bottom:72px;width:380px;max-width:calc(100vw - 40px);
+  height:560px;max-height:calc(100vh - 110px);display:flex;flex-direction:column;overflow:hidden;
+  background:var(--surface);border:var(--border);border-radius:18px;box-shadow:0 30px 70px rgba(28,26,23,.28);
+  transform-origin:bottom right;animation:ai-panel-in .26s var(--ease);}
+@keyframes ai-panel-in{from{opacity:0;transform:translateY(14px) scale(.97);}to{opacity:1;transform:none;}}
+.ai-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;
+  background:var(--primary);color:#fff;}
+.ai-head-brand{display:flex;align-items:center;gap:10px;}
+.ai-head-dot{width:9px;height:9px;border-radius:50%;background:#5fd08a;box-shadow:0 0 0 3px rgba(95,208,138,.25);flex:0 0 auto;}
+.ai-head-title{font-family:var(--font-display);font-weight:700;font-size:.98rem;letter-spacing:-.01em;}
+.ai-head-sub{font-size:.72rem;color:rgba(255,255,255,.7);}
+.ai-head-close{background:rgba(255,255,255,.12);border:none;color:#fff;width:30px;height:30px;
+  border-radius:50%;display:grid;place-items:center;cursor:pointer;transition:background var(--tr);}
+.ai-head-close:hover{background:rgba(255,255,255,.24);}
+
+.ai-messages{flex:1 1 auto;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;
+  background:linear-gradient(180deg,var(--surface-2),var(--surface));}
+.ai-msg{display:flex;}
+.ai-msg-user{justify-content:flex-end;}
+.ai-bubble{max-width:84%;padding:.7rem .9rem;border-radius:14px;font-size:.9rem;line-height:1.5;
+  white-space:pre-wrap;word-wrap:break-word;}
+.ai-msg-assistant .ai-bubble{background:var(--surface);border:var(--border);color:var(--text);border-bottom-left-radius:4px;}
+.ai-msg-user .ai-bubble{background:var(--primary);color:#fff;border-bottom-right-radius:4px;}
+.ai-msg.is-thinking .ai-bubble{color:var(--muted);font-style:italic;}
+
+.ai-quick{padding:0 16px 8px;display:flex;flex-wrap:wrap;gap:8px;}
+.ai-chip{background:var(--surface);border:var(--border);border-radius:var(--radius-pill);
+  padding:.45rem .8rem;font-size:.8rem;color:var(--text);cursor:pointer;transition:all var(--tr);}
+.ai-chip:hover{border-color:var(--accent);color:var(--accent-2);transform:translateY(-1px);}
+
+.ai-fb{display:flex;align-items:center;gap:8px;margin-top:8px;}
+.ai-fb-label{font-size:.74rem;color:var(--muted);}
+.ai-fb-btn{background:transparent;border:var(--border);border-radius:var(--radius-pill);
+  font-size:.74rem;padding:.2rem .6rem;cursor:pointer;color:var(--text);}
+.ai-fb-btn:hover{border-color:var(--accent);color:var(--accent-2);}
+.ai-support{flex-direction:column;}
+.ai-support-form{display:flex;gap:8px;margin-top:8px;width:100%;}
+.ai-support-email{flex:1;border:var(--border);border-radius:var(--radius-sm);padding:.5rem .7rem;font-size:.85rem;}
+
+.ai-input{display:flex;gap:8px;padding:12px;border-top:var(--border);background:var(--surface);}
+.ai-input input{flex:1;border:var(--border);border-radius:var(--radius-pill);padding:.65rem 1rem;
+  font-size:.9rem;background:var(--surface-2);transition:border-color var(--tr),background var(--tr);}
+.ai-input input:focus{outline:none;border-color:var(--accent);background:var(--surface);box-shadow:var(--focus-ring);}
+.ai-send{flex:0 0 auto;width:42px;height:42px;border:none;border-radius:50%;background:var(--primary);
+  color:#fff;display:grid;place-items:center;cursor:pointer;transition:background var(--tr),transform var(--tr);}
+.ai-send:hover{background:var(--accent);transform:translateY(-1px);}
+.ai-foot{padding:8px 14px;font-size:.66rem;color:var(--muted);text-align:center;border-top:var(--border);background:var(--surface);}
+
+/* Keep the FAB clear of the PDP mobile sticky add-to-cart bar */
+body.has-sticky-cta .ai-assistant{bottom:78px;}
+
+@media (max-width:575.98px){
+  .ai-assistant{right:14px;bottom:14px;}
+  body.has-sticky-cta .ai-assistant{bottom:74px;}
+  .ai-panel{position:fixed;right:0;left:0;bottom:0;top:auto;width:100vw;max-width:100vw;
+    height:80vh;max-height:84vh;border-radius:18px 18px 0 0;}
+  .ai-fab{height:52px;}
+}
+@media (prefers-reduced-motion:reduce){
+  .js-anim .ai-fab,.ai-panel{animation:none!important;}
+  .ai-fab-icon{transition:none!important;}
+}

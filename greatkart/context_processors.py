@@ -29,4 +29,5 @@ def site_globals(request):
         "PAYPAL_CLIENT_ID": getattr(settings, "PAYPAL_CLIENT_ID", ""),
         "PAYPAL_CURRENCY": getattr(settings, "PAYPAL_CURRENCY", "EUR"),
         "SUPPORT_EMAIL": getattr(settings, "SUPPORT_EMAIL", ""),
+        "AI_ASSISTANT_ENABLED": getattr(settings, "AI_ASSISTANT_ENABLED", False),
     }
