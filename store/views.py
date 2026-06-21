@@ -70,6 +70,11 @@ def product_detail(request, category_slug, product_slug):
     shipping_quote = fallback_quote(detect_country(request), total_quantity=1,
                                     subtotal=single_product.price)
 
+    # Recently viewed (session) — record THIS product, fetch the previous ones.
+    from storefront.recently import record_view, get_recently_viewed
+    recently_viewed = get_recently_viewed(request, exclude_id=single_product.id, limit=4)
+    record_view(request, single_product.id)
+
     # "You may also like" — same category first, topped up with other products.
     related = list(Product.objects.filter(is_available=True, category=single_product.category)
                    .exclude(id=single_product.id).prefetch_related("gallery")[:4])
@@ -87,6 +92,7 @@ def product_detail(request, category_slug, product_slug):
         'reviews': reviews,
         'shipping_quote': shipping_quote,
         'related_products': related,
+        'recently_viewed': recently_viewed,
     }
     return render(request, 'store/product_detail.html', context)
 

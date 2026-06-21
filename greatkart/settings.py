@@ -88,6 +88,7 @@ INSTALLED_APPS = [
     "returns",
     "notifications",
     "assistant",
+    "storefront",
     # Third party
     "stripe",
 ]
@@ -121,6 +122,7 @@ TEMPLATES = [
                 "carts.context_processors.counter",
                 "shipping.context_processors.shipping_context",
                 "greatkart.context_processors.site_globals",
+                "storefront.context_processors.announcement",
             ],
         },
     },
