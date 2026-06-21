@@ -9,7 +9,7 @@ def _asset_version():
     """Cache-busting token = newest mtime of our custom css/js assets."""
     latest = 0
     for rel in ("css/premium.css", "css/theme.css", "js/premium.js",
-                "js/theme.js", "js/script.js"):
+                "js/theme.js", "js/script.js", "js/assistant.js", "js/storefront.js"):
         try:
             latest = max(latest, int(os.path.getmtime(os.path.join(_ASSET_BASE, rel))))
         except OSError:

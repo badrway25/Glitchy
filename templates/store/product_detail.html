@@ -17,7 +17,7 @@
     </nav>
 
     <!-- Product -->
-    <div class="pdp-card">
+    <div class="pdp-card" data-track-product="{{ single_product.id }}">
       <div class="row no-gutters">
 
         <aside class="col-md-6 pdp-media">
@@ -173,7 +173,12 @@
 
   <!-- Size -->
   <div>
-    <label class="mb-2" style="font-weight:700;">{% trans "Size" %}</label>
+    <div class="d-flex align-items-center justify-content-between mb-2">
+      <label class="mb-0" style="font-weight:700;">{% trans "Size" %}</label>
+      <button type="button" class="size-guide-link" data-size-guide-open data-sg-target="#sizeGuide">
+        {% icon "ruler" "ic" 15 %} {% trans "Size guide" %}
+      </button>
+    </div>
 
     {% if single_product.variation_set.sizes %}
       <input type="hidden" name="size" id="sizeInput" required>
@@ -454,9 +459,95 @@
   </div>
 </div>
 
+  {% if recently_viewed %}
+  <section class="recently-viewed container" style="max-width:1280px;">
+    <div class="lux-eyebrow mb-1">{% trans "Keep browsing" %}</div>
+    <h3 class="section-title mb-3">{% trans "Recently viewed" %}</h3>
+    <div class="rv-grid">
+      {% for p in recently_viewed %}
+        <div class="ymal-card">
+          <a href="{{ p.get_url }}" class="p-media d-block" style="aspect-ratio:1/1;">
+            <img src="{% if p.cover_image %}{{ p.cover_image }}{% else %}{% static 'images/placeholder.png' %}{% endif %}"
+                 alt="{{ p.product_name }}" loading="lazy" decoding="async"
+                 style="width:100%;height:100%;object-fit:cover;">
+          </a>
+          <div class="p-3">
+            <a href="{{ p.get_url }}" class="product-title d-block mb-1" style="font-size:.9rem;">{{ p.product_name|truncatechars:40 }}</a>
+            <div class="price" style="font-size:1rem;">{{ CURRENCY_SYMBOL }} {{ p.price }}</div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
 </div>  <!-- /container -->
 </div>  <!-- /container-fluid -->
 </section>
+
+<!-- Size guide modal -->
+<div class="sg-backdrop" data-sg-backdrop></div>
+<div class="sg-modal" id="sizeGuide" role="dialog" aria-modal="true" aria-label="{% trans 'Size guide' %}">
+  <div class="sg-head">
+    <h4>{% trans "Size guide" %}</h4>
+    <button type="button" class="sg-close" data-sg-close aria-label="{% trans 'Close' %}">&times;</button>
+  </div>
+  <div class="sg-body">
+    <p class="text-muted" style="font-size:.88rem;">{% trans "Measurements are approximate (cm). If you're between sizes, we suggest sizing up." %}</p>
+    <table class="sg-table">
+      <thead><tr><th>{% trans "Size" %}</th><th>{% trans "Chest" %}</th><th>{% trans "Length" %}</th><th>{% trans "Sleeve" %}</th></tr></thead>
+      <tbody>
+        <tr><td>XS</td><td>46</td><td>66</td><td>20</td></tr>
+        <tr><td>S</td><td>49</td><td>69</td><td>21</td></tr>
+        <tr><td>M</td><td>52</td><td>72</td><td>22</td></tr>
+        <tr><td>L</td><td>55</td><td>74</td><td>23</td></tr>
+        <tr><td>XL</td><td>58</td><td>76</td><td>24</td></tr>
+        <tr><td>XXL</td><td>61</td><td>78</td><td>25</td></tr>
+      </tbody>
+    </table>
+    <p class="sg-note">{% blocktrans with d=RETURN_WINDOW_DAYS %}Not the right fit? Free returns within {{ d }} days.{% endblocktrans %}</p>
+  </div>
+</div>
+
+<!-- Structured data: Product + Breadcrumb (SEO) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "Product",
+  "name": "{{ single_product.product_name|escapejs }}",
+  "image": "{{ single_product.cover_image }}",
+  "description": "{{ single_product.description|default:single_product.product_name|escapejs }}",
+  "category": "{{ single_product.category.category_name|escapejs }}",
+  "offers": {
+    "@type": "Offer",
+    "price": "{{ single_product.price }}",
+    "priceCurrency": "{{ STRIPE_CURRENCY|default:'EUR'|upper }}",
+    "availability": "{% if single_product.stock > 0 and single_product.is_available %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type":"ListItem","position":1,"name":"{% trans 'Home' %}","item":"{{ request.scheme }}://{{ request.get_host }}{% url 'home' %}"},
+    {"@type":"ListItem","position":2,"name":"{% trans 'Store' %}","item":"{{ request.scheme }}://{{ request.get_host }}{% url 'store' %}"},
+    {"@type":"ListItem","position":3,"name":"{{ single_product.product_name|escapejs }}"}
+  ]
+}
+</script>
+<script>
+(function(){
+  var modal=document.getElementById('sizeGuide'), bd=document.querySelector('.sg-backdrop');
+  if(!modal) return;
+  function open(){modal.classList.add('is-open');bd.classList.add('is-open');}
+  function close(){modal.classList.remove('is-open');bd.classList.remove('is-open');}
+  document.querySelectorAll('[data-size-guide-open]').forEach(function(b){b.addEventListener('click',open);});
+  document.querySelectorAll('[data-sg-close],[data-sg-backdrop]').forEach(function(b){b.addEventListener('click',close);});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')close();});
+})();
+</script>
 
 <!-- Mobile sticky add-to-cart -->
 <div class="pdp-sticky-cta">

@@ -1,0 +1,14 @@
+{% load i18n %}
+{% if ANNOUNCEMENT %}
+<div class="announce-bar" id="announceBar" data-id="{{ ANNOUNCEMENT.id }}" role="region" aria-label="{% trans 'Announcement' %}">
+  <div class="announce-inner">
+    <span class="announce-text">{{ ANNOUNCEMENT.message }}</span>
+    {% if ANNOUNCEMENT.link_url and ANNOUNCEMENT.link_label %}
+      <a class="announce-link" href="{{ ANNOUNCEMENT.link_url }}">{{ ANNOUNCEMENT.link_label }} →</a>
+    {% endif %}
+  </div>
+  {% if ANNOUNCEMENT.dismissible %}
+    <button type="button" class="announce-close" data-announce-close aria-label="{% trans 'Dismiss' %}">&times;</button>
+  {% endif %}
+</div>
+{% endif %}

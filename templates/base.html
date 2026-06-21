@@ -9,6 +9,12 @@
 
   <title>{% block title %}{{ SITE_NAME }} — {{ SITE_TAGLINE }}{% endblock %}</title>
   <meta name="description" content="{% block meta_description %}{{ SITE_TAGLINE }}{% endblock %}">
+  <meta property="og:title" content="{% block og_title %}{{ SITE_NAME }} — {{ SITE_TAGLINE }}{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}{{ SITE_TAGLINE }}{% endblock %}">
+  <meta property="og:type" content="website">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"Organization","name":"{{ SITE_NAME }}","description":"{{ SITE_TAGLINE }}"}
+  </script>
 
   <link href="{% static 'images/favicon.ico' %}" rel="shortcut icon" type="image/x-icon">
 
@@ -39,6 +45,8 @@
 
 <body>
 
+  {% include 'includes/announcement_bar.html' %}
+
   {% include 'includes/navbar.html' %}
 
   {% block content %}{% endblock %}
@@ -53,6 +61,7 @@
   <script src="{% static 'js/script.js' %}?v={{ ASSET_VERSION }}"></script>
   <script src="{% static 'js/theme.js' %}?v={{ ASSET_VERSION }}"></script>
   <script src="{% static 'js/premium.js' %}?v={{ ASSET_VERSION }}"></script>
+  <script src="{% static 'js/storefront.js' %}?v={{ ASSET_VERSION }}"></script>
 
   {% block extra_js %}{% endblock %}
 
