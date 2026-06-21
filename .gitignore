@@ -66,3 +66,10 @@ fixed-*.png
 
 # Phase 12 acceptance screenshots
 acceptance-*.png
+
+# Phase 15 feature screenshots
+ai-*.png
+size-guide.png
+recently-viewed.png
+no-results-search.png
+announcement-bar.png
