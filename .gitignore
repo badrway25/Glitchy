@@ -51,3 +51,7 @@ rebrand-*.png
 # Visual polish screenshots
 polish-*.png
 deep-*.png
+
+# Phase 9 screenshots
+humanfix-*.png
+audit-*.png

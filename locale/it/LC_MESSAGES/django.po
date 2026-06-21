@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: greatkart 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-20 21:53+0200\n"
+"POT-Creation-Date: 2026-06-21 10:25+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -175,6 +175,7 @@ msgstr "Inserisci un indirizzo email valido."
 msgid "Thanks for subscribing! Check your inbox to confirm."
 msgstr "Grazie per l'iscrizione! Controlla la tua casella per confermare."
 "Grazie per l'iscrizione! Controlla la tua casella per confermare.Grazie per "
+"l'iscrizione! Controlla la tua casella per confermare.Grazie per "
 "l'iscrizione! Controlla la tua casella per confermare.Grazie per "
 "l'iscrizione! Controlla la tua casella di posta per confermare."
 
@@ -381,8 +382,9 @@ msgstr "Motivo del reso"
 msgid "Tell us why you'd like to return your order (optional)."
 msgstr "Dicci perché vuoi restituire il tuo ordine (facoltativo)."
 "Dicci perché vuoi restituire il tuo ordine (facoltativo).Dicci perché vuoi "
-"restituire il tuo ordine (facoltativo).Indicaci il motivo per cui desideri "
-"restituire il tuo ordine (facoltativo)."
+"restituire il tuo ordine (facoltativo).Dicci perché vuoi restituire il tuo "
+"ordine (facoltativo).Indicaci il motivo per cui desideri restituire il tuo "
+"ordine (facoltativo)."
 
 #: .\returns\forms.py:30
 msgid "Please enter the email used for this order."
@@ -544,7 +546,7 @@ msgstr "Panoramica"
 #: .\templates\accounts\_sidebar.html:19 .\templates\accounts\my_orders.html:4
 #: .\templates\accounts\my_orders.html:20
 #: .\templates\accounts\transactions.html:27
-#: .\templates\includes\navbar.html:98
+#: .\templates\includes\navbar.html:97
 msgid "My orders"
 msgstr "I miei ordini"
 
@@ -563,13 +565,13 @@ msgstr "Esci"
 #: .\templates\accounts\address_form.html:3
 #: .\templates\accounts\address_form.html:33
 msgid "Edit address"
-msgstr "Indirizzo email"
+msgstr "Modifica indirizzo"
 
 #: .\templates\accounts\address_form.html:3
 #: .\templates\accounts\address_list.html:23
 #: .\templates\accounts\address_list.html:75
 msgid "Add address"
-msgstr "Indirizzo email"
+msgstr "Aggiungi indirizzo"
 
 #: .\templates\accounts\address_form.html:33
 msgid "Add a new address"
@@ -598,7 +600,7 @@ msgstr "Annullato"
 #: .\templates\accounts\address_list.html:3
 #: .\templates\accounts\address_list.html:18
 msgid "My addresses"
-msgstr "Indirizzo email"
+msgstr "I miei indirizzi"
 
 #: .\templates\accounts\address_list.html:19
 msgid "Manage your saved delivery addresses."
@@ -632,7 +634,7 @@ msgstr "Usa indirizzo salvato"
 msgid "Add an address to speed up your next checkout."
 msgstr "Aggiungi un indirizzo per velocizzare il prossimo checkout."
 
-#: .\templates\accounts\dashboard.html:4 .\templates\includes\navbar.html:97
+#: .\templates\accounts\dashboard.html:4 .\templates\includes\navbar.html:96
 msgid "Dashboard"
 msgstr "Dashboard"
 
@@ -647,7 +649,7 @@ msgstr "Tieni traccia dei tuoi ordini, pagamenti e consegne."
 #: .\templates\accounts\dashboard.html:32
 #: .\templates\accounts\my_orders.html:25
 #: .\templates\accounts\transactions.html:51
-#: .\templates\includes\footer.html:36
+#: .\templates\includes\footer.html:55
 msgid "Shop"
 msgstr "Shop"
 
@@ -799,7 +801,7 @@ msgid "Already verified?"
 msgstr "Già verificato?"
 
 #: .\templates\accounts\login.html:16 .\templates\accounts\login.html:40
-#: .\templates\includes\navbar.html:103
+#: .\templates\includes\navbar.html:102
 msgid "Login"
 msgstr "Accedi"
 
@@ -933,7 +935,7 @@ msgstr "Crea password"
 msgid "Repeat password"
 msgstr "Ripeti password"
 
-#: .\templates\accounts\register.html:51 .\templates\includes\navbar.html:104
+#: .\templates\accounts\register.html:51 .\templates\includes\navbar.html:103
 msgid "Register"
 msgstr "Registrati"
 
@@ -1117,6 +1119,7 @@ msgid "Heavyweight, soft-touch materials chosen for comfort and longevity."
 msgstr "Materiali pesanti e dal tatto morbido, scelti per comfort e durata nel tempo."
 "Materiali pesanti e dal tatto morbido, scelti per comfort e durata nel "
 "tempo.Materiali pesanti e dal tatto morbido, scelti per comfort e durata nel "
+"tempo.Materiali pesanti e dal tatto morbido, scelti per comfort e durata nel "
 "tempo."
 
 #: .\templates\home.html:97
@@ -1157,10 +1160,8 @@ msgstr ""
 "sola.”"
 
 #: .\templates\home.html:128
-#, fuzzy
-#| msgid "Premium, ethically printed"
 msgid "Premium fabrics, carefully finished"
-msgstr "Premium, stampa etica"
+msgstr "Tessuti premium, finiture curate"
 
 #: .\templates\home.html:131
 msgid "Crafted, not churned"
@@ -1177,10 +1178,8 @@ msgid ""
 msgstr ""
 
 #: .\templates\home.html:134
-#, fuzzy
-#| msgid "Shop the collection"
 msgid "Explore the collection"
-msgstr "Scopri la collezione"
+msgstr "Esplora la collezione"
 
 #: .\templates\home.html:145
 msgid "Latest arrivals"
@@ -1198,16 +1197,46 @@ msgstr "Scopri le novità"
 msgid "Bestseller"
 msgstr "Bestseller"
 
-#: .\templates\includes\country_switcher.html:6 .\templates\store\cart.html:147
-#: .\templates\store\checkout.html:187
-msgid "Ship to"
-msgstr "Spedisci in"
-
-#: .\templates\includes\country_switcher.html:9
+#: .\templates\includes\country_switcher.html:7
 msgid "Shipping country"
 msgstr "Paese di spedizione"
 
+#: .\templates\includes\footer.html:10
+msgid "Stay in the loop"
+msgstr "Resta aggiornato"
+
+#: .\templates\includes\footer.html:11
+#, python-format
+msgid "Join the list — early drops & 10%% off"
+msgstr "Iscriviti — anteprime e 10%% di sconto"
+
+#: .\templates\includes\footer.html:12
+msgid ""
+"New arrivals, members-only offers and styling notes. No spam, unsubscribe "
+"anytime."
+msgstr ""
+
 #: .\templates\includes\footer.html:19
+msgid "Enter your email address"
+msgstr "Inserisci il tuo indirizzo email"
+
+#: .\templates\includes\footer.html:19
+msgid "Email address"
+msgstr "Indirizzo email"
+
+#: .\templates\includes\footer.html:21
+msgid "Subscribe"
+msgstr "Iscriviti"
+
+#: .\templates\includes\footer.html:25
+msgid "By subscribing, you agree to our"
+msgstr "Iscrivendoti, accetti la nostra"
+
+#: .\templates\includes\footer.html:25
+msgid "Privacy Policy"
+msgstr "Informativa sulla privacy"
+
+#: .\templates\includes\footer.html:43
 msgid ""
 "Curated essentials, designed for everyday comfort. Premium quality, fast "
 "shipping, easy returns."
@@ -1215,48 +1244,48 @@ msgstr ""
 "Essenziali selezionati, pensati per il comfort di ogni giorno. Qualità "
 "premium, spedizione rapida, resi facili."
 
-#: .\templates\includes\footer.html:38
+#: .\templates\includes\footer.html:57
 msgid "All Products"
 msgstr "Tutti i prodotti"
 
-#: .\templates\includes\footer.html:39
+#: .\templates\includes\footer.html:58
 msgid "New Arrivals"
 msgstr "Nuovi arrivi"
 
-#: .\templates\includes\footer.html:40
+#: .\templates\includes\footer.html:59
 msgid "Best Sellers"
 msgstr "Bestseller"
 
-#: .\templates\includes\footer.html:45
+#: .\templates\includes\footer.html:64
 msgid "Company"
 msgstr "Azienda"
 
-#: .\templates\includes\footer.html:47
+#: .\templates\includes\footer.html:66
 msgid "About"
 msgstr "Chi siamo"
 
-#: .\templates\includes\footer.html:48
+#: .\templates\includes\footer.html:67
 msgid "Sustainability"
 msgstr "Sostenibilità"
 
-#: .\templates\includes\footer.html:49
+#: .\templates\includes\footer.html:68
 msgid "Press"
 msgstr "Stampa"
 
-#: .\templates\includes\footer.html:54
+#: .\templates\includes\footer.html:73
 msgid "Support"
 msgstr "Assistenza"
 
-#: .\templates\includes\footer.html:56
+#: .\templates\includes\footer.html:75
 msgid "Contact"
 msgstr "Contatti"
 
-#: .\templates\includes\footer.html:57 .\templates\returns\policy.html:3
+#: .\templates\includes\footer.html:76 .\templates\returns\policy.html:3
 #: .\templates\returns\policy.html:11 .\templates\returns\policy.html:15
 msgid "Returns & refunds"
 msgstr "Resi e rimborsi"
 
-#: .\templates\includes\footer.html:58
+#: .\templates\includes\footer.html:77
 #: .\templates\notifications\email\transactional.html:89
 #: .\templates\orders\payments.html:115 .\templates\store\cart.html:137
 #: .\templates\store\checkout.html:178
@@ -1264,60 +1293,45 @@ msgstr "Resi e rimborsi"
 msgid "Shipping"
 msgstr "Spedizione"
 
-#: .\templates\includes\footer.html:64
-msgid "Newsletter"
-msgstr "Newsletter"
+#: .\templates\includes\footer.html:83 .\templates\store\cart.html:147
+#: .\templates\store\checkout.html:187
+msgid "Ship to"
+msgstr "Spedisci in"
 
-#: .\templates\includes\footer.html:69
-msgid "Email address"
-msgstr "Indirizzo email"
-
-#: .\templates\includes\footer.html:70
-msgid "Subscribe"
-msgstr "Iscriviti"
-
-#: .\templates\includes\footer.html:75
-msgid "By subscribing, you agree to our"
-msgstr "Iscrivendoti, accetti la nostra"
-
-#: .\templates\includes\footer.html:75
-msgid "Privacy Policy"
-msgstr "Informativa sulla privacy"
-
-#: .\templates\includes\footer.html:83
+#: .\templates\includes\footer.html:90
 msgid "Store benefits"
 msgstr "Vantaggi dello store"
 
-#: .\templates\includes\footer.html:84
+#: .\templates\includes\footer.html:91
 msgid "Fast Shipping"
 msgstr "Spedizione rapida"
 
-#: .\templates\includes\footer.html:85
+#: .\templates\includes\footer.html:92
 #, python-format
 msgid "%(d)s-Day Returns"
 msgstr "Resi entro %(d)s giorni"
 
-#: .\templates\includes\footer.html:86
+#: .\templates\includes\footer.html:93
 msgid "Secure Checkout"
 msgstr "Pagamento sicuro"
 
-#: .\templates\includes\footer.html:87 .\templates\store\cart.html:173
+#: .\templates\includes\footer.html:94 .\templates\store\cart.html:173
 msgid "Support 7/7"
 msgstr "Assistenza 7/7"
 
-#: .\templates\includes\footer.html:94
+#: .\templates\includes\footer.html:101
 msgid "All rights reserved."
 msgstr "Tutti i diritti riservati."
 
-#: .\templates\includes\footer.html:98
+#: .\templates\includes\footer.html:104
 msgid "Terms"
 msgstr "Termini"
 
-#: .\templates\includes\footer.html:100
+#: .\templates\includes\footer.html:106
 msgid "Privacy"
 msgstr "Privacy"
 
-#: .\templates\includes\footer.html:102 .\templates\returns\request.html:11
+#: .\templates\includes\footer.html:108 .\templates\returns\request.html:11
 #: .\templates\store\product_detail.html:244
 msgid "Returns"
 msgstr "Resi"
@@ -1327,49 +1341,49 @@ msgstr "Resi"
 msgid "Language"
 msgstr "Lingua"
 
-#: .\templates\includes\navbar.html:15
+#: .\templates\includes\navbar.html:14
 msgid "Toggle navigation"
 msgstr "Apri/chiudi navigazione"
 
-#: .\templates\includes\navbar.html:25 .\templates\store\product_detail.html:14
+#: .\templates\includes\navbar.html:24 .\templates\store\product_detail.html:14
 #: .\templates\store\store.html:4 .\templates\store\store.html:25
 msgid "Store"
 msgstr "Store"
 
-#: .\templates\includes\navbar.html:30 .\templates\store\store.html:168
+#: .\templates\includes\navbar.html:29 .\templates\store\store.html:168
 msgid "Categories"
 msgstr "Categorie"
 
-#: .\templates\includes\navbar.html:33
+#: .\templates\includes\navbar.html:32
 msgid "Browse categories"
 msgstr "Esplora le categorie"
 
-#: .\templates\includes\navbar.html:39 .\templates\store\store.html:33
+#: .\templates\includes\navbar.html:38 .\templates\store\store.html:33
 #: .\templates\store\store.html:174
 msgid "All products"
 msgstr "Tutti i prodotti"
 
-#: .\templates\includes\navbar.html:56
+#: .\templates\includes\navbar.html:55
 msgid "No categories available"
 msgstr "Nessuna categoria disponibile"
 
-#: .\templates\includes\navbar.html:68
+#: .\templates\includes\navbar.html:67
 msgid "Search products, categories…"
 msgstr "Cerca prodotti, categorie…"
 
-#: .\templates\includes\navbar.html:80
+#: .\templates\includes\navbar.html:79
 msgid "Theme"
 msgstr "Tema"
 
-#: .\templates\includes\navbar.html:88
+#: .\templates\includes\navbar.html:87
 msgid "Account"
 msgstr "Account"
 
-#: .\templates\includes\navbar.html:99
+#: .\templates\includes\navbar.html:98
 msgid "Logout"
 msgstr "Esci"
 
-#: .\templates\includes\navbar.html:108
+#: .\templates\includes\navbar.html:107
 msgid "Cart"
 msgstr "Carrello"
 
@@ -1405,6 +1419,7 @@ msgstr "Ecco un aggiornamento sul tuo ordine <strong>#%(n)s</strong>."
 msgid "We have received your return request and our team is reviewing it."
 msgstr "Abbiamo ricevuto la tua richiesta di reso e il nostro team la sta esaminando."
 "Abbiamo ricevuto la tua richiesta di reso e il nostro team la sta "
+"esaminando.Abbiamo ricevuto la tua richiesta di reso e il nostro team la sta "
 "esaminando.Abbiamo ricevuto la tua richiesta di reso e il nostro team la sta "
 "esaminando.Abbiamo ricevuto la tua richiesta di reso e il nostro team la sta "
 "esaminando."
@@ -1490,6 +1505,7 @@ msgstr "Vedi lo stato del reso"
 msgid "Not quite right? You can return your order within %(d)s days."
 msgstr "Non è quello che cercavi? Puoi restituire il tuo ordine entro %(d)s giorni."
 "Non è quello che cercavi? Puoi restituire il tuo ordine entro %(d)s "
+"giorni.Non è quello che cercavi? Puoi restituire il tuo ordine entro %(d)s "
 "giorni.Non è quello che cercavi? Puoi restituire il tuo ordine entro %(d)s "
 "giorni.Non è proprio quello che cercavi? Puoi restituire il tuo ordine entro "
 "%(d)s giorni."
@@ -1671,6 +1687,7 @@ msgid "We review your request and email you the next steps."
 msgstr "Esaminiamo la tua richiesta e ti inviamo i passaggi successivi via email."
 "Esaminiamo la tua richiesta e ti inviamo i passaggi successivi via "
 "email.Esaminiamo la tua richiesta e ti inviamo i passaggi successivi via "
+"email.Esaminiamo la tua richiesta e ti inviamo i passaggi successivi via "
 "email.Esaminiamo la tua richiesta e ti inviamo via email i passaggi "
 "successivi."
 
@@ -1698,7 +1715,8 @@ msgid "Need help? Contact our support team and we'll be glad to assist."
 msgstr "Hai bisogno di aiuto? Contatta il nostro team di supporto, saremo lieti di aiutarti."
 "Hai bisogno di aiuto? Contatta il nostro team di supporto, saremo lieti di "
 "aiutarti.Hai bisogno di aiuto? Contatta il nostro team di supporto, saremo "
-"lieti di aiutarti.Hai bisogno di aiuto? Contatta il nostro team di "
+"lieti di aiutarti.Hai bisogno di aiuto? Contatta il nostro team di supporto, "
+"saremo lieti di aiutarti.Hai bisogno di aiuto? Contatta il nostro team di "
 "assistenza, saremo lieti di aiutarti."
 
 #: .\templates\returns\policy.html:55
@@ -1902,6 +1920,7 @@ msgid "Pick one to autofill your billing details."
 msgstr "Selezionane uno per compilare automaticamente i dati di fatturazione."
 "Selezionane uno per compilare automaticamente i dati di "
 "fatturazione.Selezionane uno per compilare automaticamente i dati di "
+"fatturazione.Selezionane uno per compilare automaticamente i dati di "
 "fatturazione.Selezionane uno per compilare automaticamente i tuoi dati di "
 "fatturazione."
 
@@ -1966,7 +1985,8 @@ msgid "We don't ship to this country yet — choose another at checkout."
 msgstr "Non spediamo ancora in questo paese — scegline un altro al checkout."
 "Non spediamo ancora in questo paese — scegline un altro al checkout.Non "
 "spediamo ancora in questo paese — scegline un altro al checkout.Non spediamo "
-"ancora in questo Paese — scegline un altro al momento del pagamento."
+"ancora in questo paese — scegline un altro al checkout.Non spediamo ancora "
+"in questo Paese — scegline un altro al momento del pagamento."
 
 #: .\templates\store\checkout.html:197
 msgid "Continue to payment"
@@ -2083,10 +2103,8 @@ msgid "Free returns within %(d)s days"
 msgstr "Resi gratuiti entro %(d)s giorni"
 
 #: .\templates\store\product_detail.html:261
-#, fuzzy
-#| msgid "Completed"
 msgid "Complete the look"
-msgstr "Completato"
+msgstr "Completa il look"
 
 #: .\templates\store\product_detail.html:262
 msgid "You may also like"
@@ -2136,10 +2154,8 @@ msgid "Filters"
 msgstr "Filtri"
 
 #: .\templates\store\store.html:162
-#, fuzzy
-#| msgid "Closed"
 msgid "Close"
-msgstr "Chiuso"
+msgstr "Chiudi"
 
 #: .\templates\store\store.html:200
 msgid "Price range"
@@ -2184,6 +2200,9 @@ msgstr "Anteprima"
 #: .\templates\store\store.html:314
 msgid "No products available."
 msgstr "Nessun prodotto disponibile."
+
+#~ msgid "Newsletter"
+#~ msgstr "Newsletter"
 
 #~ msgid "New drops"
 #~ msgstr "Nuovi arrivi"
