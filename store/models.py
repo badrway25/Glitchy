@@ -162,3 +162,47 @@ class ReviewRating(models.Model):
     def __str__(self):
         return self.subject
     
+
+
+class ProductFAQ(models.Model):
+    """A FAQ entry shown on product pages and used as assistant context. Can be
+    attached to one product, a whole category, or be global (both blank)."""
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=True,
+                                related_name="faqs")
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True,
+                                 related_name="faqs")
+
+    question = models.CharField(max_length=200)
+    question_it = models.CharField(max_length=200, blank=True, default="")
+    question_fr = models.CharField(max_length=200, blank=True, default="")
+    answer = models.TextField()
+    answer_it = models.TextField(blank=True, default="")
+    answer_fr = models.TextField(blank=True, default="")
+
+    order = models.IntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["order", "id"]
+        verbose_name = "Product FAQ"
+        verbose_name_plural = "Product FAQs"
+
+    def __str__(self):
+        scope = self.product.product_name if self.product_id else (
+            self.category.category_name if self.category_id else "Global")
+        return f"[{scope}] {self.question}"
+
+    def question_for(self, lang):
+        return {"it": self.question_it, "fr": self.question_fr}.get(lang) or self.question
+
+    def answer_for(self, lang):
+        return {"it": self.answer_it, "fr": self.answer_fr}.get(lang) or self.answer
+
+    @classmethod
+    def for_product(cls, product):
+        """Active FAQs relevant to a product: product-specific + its category + global."""
+        from django.db.models import Q
+        return cls.objects.filter(is_active=True).filter(
+            Q(product=product) | Q(category=product.category, product__isnull=True)
+            | Q(product__isnull=True, category__isnull=True))

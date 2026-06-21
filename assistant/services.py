@@ -84,13 +84,15 @@ def answer_question(request, query):
     AssistantMessage.objects.create(conversation=conv, role="user", content=query[:1000])
 
     knowledge = retrieval.retrieve_knowledge(query, limit=5)
+    faqs = retrieval.retrieve_faqs(query, limit=4)
     products = retrieval.retrieve_products(query, limit=4)
     order_ctx = _order_context_for(request, query, lang)
-    in_scope = bool(knowledge or products or order_ctx) or retrieval.is_in_scope(query)
+    in_scope = bool(knowledge or faqs or products or order_ctx) or retrieval.is_in_scope(query)
 
     decline = prompt_mod.decline_message(lang)
-    sources = ([f"kb:{k.key}" for k in knowledge] +
+    sources = ([f"kb:{k.key}" for k in knowledge] + [f"faq:{f.id}" for f in faqs] +
                [f"product:{p.id}" for p in products])
+    knowledge = list(knowledge) + list(faqs)   # FAQs grounded alongside the KB
 
     # Out of scope and nothing to ground on -> decline immediately (no LLM call).
     if not in_scope:

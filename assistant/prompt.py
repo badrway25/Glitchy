@@ -37,7 +37,9 @@ def build_context(knowledge, products, lang, order_context=None):
     """Render the retrieved knowledge + products into a compact context block."""
     blocks = []
     for k in knowledge:
-        blocks.append(f"- [{k.category}] {k.question_for(lang)}\n  {k.answer_for(lang)}")
+        cat = getattr(k, "category", "") or ""
+        cat = cat if isinstance(cat, str) else "faq"   # ProductFAQ.category is a FK
+        blocks.append(f"- [{cat}] {k.question_for(lang)}\n  {k.answer_for(lang)}")
     if products:
         sym = getattr(settings, "STORE_CURRENCY_SYMBOL", "€")
         plines = []

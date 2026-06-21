@@ -70,6 +70,15 @@ def product_detail(request, category_slug, product_slug):
     shipping_quote = fallback_quote(detect_country(request), total_quantity=1,
                                     subtotal=single_product.price)
 
+    lang = (getattr(request, "LANGUAGE_CODE", "en") or "en")[:2]
+    product_faqs = []
+    try:
+        from store.models import ProductFAQ
+        product_faqs = [{"q": f.question_for(lang), "a": f.answer_for(lang)}
+                        for f in ProductFAQ.for_product(single_product)[:8]]
+    except Exception:
+        pass
+
     # Recently viewed (session) — record THIS product, fetch the previous ones.
     from storefront.recently import record_view, get_recently_viewed
     recently_viewed = get_recently_viewed(request, exclude_id=single_product.id, limit=4)
@@ -93,6 +102,7 @@ def product_detail(request, category_slug, product_slug):
         'shipping_quote': shipping_quote,
         'related_products': related,
         'recently_viewed': recently_viewed,
+        'product_faqs': product_faqs,
     }
     return render(request, 'store/product_detail.html', context)
 

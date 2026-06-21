@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
-from .models import Product, ProductImage, ReviewRating, Variation
+from .models import (Product, ProductFAQ, ProductImage, ReviewRating, Variation)
 
 
 class ProductImageInline(admin.TabularInline):
@@ -81,5 +81,36 @@ class VariationAdmin(admin.ModelAdmin):
     search_fields = ("product__product_name", "variation_value")
 
 
-admin.site.register(ReviewRating)
+@admin.register(ReviewRating)
+class ReviewRatingAdmin(admin.ModelAdmin):
+    list_display = ("subject", "product", "user", "rating", "status", "created_at")
+    list_filter = ("status", "rating", "created_at")
+    list_editable = ("status",)
+    search_fields = ("subject", "review", "product__product_name", "user__email")
+    actions = ["approve_reviews", "reject_reviews"]
+
+    @admin.action(description="Approve selected reviews")
+    def approve_reviews(self, request, queryset):
+        queryset.update(status=True)
+
+    @admin.action(description="Reject selected reviews")
+    def reject_reviews(self, request, queryset):
+        queryset.update(status=False)
+
+
+@admin.register(ProductFAQ)
+class ProductFAQAdmin(admin.ModelAdmin):
+    list_display = ("question", "product", "category", "order", "is_active")
+    list_filter = ("is_active", "category")
+    list_editable = ("order", "is_active")
+    search_fields = ("question", "answer")
+    raw_id_fields = ("product",)
+    fieldsets = (
+        (None, {"fields": ("product", "category", "order", "is_active")}),
+        ("English", {"fields": ("question", "answer")}),
+        ("Italiano", {"fields": ("question_it", "answer_it")}),
+        ("Français", {"fields": ("question_fr", "answer_fr")}),
+    )
+
+
 admin.site.register(ProductImage)

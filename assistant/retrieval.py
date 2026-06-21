@@ -39,6 +39,25 @@ def retrieve_knowledge(query, limit=5):
     return [e for _, e in scored[:limit]]
 
 
+def retrieve_faqs(query, limit=4):
+    """Active global/category product FAQs relevant to a query (used as assistant
+    context alongside the curated knowledge base)."""
+    from store.models import ProductFAQ  # local import to avoid load cycles
+
+    q_tokens = set(_tokens(query))
+    if not q_tokens:
+        return []
+    scored = []
+    for f in ProductFAQ.objects.filter(is_active=True):
+        blob = " ".join(filter(None, [f.question, f.question_it, f.question_fr,
+                                       f.answer, f.answer_it, f.answer_fr])).lower()
+        overlap = len(q_tokens & set(_tokens(blob)))
+        if overlap:
+            scored.append((overlap, f))
+    scored.sort(key=lambda x: x[0], reverse=True)
+    return [f for _, f in scored[:limit]]
+
+
 def retrieve_products(query, limit=4):
     """Return catalog products relevant to the query (name/description/category)."""
     from store.models import Product  # local import to avoid app-load cycles
