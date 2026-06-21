@@ -723,3 +723,9 @@ img{max-width:100%;}
   .js-anim .nav-icon .badge-pill{animation:none!important;}
   *{scroll-behavior:auto!important;}
 }
+
+/* Off-canvas drawers (position:fixed, translated off-screen) must not create a
+   horizontal scrollbar on small screens. Clip page-level x-overflow at mobile. */
+@media (max-width:991.98px){
+  html,body{overflow-x:hidden;max-width:100%;}
+}
