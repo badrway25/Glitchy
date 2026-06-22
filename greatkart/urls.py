@@ -9,10 +9,12 @@ from django.views.generic import TemplateView
 
 from . import views, seo
 from store.views import faq as faq_view
+from store.admin_views import printify_dashboard
 
 # Non-localized routes: admin, language switch, and machine/API endpoints
 # (n8n webhooks must have stable, prefix-free URLs).
 urlpatterns = [
+    path("admin/printify-dashboard/", printify_dashboard, name="printify_dashboard"),
     path("admin/", admin.site.urls),
     path("sitemap.xml", seo.sitemap_xml, name="sitemap"),
     path("robots.txt", seo.robots_txt, name="robots"),

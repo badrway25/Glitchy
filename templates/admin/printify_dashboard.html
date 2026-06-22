@@ -1,0 +1,111 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+{% block title %}Printify dashboard{% endblock %}
+{% block extrastyle %}{{ block.super }}
+<style>
+  .pf-wrap{max-width:1200px;margin:0 auto;}
+  .pf-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:16px 0;}
+  .pf-kpi{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:14px 16px;}
+  .pf-kpi .v{font-size:26px;font-weight:800;color:#111;}
+  .pf-kpi .l{font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;}
+  .pf-section{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin:16px 0;}
+  .pf-section h2{margin:0 0 12px;font-size:16px;}
+  .pf-chip{display:inline-block;padding:2px 10px;border-radius:999px;font-size:11px;font-weight:700;color:#fff;}
+  .pf-table{width:100%;border-collapse:collapse;font-size:13px;}
+  .pf-table th,.pf-table td{text-align:left;padding:7px 10px;border-bottom:1px solid #f1f5f9;}
+  .pf-table th{color:#6b7280;font-size:11px;text-transform:uppercase;}
+  .pf-bar{height:7px;border-radius:99px;background:#e5e7eb;overflow:hidden;width:70px;display:inline-block;vertical-align:middle;}
+  .pf-bar i{display:block;height:100%;}
+  .pf-warn{background:#fef3c7;color:#92400e;padding:8px 12px;border-radius:8px;font-size:13px;margin:8px 0;}
+  .pf-actions a{display:inline-block;margin:4px 8px 4px 0;padding:7px 12px;border:1px solid #d1d5db;border-radius:8px;
+    font-size:13px;text-decoration:none;color:#111;background:#f9fafb;}
+</style>{% endblock %}
+{% block content %}
+<div class="pf-wrap">
+  <h1>Printify operations dashboard</h1>
+  <p style="color:#6b7280;">Shop <b>{{ overview.shop_id }}</b> · Push:
+    <span class="pf-chip" style="background:{% if overview.push_enabled %}#dc2626{% else %}#16a34a{% endif %}">
+      {% if overview.push_enabled %}ENABLED{% else %}DISABLED (safe){% endif %}</span>
+    · Shipping source: <b>{{ overview.shipping_source }}</b></p>
+
+  <!-- Overview -->
+  <div class="pf-grid">
+    <div class="pf-kpi"><div class="v">{{ overview.products_synced }}/{{ overview.products_total }}</div><div class="l">Synced products</div></div>
+    <div class="pf-kpi"><div class="v">{{ overview.variants_total }}</div><div class="l">Variants</div></div>
+    <div class="pf-kpi"><div class="v">{{ overview.variants_with_cost }}</div><div class="l">Variants w/ cost</div></div>
+    <div class="pf-kpi"><div class="v">{{ overview.images_total }}</div><div class="l">Images</div></div>
+    <div class="pf-kpi"><div class="v">{{ avg_quality }}%</div><div class="l">Avg data quality</div></div>
+  </div>
+
+  <!-- Data quality -->
+  <div class="pf-section">
+    <h2>Data quality</h2>
+    <span class="pf-chip" style="background:#16a34a">90–100: {{ buckets.high }}</span>
+    <span class="pf-chip" style="background:#d97706">60–89: {{ buckets.mid }}</span>
+    <span class="pf-chip" style="background:#dc2626">&lt;60: {{ buckets.low }}</span>
+    {% if buckets.low %}<div class="pf-warn">{{ buckets.low }} product(s) below 60% — add composition, gallery, costs or run a Printify sync.</div>{% endif %}
+  </div>
+
+  <!-- Products -->
+  <div class="pf-section">
+    <h2>Products</h2>
+    <table class="pf-table">
+      <tr><th>Product</th><th>Printify</th><th>Blueprint</th><th>Provider</th><th>Variants</th><th>Cost cov.</th><th>Images</th><th>Quality</th><th>Sync</th><th></th></tr>
+      {% for r in rows %}
+      <tr>
+        <td><b>{{ r.name|truncatechars:30 }}</b>{% if not r.visible %} <span class="pf-chip" style="background:#94a3b8">hidden</span>{% endif %}</td>
+        <td style="color:#9ca3af;">{{ r.pid }}</td>
+        <td>{{ r.blueprint|truncatechars:22 }}</td>
+        <td>{{ r.provider|truncatechars:16 }}</td>
+        <td>{{ r.variants_cost }}/{{ r.variants }}</td>
+        <td>{{ r.cost_cov }}%</td>
+        <td>{{ r.images }}</td>
+        <td><span class="pf-bar"><i style="width:{{ r.score }}%;background:{% if r.score >= 80 %}#16a34a{% elif r.score >= 50 %}#d97706{% else %}#dc2626{% endif %};"></i></span> {{ r.score }}%</td>
+        <td>{{ r.sync }}</td>
+        <td><a href="/admin/store/product/{{ r.id }}/change/">edit</a></td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  <!-- Shipping matrix -->
+  <div class="pf-section">
+    <h2>Shipping matrix {% if ship_live %}<span class="pf-chip" style="background:#16a34a">live</span>{% else %}<span class="pf-chip" style="background:#94a3b8">fallback</span>{% endif %}</h2>
+    {% if not ship_live %}<p><a class="pf-chip" style="background:#2563eb;text-decoration:none;padding:5px 12px;" href="?check_shipping=1">Run live Printify check</a></p>{% endif %}
+    <table class="pf-table">
+      <tr><th>Country</th><th>Source</th><th>Customer cost</th><th>ETA</th></tr>
+      {% for s in ship_rows %}
+      <tr><td>{{ s.country }}</td><td><span class="pf-chip" style="background:{% if s.source == 'printify' %}#16a34a{% elif s.source == 'error' %}#dc2626{% else %}#64748b{% endif %}">{{ s.source }}</span></td><td>{{ s.cost }}</td><td>{{ s.eta }}</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  <!-- Variants (admin-only cost/margin) -->
+  <div class="pf-section">
+    <h2>Variants <span style="font-size:12px;color:#9ca3af;">(admin-only cost &amp; margin — never shown to customers)</span></h2>
+    <table class="pf-table">
+      <tr><th>Product</th><th>Value</th><th>SKU</th><th>Enabled</th><th>Price</th><th>Cost</th><th>Margin</th><th>Grams</th></tr>
+      {% for v in vrows %}
+      <tr>
+        <td>{{ v.product|truncatechars:20 }}</td><td>{{ v.cat }}: {{ v.value }}</td>
+        <td style="color:#9ca3af;">{{ v.sku }}</td>
+        <td>{% if v.enabled %}✓{% else %}<span style="color:#dc2626">✗</span>{% endif %}</td>
+        <td>{{ v.price }}</td><td>{{ v.cost }}</td>
+        <td>{% if v.margin %}<b>{{ v.margin }}</b>{% else %}—{% endif %}</td><td>{{ v.grams }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  <!-- Actions (safe, dry-run; no order push) -->
+  <div class="pf-section">
+    <h2>Safe operations</h2>
+    <div class="pf-actions">
+      <a href="/admin/store/product/">Manage products</a>
+      <a href="?check_shipping=1">Live shipping check</a>
+    </div>
+    <p style="font-size:12px;color:#6b7280;">CLI: <code>product_audit</code>, <code>printify_sync_products --dry-run</code>,
+      <code>backfill_order_costs</code> (dry-run default), <code>integration_status</code>. No action here pushes a real order.</p>
+  </div>
+</div>
+{% endblock %}
