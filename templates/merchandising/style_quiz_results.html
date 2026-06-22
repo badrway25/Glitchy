@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static i18n uikit %}
+{% block title %}{% trans "Your matches" %} • {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<section class="section-content padding-y">
+  <div class="container" style="max-width:1280px;">
+    <div class="text-center mb-4">
+      <div class="lux-eyebrow mb-2">{% trans "Your style quiz" %}</div>
+      <h1 class="dash-title mb-1">{% trans "Picked for you" %}</h1>
+      {% if fallback %}
+        <p class="text-muted">{% trans "We broadened the search to show you our best pieces." %}</p>
+      {% else %}
+        <p class="text-muted">{% trans "Based on your answers, from our real catalogue." %}</p>
+      {% endif %}
+    </div>
+
+    <div class="row g-3 g-md-4">
+      {% for p in products %}
+        <div class="col-6 col-lg-3 d-flex">{% include 'merchandising/_product_card.html' with p=p %}</div>
+      {% endfor %}
+    </div>
+
+    <div class="text-center mt-5" style="display:flex;gap:.7rem;justify-content:center;flex-wrap:wrap;">
+      <a href="{% url 'merchandising:style_quiz' %}" class="btn btn-soft">{% trans "Retake the quiz" %}</a>
+      <a href="{% url 'store' %}" class="btn btn-primary">{% trans "Browse all products" %}</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

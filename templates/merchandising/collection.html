@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static i18n uikit %}
+{% block title %}{{ collection.name }} • {{ SITE_NAME }}{% endblock %}
+{% block meta_description %}{{ collection.meta_description|default:subtitle }}{% endblock %}
+
+{% block content %}
+<section class="coll-hero {% if collection.image %}has-img{% endif %}"
+         {% if collection.image %}style="background-image:linear-gradient(rgba(28,26,23,.45),rgba(28,26,23,.55)),url('{{ collection.image }}')"{% endif %}>
+  <div class="container">
+    <nav class="coll-crumbs"><a href="{% url 'home' %}">{% trans "Home" %}</a> / <a href="{% url 'merchandising:collections' %}">{% trans "Collections" %}</a> / <span>{{ collection.name }}</span></nav>
+    <h1 class="coll-hero-title">{{ hero_title }}</h1>
+    {% if subtitle %}<p class="coll-hero-sub">{{ subtitle }}</p>{% endif %}
+  </div>
+</section>
+
+<section class="section-content padding-y">
+  <div class="container" style="max-width:1280px;">
+    {% if products %}
+      <div class="row g-3 g-md-4">
+        {% for p in products %}
+          <div class="col-6 col-lg-3 d-flex">{% include 'merchandising/_product_card.html' with p=p %}</div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="store-empty"><h3>{% trans "This collection is being curated" %}</h3>
+        <a href="{% url 'store' %}" class="btn btn-primary mt-3">{% trans "Browse all products" %}</a></div>
+    {% endif %}
+  </div>
+</section>
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
+{"@type":"ListItem","position":1,"name":"{% trans 'Home' %}","item":"{{ request.scheme }}://{{ request.get_host }}/"},
+{"@type":"ListItem","position":2,"name":"{% trans 'Collections' %}"},
+{"@type":"ListItem","position":3,"name":"{{ collection.name|escapejs }}"}]}
+</script>
+{% endblock %}

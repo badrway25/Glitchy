@@ -55,8 +55,8 @@
           <div class="footer-title">{% trans "Shop" %}</div>
           <ul class="footer-list">
             <li><a class="footer-link" href="{% url 'store' %}">{% trans "All Products" %}</a></li>
-            <li><a class="footer-link" href="{% url 'store' %}?sort=newest">{% trans "New Arrivals" %}</a></li>
-            <li><a class="footer-link" href="{% url 'store' %}">{% trans "Best Sellers" %}</a></li>
+            <li><a class="footer-link" href="{% url 'merchandising:collections' %}">{% trans "Collections" %}</a></li>
+            <li><a class="footer-link" href="{% url 'merchandising:style_quiz' %}">{% trans "Style quiz" %}</a></li>
           </ul>
         </div>
 

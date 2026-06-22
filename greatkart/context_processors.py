@@ -10,7 +10,7 @@ def _asset_version():
     latest = 0
     for rel in ("css/premium.css", "css/theme.css", "js/premium.js",
                 "js/theme.js", "js/script.js", "js/assistant.js", "js/storefront.js",
-                "js/wishlist.js", "js/search.js"):
+                "js/wishlist.js", "js/search.js", "js/growth.js"):
         try:
             latest = max(latest, int(os.path.getmtime(os.path.join(_ASSET_BASE, rel))))
         except OSError:

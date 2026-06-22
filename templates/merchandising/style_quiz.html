@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static i18n uikit %}
+{% block title %}{% trans "Style quiz" %} • {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<section class="quiz-page">
+  <div class="container" style="max-width:760px;">
+    <div class="text-center mb-4">
+      <div class="lux-eyebrow mb-2">{% icon "spark" "ic" 15 %} {% trans "Find your match" %}</div>
+      <h1 class="quiz-title">{% trans "Style quiz" %}</h1>
+      <p class="text-muted">{% trans "A few quick taps and we'll suggest pieces from our catalogue. No personal data needed." %}</p>
+    </div>
+
+    <form method="post" action="{% url 'merchandising:style_quiz' %}" class="quiz-form">
+      {% csrf_token %}
+
+      <div class="quiz-q">
+        <div class="quiz-q-label">{% trans "What are you looking for?" %}</div>
+        <div class="quiz-opts">
+          <label class="quiz-opt"><input type="radio" name="category" value="any" checked><span>{% trans "Anything" %}</span></label>
+          {% for c in categories %}
+          <label class="quiz-opt"><input type="radio" name="category" value="{{ c.slug }}"><span>{{ c.category_name }}</span></label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="quiz-q">
+        <div class="quiz-q-label">{% trans "Your budget?" %}</div>
+        <div class="quiz-opts">
+          <label class="quiz-opt"><input type="radio" name="budget" value="under_25"><span>{% trans "Under" %} {{ CURRENCY_SYMBOL }}25</span></label>
+          <label class="quiz-opt"><input type="radio" name="budget" value="25_50" checked><span>{{ CURRENCY_SYMBOL }}25–50</span></label>
+          <label class="quiz-opt"><input type="radio" name="budget" value="50_100"><span>{{ CURRENCY_SYMBOL }}50–100</span></label>
+          <label class="quiz-opt"><input type="radio" name="budget" value="over_100"><span>{{ CURRENCY_SYMBOL }}100+</span></label>
+        </div>
+      </div>
+
+      <div class="quiz-q">
+        <div class="quiz-q-label">{% trans "Your vibe?" %}</div>
+        <div class="quiz-opts">
+          <label class="quiz-opt"><input type="radio" name="vibe" value="minimal" checked><span>{% trans "Minimal" %}</span></label>
+          <label class="quiz-opt"><input type="radio" name="vibe" value="elegant"><span>{% trans "Elegant" %}</span></label>
+          <label class="quiz-opt"><input type="radio" name="vibe" value="casual"><span>{% trans "Casual" %}</span></label>
+          <label class="quiz-opt"><input type="radio" name="vibe" value="bold"><span>{% trans "Bold" %}</span></label>
+        </div>
+      </div>
+
+      <div class="quiz-q">
+        <div class="quiz-q-label">{% trans "Favourite colour?" %}</div>
+        <div class="quiz-opts">
+          <label class="quiz-opt"><input type="radio" name="color" value="any" checked><span>{% trans "Any" %}</span></label>
+          <label class="quiz-opt"><input type="radio" name="color" value="black"><span>{% trans "Black" %}</span></label>
+          <label class="quiz-opt"><input type="radio" name="color" value="white"><span>{% trans "White" %}</span></label>
+          <label class="quiz-opt"><input type="radio" name="color" value="blue"><span>{% trans "Blue" %}</span></label>
+          <label class="quiz-opt"><input type="radio" name="color" value="neutral"><span>{% trans "Neutral" %}</span></label>
+        </div>
+      </div>
+
+      <div class="quiz-q">
+        <div class="quiz-q-label">{% trans "For what occasion?" %}</div>
+        <div class="quiz-opts">
+          <label class="quiz-opt"><input type="radio" name="occasion" value="everyday" checked><span>{% trans "Everyday" %}</span></label>
+          <label class="quiz-opt"><input type="radio" name="occasion" value="work"><span>{% trans "Work" %}</span></label>
+          <label class="quiz-opt"><input type="radio" name="occasion" value="going_out"><span>{% trans "Going out" %}</span></label>
+          <label class="quiz-opt"><input type="radio" name="occasion" value="gift"><span>{% trans "A gift" %}</span></label>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block quiz-submit">{% trans "Show my matches" %} {% icon "arrow-right" "ic" 16 %}</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

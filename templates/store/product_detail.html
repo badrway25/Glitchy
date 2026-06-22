@@ -232,6 +232,26 @@
                 {% endif %}
               </div>
 
+              {% if notify_me_enabled %}
+              <div class="notify-box">
+                <h4>{% icon "mail" "ic" 16 %} {% trans "Notify me when it's back" %}</h4>
+                <p>{% trans "We'll email you if this item becomes available again. No spam." %}</p>
+                <form data-notify-form action="{% url 'merchandising:notify_me' %}" method="post"
+                      data-err="{% trans 'Please enter a valid email and tick consent.' %}">
+                  {% csrf_token %}
+                  <input type="hidden" name="product_id" value="{{ single_product.id }}">
+                  <input type="hidden" name="notify_type" value="back_in_stock">
+                  <input type="text" name="website" class="notify-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+                  <div class="notify-form">
+                    <input type="email" name="email" required placeholder="{% trans 'your@email.com' %}" aria-label="{% trans 'Email address' %}">
+                    <button type="submit" class="btn btn-primary">{% trans "Notify me" %}</button>
+                  </div>
+                  <label class="notify-consent"><input type="checkbox" name="consent" value="1" required> {% trans "Email me once, about this item only." %}</label>
+                  <div class="notify-msg" data-notify-msg hidden></div>
+                </form>
+              </div>
+              {% endif %}
+
               <!-- "More" — expandable product details -->
               <div class="pdp-more mt-4">
                 <button type="button" class="btn btn-link p-0 pdp-more-toggle" data-toggle="collapse"
@@ -263,13 +283,55 @@
       </div>
     </div>
 
+    <!-- Complete the look (outfit builder) -->
+    {% with ctl=outfit_products|default:complete_look %}
+    {% if ctl %}
+    <section class="ctl-wrap mt-5" data-outfit-view>
+      <div class="ctl-head">
+        <div class="lux-eyebrow mb-1">{% icon "spark" "ic" 15 %} {% trans "Complete the look" %}</div>
+        <h3 class="section-title m-0">{% if outfit_title %}{{ outfit_title }}{% else %}{% trans "Style it together" %}{% endif %}</h3>
+        {% if outfit_desc %}<p class="text-muted mt-1 mb-0" style="font-size:.92rem;">{{ outfit_desc }}</p>{% endif %}
+      </div>
+      <div class="ctl-grid" id="outfitBuilder">
+        <!-- current product is always part of the look -->
+        <label class="ctl-item is-anchor">
+          <input type="checkbox" value="{{ single_product.id }}" data-outfit-price="{{ single_product.price }}" checked disabled>
+          <span class="ctl-card">
+            <img src="{% if single_product.cover_image %}{{ single_product.cover_image }}{% else %}{% static 'images/placeholder.png' %}{% endif %}" alt="" loading="lazy">
+            <span class="ctl-name">{{ single_product.product_name|truncatechars:32 }}</span>
+            <span class="ctl-price">{{ CURRENCY_SYMBOL }} {{ single_product.price }}</span>
+            <span class="ctl-tag">{% trans "This item" %}</span>
+          </span>
+        </label>
+        {% for p in ctl %}
+        <label class="ctl-item">
+          <input type="checkbox" value="{{ p.id }}" data-outfit-price="{{ p.price }}" checked>
+          <span class="ctl-card">
+            <img src="{% if p.cover_image %}{{ p.cover_image }}{% else %}{% static 'images/placeholder.png' %}{% endif %}" alt="" loading="lazy">
+            <span class="ctl-name">{{ p.product_name|truncatechars:32 }}</span>
+            <span class="ctl-price">{{ CURRENCY_SYMBOL }} {{ p.price }}</span>
+            <span class="ctl-check">{% icon "check" "ic" 14 %}</span>
+          </span>
+        </label>
+        {% endfor %}
+      </div>
+      <div class="ctl-bar">
+        <div class="ctl-total">{% trans "Total" %}: <strong><span id="outfitTotal">0</span></strong></div>
+        <button type="button" class="btn btn-primary" id="outfitAdd" data-outfit-add>
+          {% icon "bag" "ic" 16 %} <span data-outfit-add-label>{% trans "Add selected to cart" %}</span>
+        </button>
+      </div>
+    </section>
+    {% endif %}
+    {% endwith %}
+
     <!-- You may also like -->
     {% if related_products %}
     <section class="ymal-wrap mt-5">
       <div class="d-flex align-items-end justify-content-between mb-3">
         <div>
-          <div class="lux-eyebrow mb-1">{% trans "Complete the look" %}</div>
-          <h3 class="section-title m-0">{% trans "You may also like" %}</h3>
+          <div class="lux-eyebrow mb-1">{% trans "You may also like" %}</div>
+          <h3 class="section-title m-0">{% trans "Recommended for you" %}</h3>
         </div>
       </div>
       <div class="row g-3 g-md-4">

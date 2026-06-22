@@ -102,15 +102,21 @@ def product_detail(request, category_slug, product_slug):
     recently_viewed = get_recently_viewed(request, exclude_id=single_product.id, limit=4)
     record_view(request, single_product.id)
 
-    # "You may also like" — same category first, topped up with other products.
-    related = list(Product.objects.filter(is_available=True, category=single_product.category)
-                   .exclude(id=single_product.id).prefetch_related("gallery")[:4])
-    if len(related) < 4:
-        extra = (Product.objects.filter(is_available=True)
-                 .exclude(id=single_product.id)
-                 .exclude(id__in=[p.id for p in related])
-                 .prefetch_related("gallery")[:4 - len(related)])
-        related += list(extra)
+    # "You may also like" — smart recommendations (curated → category → newest).
+    complete_look, outfit = [], None
+    try:
+        from merchandising.recommendations import (recommend_for_product, complete_the_look,
+                                                   outfits_for_product)
+        related = recommend_for_product(single_product, limit=4)
+        complete_look = complete_the_look(single_product, limit=6)
+        outfits = outfits_for_product(single_product, limit=1)
+        outfit = outfits[0] if outfits else None
+    except Exception:
+        related = list(Product.objects.filter(is_available=True, category=single_product.category)
+                       .exclude(id=single_product.id).prefetch_related("gallery")[:4])
+    if not related:
+        related = list(Product.objects.filter(is_available=True)
+                       .exclude(id=single_product.id).prefetch_related("gallery")[:4])
 
     context = {
         'single_product': single_product,
@@ -124,6 +130,12 @@ def product_detail(request, category_slug, product_slug):
         'related_products': related,
         'recently_viewed': recently_viewed,
         'product_faqs': product_faqs,
+        'complete_look': complete_look,
+        'outfit': outfit,
+        'outfit_title': outfit.title_for(lang) if outfit else "",
+        'outfit_desc': outfit.description_for(lang) if outfit else "",
+        'outfit_products': list(outfit.active_products()) if outfit else [],
+        'notify_me_enabled': single_product.stock <= 0 or not single_product.is_available,
     }
     return render(request, 'store/product_detail.html', context)
 
