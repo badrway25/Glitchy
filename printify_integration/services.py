@@ -87,6 +87,18 @@ def _enabled_variant_info(p: dict):
     return price, cost
 
 
+def _options_summary(options):
+    """Compact, human-readable summary of Printify options, e.g.
+    'Sizes: 5 · Colours: 8'. Safe, non-sensitive."""
+    parts = []
+    for opt in options or []:
+        name = (opt.get("name") or opt.get("type") or "Option").strip().capitalize()
+        n = len(opt.get("values") or [])
+        if n:
+            parts.append(f"{name}: {n}")
+    return " · ".join(parts)[:300]
+
+
 def _sync_variations(product: Product, p: dict):
     """Map Printify options (color/size) to store.Variation, capturing cost."""
     options = p.get("options") or []
@@ -214,6 +226,11 @@ def _upsert_product(p: dict, fallback_category, settings_map, overwrite_category
         Product.SYNC_SYNCED if is_new else Product.SYNC_UPDATED)
     obj.printify_synced_at = timezone.now()
     obj.printify_sync_error = ""
+    # Safe, non-sensitive catalogue metadata (admin/data-quality only)
+    obj.printify_visible = bool(p.get("visible", True))
+    tags = p.get("tags") or []
+    obj.printify_tags = ", ".join(str(t) for t in tags)[:400]
+    obj.printify_options_summary = _options_summary(p.get("options") or [])
     obj.save()
 
     _sync_images(obj, p, refresh=refresh_images)

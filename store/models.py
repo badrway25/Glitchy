@@ -47,6 +47,15 @@ class Product(models.Model):
     printify_synced_at = models.DateTimeField(blank=True, null=True)
     printify_sync_error = models.TextField(blank=True, default="")
 
+    # Printify catalogue metadata (safe, non-sensitive — for admin/data-quality only)
+    printify_blueprint_title = models.CharField(max_length=160, blank=True, default="")
+    printify_provider_name = models.CharField(max_length=120, blank=True, default="")
+    printify_visible = models.BooleanField(default=True,
+                                           help_text="Mirrors Printify product visibility")
+    printify_tags = models.CharField(max_length=400, blank=True, default="")
+    printify_options_summary = models.CharField(max_length=300, blank=True, default="",
+                                                help_text="e.g. 'Sizes: S–XXL · Colours: 5'")
+
     # --- Premium product detail content (bulleted "More" sections) ---
     composition = models.TextField(blank=True, default="",
                                    help_text="Materials / composition, e.g. '100% organic cotton'")
@@ -73,6 +82,55 @@ class Product(models.Model):
         if not self.created_date:
             return False
         return (timezone.now() - self.created_date).days <= days
+
+    def data_quality(self):
+        """Admin-only 0–100 completeness score with a per-check breakdown.
+        Never shown to customers (it can reference internal coverage)."""
+        checks = []
+
+        def chk(key, ok, weight):
+            checks.append({"key": key, "ok": bool(ok), "weight": weight})
+
+        has_variants = self.variation_set.exists() if hasattr(self, "variation_set") else False
+        variant_costs = False
+        gallery_count = self.gallery.count() if hasattr(self, "gallery") else 0
+        try:
+            from store.models import Variation
+            variant_costs = Variation.objects.filter(
+                product=self, production_cost__gt=0).exists()
+        except Exception:
+            pass
+        has_reviews = False
+        try:
+            has_reviews = self.reviews.filter(status=True).exists()
+        except Exception:
+            pass
+        has_faq = False
+        try:
+            from store.models import ProductFAQ
+            has_faq = ProductFAQ.for_product(self).exists()
+        except Exception:
+            pass
+
+        chk("composition", self.composition.strip(), 12)
+        chk("fit_or_care", self.fit_notes.strip() or self.care_instructions.strip(), 10)
+        chk("gallery_multi", gallery_count >= 2, 12)
+        chk("blueprint_provider", self.printify_blueprint_id and self.printify_provider_id, 12)
+        chk("variant_costs", variant_costs or self.base_cost > 0, 14)
+        chk("synced", self.printify_sync_status in (self.SYNC_SYNCED, self.SYNC_UPDATED), 8)
+        chk("recent_sync", bool(self.printify_synced_at), 6)
+        chk("faq", has_faq, 8)
+        chk("reviews", has_reviews, 8)
+        chk("seo", bool((self.description or "").strip()) and len((self.product_name or "")) > 3, 10)
+
+        total_w = sum(c["weight"] for c in checks)
+        got = sum(c["weight"] for c in checks if c["ok"])
+        score = round(100 * got / total_w) if total_w else 0
+        missing = [c["key"] for c in checks if not c["ok"]]
+        return {"score": score, "missing": missing, "checks": checks}
+
+    def data_quality_score(self):
+        return self.data_quality()["score"]
 
     def cover_image(self):
         """Best available image: explicit cover, else first gallery image."""
