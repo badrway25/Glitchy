@@ -56,6 +56,7 @@ class AnalyticsEvent(models.Model):
         ("cart_save_for_later", "cart_save_for_later"),
         ("review_submit", "review_submit"),
         ("search_query", "search_query"),
+        ("autocomplete_select", "autocomplete_select"),
         ("support_order_help", "support_order_help"),
     ]
 

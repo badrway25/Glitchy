@@ -15,6 +15,7 @@ PRINTIFY_ERROR = "printify.error"
 MARGIN_NEGATIVE = "margin.negative"
 NEWSLETTER_SUBSCRIBED = "newsletter.subscribed"
 SUPPORT_AUTOREPLY = "support.autoreply"
+SUPPORT_ORDER_HELP = "support.order_help"
 INTERNAL_ALERT = "internal.alert"
 
 # Each event maps to an n8n webhook path segment + a human label.
@@ -33,6 +34,7 @@ EVENT_CATALOG = {
     MARGIN_NEGATIVE: "Internal: negative margin alert",
     NEWSLETTER_SUBSCRIBED: "Newsletter welcome email",
     SUPPORT_AUTOREPLY: "Support auto-reply email",
+    SUPPORT_ORDER_HELP: "Order help request from account",
     INTERNAL_ALERT: "Internal: generic ops alert",
 }
 
