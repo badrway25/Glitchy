@@ -164,34 +164,13 @@ def product_detail(request, category_slug, product_slug):
 
 
 def search(request):
-    keyword = request.GET.get("keyword", "").strip()
-    products = Product.objects.filter(is_available=True)
-
-    all_categories = Category.objects.all().order_by("category_name")  # ✅
-
-    if keyword:
-        products = products.filter(
-            Q(description__icontains=keyword) | Q(product_name__icontains=keyword)
-        )
-
-    products = products.order_by("-created_date")
-
-    count = products.count()
-    if keyword:
-        _track_event(request, "search_query", {"q": keyword[:60]})
-        if count == 0:
-            _track_event(request, "search_no_results", {"q": keyword[:60]})
-
-    paginator = Paginator(products, 9)
-    page = request.GET.get("page")
-    paged_products = paginator.get_page(page)
-
-    context = {
-        "categories": all_categories,   # ✅
-        "products": paged_products,
-        "product_count": count,
-    }
-    return render(request, "store/store.html", context)
+    """Unify keyword search with the advanced-filter store page so the same facets,
+    active-filter chips and no-results discovery (recommendations + clear + assistant)
+    apply. Redirect preserves the full query string (keyword + any filters/sort)."""
+    from django.urls import reverse
+    qs = request.GET.urlencode()
+    target = reverse("store")
+    return redirect(f"{target}?{qs}" if qs else target)
 
 
 def _track_event(request, name, meta=None):

@@ -83,15 +83,22 @@ class ReturnRequestAdmin(admin.ModelAdmin):
 
     @admin.action(description=_("Mark as refunded (updates order margin)"))
     def mark_refunded(self, request, queryset):
+        from django.db.models import Sum
         count = queryset.count()
         for rr in queryset:
             order = rr.order
-            # Apply the refund to the order's running refunded total.
-            order.refunded_amount = float(order.refunded_amount or 0) + float(rr.refund_amount or 0)
-            order.save(update_fields=["refunded_amount", "updated_at"])
             rr.status = ReturnRequest.STATUS_REFUNDED
             rr.mark_processed()
             rr.save(update_fields=["status", "processed_at", "updated_at"])
+            # Idempotent: the order's refunded total is RECOMPUTED as the sum of its
+            # already-refunded return requests (a SET, not a +=), so re-running the action
+            # never double-counts and it stays consistent with the Stripe webhook, which
+            # also SETS the cumulative refunded amount.
+            total = (ReturnRequest.objects
+                     .filter(order=order, status=ReturnRequest.STATUS_REFUNDED)
+                     .aggregate(s=Sum("refund_amount"))["s"] or 0)
+            order.refunded_amount = float(total)
+            order.save(update_fields=["refunded_amount", "updated_at"])
             _dispatch(rr, "REFUND_COMPLETED")
         self.message_user(request, _("Marked %(n)d return(s) as refunded.") % {"n": count},
                           level=messages.SUCCESS)
