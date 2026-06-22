@@ -19,26 +19,71 @@ class VariationInline(admin.TabularInline):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ("product_name", "price", "base_cost", "margin_hint", "stock",
-                    "category", "sync_badge", "is_available", "is_bestseller")
+    list_display = ("product_name", "price", "base_cost", "margin_hint", "quality_score",
+                    "stock", "category", "sync_badge", "is_available", "is_bestseller")
     list_filter = ("category", "is_available", "is_bestseller", "is_featured",
-                   "printify_sync_status")
+                   "printify_sync_status", "printify_visible")
     list_editable = ("is_available", "is_bestseller")
     search_fields = ("product_name", "sku", "printify_product_id")
     prepopulated_fields = {"slug": ("product_name",)}
-    readonly_fields = ("printify_synced_at", "printify_sync_error")
+    readonly_fields = ("printify_synced_at", "printify_sync_error", "printify_panel")
     inlines = [ProductImageInline, VariationInline]
-    actions = ["resync_from_printify"]
+    actions = ["resync_from_printify", "audit_data_quality"]
     fieldsets = (
         (None, {"fields": ("product_name", "slug", "category", "description")}),
         (_("Pricing & stock"), {"fields": ("price", "compare_at_price", "base_cost",
                                            "stock", "is_available")}),
         (_("Premium content"), {"fields": ("composition", "fit_notes", "care_instructions")}),
         (_("Merchandising"), {"fields": ("is_bestseller", "is_featured", "images")}),
-        (_("Printify"), {"fields": ("printify_product_id", "printify_blueprint_id",
-                                    "printify_provider_id", "sku", "printify_sync_status",
+        (_("Printify"), {"fields": ("printify_panel", "printify_product_id",
+                                    "printify_blueprint_id", "printify_provider_id", "sku",
+                                    "printify_blueprint_title", "printify_provider_name",
+                                    "printify_options_summary", "printify_tags",
+                                    "printify_visible", "printify_sync_status",
                                     "printify_synced_at", "printify_sync_error")}),
     )
+
+    @admin.display(description=_("Quality"))
+    def quality_score(self, obj):
+        s = obj.data_quality_score()
+        color = "#16a34a" if s >= 80 else ("#d97706" if s >= 50 else "#dc2626")
+        return format_html('<strong style="color:{}">{}</strong>', color, f"{s}%")
+
+    @admin.display(description=_("Printify data panel"))
+    def printify_panel(self, obj):
+        dq = obj.data_quality()
+        variants = obj.variation_set.count() if hasattr(obj, "variation_set") else 0
+        with_cost = obj.variation_set.filter(production_cost__gt=0).count() if variants else 0
+        images = obj.gallery.count() if hasattr(obj, "gallery") else 0
+        sc = dq["score"]
+        scolor = "#16a34a" if sc >= 80 else ("#d97706" if sc >= 50 else "#dc2626")
+        rows = "".join(
+            f'<tr><td style="padding:2px 10px 2px 0;">{c["key"]}</td>'
+            f'<td style="color:{"#16a34a" if c["ok"] else "#dc2626"};">'
+            f'{"✓" if c["ok"] else "✗"}</td></tr>' for c in dq["checks"])
+        return format_html(
+            '<div style="font-size:13px;line-height:1.5;">'
+            '<div style="font-size:22px;font-weight:800;color:{};margin-bottom:6px;">{}% '
+            '<span style="font-size:12px;color:#64748b;font-weight:500;">data quality</span></div>'
+            '<div>Blueprint: <b>{}</b> (#{}) · Provider: <b>{}</b> (#{})</div>'
+            '<div>Options: {} · Visible: {} · Variants: <b>{}</b> ({} with cost) · Images: <b>{}</b></div>'
+            '<table style="margin-top:8px;border-collapse:collapse;">{}</table></div>',
+            scolor, sc, obj.printify_blueprint_title or "—", obj.printify_blueprint_id or "—",
+            obj.printify_provider_name or "—", obj.printify_provider_id or "—",
+            obj.printify_options_summary or "—", "yes" if obj.printify_visible else "no",
+            variants, with_cost, images, format_html(rows))
+
+    @admin.action(description=_("Audit data quality (selected)"))
+    def audit_data_quality(self, request, queryset):
+        from django.contrib import messages
+        low = [p for p in queryset if p.data_quality_score() < 80]
+        if low:
+            names = ", ".join(f"{p.product_name[:24]} ({p.data_quality_score()}%)" for p in low[:10])
+            self.message_user(request, _("%(n)d product(s) below 80%%: %(names)s") % {
+                "n": len(low), "names": names}, level=messages.WARNING)
+        else:
+            self.message_user(request, _("All selected products are at 80%%+ data quality."),
+                              level=messages.SUCCESS)
 
     @admin.display(description=_("Margin/unit"))
     def margin_hint(self, obj):
