@@ -1,19 +1,10 @@
 from django import forms
 from .models import Order
 
-
-COUNTRY_CHOICES = [
-    ("IT", "Italy"),
-    ("FR", "France"),
-    ("DE", "Germany"),
-    ("ES", "Spain"),
-    ("NL", "Netherlands"),
-    ("BE", "Belgium"),
-    ("CH", "Switzerland"),
-    ("AT", "Austria"),
-    ("GB", "United Kingdom"),
-    ("US", "United States"),
-]
+# Single source of truth for the shippable countries, so the checkout <select> and
+# the form's accepted values can never drift apart (previously the form accepted only
+# 10 while the dropdown offered 14 — PT/IE/CA/AU silently failed validation).
+from shipping.constants import COUNTRIES as COUNTRY_CHOICES
 
 class OrderForm(forms.ModelForm):
     country = forms.ChoiceField(choices=COUNTRY_CHOICES)
