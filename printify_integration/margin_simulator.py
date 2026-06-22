@@ -96,3 +96,66 @@ def simulate_margin(*, product, variant=None, quantity=1, country="IT",
         supplier_shipping_cost=round(supplier_shipping, 2), payment_fee=payment_fee,
         gross_margin=gross_margin, net_margin=net_margin, margin_pct=margin_pct,
         low_margin_warning=gross_pct < 15.0)
+
+
+@dataclass
+class RefundMarginSimulation:
+    base: MarginSimulation
+    refund_type: str
+    refund_amount: float
+    shipping_refunded: bool
+    return_shipping_cost: float
+    payment_fee_retained: float
+    net_margin_after_refund: float
+    negative_after_refund: bool
+    explanation: str
+
+    def as_dict(self):
+        d = {k: v for k, v in self.__dict__.items() if k != "base"}
+        d["base"] = self.base.as_dict()
+        return d
+
+
+def simulate_margin_after_refund(*, product, variant=None, quantity=1, country="IT",
+                                 coupon_pct=0.0, shipping_source="auto",
+                                 refund_type="full", partial_amount=0.0,
+                                 shipping_refunded=False, return_shipping_cost=0.0):
+    """Layer a refund scenario on top of simulate_margin(). Pure calc — no order, no real
+    refund, no DB write, no email. refund_type: 'full' | 'partial' | 'item_only'."""
+    base = simulate_margin(product=product, variant=variant, quantity=quantity,
+                           country=country, coupon_pct=coupon_pct,
+                           shipping_source=shipping_source)
+    net_revenue = base.customer_subtotal - base.discount
+
+    if refund_type == "full":
+        refund = net_revenue + (base.shipping_paid if shipping_refunded else 0.0)
+    elif refund_type == "item_only":
+        refund = net_revenue
+        shipping_refunded = False
+    else:  # partial
+        refund = min(float(partial_amount or 0), net_revenue + base.shipping_paid)
+    refund = round(refund, 2)
+
+    # We've already incurred production + supplier shipping + the payment fee (Stripe keeps
+    # its fee on refunds). Return shipping is an extra cost when the item comes back.
+    net_after = round(
+        net_revenue + base.shipping_paid          # money taken
+        - base.supplier_production_cost            # already produced
+        - base.supplier_shipping_cost              # already shipped to customer
+        - base.payment_fee                         # fee retained by processor
+        - refund                                   # money returned
+        - float(return_shipping_cost or 0), 2)
+
+    parts = [f"Refund {base.currency} {refund:.2f} ({refund_type}"
+             + (", incl. shipping" if shipping_refunded else "") + ")."]
+    if base.payment_fee:
+        parts.append(f"Processor keeps the {base.currency} {base.payment_fee:.2f} fee.")
+    if return_shipping_cost:
+        parts.append(f"Return shipping {base.currency} {float(return_shipping_cost):.2f}.")
+    parts.append(f"Net after refund: {base.currency} {net_after:.2f}.")
+
+    return RefundMarginSimulation(
+        base=base, refund_type=refund_type, refund_amount=refund,
+        shipping_refunded=shipping_refunded, return_shipping_cost=round(float(return_shipping_cost or 0), 2),
+        payment_fee_retained=base.payment_fee, net_margin_after_refund=net_after,
+        negative_after_refund=net_after < 0, explanation=" ".join(parts))
