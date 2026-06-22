@@ -51,25 +51,32 @@
       });
     }
 
-    // --- notify me ---
-    document.querySelectorAll("[data-notify-form]").forEach(function (form) {
-      form.addEventListener("submit", function (e) {
-        e.preventDefault();
-        var msg = form.querySelector("[data-notify-msg]");
-        var fd = new FormData(form);
-        fetch(form.getAttribute("action"), {
+    // --- notify me (container is a <div>, not a <form>, to avoid nested-form HTML) ---
+    document.querySelectorAll("[data-notify-form]").forEach(function (box) {
+      var btn = box.querySelector("[data-notify-submit]");
+      if (!btn) return;
+      btn.addEventListener("click", function () {
+        var msg = box.querySelector("[data-notify-msg]");
+        var fd = new FormData();
+        box.querySelectorAll("input").forEach(function (inp) {
+          if (inp.type === "checkbox") { if (inp.checked) fd.append(inp.name, inp.value || "1"); }
+          else fd.append(inp.name, inp.value);
+        });
+        btn.disabled = true;
+        fetch(box.getAttribute("data-action"), {
           method: "POST",
           headers: { "X-CSRFToken": cookie("csrftoken") },
           body: fd
         }).then(function (r) { return r.json().then(function (d){ return { ok: r.ok, d: d }; }); })
           .then(function (res) {
+            btn.disabled = false;
             if (msg) {
               msg.hidden = false;
-              msg.textContent = res.d.message || (res.ok ? "Thanks!" : (form.getAttribute("data-err") || "Please check your details."));
+              msg.textContent = res.d.message || (res.ok ? "Thanks!" : (box.getAttribute("data-err") || "Please check your details."));
               msg.className = "notify-msg " + (res.ok && res.d.ok ? "is-ok" : "is-err");
             }
-            if (res.ok && res.d.ok) { form.querySelector('input[type="email"]').value = ""; track("notification_signup", {}); }
-          }).catch(function () {});
+            if (res.ok && res.d.ok) { var e = box.querySelector('input[type="email"]'); if (e) e.value = ""; track("notification_signup", {}); }
+          }).catch(function () { btn.disabled = false; });
       });
     });
   });

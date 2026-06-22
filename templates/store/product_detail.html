@@ -233,22 +233,20 @@
               </div>
 
               {% if notify_me_enabled %}
-              <div class="notify-box">
+              {# NB: a <div> (not a nested <form>) because this sits inside the add-to-cart form. #}
+              <div class="notify-box" data-notify-form data-action="{% url 'merchandising:notify_me' %}"
+                   data-err="{% trans 'Please enter a valid email and tick consent.' %}">
                 <h4>{% icon "mail" "ic" 16 %} {% trans "Notify me when it's back" %}</h4>
                 <p>{% trans "We'll email you if this item becomes available again. No spam." %}</p>
-                <form data-notify-form action="{% url 'merchandising:notify_me' %}" method="post"
-                      data-err="{% trans 'Please enter a valid email and tick consent.' %}">
-                  {% csrf_token %}
-                  <input type="hidden" name="product_id" value="{{ single_product.id }}">
-                  <input type="hidden" name="notify_type" value="back_in_stock">
-                  <input type="text" name="website" class="notify-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
-                  <div class="notify-form">
-                    <input type="email" name="email" required placeholder="{% trans 'your@email.com' %}" aria-label="{% trans 'Email address' %}">
-                    <button type="submit" class="btn btn-primary">{% trans "Notify me" %}</button>
-                  </div>
-                  <label class="notify-consent"><input type="checkbox" name="consent" value="1" required> {% trans "Email me once, about this item only." %}</label>
-                  <div class="notify-msg" data-notify-msg hidden></div>
-                </form>
+                <input type="hidden" name="product_id" value="{{ single_product.id }}">
+                <input type="hidden" name="notify_type" value="back_in_stock">
+                <input type="text" name="website" class="notify-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+                <div class="notify-form">
+                  <input type="email" name="email" required placeholder="{% trans 'your@email.com' %}" aria-label="{% trans 'Email address' %}">
+                  <button type="button" class="btn btn-primary" data-notify-submit>{% trans "Notify me" %}</button>
+                </div>
+                <label class="notify-consent"><input type="checkbox" name="consent" value="1"> {% trans "Email me once, about this item only." %}</label>
+                <div class="notify-msg" data-notify-msg hidden></div>
               </div>
               {% endif %}
 
