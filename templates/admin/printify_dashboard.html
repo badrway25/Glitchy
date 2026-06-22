@@ -68,14 +68,39 @@
     </table>
   </div>
 
-  <!-- Shipping matrix -->
+  <!-- Shipping profiles (persisted) -->
   <div class="pf-section">
-    <h2>Shipping matrix {% if ship_live %}<span class="pf-chip" style="background:#16a34a">live</span>{% else %}<span class="pf-chip" style="background:#94a3b8">fallback</span>{% endif %}</h2>
-    {% if not ship_live %}<p><a class="pf-chip" style="background:#2563eb;text-decoration:none;padding:5px 12px;" href="?check_shipping=1">Run live Printify check</a></p>{% endif %}
+    <h2>Shipping profiles <span class="pf-chip" style="background:#16a34a">persisted</span></h2>
+    <div class="pf-grid">
+      <div class="pf-kpi"><div class="v">{{ shipping_kpi.profiles }}</div><div class="l">Profiles synced</div></div>
+      <div class="pf-kpi"><div class="v">{{ shipping_kpi.countries }}</div><div class="l">Countries covered</div></div>
+      <div class="pf-kpi"><div class="v" style="font-size:14px;">{{ shipping_kpi.last_checked|default:"—" }}</div><div class="l">Last checked</div></div>
+    </div>
+    {% if not ship_rows %}<div class="pf-warn">No shipping profiles persisted yet — run <code>printify_sync_shipping_profiles --apply</code>.</div>{% endif %}
     <table class="pf-table">
-      <tr><th>Country</th><th>Source</th><th>Customer cost</th><th>ETA</th></tr>
+      <tr><th>Country</th><th>Source</th><th>First item</th><th>Additional</th><th>ETA</th><th>Checked</th></tr>
       {% for s in ship_rows %}
-      <tr><td>{{ s.country }}</td><td><span class="pf-chip" style="background:{% if s.source == 'printify' %}#16a34a{% elif s.source == 'error' %}#dc2626{% else %}#64748b{% endif %}">{{ s.source }}</span></td><td>{{ s.cost }}</td><td>{{ s.eta }}</td></tr>
+      <tr><td>{{ s.country }}</td>
+        <td><span class="pf-chip" style="background:{% if s.source == 'printify' %}#16a34a{% else %}#64748b{% endif %}">{{ s.source }}</span></td>
+        <td>{{ s.first }}</td><td>{{ s.additional }}</td><td>{{ s.eta }}</td><td style="color:#9ca3af;">{{ s.checked|date:"y-m-d H:i" }}</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  <!-- Print areas -->
+  <div class="pf-section">
+    <h2>Print areas &amp; placeholders</h2>
+    <div class="pf-grid">
+      <div class="pf-kpi"><div class="v">{{ printarea_kpi.products_with }}</div><div class="l">Products with areas</div></div>
+      <div class="pf-kpi"><div class="v">{{ printarea_kpi.products_without }}</div><div class="l">Synced w/o areas</div></div>
+      <div class="pf-kpi"><div class="v">{{ printarea_kpi.placeholders }}</div><div class="l">Placeholders</div></div>
+      <div class="pf-kpi"><div class="v" style="color:{% if printarea_kpi.missing_print_file %}#dc2626{% else %}#16a34a{% endif %}">{{ printarea_kpi.missing_print_file }}</div><div class="l">Missing print file</div></div>
+    </div>
+    <table class="pf-table">
+      <tr><th>Product</th><th>Position</th><th>Placeholders</th><th>Print file</th><th>Variants</th></tr>
+      {% for a in area_rows %}
+      <tr><td>{{ a.product|truncatechars:24 }}</td><td>{{ a.position }}</td><td>{{ a.placeholders }}</td>
+        <td>{% if a.has_file %}✓{% else %}<span style="color:#dc2626">✗ missing</span>{% endif %}</td><td>{{ a.variants }}</td></tr>
       {% endfor %}
     </table>
   </div>

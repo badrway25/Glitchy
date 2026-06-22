@@ -29,6 +29,8 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--staging", action="store_true",
                             help="Exit non-zero if a staging-critical item is not ready.")
+        parser.add_argument("--json", action="store_true",
+                            help="Emit the report as JSON (statuses only, no values).")
 
     def handle(self, *args, **options):
         S = settings
@@ -108,6 +110,12 @@ class Command(BaseCommand):
         add("Security", "SITE_URL", kv("SITE_URL"))
 
         # --- Render ---
+        if options["json"]:
+            import json
+            payload = [{"group": g, "item": i, "status": s, "critical": c}
+                       for g, i, s, c in checks]
+            self.stdout.write(json.dumps(payload, indent=2))
+            return
         if not options["staging"]:
             cur = None
             for group, item, status, _c in checks:

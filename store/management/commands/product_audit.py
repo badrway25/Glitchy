@@ -17,15 +17,19 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--json", action="store_true")
         parser.add_argument("--threshold", type=int, default=80)
+        parser.add_argument("--product-id", type=int, default=None)
 
     def handle(self, *args, **opts):
         from store.models import Product, Variation
+        qs = Product.objects.all()
+        if opts["product_id"]:
+            qs = qs.filter(id=opts["product_id"])
         buckets = {
             "no_composition": [], "no_gallery": [], "no_costs": [], "no_provider": [],
             "not_synced": [], "no_faq": [], "low_quality": [], "not_visible": [],
         }
         scores = []
-        for p in Product.objects.all():
+        for p in qs:
             dq = p.data_quality()
             scores.append(dq["score"])
             miss = set(dq["missing"])

@@ -71,36 +71,41 @@ def printify_dashboard(request):
             "cost": v.production_cost, "margin": v.margin(), "grams": v.printify_grams,
         })
 
-    # --- Shipping matrix (live only on explicit request, else fallback) ---
-    ship_rows, ship_live = [], False
-    sample = next((p for p in synced if p.printify_blueprint_id and p.printify_provider_id), None)
-    if sample:
-        from shipping.services import quote_for_cart, fallback_quote
-        from django.test import override_settings
+    # --- Shipping matrix from the PERSISTED profiles (no live API call) ---
+    from printify_integration.models import PrintifyShippingProfile, PrintifyPrintArea
+    profiles = PrintifyShippingProfile.objects.all()
+    ship_rows = []
+    for sp in profiles.order_by("country_code", "blueprint_id")[:24]:
+        ship_rows.append({
+            "country": sp.country_code, "source": sp.source,
+            "first": f"{sp.currency} {sp.first_item_cost:.2f}",
+            "additional": f"{sp.currency} {sp.additional_item_cost:.2f}",
+            "eta": f"{sp.min_delivery_days}-{sp.max_delivery_days}d",
+            "checked": sp.last_checked_at})
+    shipping_kpi = {
+        "profiles": profiles.count(),
+        "countries": profiles.values("country_code").distinct().count(),
+        "last_checked": profiles.order_by("-last_checked_at").values_list(
+            "last_checked_at", flat=True).first(),
+    }
 
-        class _CI:
-            def __init__(s, p): s.product = p; s.quantity = 1
-        cart = [_CI(sample)]
-        check_live = request.GET.get("check_shipping") == "1"
-        for cc in ["BE", "IT", "FR", "US", "MA"]:
-            try:
-                if check_live:
-                    with override_settings(SHIPPING_USE_PRINTIFY=True):
-                        q = quote_for_cart(cc, cart, subtotal=sample.price)
-                    ship_live = True
-                else:
-                    q = fallback_quote(cc, 1, sample.price)
-                ship_rows.append({
-                    "country": cc, "source": q.source,
-                    "cost": f"{q.currency} {q.cost:.2f}" if q.available else "n/a",
-                    "eta": f"{q.min_days}-{q.max_days}d" if q.available else "—"})
-            except Exception as e:
-                ship_rows.append({"country": cc, "source": "error",
-                                  "cost": type(e).__name__, "eta": "—"})
+    # --- Print area coverage KPIs ---
+    areas = PrintifyPrintArea.objects.all()
+    with_area_ids = set(areas.values_list("product_id", flat=True))
+    printarea_kpi = {
+        "products_with": len(with_area_ids),
+        "products_without": len([p for p in synced if p.id not in with_area_ids]),
+        "placeholders": areas.count(),
+        "missing_print_file": areas.filter(has_print_file=False).count(),
+    }
+    area_rows = [{"product": a.product.product_name, "position": a.position,
+                  "placeholders": a.placeholder_count, "has_file": a.has_print_file,
+                  "variants": a.variant_count} for a in areas.select_related("product")[:20]]
 
     ctx = {
         "title": "Printify dashboard",
         "overview": overview, "buckets": buckets, "avg_quality": avg_quality,
-        "rows": rows, "vrows": vrows, "ship_rows": ship_rows, "ship_live": ship_live,
+        "rows": rows, "vrows": vrows, "ship_rows": ship_rows,
+        "shipping_kpi": shipping_kpi, "printarea_kpi": printarea_kpi, "area_rows": area_rows,
     }
     return render(request, "admin/printify_dashboard.html", ctx)
