@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: greatkart 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-22 20:32+0200\n"
+"POT-Creation-Date: 2026-06-22 21:02+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -34,7 +34,7 @@ msgstr "Livraison"
 
 #: .\assistant\models.py:18 .\templates\includes\footer.html:111
 #: .\templates\legal\terms.html:15
-#: .\templates\merchandising\collections_index.html:142
+#: .\templates\merchandising\collections_index.html:160
 #: .\templates\returns\request.html:11
 #: .\templates\store\product_detail.html:273
 msgid "Returns"
@@ -202,7 +202,51 @@ msgstr "Retirer « à la une » de la sélection"
 msgid "%(n)d collection(s) un-featured."
 msgstr "%(n)d collection(s) retirée(s)."
 
-#: .\merchandising\views.py:227
+#: .\merchandising\models.py:61 .\templates\merchandising\style_quiz.html:40
+msgid "Minimal"
+msgstr "Minimal"
+
+#: .\merchandising\models.py:61 .\templates\merchandising\style_quiz.html:43
+msgid "Bold"
+msgstr "Audacieux"
+
+#: .\merchandising\models.py:61 .\templates\merchandising\style_quiz.html:61
+msgid "Everyday"
+msgstr "Quotidien"
+
+#: .\merchandising\models.py:62
+msgid "Street"
+msgstr "Street"
+
+#: .\merchandising\models.py:62
+msgid "Soft"
+msgstr "Doux"
+
+#: .\merchandising\models.py:62
+msgid "Gift-ready"
+msgstr "Idée cadeau"
+
+#: .\merchandising\models.py:65 .\templates\home.html:14
+msgid "New season"
+msgstr "Nouvelle saison"
+
+#: .\merchandising\models.py:65
+msgid "Essentials"
+msgstr "Essentiels"
+
+#: .\merchandising\models.py:65
+msgid "Gifts"
+msgstr "Cadeaux"
+
+#: .\merchandising\models.py:66
+msgid "Summer"
+msgstr "Été"
+
+#: .\merchandising\models.py:66
+msgid "Winter"
+msgstr "Hiver"
+
+#: .\merchandising\views.py:243
 msgid "We'll email you — no spam, promise."
 msgstr "Nous vous écrirons par e-mail — pas de spam, c'est promis."
 
@@ -553,7 +597,7 @@ msgstr "Resynchronisation d'un seul produit"
 msgid "Running"
 msgstr "En cours d'exécution"
 
-#: .\printify_integration\models.py:25 .\templates\base.html:90
+#: .\printify_integration\models.py:25 .\templates\base.html:91
 msgid "Success"
 msgstr "Succès"
 
@@ -561,7 +605,7 @@ msgstr "Succès"
 msgid "Partial"
 msgstr "Partiel"
 
-#: .\printify_integration\models.py:27 .\templates\base.html:91
+#: .\printify_integration\models.py:27 .\templates\base.html:92
 msgid "Error"
 msgstr "Erreur"
 
@@ -1539,21 +1583,17 @@ msgstr "En erreur"
 msgid "To fulfil"
 msgstr "À traiter"
 
-#: .\templates\base.html:92
+#: .\templates\base.html:93
 msgid "Warning"
 msgstr "Avertissement"
 
-#: .\templates\base.html:93
+#: .\templates\base.html:94
 msgid "Info"
 msgstr "Info"
 
 #: .\templates\home.html:11
 msgid "Editorial fashion — premium tailoring"
 msgstr "Mode éditoriale — tailoring premium"
-
-#: .\templates\home.html:14
-msgid "New season"
-msgstr "Nouvelle saison"
 
 #: .\templates\home.html:15
 msgid "Wear something worth keeping."
@@ -1649,7 +1689,7 @@ msgstr ""
 "longévité."
 
 #: .\templates\home.html:97 .\templates\merchandising\collection.html:49
-#: .\templates\merchandising\collections_index.html:115
+#: .\templates\merchandising\collections_index.html:133
 #: .\templates\store\product_detail.html:282
 msgid "Made on demand"
 msgstr "Fabriqués à la demande"
@@ -1932,9 +1972,9 @@ msgstr "Tous les produits"
 #: .\templates\merchandising\collection.html:116
 #: .\templates\merchandising\collections_index.html:3
 #: .\templates\merchandising\collections_index.html:5
-#: .\templates\merchandising\collections_index.html:17
-#: .\templates\merchandising\collections_index.html:161
-#: .\templates\merchandising\collections_index.html:168
+#: .\templates\merchandising\collections_index.html:31
+#: .\templates\merchandising\collections_index.html:179
+#: .\templates\merchandising\collections_index.html:186
 msgid "Collections"
 msgstr "Collections"
 
@@ -1961,7 +2001,7 @@ msgid "Press"
 msgstr "Presse"
 
 #: .\templates\includes\footer.html:75
-#: .\templates\merchandising\collections_index.html:141
+#: .\templates\merchandising\collections_index.html:159
 msgid "FAQ"
 msgstr "FAQ"
 
@@ -2060,7 +2100,7 @@ msgid "Browse categories"
 msgstr "Parcourir les catégories"
 
 #: .\templates\includes\navbar.html:66
-#: .\templates\merchandising\collections_index.html:140
+#: .\templates\merchandising\collections_index.html:158
 #: .\templates\store\_filters.html:10 .\templates\store\store.html:33
 msgid "All products"
 msgstr "Tous les produits"
@@ -2084,7 +2124,7 @@ msgstr "Panier"
 #: .\templates\legal\_legal_base.html:9
 #: .\templates\merchandising\collection.html:15
 #: .\templates\merchandising\collection.html:115
-#: .\templates\merchandising\collections_index.html:167
+#: .\templates\merchandising\collections_index.html:185
 #: .\templates\returns\policy.html:10 .\templates\returns\request.html:10
 #: .\templates\store\product_detail.html:13
 #: .\templates\store\product_detail.html:669 .\templates\store\store.html:22
@@ -2400,8 +2440,9 @@ msgid "Breadcrumb"
 msgstr "Fil d'Ariane"
 
 #: .\templates\merchandising\collection.html:26
-#: .\templates\merchandising\collections_index.html:22
-#: .\templates\merchandising\collections_index.html:49
+#: .\templates\merchandising\collections_index.html:24
+#: .\templates\merchandising\collections_index.html:36
+#: .\templates\merchandising\collections_index.html:64
 #, python-format
 msgid "%(n)s piece"
 msgid_plural "%(n)s pieces"
@@ -2433,7 +2474,7 @@ msgid "Sort"
 msgstr "Trier"
 
 #: .\templates\merchandising\collection.html:58
-#: .\templates\merchandising\collections_index.html:43
+#: .\templates\merchandising\collections_index.html:58
 msgid "Featured"
 msgstr "À la une"
 
@@ -2469,16 +2510,18 @@ msgstr "Cette collection est en préparation"
 msgid ""
 "New pieces are landing soon. Explore the full catalogue or find your match "
 "in the meantime."
-msgstr "De nouvelles pièces arrivent bientôt. En attendant, explorez tout le catalogue ou trouvez votre match."
+msgstr ""
+"De nouvelles pièces arrivent bientôt. En attendant, explorez tout le "
+"catalogue ou trouvez votre match."
 
 #: .\templates\merchandising\collection.html:85
-#: .\templates\merchandising\collections_index.html:151
+#: .\templates\merchandising\collections_index.html:169
 #: .\templates\merchandising\style_quiz_results.html:26
 msgid "Browse all products"
 msgstr "Parcourir les produits"
 
 #: .\templates\merchandising\collection.html:86
-#: .\templates\merchandising\collections_index.html:26
+#: .\templates\merchandising\collections_index.html:40
 msgid "Take the style quiz"
 msgstr "Refaire le quiz"
 
@@ -2487,7 +2530,7 @@ msgid "You might also like"
 msgstr "Vous aimerez aussi"
 
 #: .\templates\merchandising\collection.html:103
-#: .\templates\merchandising\collections_index.html:106
+#: .\templates\merchandising\collections_index.html:124
 msgid "Explore"
 msgstr "Découvrir"
 
@@ -2503,11 +2546,35 @@ msgstr ""
 msgid "Curated collections of made-on-demand fashion."
 msgstr "Collections soignées de mode à la demande."
 
-#: .\templates\merchandising\collections_index.html:16
+#: .\templates\merchandising\collections_index.html:19
+#: .\templates\merchandising\collections_index.html:78
+msgid "Shop by mood"
+msgstr "Shop par mood"
+
+#: .\templates\merchandising\collections_index.html:19
+#: .\templates\merchandising\collections_index.html:88
+msgid "Shop by season"
+msgstr "Shop par saison"
+
+#: .\templates\merchandising\collections_index.html:22
+#: .\templates\merchandising\collections_index.html:34
+#: .\templates\merchandising\collections_index.html:105
+#, python-format
+msgid "%(n)s collection"
+msgid_plural "%(n)s collections"
+msgstr[0] "%(n)s collection"
+msgstr[1] "%(n)s collections"
+
+#: .\templates\merchandising\collections_index.html:27
+#: .\templates\merchandising\collections_index.html:104
+msgid "All collections"
+msgstr "Collections"
+
+#: .\templates\merchandising\collections_index.html:30
 msgid "The edit"
 msgstr "La sélection"
 
-#: .\templates\merchandising\collections_index.html:18
+#: .\templates\merchandising\collections_index.html:32
 msgid ""
 "Shop our edits, grouped by mood and moment — each piece printed on demand, "
 "less waste, always fresh."
@@ -2515,35 +2582,24 @@ msgstr ""
 "Découvrez nos sélections, regroupées par mood et par moment — chaque pièce "
 "imprimée à la demande, moins de gaspillage, toujours neuve."
 
-#: .\templates\merchandising\collections_index.html:20
-#: .\templates\merchandising\collections_index.html:87
-#, python-format
-msgid "%(n)s collection"
-msgid_plural "%(n)s collections"
-msgstr[0] "%(n)s collection"
-msgstr[1] "%(n)s collections"
-
-#: .\templates\merchandising\collections_index.html:25
+#: .\templates\merchandising\collections_index.html:39
 msgid "Shop all pieces"
 msgstr "Voir toutes les pièces"
 
-#: .\templates\merchandising\collections_index.html:50
+#: .\templates\merchandising\collections_index.html:65
 msgid "Explore the edit"
 msgstr "Explorer la collection"
 
-#: .\templates\merchandising\collections_index.html:63
-msgid "Shop by mood"
-msgstr "Shop par mood"
+#: .\templates\merchandising\collections_index.html:97
+msgid "Clear filter"
+msgstr "Effacer le filtre"
 
-#: .\templates\merchandising\collections_index.html:73
-msgid "Shop by season"
-msgstr "Shop par saison"
+#: .\templates\merchandising\collections_index.html:104
+#, fuzzy, python-format
+msgid "%(l)s collections"
+msgstr "%(n)s collection"
 
-#: .\templates\merchandising\collections_index.html:86
-msgid "All collections"
-msgstr "Collections"
-
-#: .\templates\merchandising\collections_index.html:116
+#: .\templates\merchandising\collections_index.html:134
 msgid ""
 "Each piece is printed only when you order — less overproduction, less waste."
 msgstr ""
@@ -2561,54 +2617,54 @@ msgstr ""
 "gaspillage, toujours neufs.Imprimés uniquement à la commande — moins de "
 "gaspillage, toujours neufs."
 
-#: .\templates\merchandising\collections_index.html:117
+#: .\templates\merchandising\collections_index.html:135
 msgid "Curated drops"
 msgstr "Sélection"
 
-#: .\templates\merchandising\collections_index.html:118
+#: .\templates\merchandising\collections_index.html:136
 msgid ""
 "Collections built around a mood, a season, a moment — not endless noise."
 msgstr ""
 "Des collections construites autour d'un mood, d'une saison, d'un moment — "
 "pas de bruit sans fin."
 
-#: .\templates\merchandising\collections_index.html:119
+#: .\templates\merchandising\collections_index.html:137
 msgid "Designed for everyday"
 msgstr "Pensés pour le quotidien"
 
-#: .\templates\merchandising\collections_index.html:120
+#: .\templates\merchandising\collections_index.html:138
 msgid "Comfortable, durable staples meant to be worn, washed and loved."
 msgstr ""
 "Des basiques confortables et durables, faits pour être portés, lavés et "
 "aimés."
 
-#: .\templates\merchandising\collections_index.html:128
+#: .\templates\merchandising\collections_index.html:146
 msgid "Not sure where to start?"
 msgstr "Vous ne savez pas par où commencer ?"
 
-#: .\templates\merchandising\collections_index.html:129
+#: .\templates\merchandising\collections_index.html:147
 msgid "Ask our assistant to help you pick the right collection for your style."
 msgstr ""
 "Demandez à notre assistant de vous aider à choisir la collection adaptée à "
 "votre style."
 
-#: .\templates\merchandising\collections_index.html:132
+#: .\templates\merchandising\collections_index.html:150
 msgid "Help me choose a collection for my style"
 msgstr "Aidez-moi à choisir une collection pour mon style"
 
-#: .\templates\merchandising\collections_index.html:133
+#: .\templates\merchandising\collections_index.html:151
 msgid "Need help choosing?"
 msgstr "Besoin d'aide pour choisir ?"
 
-#: .\templates\merchandising\collections_index.html:139
+#: .\templates\merchandising\collections_index.html:157
 msgid "Helpful links"
 msgstr "Liens utiles"
 
-#: .\templates\merchandising\collections_index.html:149
+#: .\templates\merchandising\collections_index.html:167
 msgid "Collections are on their way"
 msgstr "Les collections arrivent"
 
-#: .\templates\merchandising\collections_index.html:150
+#: .\templates\merchandising\collections_index.html:168
 msgid ""
 "We're curating our first edits. In the meantime, explore the full catalogue."
 msgstr ""
@@ -2647,10 +2703,6 @@ msgstr "Moins de"
 msgid "Your vibe?"
 msgstr "Votre style ?"
 
-#: .\templates\merchandising\style_quiz.html:40
-msgid "Minimal"
-msgstr "Minimaliste"
-
 #: .\templates\merchandising\style_quiz.html:41
 msgid "Elegant"
 msgstr "Élégant"
@@ -2658,10 +2710,6 @@ msgstr "Élégant"
 #: .\templates\merchandising\style_quiz.html:42
 msgid "Casual"
 msgstr "Décontracté"
-
-#: .\templates\merchandising\style_quiz.html:43
-msgid "Bold"
-msgstr "Audacieux"
 
 #: .\templates\merchandising\style_quiz.html:48
 msgid "Favourite colour?"
@@ -2691,10 +2739,6 @@ msgstr "Neutre"
 #: .\templates\merchandising\style_quiz.html:59
 msgid "For what occasion?"
 msgstr "Pour quelle occasion ?"
-
-#: .\templates\merchandising\style_quiz.html:61
-msgid "Everyday"
-msgstr "Au quotidien"
 
 #: .\templates\merchandising\style_quiz.html:62
 msgid "Work"
@@ -3773,7 +3817,10 @@ msgid ""
 "Because items are produced on demand, please allow a short production time "
 "before shipping. You'll get a tracking link by email as soon as your order "
 "ships."
-msgstr "Comme les articles sont fabriqués à la demande, prévoyez un court délai de production avant l'expédition. Vous recevrez un lien de suivi par e-mail dès l'expédition de votre commande."
+msgstr ""
+"Comme les articles sont fabriqués à la demande, prévoyez un court délai de "
+"production avant l'expédition. Vous recevrez un lien de suivi par e-mail dès "
+"l'expédition de votre commande."
 
 #: .\templates\store\product_detail.html:313
 msgid "Complete the look"
