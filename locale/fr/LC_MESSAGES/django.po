@@ -2372,7 +2372,7 @@ msgstr "Parcourir les produits"
 msgid ""
 "Explore our edits — curated collections of made-on-demand fashion, grouped "
 "by mood and moment."
-msgstr ""
+msgstr "Explorez nos sélections — des collections soignées de mode à la demande, regroupées par mood et par moment."
 
 #: .\templates\merchandising\collections_index.html:6
 msgid "Curated collections of made-on-demand fashion."
@@ -2386,7 +2386,7 @@ msgstr "La sélection"
 msgid ""
 "Shop our edits, grouped by mood and moment — each piece printed on demand, "
 "less waste, always fresh."
-msgstr ""
+msgstr "Découvrez nos sélections, regroupées par mood et par moment — chaque pièce imprimée à la demande, moins de gaspillage, toujours neuve."
 
 #: .\templates\merchandising\collections_index.html:20
 #: .\templates\merchandising\collections_index.html:61
@@ -2467,7 +2467,7 @@ msgstr "Sélection"
 #: .\templates\merchandising\collections_index.html:92
 msgid ""
 "Collections built around a mood, a season, a moment — not endless noise."
-msgstr ""
+msgstr "Des collections construites autour d'un mood, d'une saison, d'un moment — pas de bruit sans fin."
 
 #: .\templates\merchandising\collections_index.html:93
 msgid "Designed for everyday"
@@ -2504,7 +2504,7 @@ msgstr "Les collections arrivent"
 #: .\templates\merchandising\collections_index.html:124
 msgid ""
 "We're curating our first edits. In the meantime, explore the full catalogue."
-msgstr ""
+msgstr "Nous préparons nos premières sélections. En attendant, explorez tout le catalogue."
 
 #: .\templates\merchandising\style_quiz.html:9
 msgid "Find your match"
