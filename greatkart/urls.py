@@ -4,6 +4,8 @@ from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
+from django.utils.translation import gettext_lazy as _
+from django.views.generic import TemplateView
 
 from . import views, seo
 from store.views import faq as faq_view
@@ -27,6 +29,12 @@ urlpatterns = [
 urlpatterns += i18n_patterns(
     path("", views.home, name="home"),
     path("faq/", faq_view, name="faq"),
+    path("privacy/", TemplateView.as_view(template_name="legal/privacy.html",
+         extra_context={"legal_title": _("Privacy Policy")}), name="privacy"),
+    path("terms/", TemplateView.as_view(template_name="legal/terms.html",
+         extra_context={"legal_title": _("Terms of Service")}), name="terms"),
+    path("cookies/", TemplateView.as_view(template_name="legal/cookies.html",
+         extra_context={"legal_title": _("Cookie Policy")}), name="cookies"),
     path("", include("merchandising.urls")),       # collections, style-quiz, notify-me, outfit
     path("store/", include("store.urls")),
     path("cart/", include("carts.urls")),

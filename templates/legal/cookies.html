@@ -1,0 +1,27 @@
+{% extends 'legal/_legal_base.html' %}
+{% load i18n %}
+{% block legal_content %}
+<p>{% blocktrans %}{{ SITE_NAME }} uses a small number of cookies. We do not use third-party advertising or cross-site tracking cookies.{% endblocktrans %}</p>
+
+<h2>{% trans "Strictly necessary" %}</h2>
+<ul>
+  <li><strong>sessionid</strong> — {% trans "keeps you signed in and remembers your cart." %}</li>
+  <li><strong>csrftoken</strong> — {% trans "protects forms against cross-site request forgery." %}</li>
+</ul>
+<p>{% trans "These are required for the store to work and cannot be switched off." %}</p>
+
+<h2>{% trans "Preferences" %}</h2>
+<ul>
+  <li><strong>cookie_consent</strong> — {% trans "remembers your choice on this banner." %}</li>
+  <li><strong>theme</strong> — {% trans "remembers light/dark preference (if used)." %}</li>
+</ul>
+
+<h2>{% trans "Analytics" %}</h2>
+<p>{% trans "We use first-party, aggregated analytics to understand how the store is used (e.g. page views, searches, filters). These events are not used to identify you and are not shared with advertising networks." %}</p>
+
+<h2>{% trans "Managing cookies" %}</h2>
+<p>{% trans "You can clear or block cookies in your browser settings; note that blocking strictly-necessary cookies will break checkout and sign-in." %}</p>
+
+<h2>{% trans "Contact" %}</h2>
+<p>{% trans "Email" %}: <a href="mailto:{{ SUPPORT_EMAIL }}">{{ SUPPORT_EMAIL }}</a></p>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends 'legal/_legal_base.html' %}
+{% load i18n %}
+{% block legal_content %}
+<p>{% blocktrans %}{{ SITE_NAME }} ("we") respects your privacy. This policy explains what personal data we collect, why, and the rights you have under the GDPR.{% endblocktrans %}</p>
+
+<h2>{% trans "What we collect" %}</h2>
+<ul>
+  <li>{% trans "Order & account data you provide: name, email, shipping/billing address, phone." %}</li>
+  <li>{% trans "Payment is processed by Stripe (and PayPal where enabled); we never store full card numbers." %}</li>
+  <li>{% trans "First-party analytics: anonymous, aggregated usage events (page views, search, filters). We do not use third-party advertising trackers. IP addresses, where stored, are hashed." %}</li>
+  <li>{% trans "Strictly necessary cookies (session, security/CSRF, cart) and an analytics preference cookie." %}</li>
+</ul>
+
+<h2>{% trans "Why we use it" %}</h2>
+<ul>
+  <li>{% trans "To process orders, payments, fulfilment (via our print-on-demand partner) and shipping." %}</li>
+  <li>{% trans "To provide customer support and, if you opt in, marketing emails (you can unsubscribe anytime)." %}</li>
+  <li>{% trans "To improve the store using aggregated, non-identifying analytics." %}</li>
+</ul>
+
+<h2>{% trans "Sharing" %}</h2>
+<p>{% trans "We share data only with the processors needed to run the store: the payment provider (Stripe/PayPal), the fulfilment provider (Printify) and our email/automation provider. We do not sell your data." %}</p>
+
+<h2>{% trans "Your rights" %}</h2>
+<p>{% trans "You may request access, correction, deletion, export (portability) or restriction of your data, and object to processing. To exercise these rights, contact us at the address below." %}</p>
+
+<h2>{% trans "Retention" %}</h2>
+<p>{% trans "We keep order records as long as required for accounting/legal obligations, then delete or anonymise them." %}</p>
+
+<h2>{% trans "Contact" %}</h2>
+<p>{% trans "Email" %}: <a href="mailto:{{ SUPPORT_EMAIL }}">{{ SUPPORT_EMAIL }}</a></p>
+{% endblock %}

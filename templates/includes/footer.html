@@ -22,7 +22,7 @@
             </button>
           </div>
           <div class="footer-legal-hint">
-            {% trans "By subscribing, you agree to our" %} <a class="footer-link-inline" href="#">{% trans "Privacy Policy" %}</a>.
+            {% trans "By subscribing, you agree to our" %} <a class="footer-link-inline" href="{% url 'privacy' %}">{% trans "Privacy Policy" %}</a>.
           </div>
         </form>
       </div>
@@ -102,9 +102,11 @@
         <span>© {% now "Y" %} {{ SITE_NAME }}. {% trans "All rights reserved." %}</span>
       </div>
       <div class="footer-bottom-right">
-        <a class="footer-link" href="#">{% trans "Terms" %}</a>
+        <a class="footer-link" href="{% url 'terms' %}">{% trans "Terms" %}</a>
         <span class="dot-sep">•</span>
-        <a class="footer-link" href="#">{% trans "Privacy" %}</a>
+        <a class="footer-link" href="{% url 'privacy' %}">{% trans "Privacy" %}</a>
+        <span class="dot-sep">•</span>
+        <a class="footer-link" href="{% url 'cookies' %}">{% trans "Cookies" %}</a>
         <span class="dot-sep">•</span>
         <a class="footer-link" href="{% url 'returns:policy' %}">{% trans "Returns" %}</a>
       </div>

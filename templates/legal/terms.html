@@ -1,0 +1,26 @@
+{% extends 'legal/_legal_base.html' %}
+{% load i18n %}
+{% block legal_content %}
+<p>{% blocktrans %}These terms govern your use of {{ SITE_NAME }} and any purchase you make.{% endblocktrans %}</p>
+
+<h2>{% trans "Products & orders" %}</h2>
+<p>{% trans "Items are printed on demand when you order. Colours may vary slightly from screen to garment. We may decline or cancel an order (with a full refund) if a product becomes unavailable or a pricing error occurs." %}</p>
+
+<h2>{% trans "Prices & payment" %}</h2>
+<p>{% trans "Prices are shown in the displayed currency and include applicable taxes where stated. Payment is taken securely at checkout via Stripe (and PayPal where enabled). Your order is confirmed only after payment is verified." %}</p>
+
+<h2>{% trans "Shipping" %}</h2>
+<p>{% trans "Shipping cost and estimated delivery time are shown at checkout based on your destination. Estimates are not guarantees." %}</p>
+
+<h2>{% trans "Returns" %}</h2>
+<p>{% blocktrans with d=RETURN_WINDOW_DAYS %}You may request a return within {{ d }} days of delivery, subject to our Returns policy. Items must be unworn and in original condition.{% endblocktrans %}</p>
+
+<h2>{% trans "Coupons" %}</h2>
+<p>{% trans "Promo codes are subject to their own conditions (validity, minimum order, usage limits) and may be withdrawn at any time. They have no cash value." %}</p>
+
+<h2>{% trans "Liability" %}</h2>
+<p>{% trans "To the extent permitted by law, our liability is limited to the value of your order. Nothing in these terms excludes liability that cannot be excluded by law." %}</p>
+
+<h2>{% trans "Contact" %}</h2>
+<p>{% trans "Email" %}: <a href="mailto:{{ SUPPORT_EMAIL }}">{{ SUPPORT_EMAIL }}</a></p>
+{% endblock %}

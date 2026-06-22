@@ -1303,3 +1303,36 @@ body.has-sticky-cta .ai-assistant{bottom:78px;}
   .guest-banner{flex-direction:column;align-items:stretch;}
   .guest-banner-cta{width:100%;justify-content:center;}
 }
+
+/* ============================================================================
+   PHASE 26 — legal pages + cookie consent
+   ============================================================================ */
+.legal-page{padding:2.5rem 0 4rem;}
+.legal-crumbs{font-size:.8rem;color:var(--muted);margin-bottom:1rem;}
+.legal-crumbs a{color:var(--accent-2);text-decoration:none;}
+.legal-title{font-family:var(--font-display);font-weight:800;font-size:clamp(1.9rem,5vw,2.6rem);
+  letter-spacing:-.02em;margin-bottom:.3rem;}
+.legal-updated{font-size:.85rem;margin-bottom:1.8rem;}
+.legal-body{font-size:.96rem;line-height:1.75;color:var(--text);}
+.legal-body h2{font-family:var(--font-display);font-weight:700;font-size:1.2rem;margin:1.8rem 0 .6rem;}
+.legal-body ul{padding-left:1.2rem;margin-bottom:1rem;}
+.legal-body li{margin-bottom:.4rem;color:var(--muted);}
+.legal-body a{color:var(--accent-2);}
+.legal-note{margin-top:2.5rem;padding:1rem 1.1rem;background:var(--surface-2);border:var(--border);
+  border-radius:var(--radius-sm);font-size:.82rem;color:var(--muted);}
+
+/* Cookie consent */
+.cookie-consent{position:fixed;left:1rem;right:1rem;bottom:1rem;z-index:2100;max-width:760px;margin:0 auto;
+  background:var(--surface);border:var(--border);border-radius:var(--radius);box-shadow:var(--shadow-lg);
+  transform:translateY(140%);transition:transform .3s var(--ease);}
+.cookie-consent.is-shown{transform:none;}
+.cookie-consent[hidden]{display:none;}
+.cookie-consent-inner{display:flex;align-items:center;gap:1rem;padding:1rem 1.2rem;flex-wrap:wrap;}
+.cookie-consent-text{margin:0;font-size:.85rem;color:var(--muted);flex:1;min-width:220px;}
+.cookie-consent-text a{color:var(--accent-2);}
+.cookie-consent-actions{display:flex;gap:.5rem;flex:0 0 auto;}
+@media (max-width:575.98px){
+  .cookie-consent{left:.5rem;right:.5rem;bottom:.5rem;}
+  .cookie-consent-actions{width:100%;}
+  .cookie-consent-actions .btn{flex:1;}
+}

@@ -1,0 +1,28 @@
+{% load i18n %}
+<div class="cookie-consent" id="cookieConsent" hidden role="dialog" aria-label="{% trans 'Cookie notice' %}">
+  <div class="cookie-consent-inner">
+    <p class="cookie-consent-text">
+      {% blocktrans %}We use strictly-necessary cookies and first-party analytics to run and improve the store. No third-party ad trackers.{% endblocktrans %}
+      <a href="{% url 'cookies' %}">{% trans "Learn more" %}</a>.
+    </p>
+    <div class="cookie-consent-actions">
+      <button type="button" class="btn btn-soft btn-sm" data-cookie="declined">{% trans "Decline analytics" %}</button>
+      <button type="button" class="btn btn-primary btn-sm" data-cookie="accepted">{% trans "Accept" %}</button>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  var KEY="cookie_consent";
+  try{ if(localStorage.getItem(KEY)) return; }catch(e){ return; }
+  var box=document.getElementById("cookieConsent"); if(!box) return;
+  box.hidden=false; requestAnimationFrame(function(){ box.classList.add("is-shown"); });
+  box.querySelectorAll("[data-cookie]").forEach(function(b){
+    b.addEventListener("click",function(){
+      try{ localStorage.setItem(KEY, b.getAttribute("data-cookie")); }catch(e){}
+      box.classList.remove("is-shown");
+      setTimeout(function(){ box.hidden=true; }, 250);
+    });
+  });
+})();
+</script>

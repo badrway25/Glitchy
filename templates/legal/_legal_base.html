@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+{% block title %}{{ legal_title }} • {{ SITE_NAME }}{% endblock %}
+{% block meta_description %}{{ legal_title }} — {{ SITE_NAME }}.{% endblock %}
+
+{% block content %}
+<section class="legal-page">
+  <div class="container" style="max-width:820px;">
+    <nav class="legal-crumbs"><a href="{% url 'home' %}">{% trans "Home" %}</a> / <span>{{ legal_title }}</span></nav>
+    <h1 class="legal-title">{{ legal_title }}</h1>
+    <p class="legal-updated text-muted">{% trans "Last updated" %}: {% now "F Y" %}</p>
+    <div class="legal-body">
+      {% block legal_content %}{% endblock %}
+    </div>
+    <div class="legal-note">
+      {% trans "This document is a starting template and should be reviewed by qualified legal counsel before launch." %}
+    </div>
+  </div>
+</section>
+{% endblock %}
