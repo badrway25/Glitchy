@@ -25,6 +25,7 @@ urlpatterns = [
 urlpatterns += i18n_patterns(
     path("", views.home, name="home"),
     path("faq/", faq_view, name="faq"),
+    path("", include("merchandising.urls")),       # collections, style-quiz, notify-me, outfit
     path("store/", include("store.urls")),
     path("cart/", include("carts.urls")),
     path("accounts/", include("accounts.urls")),

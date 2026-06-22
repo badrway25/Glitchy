@@ -91,6 +91,7 @@ INSTALLED_APPS = [
     "storefront",
     "wishlist",
     "promotions",
+    "merchandising",
     # Third party
     "stripe",
 ]
