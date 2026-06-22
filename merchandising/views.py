@@ -61,23 +61,59 @@ def collections_index(request):
     featured = [c for c in cards if c["featured"] and c["count"]][:3]
     total_products = sum(c["count"] for c in cards)
 
+    # Shop by mood / season — only buckets with at least one real, non-empty collection.
+    def _buckets(attr, choices):
+        out = []
+        for key, label in choices:
+            members = [c for c in cards if getattr(c["obj"], attr) == key and c["count"]]
+            if members:
+                out.append({"key": key, "label": label, "count": len(members),
+                            "first": members[0]})
+        return out
+
+    moods = _buckets("mood", Collection.MOOD_CHOICES)
+    seasons = _buckets("season", Collection.SEASON_CHOICES)
+
     return render(request, "merchandising/collections_index.html", {
         "cards": cards,
         "featured": featured,
         "collection_count": len(cards),
         "total_products": total_products,
+        "moods": moods,
+        "seasons": seasons,
         "ai_enabled": getattr(settings, "AI_ASSISTANT_ENABLED", False),
     })
 
 
 def collection_detail(request, slug):
     collection = get_object_or_404(Collection, slug=slug, is_active=True)
+    lang = _lang(request)
     track(request, "collection_view", {"slug": slug})
+
+    products = list(collection.active_products().prefetch_related("gallery"))
+    sort = request.GET.get("sort", "")
+    if sort == "price_asc":
+        products.sort(key=lambda p: float(p.price or 0))
+    elif sort == "price_desc":
+        products.sort(key=lambda p: float(p.price or 0), reverse=True)
+    elif sort == "newest":
+        products.sort(key=lambda p: p.created_date or 0, reverse=True)
+
+    pr = collection.price_range()
     return render(request, "merchandising/collection.html", {
         "collection": collection,
-        "products": collection.active_products(),
-        "hero_title": collection.hero_title_for(_lang(request)),
-        "subtitle": collection.subtitle_for(_lang(request)),
+        "products": products,
+        "product_count": len(products),
+        "hero_title": collection.hero_title_for(lang),
+        "subtitle": collection.subtitle_for(lang),
+        "editorial": collection.editorial_intro_for(lang),
+        "mood_label": collection.get_mood_display() if collection.mood else "",
+        "season_label": collection.get_season_display() if collection.season else "",
+        "colors": collection.main_colors(),
+        "price_min": pr[0] if pr else None,
+        "price_max": pr[1] if pr else None,
+        "related": collection.related(limit=3),
+        "sort": sort,
     })
 
 

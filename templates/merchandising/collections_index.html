@@ -55,6 +55,32 @@
     </div>
     {% endif %}
 
+    <!-- Shop by mood / season (real buckets only) -->
+    {% if moods or seasons %}
+    <div class="collx-shopby">
+      {% if moods %}
+      <div class="collx-shopby-group">
+        <h3>{% trans "Shop by mood" %}</h3>
+        <div class="collx-chips">
+          {% for m in moods %}
+          <a href="{{ m.first.url }}" class="collx-chip">{{ m.label }} <em>{{ m.count }}</em></a>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+      {% if seasons %}
+      <div class="collx-shopby-group">
+        <h3>{% trans "Shop by season" %}</h3>
+        <div class="collx-chips">
+          {% for s in seasons %}
+          <a href="{{ s.first.url }}" class="collx-chip">{{ s.label }} <em>{{ s.count }}</em></a>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
     <!-- All collections grid -->
     <div class="collx-allhead">
       <h2>{% trans "All collections" %}</h2>

@@ -1,37 +1,127 @@
 {% extends 'base.html' %}
 {% load static i18n uikit %}
-{% block title %}{{ collection.name }} • {{ SITE_NAME }}{% endblock %}
+{% block title %}{{ collection.seo_title_for|default:collection.name }} • {{ SITE_NAME }}{% endblock %}
 {% block meta_description %}{{ collection.meta_description|default:subtitle }}{% endblock %}
+{% block og_title %}{{ collection.name }} • {{ SITE_NAME }}{% endblock %}
+{% block og_description %}{{ collection.meta_description|default:subtitle }}{% endblock %}
+{% if collection.image %}{% block og_image %}{{ collection.image }}{% endblock %}{% endif %}
 
 {% block content %}
-<section class="coll-hero {% if collection.image %}has-img{% endif %}"
-         {% if collection.image %}style="background-image:linear-gradient(rgba(28,26,23,.45),rgba(28,26,23,.55)),url('{{ collection.image }}')"{% endif %}>
-  <div class="container">
-    <nav class="coll-crumbs"><a href="{% url 'home' %}">{% trans "Home" %}</a> / <a href="{% url 'merchandising:collections' %}">{% trans "Collections" %}</a> / <span>{{ collection.name }}</span></nav>
-    <h1 class="coll-hero-title">{{ hero_title }}</h1>
-    {% if subtitle %}<p class="coll-hero-sub">{{ subtitle }}</p>{% endif %}
+<!-- Hero -->
+<section class="cdx-hero {% if collection.image %}has-img{% endif %}"
+         {% if collection.image %}style="background-image:linear-gradient(rgba(28,26,23,.5),rgba(28,26,23,.6)),url('{{ collection.image }}')"{% endif %}>
+  <div class="container" style="max-width:1280px;">
+    <nav class="cdx-crumbs" aria-label="{% trans 'Breadcrumb' %}">
+      <a href="{% url 'home' %}">{% trans "Home" %}</a>
+      <span>/</span><a href="{% url 'merchandising:collections' %}">{% trans "Collections" %}</a>
+      <span>/</span><span aria-current="page">{{ collection.name }}</span>
+    </nav>
+    <div class="cdx-hero-badges">
+      {% if mood_label %}<span class="cdx-badge">{% icon "spark" "ic" 13 %} {{ mood_label }}</span>{% endif %}
+      {% if season_label %}<span class="cdx-badge">{{ season_label }}</span>{% endif %}
+    </div>
+    <h1 class="cdx-hero-title">{{ hero_title }}</h1>
+    {% if subtitle %}<p class="cdx-hero-sub">{{ subtitle }}</p>{% endif %}
+    <div class="cdx-hero-meta">
+      <span>{% blocktrans count n=product_count %}{{ n }} piece{% plural %}{{ n }} pieces{% endblocktrans %}</span>
+      {% if price_min %}<span class="dot">·</span><span>{% trans "from" %} {{ CURRENCY_SYMBOL }}{{ price_min|floatformat:0 }}</span>{% endif %}
+    </div>
+    {% if products %}<a href="#cdx-products" class="btn btn-primary cdx-hero-cta">{% trans "Shop this edit" %} {% icon "arrow-right" "ic" 15 %}</a>{% endif %}
   </div>
 </section>
 
 <section class="section-content padding-y">
   <div class="container" style="max-width:1280px;">
+
+    {% if editorial %}
+    <div class="cdx-editorial">{{ editorial|linebreaksbr }}</div>
+    {% endif %}
+
     {% if products %}
-      <div class="row g-3 g-md-4">
-        {% for p in products %}
-          <div class="col-6 col-lg-3 d-flex">{% include 'merchandising/_product_card.html' with p=p %}</div>
+    <!-- Insights -->
+    <div class="cdx-insights">
+      <div class="cdx-insight"><span class="l">{% trans "Pieces" %}</span><span class="v">{{ product_count }}</span></div>
+      {% if price_min %}<div class="cdx-insight"><span class="l">{% trans "Price range" %}</span><span class="v">{{ CURRENCY_SYMBOL }}{{ price_min|floatformat:0 }}–{{ price_max|floatformat:0 }}</span></div>{% endif %}
+      {% if colors %}
+      <div class="cdx-insight cdx-insight-colors"><span class="l">{% trans "Colours" %}</span>
+        <span class="cdx-swatches">{% for c in colors %}<span class="cdx-sw" title="{{ c }}" style="--sw:{{ c|lower }}"></span>{% endfor %}</span></div>
+      {% endif %}
+      <div class="cdx-insight cdx-insight-pod">{% icon "leaf" "ic" 16 %} {% trans "Made on demand" %}</div>
+    </div>
+
+    <!-- Sort + grid -->
+    <div class="cdx-toolbar" id="cdx-products">
+      <h2 class="cdx-grid-title">{% trans "In this collection" %}</h2>
+      <form method="get" class="cdx-sort">
+        <label for="cdxSort" class="sr-only">{% trans "Sort" %}</label>
+        <select id="cdxSort" name="sort" onchange="this.form.submit()" class="form-control">
+          <option value="" {% if not sort %}selected{% endif %}>{% trans "Featured" %}</option>
+          <option value="newest" {% if sort == 'newest' %}selected{% endif %}>{% trans "Newest" %}</option>
+          <option value="price_asc" {% if sort == 'price_asc' %}selected{% endif %}>{% trans "Price: low to high" %}</option>
+          <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>{% trans "Price: high to low" %}</option>
+        </select>
+      </form>
+    </div>
+    <div class="row g-3 g-md-4">
+      {% for p in products %}
+        <div class="col-6 col-lg-3 d-flex">{% include 'merchandising/_product_card.html' with p=p %}</div>
+      {% endfor %}
+    </div>
+
+    <!-- Trust block -->
+    <div class="cdx-trust">
+      <div class="cdx-trust-item">{% icon "leaf" "ic" 18 %}<span>{% trans "Printed on demand" %}</span></div>
+      <div class="cdx-trust-item">{% icon "returns" "ic" 18 %}<span>{% blocktrans with d=RETURN_WINDOW_DAYS %}{{ d }}-day returns{% endblocktrans %}</span></div>
+      <div class="cdx-trust-item">{% icon "truck" "ic" 18 %}<span>{% trans "Tracked delivery" %}</span></div>
+    </div>
+
+    {% else %}
+    <!-- Empty state -->
+    <div class="cdx-empty">
+      <div class="cdx-empty-ic">{% icon "bag" "ic" 38 %}</div>
+      <h3>{% trans "This collection is being curated" %}</h3>
+      <p class="text-muted">{% blocktrans %}New pieces are landing soon. Explore the full catalogue or find your match in the meantime.{% endblocktrans %}</p>
+      <div class="cdx-empty-cta">
+        <a href="{% url 'store' %}" class="btn btn-primary">{% trans "Browse all products" %}</a>
+        <a href="{% url 'merchandising:style_quiz' %}" class="btn btn-soft">{% trans "Take the style quiz" %}</a>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Related collections -->
+    {% if related %}
+    <section class="cdx-related">
+      <h2>{% trans "You might also like" %}</h2>
+      <div class="cdx-related-grid">
+        {% for r in related %}
+        <a href="{{ r.get_url }}" class="cdx-related-card">
+          <div class="cdx-related-media">
+            {% if r.image %}<img src="{{ r.image }}" alt="{{ r.name }}" loading="lazy">
+            {% else %}<div class="cdx-related-collage">{% for p in r.active_products|slice:':4' %}{% if p.cover_image %}<img src="{{ p.cover_image }}" alt="" loading="lazy">{% endif %}{% endfor %}</div>{% endif %}
+          </div>
+          <div class="cdx-related-body"><span class="cdx-related-name">{{ r.name }}</span>
+            <span class="cdx-related-cta">{% trans "Explore" %} {% icon "arrow-right" "ic" 12 %}</span></div>
+        </a>
         {% endfor %}
       </div>
-    {% else %}
-      <div class="store-empty"><h3>{% trans "This collection is being curated" %}</h3>
-        <a href="{% url 'store' %}" class="btn btn-primary mt-3">{% trans "Browse all products" %}</a></div>
+    </section>
     {% endif %}
+
   </div>
 </section>
 
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
-{"@type":"ListItem","position":1,"name":"{% trans 'Home' %}","item":"{{ request.scheme }}://{{ request.get_host }}/"},
-{"@type":"ListItem","position":2,"name":"{% trans 'Collections' %}"},
-{"@type":"ListItem","position":3,"name":"{{ collection.name|escapejs }}"}]}
+{"@type":"ListItem","position":1,"name":"{% trans 'Home' %}","item":"{{ SITE_URL }}/"},
+{"@type":"ListItem","position":2,"name":"{% trans 'Collections' %}","item":"{{ SITE_URL }}{% url 'merchandising:collections' %}"},
+{"@type":"ListItem","position":3,"name":"{{ collection.name|escapejs }}","item":"{{ SITE_URL }}{{ collection.get_url }}"}]}
 </script>
+{% if products %}
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"CollectionPage","name":"{{ collection.name|escapejs }}",
+ "url":"{{ SITE_URL }}{{ collection.get_url }}","description":"{{ collection.meta_description|default:subtitle|escapejs }}",
+ "mainEntity":{"@type":"ItemList","numberOfItems":{{ product_count }},
+  "itemListElement":[{% for p in products %}{"@type":"ListItem","position":{{ forloop.counter }},"name":"{{ p.product_name|escapejs }}","url":"{{ SITE_URL }}{{ p.get_url }}"}{% if not forloop.last %},{% endif %}{% endfor %}]}}
+</script>
+{% endif %}
 {% endblock %}
