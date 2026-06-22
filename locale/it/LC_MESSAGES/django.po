@@ -790,14 +790,10 @@ msgid "Printify"
 msgstr "Printify"
 
 #: .\store\admin.py:47
-#, fuzzy
-#| msgid "Liability"
 msgid "Quality"
 msgstr "Responsabilità"
 
 #: .\store\admin.py:53
-#, fuzzy
-#| msgid "Printify sync log"
 msgid "Printify data panel"
 msgstr "Registro di sincronizzazione Printify"
 
@@ -3290,14 +3286,10 @@ msgid "Free returns within %(d)s days"
 msgstr "Resi gratuiti entro %(d)s giorni"
 
 #: .\templates\store\product_detail.html:283
-#, fuzzy
-#| msgid "Printed only when you order — less waste, always fresh."
 msgid "Each piece is printed only when you order — less waste, always fresh."
 msgstr "Stampati solo quando ordini — meno sprechi, sempre freschi."
 
 #: .\templates\store\product_detail.html:285
-#, fuzzy
-#| msgid "Print on demand"
 msgid "Printed to order"
 msgstr "Prodotti su richiesta"
 
@@ -3313,17 +3305,13 @@ msgstr[0] "%(c)s colore"
 msgstr[1] "%(c)s colori"
 
 #: .\templates\store\product_detail.html:291
-#, fuzzy, python-format
-#| msgid "%(n)s sold"
-#| msgid_plural "%(n)s sold"
+#, python-format
 msgid "%(s)s size"
 msgid_plural "%(s)s sizes"
-msgstr[0] "%(n)s venduto"
-msgstr[1] "%(n)s venduti"
+msgstr[0] "%(s)s taglia"
+msgstr[1] "%(s)s taglie"
 
 #: .\templates\store\product_detail.html:294
-#, fuzzy
-#| msgid "Estimated delivery"
 msgid "Tracked delivery"
 msgstr "Consegna stimata"
 
