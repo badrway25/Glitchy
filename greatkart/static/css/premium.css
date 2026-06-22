@@ -1291,3 +1291,15 @@ body.has-sticky-cta .ai-assistant{bottom:78px;}
   .shop-aside{display:none;}
   .filter-bar{display:flex;}
 }
+
+/* Guest checkout banner — premium, on-brand (replaces hardcoded slate alert) */
+.guest-banner{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;
+  background:var(--surface-2);border:var(--border);border-left:3px solid var(--accent);
+  border-radius:var(--radius);padding:.85rem 1.1rem;margin-bottom:1.4rem;box-shadow:var(--shadow-soft);}
+.guest-banner-text{display:inline-flex;align-items:center;gap:.55rem;font-size:.92rem;color:var(--text);}
+.guest-banner-text i{color:var(--accent-2);}
+.guest-banner-cta{flex:0 0 auto;white-space:nowrap;font-weight:600;}
+@media (max-width:575.98px){
+  .guest-banner{flex-direction:column;align-items:stretch;}
+  .guest-banner-cta{width:100%;justify-content:center;}
+}

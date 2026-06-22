@@ -18,11 +18,12 @@
     </div>
 
     {% if is_guest %}
-    <div class="alert d-flex align-items-center justify-content-between" role="alert"
-         style="background:#f1f5f9;border:1px solid #e2e8f0;border-radius:12px;">
-      <span><i class="fa fa-user-clock mr-2"></i>{% trans "You're checking out as a guest. No account needed." %}</span>
-      <a href="{% url 'login' %}?next={% url 'checkout' %}" class="btn btn-sm btn-outline-dark">
-        {% trans "Have an account? Sign in" %}
+    <div class="guest-banner">
+      <span class="guest-banner-text">
+        <i class="fa fa-user-clock"></i>{% trans "You're checking out as a guest. No account needed." %}
+      </span>
+      <a href="{% url 'login' %}?next={% url 'checkout' %}" class="btn btn-soft btn-sm guest-banner-cta">
+        {% trans "Have an account? Sign in" %} <i class="fa fa-arrow-right ml-1"></i>
       </a>
     </div>
     {% endif %}
