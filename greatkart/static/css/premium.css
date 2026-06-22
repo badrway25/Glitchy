@@ -1573,3 +1573,10 @@ body.has-sticky-cta .ai-assistant{bottom:78px;}
 .collx-chip em{font-style:normal;font-size:.72rem;color:var(--muted);background:var(--surface-2);
   border-radius:999px;padding:.05rem .4rem;}
 @media (max-width:700px){.collx-shopby{grid-template-columns:1fr;gap:1.2rem;}}
+
+/* Active filter chip + clear (collections index, Phase 36) */
+.collx-chip.is-active{background:var(--primary);color:#fff;border-color:var(--primary);}
+.collx-chip.is-active em{background:rgba(255,255,255,.2);color:#fff;}
+.collx-clear{grid-column:1/-1;display:inline-flex;align-items:center;gap:.35rem;justify-self:start;
+  margin-top:.3rem;font-size:.82rem;font-weight:600;color:var(--accent-2);text-decoration:none;}
+.collx-clear:hover{color:var(--primary);}

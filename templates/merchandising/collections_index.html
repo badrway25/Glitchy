@@ -4,6 +4,7 @@
 {% block meta_description %}{% blocktrans %}Explore our edits — curated collections of made-on-demand fashion, grouped by mood and moment.{% endblocktrans %}{% endblock %}
 {% block og_title %}{% trans "Collections" %} • {{ SITE_NAME }}{% endblock %}
 {% block og_description %}{% blocktrans %}Curated collections of made-on-demand fashion.{% endblocktrans %}{% endblock %}
+{% block robots %}{% if active_filter %}<meta name="robots" content="noindex,follow">{% endif %}{% endblock %}
 
 {% block content %}
 <section class="collx">
@@ -13,18 +14,32 @@
     <!-- Hero -->
     <header class="collx-hero">
       <div class="collx-hero-inner">
-        <div class="lux-eyebrow mb-2">{% icon "spark" "ic" 15 %} {% trans "The edit" %}</div>
-        <h1 class="collx-hero-title">{% trans "Collections" %}</h1>
-        <p class="collx-hero-sub">{% blocktrans %}Shop our edits, grouped by mood and moment — each piece printed on demand, less waste, always fresh.{% endblocktrans %}</p>
-        <div class="collx-hero-meta">
-          <span>{% blocktrans count n=collection_count %}{{ n }} collection{% plural %}{{ n }} collections{% endblocktrans %}</span>
-          <span class="dot">·</span>
-          <span>{% blocktrans count n=total_products %}{{ n }} piece{% plural %}{{ n }} pieces{% endblocktrans %}</span>
-        </div>
-        <div class="collx-hero-cta">
-          <a href="{% url 'store' %}" class="btn btn-primary">{% trans "Shop all pieces" %} {% icon "arrow-right" "ic" 15 %}</a>
-          <a href="{% url 'merchandising:style_quiz' %}" class="btn btn-soft">{% trans "Take the style quiz" %}</a>
-        </div>
+        {% if active_filter %}
+          <div class="lux-eyebrow mb-2">{% icon "spark" "ic" 15 %}
+            {% if active_filter.type == 'mood' %}{% trans "Shop by mood" %}{% else %}{% trans "Shop by season" %}{% endif %}</div>
+          <h1 class="collx-hero-title">{{ active_filter.label }}</h1>
+          <div class="collx-hero-meta">
+            <span>{% blocktrans count n=collection_count %}{{ n }} collection{% plural %}{{ n }} collections{% endblocktrans %}</span>
+            <span class="dot">·</span>
+            <span>{% blocktrans count n=total_products %}{{ n }} piece{% plural %}{{ n }} pieces{% endblocktrans %}</span>
+          </div>
+          <div class="collx-hero-cta">
+            <a href="{% url 'merchandising:collections' %}" class="btn btn-soft">{% icon "arrow-left" "ic" 14 %} {% trans "All collections" %}</a>
+          </div>
+        {% else %}
+          <div class="lux-eyebrow mb-2">{% icon "spark" "ic" 15 %} {% trans "The edit" %}</div>
+          <h1 class="collx-hero-title">{% trans "Collections" %}</h1>
+          <p class="collx-hero-sub">{% blocktrans %}Shop our edits, grouped by mood and moment — each piece printed on demand, less waste, always fresh.{% endblocktrans %}</p>
+          <div class="collx-hero-meta">
+            <span>{% blocktrans count n=collection_count %}{{ n }} collection{% plural %}{{ n }} collections{% endblocktrans %}</span>
+            <span class="dot">·</span>
+            <span>{% blocktrans count n=total_products %}{{ n }} piece{% plural %}{{ n }} pieces{% endblocktrans %}</span>
+          </div>
+          <div class="collx-hero-cta">
+            <a href="{% url 'store' %}" class="btn btn-primary">{% trans "Shop all pieces" %} {% icon "arrow-right" "ic" 15 %}</a>
+            <a href="{% url 'merchandising:style_quiz' %}" class="btn btn-soft">{% trans "Take the style quiz" %}</a>
+          </div>
+        {% endif %}
       </div>
     </header>
 
@@ -55,7 +70,7 @@
     </div>
     {% endif %}
 
-    <!-- Shop by mood / season (real buckets only) -->
+    <!-- Shop by mood / season (real buckets only) -> filtered landing -->
     {% if moods or seasons %}
     <div class="collx-shopby">
       {% if moods %}
@@ -63,7 +78,7 @@
         <h3>{% trans "Shop by mood" %}</h3>
         <div class="collx-chips">
           {% for m in moods %}
-          <a href="{{ m.first.url }}" class="collx-chip">{{ m.label }} <em>{{ m.count }}</em></a>
+          <a href="?mood={{ m.key }}" class="collx-chip {% if active_filter.type == 'mood' and active_filter.key == m.key %}is-active{% endif %}">{{ m.label }} <em>{{ m.count }}</em></a>
           {% endfor %}
         </div>
       </div>
@@ -73,17 +88,20 @@
         <h3>{% trans "Shop by season" %}</h3>
         <div class="collx-chips">
           {% for s in seasons %}
-          <a href="{{ s.first.url }}" class="collx-chip">{{ s.label }} <em>{{ s.count }}</em></a>
+          <a href="?season={{ s.key }}" class="collx-chip {% if active_filter.type == 'season' and active_filter.key == s.key %}is-active{% endif %}">{{ s.label }} <em>{{ s.count }}</em></a>
           {% endfor %}
         </div>
       </div>
+      {% endif %}
+      {% if active_filter %}
+      <a href="{% url 'merchandising:collections' %}" class="collx-clear">{% icon "x" "ic" 13 %} {% trans "Clear filter" %}</a>
       {% endif %}
     </div>
     {% endif %}
 
     <!-- All collections grid -->
     <div class="collx-allhead">
-      <h2>{% trans "All collections" %}</h2>
+      <h2>{% if active_filter %}{% blocktrans with l=active_filter.label %}{{ l }} collections{% endblocktrans %}{% else %}{% trans "All collections" %}{% endif %}</h2>
       <span class="text-muted">{% blocktrans count n=collection_count %}{{ n }} collection{% plural %}{{ n }} collections{% endblocktrans %}</span>
     </div>
     <div class="collx-grid">

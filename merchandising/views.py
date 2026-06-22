@@ -57,22 +57,37 @@ def collections_index(request):
             "previews": [p for p in prods[:4]],   # small thumbnails for the card
         }
 
-    cards = [_card(c) for c in qs]
-    featured = [c for c in cards if c["featured"] and c["count"]][:3]
-    total_products = sum(c["count"] for c in cards)
+    all_cards = [_card(c) for c in qs]
 
     # Shop by mood / season — only buckets with at least one real, non-empty collection.
+    mood_map = dict(Collection.MOOD_CHOICES)
+    season_map = dict(Collection.SEASON_CHOICES)
+
     def _buckets(attr, choices):
         out = []
         for key, label in choices:
-            members = [c for c in cards if getattr(c["obj"], attr) == key and c["count"]]
-            if members:
-                out.append({"key": key, "label": label, "count": len(members),
-                            "first": members[0]})
+            n = sum(1 for c in all_cards if getattr(c["obj"], attr) == key and c["count"])
+            if n:
+                out.append({"key": key, "label": label, "count": n})
         return out
 
     moods = _buckets("mood", Collection.MOOD_CHOICES)
     seasons = _buckets("season", Collection.SEASON_CHOICES)
+
+    # Active filter (real, validated key only) -> a true filtered landing.
+    f_mood = request.GET.get("mood", "")
+    f_season = request.GET.get("season", "")
+    active_filter = None
+    cards = all_cards
+    if f_mood in mood_map and any(b["key"] == f_mood for b in moods):
+        cards = [c for c in all_cards if c["obj"].mood == f_mood]
+        active_filter = {"type": "mood", "key": f_mood, "label": mood_map[f_mood]}
+    elif f_season in season_map and any(b["key"] == f_season for b in seasons):
+        cards = [c for c in all_cards if c["obj"].season == f_season]
+        active_filter = {"type": "season", "key": f_season, "label": season_map[f_season]}
+
+    featured = [] if active_filter else [c for c in all_cards if c["featured"] and c["count"]][:3]
+    total_products = sum(c["count"] for c in cards)
 
     return render(request, "merchandising/collections_index.html", {
         "cards": cards,
@@ -81,6 +96,7 @@ def collections_index(request):
         "total_products": total_products,
         "moods": moods,
         "seasons": seasons,
+        "active_filter": active_filter,
         "ai_enabled": getattr(settings, "AI_ASSISTANT_ENABLED", False),
     })
 

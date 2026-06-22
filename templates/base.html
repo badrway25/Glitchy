@@ -19,6 +19,7 @@
 
   {# Canonical + EN/IT/FR hreflang alternates for international SEO #}
   <link rel="canonical" href="{{ CANONICAL_URL }}">
+  {% block robots %}{% endblock %}
   {% for lang, href in HREFLANG_ALTERNATES %}<link rel="alternate" hreflang="{{ lang }}" href="{{ href }}">
   {% endfor %}
   <script type="application/ld+json">
