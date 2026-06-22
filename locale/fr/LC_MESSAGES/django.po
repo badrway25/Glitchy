@@ -541,26 +541,18 @@ msgid "Printify sync logs"
 msgstr "Journaux de synchronisation Printify"
 
 #: .\printify_integration\models.py:78
-#, fuzzy
-#| msgid "Printify sync log"
 msgid "Printify shipping profile"
 msgstr "Journal de synchronisation Printify"
 
 #: .\printify_integration\models.py:79
-#, fuzzy
-#| msgid "Printify sync logs"
 msgid "Printify shipping profiles"
 msgstr "Journaux de synchronisation Printify"
 
 #: .\printify_integration\models.py:103
-#, fuzzy
-#| msgid "Printify data panel"
 msgid "Printify print area"
 msgstr "Journal de synchronisation Printify"
 
 #: .\printify_integration\models.py:104
-#, fuzzy
-#| msgid "Printify data panel"
 msgid "Printify print areas"
 msgstr "Journal de synchronisation Printify"
 
@@ -1994,10 +1986,8 @@ msgid "Search products"
 msgstr "Rechercher des produits"
 
 #: .\templates\includes\navbar.html:26
-#, fuzzy
-#| msgid "Search products, categories…"
 msgid "Search products, collections, colours…"
-msgstr "Rechercher des produits, des catégories…"
+msgstr "Rechercher produits, collections, couleurs…"
 
 #: .\templates\includes\navbar.html:28
 msgid "Clear search"
@@ -2005,7 +1995,7 @@ msgstr "Effacer la recherche"
 
 #: .\templates\includes\navbar.html:31
 msgid "Search"
-msgstr "Recherche :"
+msgstr "Recherche"
 
 #: .\templates\includes\navbar.html:42 .\templates\store\product_detail.html:14
 #: .\templates\store\product_detail.html:670 .\templates\store\store.html:4
@@ -2014,8 +2004,6 @@ msgid "Store"
 msgstr "Boutique"
 
 #: .\templates\includes\navbar.html:52
-#, fuzzy
-#| msgid "New season"
 msgid "New in"
 msgstr "Nouvelle saison"
 
@@ -2390,8 +2378,7 @@ msgstr "Découvrez nos sélections, regroupées par mood et par moment — chaqu
 
 #: .\templates\merchandising\collections_index.html:20
 #: .\templates\merchandising\collections_index.html:61
-#, fuzzy, python-format
-#| msgid "Browse collections"
+#, python-format
 msgid "%(n)s collection"
 msgid_plural "%(n)s collections"
 msgstr[0] "Pas encore de collections"
@@ -2399,9 +2386,7 @@ msgstr[1] "Pas encore de collections"
 
 #: .\templates\merchandising\collections_index.html:22
 #: .\templates\merchandising\collections_index.html:49
-#, fuzzy, python-format
-#| msgid "%(n)s result"
-#| msgid_plural "%(n)s results"
+#, python-format
 msgid "%(n)s piece"
 msgid_plural "%(n)s pieces"
 msgstr[0] "%(n)s vendu"
@@ -2412,8 +2397,6 @@ msgid "Shop all pieces"
 msgstr "Voir toutes les pièces"
 
 #: .\templates\merchandising\collections_index.html:26
-#, fuzzy
-#| msgid "Retake the quiz"
 msgid "Take the style quiz"
 msgstr "Refaire le quiz"
 
@@ -2422,14 +2405,10 @@ msgid "Featured"
 msgstr "À la une"
 
 #: .\templates\merchandising\collections_index.html:50
-#, fuzzy
-#| msgid "Explore the collection"
 msgid "Explore the edit"
 msgstr "Explorer la collection"
 
 #: .\templates\merchandising\collections_index.html:60
-#, fuzzy
-#| msgid "Collections"
 msgid "All collections"
 msgstr "Collections"
 
@@ -2438,9 +2417,6 @@ msgid "Explore"
 msgstr "Découvrir"
 
 #: .\templates\merchandising\collections_index.html:90
-#, fuzzy
-#| msgid ""
-#| "Each piece is printed only when you order — less waste, always fresh."
 msgid ""
 "Each piece is printed only when you order — less overproduction, less waste."
 msgstr ""
@@ -2459,8 +2435,6 @@ msgstr ""
 "gaspillage, toujours neufs."
 
 #: .\templates\merchandising\collections_index.html:91
-#, fuzzy
-#| msgid "Curated"
 msgid "Curated drops"
 msgstr "Sélection"
 
