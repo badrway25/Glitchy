@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MaxValueValidator, MinValueValidator
 from category.models import Category
 from django.urls import reverse
 from accounts.models import Account
@@ -153,11 +154,18 @@ class ReviewRating(models.Model):
     user = models.ForeignKey(Account, on_delete=models.CASCADE)
     subject = models.CharField(max_length=100, blank=True)
     review = models.TextField(max_length=500, blank=True)
-    rating = models.FloatField()
+    rating = models.FloatField(validators=[MinValueValidator(1), MaxValueValidator(5)])
     ip = models.CharField(max_length=20, blank=True)
     status = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            # Ratings are 1–5 at the database level, not just in the form UI.
+            models.CheckConstraint(condition=models.Q(rating__gte=1) & models.Q(rating__lte=5),
+                                   name="review_rating_1_5"),
+        ]
 
     def __str__(self):
         return self.subject
