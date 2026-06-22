@@ -3,6 +3,7 @@ back-in-stock / drop notification sign-ups. All customer-facing text is EN/IT/FR
 from django.conf import settings
 from django.db import models
 from django.utils.text import slugify
+from django.utils.translation import gettext_lazy as _
 
 
 class ProductRelation(models.Model):
@@ -46,7 +47,9 @@ class Collection(models.Model):
     hero_title = models.CharField(max_length=160, blank=True, default="")
     hero_title_it = models.CharField(max_length=160, blank=True, default="")
     hero_title_fr = models.CharField(max_length=160, blank=True, default="")
-    image = models.URLField(blank=True, default="")
+    image = models.URLField(blank=True, default="",
+                            help_text="Hero image URL. If empty, a collage of the collection's "
+                                      "real product images is shown automatically.")
     meta_description = models.CharField(max_length=200, blank=True, default="")
     seo_title = models.CharField(max_length=160, blank=True, default="")
     products = models.ManyToManyField("store.Product", related_name="collections", blank=True)
@@ -57,12 +60,12 @@ class Collection(models.Model):
     editorial_intro_fr = models.TextField(blank=True, default="")
 
     MOOD_CHOICES = [
-        ("minimal", "Minimal"), ("bold", "Bold"), ("everyday", "Everyday"),
-        ("street", "Street"), ("soft", "Soft"), ("gift_ready", "Gift-ready"),
+        ("minimal", _("Minimal")), ("bold", _("Bold")), ("everyday", _("Everyday")),
+        ("street", _("Street")), ("soft", _("Soft")), ("gift_ready", _("Gift-ready")),
     ]
     SEASON_CHOICES = [
-        ("new_season", "New season"), ("essentials", "Essentials"), ("gifts", "Gifts"),
-        ("summer", "Summer"), ("winter", "Winter"),
+        ("new_season", _("New season")), ("essentials", _("Essentials")), ("gifts", _("Gifts")),
+        ("summer", _("Summer")), ("winter", _("Winter")),
     ]
     mood = models.CharField(max_length=20, choices=MOOD_CHOICES, blank=True, default="")
     season = models.CharField(max_length=20, choices=SEASON_CHOICES, blank=True, default="")
