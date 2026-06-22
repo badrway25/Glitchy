@@ -1,0 +1,92 @@
+{% load i18n uikit %}
+{# Real server-side filter form -> shareable GET URL. Used by desktop aside + mobile drawer. #}
+<form class="filter-form" method="get" action="{% if category %}{{ category.get_url }}{% else %}{% url 'store' %}{% endif %}" data-filter-form>
+  {% if active_filters.keyword %}<input type="hidden" name="keyword" value="{{ active_filters.keyword }}">{% endif %}
+
+  <!-- Categories -->
+  <div class="filter-section">
+    <div class="filter-head"><h6>{% icon "tag" "ic" 16 %} {% trans "Category" %}</h6></div>
+    <div class="filter-body cat-list">
+      <a class="cat-item {% if not category %}active{% endif %}" href="{% url 'store' %}">{% trans "All products" %}</a>
+      {% for c in categories %}
+        <a class="cat-item {% if category and category.id == c.id %}active{% endif %}" href="{{ c.get_url }}">{{ c.category_name }}</a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Price -->
+  <div class="filter-section">
+    <div class="filter-head"><h6>{% icon "card" "ic" 16 %} {% trans "Price" %}</h6></div>
+    <div class="filter-body">
+      <div class="range-row">
+        <input type="number" name="min_price" class="form-control" inputmode="numeric" min="0"
+               placeholder="{% trans 'Min' %} {{ facets.price.lo }}" value="{{ active_filters.min_price|default_if_none:'' }}">
+        <span class="range-dash">–</span>
+        <input type="number" name="max_price" class="form-control" inputmode="numeric" min="0"
+               placeholder="{% trans 'Max' %} {{ facets.price.hi }}" value="{{ active_filters.max_price|default_if_none:'' }}">
+      </div>
+    </div>
+  </div>
+
+  <!-- Colour (only options that exist) -->
+  {% if facets.colors %}
+  <div class="filter-section">
+    <div class="filter-head"><h6>{% icon "spark" "ic" 16 %} {% trans "Colour" %}</h6></div>
+    <div class="filter-body chip-opts">
+      {% for c in facets.colors %}
+        <label class="chip-opt">
+          <input type="checkbox" name="color" value="{{ c.value }}" {% if c.value in active_filters.color %}checked{% endif %}>
+          <span>{{ c.value|capfirst }} <em>{{ c.count }}</em></span>
+        </label>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Size (only options that exist) -->
+  {% if facets.sizes %}
+  <div class="filter-section">
+    <div class="filter-head"><h6>{% icon "ruler" "ic" 16 %} {% trans "Size" %}</h6></div>
+    <div class="filter-body chip-opts">
+      {% for s in facets.sizes %}
+        <label class="chip-opt chip-opt-sq">
+          <input type="checkbox" name="size" value="{{ s.value }}" {% if s.value in active_filters.size %}checked{% endif %}>
+          <span>{{ s.value|upper }}</span>
+        </label>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Rating -->
+  <div class="filter-section">
+    <div class="filter-head"><h6>{% icon "star" "ic" 16 %} {% trans "Rating" %}</h6></div>
+    <div class="filter-body rating-opts">
+      {% for r in "4321"|make_list %}
+        <label class="rating-opt">
+          <input type="radio" name="rating" value="{{ r }}" {% if active_filters.rating|stringformat:'s' == r %}checked{% endif %}>
+          <span>{{ r }}★ {% trans "& up" %}</span>
+        </label>
+      {% endfor %}
+      <label class="rating-opt"><input type="radio" name="rating" value="" {% if not active_filters.rating %}checked{% endif %}><span>{% trans "Any" %}</span></label>
+    </div>
+  </div>
+
+  <!-- Toggles -->
+  <div class="filter-section">
+    <div class="filter-head"><h6>{% icon "check" "ic" 16 %} {% trans "More" %}</h6></div>
+    <div class="filter-body toggle-opts">
+      <label class="toggle-opt"><input type="checkbox" name="sale" value="1" {% if active_filters.sale %}checked{% endif %}> {% trans "On sale" %} <em>{{ facets.sale_count }}</em></label>
+      <label class="toggle-opt"><input type="checkbox" name="new" value="1" {% if active_filters.new %}checked{% endif %}> {% trans "New arrivals" %} <em>{{ facets.new_count }}</em></label>
+      <label class="toggle-opt"><input type="checkbox" name="in_stock" value="1" {% if active_filters.in_stock %}checked{% endif %}> {% trans "In stock" %} <em>{{ facets.instock_count }}</em></label>
+    </div>
+  </div>
+
+  {% if active_filters.collection %}<input type="hidden" name="collection" value="{{ active_filters.collection }}">{% endif %}
+  {% if sort %}<input type="hidden" name="sort" value="{{ sort }}">{% endif %}
+
+  <div class="filter-actions">
+    <button class="btn btn-primary" type="submit">{% trans "Apply" %} <span class="filter-count">· {{ product_count }}</span></button>
+    <a class="btn btn-soft" href="{% if category %}{{ category.get_url }}{% else %}{% url 'store' %}{% endif %}">{% trans "Clear all" %}</a>
+  </div>
+</form>

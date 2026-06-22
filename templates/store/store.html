@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static i18n uikit %}
+{% load static i18n uikit shopfilters %}
 
 {% block title %}{% if category %}{{ category.category_name }}{% else %}{% trans "Store" %}{% endif %} • {{ SITE_NAME }}{% endblock %}
 
@@ -61,81 +61,34 @@
         </div>
 
         <div class="store-actions">
-          <form id="sortForm" method="get" class="m-0">
-  {% if request.GET.keyword %}
-    <input type="hidden" name="keyword" value="{{ request.GET.keyword }}">
-  {% endif %}
-  {% if request.GET.instock %}
-    <input type="hidden" name="instock" value="{{ request.GET.instock }}">
-  {% endif %}
+          <div class="dropdown">
+            <button class="btn btn-soft dropdown-toggle sort-btn" type="button"
+                    id="sortDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <i class="fa fa-sort mr-2"></i>
+              <span id="sortLabel">
+                {% if sort == "price_asc" %}{% trans "Price: low to high" %}
+                {% elif sort == "price_desc" %}{% trans "Price: high to low" %}
+                {% elif sort == "rating" %}{% trans "Top rated" %}
+                {% elif sort == "name_asc" %}{% trans "Name: A → Z" %}
+                {% elif sort == "newest" %}{% trans "Newest" %}
+                {% else %}{% trans "Sort: recommended" %}{% endif %}
+              </span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="sortDropdown">
+              <a class="dropdown-item d-flex justify-content-between {% if not sort %}active{% endif %}" href="?{% qs_set sort='' %}"><span>{% trans "Sort: recommended" %}</span>{% if not sort %}<i class="fa fa-check"></i>{% endif %}</a>
+              <a class="dropdown-item d-flex justify-content-between {% if sort == 'newest' %}active{% endif %}" href="?{% qs_set sort='newest' %}"><span>{% trans "Newest" %}</span>{% if sort == 'newest' %}<i class="fa fa-check"></i>{% endif %}</a>
+              <a class="dropdown-item d-flex justify-content-between {% if sort == 'price_asc' %}active{% endif %}" href="?{% qs_set sort='price_asc' %}"><span>{% trans "Price: low to high" %}</span>{% if sort == 'price_asc' %}<i class="fa fa-check"></i>{% endif %}</a>
+              <a class="dropdown-item d-flex justify-content-between {% if sort == 'price_desc' %}active{% endif %}" href="?{% qs_set sort='price_desc' %}"><span>{% trans "Price: high to low" %}</span>{% if sort == 'price_desc' %}<i class="fa fa-check"></i>{% endif %}</a>
+              <a class="dropdown-item d-flex justify-content-between {% if sort == 'rating' %}active{% endif %}" href="?{% qs_set sort='rating' %}"><span>{% trans "Top rated" %}</span>{% if sort == 'rating' %}<i class="fa fa-check"></i>{% endif %}</a>
+              <a class="dropdown-item d-flex justify-content-between {% if sort == 'name_asc' %}active{% endif %}" href="?{% qs_set sort='name_asc' %}"><span>{% trans "Name: A → Z" %}</span>{% if sort == 'name_asc' %}<i class="fa fa-check"></i>{% endif %}</a>
+            </div>
+          </div>
 
-  <input type="hidden" name="sort" id="sortInput" value="{{ request.GET.sort|default:'' }}">
-
-  <div class="dropdown">
-    <button class="btn btn-soft dropdown-toggle sort-btn"
-            type="button"
-            id="sortDropdown"
-            data-toggle="dropdown"
-            aria-haspopup="true"
-            aria-expanded="false">
-      <i class="fa fa-sort mr-2"></i>
-      <span id="sortLabel">
-        {% if request.GET.sort == "price_asc" %}{% trans "Price: low to high" %}
-        {% elif request.GET.sort == "price_desc" %}{% trans "Price: high to low" %}
-        {% elif request.GET.sort == "name_asc" %}{% trans "Name: A → Z" %}
-        {% elif request.GET.sort == "name_desc" %}{% trans "Name: Z → A" %}
-        {% elif request.GET.sort == "newest" %}{% trans "Newest" %}
-        {% else %}{% trans "Sort: recommended" %}{% endif %}
-      </span>
-    </button>
-
-    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="sortDropdown">
-
-  <button class="dropdown-item d-flex align-items-center justify-content-between {% if not request.GET.sort %}active{% endif %}"
-          type="button" data-sort="">
-    <span>{% trans "Sort: recommended" %}</span>
-    {% if not request.GET.sort %}<i class="fa fa-check"></i>{% endif %}
-  </button>
-
-  <button class="dropdown-item d-flex align-items-center justify-content-between {% if request.GET.sort == 'price_asc' %}active{% endif %}"
-          type="button" data-sort="price_asc">
-    <span>{% trans "Price: low to high" %}</span>
-    {% if request.GET.sort == 'price_asc' %}<i class="fa fa-check"></i>{% endif %}
-  </button>
-
-  <button class="dropdown-item d-flex align-items-center justify-content-between {% if request.GET.sort == 'price_desc' %}active{% endif %}"
-          type="button" data-sort="price_desc">
-    <span>{% trans "Price: high to low" %}</span>
-    {% if request.GET.sort == 'price_desc' %}<i class="fa fa-check"></i>{% endif %}
-  </button>
-
-  <button class="dropdown-item d-flex align-items-center justify-content-between {% if request.GET.sort == 'name_asc' %}active{% endif %}"
-          type="button" data-sort="name_asc">
-    <span>{% trans "Name: A → Z" %}</span>
-    {% if request.GET.sort == 'name_asc' %}<i class="fa fa-check"></i>{% endif %}
-  </button>
-
-  <button class="dropdown-item d-flex align-items-center justify-content-between {% if request.GET.sort == 'name_desc' %}active{% endif %}"
-          type="button" data-sort="name_desc">
-    <span>{% trans "Name: Z → A" %}</span>
-    {% if request.GET.sort == 'name_desc' %}<i class="fa fa-check"></i>{% endif %}
-  </button>
-
-  <button class="dropdown-item d-flex align-items-center justify-content-between {% if request.GET.sort == 'newest' %}active{% endif %}"
-          type="button" data-sort="newest">
-    <span>{% trans "Newest" %}</span>
-    {% if request.GET.sort == 'newest' %}<i class="fa fa-check"></i>{% endif %}
-  </button>
-
-</div>
-
-  </div>
-</form>
-
-
-          <a class="btn btn-soft" href="{% url 'store' %}">
+          {% if has_filters %}
+          <a class="btn btn-soft" href="{% if category %}{{ category.get_url }}{% else %}{% url 'store' %}{% endif %}" data-filter-clear>
             <i class="fa fa-undo mr-2"></i>{% trans "Reset" %}
           </a>
+          {% endif %}
         </div>
 
       </div>
@@ -144,102 +97,49 @@
 </div>
 
 
-    <!-- MOBILE FILTER BAR (drawer trigger) -->
+    <!-- Active filter chips -->
+    {% if active_chips %}
+    <div class="chips-bar" aria-label="{% trans 'Active filters' %}">
+      {% for chip in active_chips %}
+        <a class="filter-chip-active" href="?{% qs_remove chip.param chip.value %}">
+          {{ chip.label }} <span class="chip-x">{% icon "close" "ic" 12 %}</span>
+        </a>
+      {% endfor %}
+      <a class="filter-chip-clear" href="{% if category %}{{ category.get_url }}{% else %}{% url 'store' %}{% endif %}">{% trans "Clear all" %}</a>
+    </div>
+    {% endif %}
+
+    <!-- Mobile filter trigger -->
     <div class="filter-bar">
       <button class="btn btn-soft" type="button" data-open-filters>
-        {% icon "sliders" %} <span class="ml-2">{% trans "Filters" %}</span>
+        {% icon "sliders" %} <span class="ml-2">{% trans "Filters" %}{% if has_filters %} · {{ active_chips|length }}{% endif %}</span>
       </button>
+      <span class="filter-result-count">{% blocktrans count n=product_count %}{{ n }} result{% plural %}{{ n }} results{% endblocktrans %}</span>
+    </div>
+
+    <!-- Mobile filter drawer -->
+    <div class="filter-drawer" id="filterDrawer" hidden>
+      <div class="filter-drawer-backdrop" data-drawer-close></div>
+      <div class="filter-drawer-panel" role="dialog" aria-modal="true" aria-label="{% trans 'Filters' %}">
+        <div class="filter-drawer-head">
+          <span class="h6 m-0">{% trans "Filters" %}</span>
+          <button class="btn btn-link p-0" type="button" data-drawer-close aria-label="{% trans 'Close' %}">{% icon "close" %}</button>
+        </div>
+        <div class="filter-drawer-body">
+          {% include 'store/_filters.html' %}
+        </div>
+      </div>
     </div>
 
     <div class="row">
 
       <!-- SIDEBAR FILTERS -->
       <aside class="col-lg-3 mb-4 shop-aside">
-  <div class="filter-card">
-
-    <div class="filter-drawer-head">
-      <span class="h6">{% trans "Filters" %}</span>
-      <button class="btn btn-link p-0" type="button" data-drawer-close aria-label="{% trans 'Close' %}">{% icon "close" %}</button>
-    </div>
-
-    <!-- Categories -->
-    <div class="filter-section">
-      <div class="filter-head" data-collapsible>
-        <h6>{% icon "tag" "ic" 16 %} {% trans "Categories" %}</h6>
-        <span class="filter-chip">{% if product_count %}{{ product_count }}{% else %}0{% endif %}</span>
-      </div>
-
-      <div class="filter-body cat-list">
-        <a class="cat-item" href="{% url 'store' %}">
-          <span>{% trans "All products" %}</span>
-          <span class="text-muted">{% icon "chevron-right" "ic" 15 %}</span>
-        </a>
-
-        {% if categories %}
-          {% for c in categories %}
-  <a class="cat-item {% if category and category.id == c.id %}active{% endif %}"
-     href="{{ c.get_url }}">
-    <span>{{ c.category_name }}</span>
-    <span class="text-muted">{% icon "chevron-right" "ic" 15 %}</span>
-  </a>
-{% endfor %}
-        {% elif links %}
-          {% for c in links %}
-            <a class="cat-item" href="{{ c.get_url }}">
-              <span>{{ c.category_name }}</span>
-              <span class="text-muted">{% icon "chevron-right" "ic" 15 %}</span>
-            </a>
-          {% endfor %}
-        {% endif %}
-      </div>
-    </div>
-
-    <!-- Price -->
-    <div class="filter-section">
-      <div class="filter-head" data-collapsible>
-        <h6>{% icon "card" "ic" 16 %} {% trans "Price range" %}</h6>
-        <span class="filter-chip">{{ CURRENCY_SYMBOL }} <span id="priceMinText">0</span> – {{ CURRENCY_SYMBOL }} <span id="priceMaxText">0</span></span>
-      </div>
-
-      <div class="filter-body price-range">
-        {# slider: sets "max" dynamically from products on page #}
-        <input id="priceRange" name="price_range" type="range" class="range-slider" min="0" value="0">
-
-        <div class="range-label">
-          <span>{% trans "Min" %}</span>
-          <span>{% trans "Max" %}</span>
+        <div class="filter-card">
+          <div class="filter-card-head"><span class="h6 m-0">{% trans "Filters" %}</span></div>
+          {% include 'store/_filters.html' %}
         </div>
-
-        <div class="range-row">
-          <input id="priceMin" name="price_min" type="number" class="form-control" placeholder="Min" min="0">
-          <input id="priceMax" name="price_max" type="number" class="form-control" placeholder="Max" min="0">
-        </div>
-      </div>
-    </div>
-
-    <!-- Availability -->
-    <div class="filter-section">
-      <div class="filter-head" data-collapsible>
-        <h6>{% icon "check" "ic" 16 %} {% trans "Availability" %}</h6>
-        <span class="filter-chip" id="stockChip">{% trans "All" %}</span>
-      </div>
-
-      <div class="filter-body custom-control custom-checkbox">
-        <input type="checkbox" name="instock" class="custom-control-input" id="inStockOnly" checked>
-        <label class="custom-control-label" for="inStockOnly">{% trans "In stock only" %}</label>
-      </div>
-    </div>
-
-    <!-- Actions -->
-
-      <div class="filter-actions">
-  <button id="applyFilters" class="btn btn-primary" type="button">{% trans "Apply" %}</button>
-  <button id="clearFilters" class="btn btn-soft" type="button">{% trans "Clear" %}</button>
-</div>
-
-
-  </div>
-</aside>
+      </aside>
 
 
       <!-- PRODUCTS GRID -->
@@ -318,17 +218,41 @@
             </div>
           {% empty %}
             <div class="col-12">
-              <div class="store-empty" {% if request.GET.keyword %}data-track-no-results="{{ request.GET.keyword }}"{% endif %}>
+              <div class="store-empty" {% if active_filters.keyword %}data-track-no-results="{{ active_filters.keyword }}"{% endif %}>
                 <div class="store-empty-ic">{% icon "search" "ic" 30 %}</div>
-                {% if request.GET.keyword %}
-                  <h3 class="mb-2">{% blocktrans with q=request.GET.keyword %}No results for “{{ q }}”{% endblocktrans %}</h3>
-                  <p class="text-muted mb-4">{% trans "Try a different search, or browse the full collection." %}</p>
+                {% if active_filters.keyword %}
+                  <h3 class="mb-2">{% blocktrans with q=active_filters.keyword %}No results for “{{ q }}”{% endblocktrans %}</h3>
                 {% else %}
-                  <h3 class="mb-2">{% trans "Nothing here yet" %}</h3>
+                  <h3 class="mb-2">{% trans "No products match these filters" %}</h3>
+                {% endif %}
+                {% if has_filters %}
+                  <p class="text-muted mb-3">{% trans "Try removing a filter to see more." %}</p>
+                  <div class="chips-bar justify-content-center mb-3">
+                    {% for chip in active_chips %}
+                      <a class="filter-chip-active" href="?{% qs_remove chip.param chip.value %}">{{ chip.label }} <span class="chip-x">{% icon "close" "ic" 12 %}</span></a>
+                    {% endfor %}
+                  </div>
+                {% else %}
                   <p class="text-muted mb-4">{% trans "There are no products in this view right now." %}</p>
                 {% endif %}
-                <a href="{% url 'store' %}" class="btn btn-primary">{% trans "Browse all products" %}</a>
+                <div class="d-flex justify-content-center" style="gap:.6rem;flex-wrap:wrap;">
+                  <a href="{% if category %}{{ category.get_url }}{% else %}{% url 'store' %}{% endif %}" class="btn btn-primary" data-filter-clear>{% trans "Clear filters" %}</a>
+                  <a href="{% url 'merchandising:collections' %}" class="btn btn-soft">{% trans "Browse collections" %}</a>
+                  <button type="button" class="btn btn-soft" onclick="document.getElementById('aiToggle')?.click()">{% icon "headset" "ic" 15 %} {% trans "Ask the assistant" %}</button>
+                </div>
               </div>
+
+              {% if recommendations %}
+              <section class="ymal-wrap mt-5">
+                <div class="lux-eyebrow mb-1 text-center">{% trans "You might like" %}</div>
+                <h3 class="section-title text-center mb-4">{% trans "Recommended for you" %}</h3>
+                <div class="row g-3 g-md-4">
+                  {% for p in recommendations %}
+                    <div class="col-6 col-lg-3 d-flex">{% include 'merchandising/_product_card.html' with p=p %}</div>
+                  {% endfor %}
+                </div>
+              </section>
+              {% endif %}
             </div>
           {% endfor %}
         </div>
