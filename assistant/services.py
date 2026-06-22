@@ -98,7 +98,16 @@ def answer_question(request, query):
     if not in_scope:
         return _finalise(conv, decline, provider="guardrail", grounded=False, sources=[])
 
-    context = prompt_mod.build_context(knowledge, products, lang, order_ctx)
+    # Surface real, active collections so the assistant can recommend them (never invented).
+    collections = []
+    try:
+        from merchandising.models import Collection
+        collections = [c for c in Collection.objects.filter(is_active=True)[:6]
+                       if c.active_products().exists()]
+    except Exception:
+        collections = []
+    context = prompt_mod.build_context(knowledge, products, lang, order_ctx,
+                                       collections=collections)
     system_prompt = prompt_mod.build_system_prompt(context, lang)
 
     provider = get_provider()

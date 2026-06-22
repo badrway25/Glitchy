@@ -33,9 +33,30 @@ def decline_message(lang):
     return DECLINE.get(lang, DECLINE["en"])
 
 
-def build_context(knowledge, products, lang, order_context=None):
-    """Render the retrieved knowledge + products into a compact context block."""
+def build_context(knowledge, products, lang, order_context=None, collections=None):
+    """Render the retrieved knowledge + products (+ collections) into a context block."""
     blocks = []
+    if collections:
+        clines = []
+        for c in collections:
+            line = f"- {c.name}"
+            sub = c.subtitle_for(lang) if hasattr(c, "subtitle_for") else ""
+            if sub:
+                line += f" — {sub}"
+            bits = []
+            if getattr(c, "mood", ""):
+                bits.append(f"mood: {c.get_mood_display()}")
+            if getattr(c, "season", ""):
+                bits.append(f"season: {c.get_season_display()}")
+            try:
+                bits.append(f"{c.active_products().count()} pieces")
+            except Exception:
+                pass
+            if bits:
+                line += " (" + ", ".join(bits) + ")"
+            clines.append(line)
+        if clines:
+            blocks.append("COLLECTIONS:\n" + "\n".join(clines))
     for k in knowledge:
         cat = getattr(k, "category", "") or ""
         cat = cat if isinstance(cat, str) else "faq"   # ProductFAQ.category is a FK
