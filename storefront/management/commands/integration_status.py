@@ -74,6 +74,10 @@ class Command(BaseCommand):
         # --- Printify ---
         add("Printify", "PRINTIFY_API_TOKEN", kv("PRINTIFY_API_TOKEN", critical=True), True)
         add("Printify", "PRINTIFY_SHOP_ID", kv("PRINTIFY_SHOP_ID", critical=True), True)
+        if _present("PRINTIFY_API_TOKEN"):
+            rotated = bool(getattr(S, "PRINTIFY_KEY_ROTATED", False))
+            add("Printify", "PRINTIFY_KEY_ROTATED",
+                "OK" if rotated else "NEEDS_ACTION (rotate the exposed token)", True)
         add("Printify", "SHIPPING_USE_PRINTIFY",
             "ON" if getattr(S, "SHIPPING_USE_PRINTIFY", False) else "OFF (fallback rates)")
         add("Printify", "PRINTIFY_PUSH_ENABLED",

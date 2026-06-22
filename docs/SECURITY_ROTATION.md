@@ -90,3 +90,23 @@ Procedure (owner only — the key is never committed, never printed):
 6. Never commit `.env`
 
 Until step 4–5 pass, **staging is blocked** by design.
+
+## Printify API token (`PRINTIFY_API_TOKEN`) — treat as EXPOSED
+
+A Printify Personal Access Token was shared over chat to verify the integration
+(read-only: shop + products + shipping rates were read successfully; **no order was
+created or sent, push stayed disabled**). Because it was shared in chat it **must be
+considered exposed** and rotated before staging/production.
+
+`scripts/rotate_secrets_check.sh` and `manage.py integration_status` now **fail / flag
+NEEDS_ACTION** while a `PRINTIFY_API_TOKEN` is set unless `PRINTIFY_KEY_ROTATED=True`.
+
+Procedure (owner only — the token is never committed, never printed):
+1. Revoke the current token: Printify → **My account → Connections** (delete the token).
+2. Generate a **new** Personal Access Token with only the scopes you need.
+3. Put it only in `.env` / the secrets manager — never in git.
+4. Set `PRINTIFY_KEY_ROTATED=True` in the same environment file.
+5. Run `bash scripts/rotate_secrets_check.sh` (must show 0 failures).
+
+Until then, **staging is blocked** by design. `PRINTIFY_PUSH_ENABLED` stays `False`
+(no real orders) and `SHIPPING_USE_PRINTIFY` stays `False` independently of rotation.

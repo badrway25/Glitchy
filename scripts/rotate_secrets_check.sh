@@ -47,5 +47,15 @@ else
   echo "ok  : AI assistant disabled (AI_API_KEY not required)"
 fi
 
+# Printify API token: a token was shared in chat (exposed), so staging/prod is BLOCKED
+# until the owner revokes it, issues a new one, and sets PRINTIFY_KEY_ROTATED=True.
+if [ -n "$(val PRINTIFY_API_TOKEN)" ]; then
+  if [ "$(val PRINTIFY_KEY_ROTATED)" != "True" ]; then
+    echo "FAIL: Printify token NOT rotated. Revoke the exposed token, issue a new one, then set PRINTIFY_KEY_ROTATED=True"; fail=$((fail+1));
+  else echo "ok  : PRINTIFY_API_TOKEN set and PRINTIFY_KEY_ROTATED=True"; fi
+else
+  echo "ok  : PRINTIFY_API_TOKEN not set (sync/push disabled)"
+fi
+
 echo "== $fail failure(s) =="
 exit $fail

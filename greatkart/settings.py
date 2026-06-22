@@ -287,6 +287,10 @@ PRINTIFY_BLUEPRINT_CATEGORY_MAP = {
     706: "t-shirt",
 }
 PRINTIFY_SYNC_OVERWRITE_CATEGORY = False
+# Rotation gates: both the OpenAI and Printify credentials were shared in chat (exposed).
+# Staging/prod is blocked until the owner revokes each, issues a new one, and flips these.
+OPENAI_KEY_ROTATED = env_bool("OPENAI_KEY_ROTATED", False)
+PRINTIFY_KEY_ROTATED = env_bool("PRINTIFY_KEY_ROTATED", False)
 
 
 # --------------------------------------------------------------------------- #
