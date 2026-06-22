@@ -45,9 +45,29 @@ def _dispatch(event, payload):
 # Collections
 # --------------------------------------------------------------------------- #
 def collections_index(request):
-    collections = Collection.objects.filter(is_active=True)
-    return render(request, "merchandising/collections_index.html",
-                  {"collections": collections})
+    lang = _lang(request)
+    qs = Collection.objects.filter(is_active=True).prefetch_related("products")
+
+    def _card(c):
+        prods = c.active_products()
+        return {
+            "obj": c, "url": c.get_url(), "name": c.name,
+            "subtitle": c.subtitle_for(lang), "image": c.image,
+            "count": len(prods), "featured": c.featured,
+            "previews": [p for p in prods[:4]],   # small thumbnails for the card
+        }
+
+    cards = [_card(c) for c in qs]
+    featured = [c for c in cards if c["featured"] and c["count"]][:3]
+    total_products = sum(c["count"] for c in cards)
+
+    return render(request, "merchandising/collections_index.html", {
+        "cards": cards,
+        "featured": featured,
+        "collection_count": len(cards),
+        "total_products": total_products,
+        "ai_enabled": getattr(settings, "AI_ASSISTANT_ENABLED", False),
+    })
 
 
 def collection_detail(request, slug):

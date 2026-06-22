@@ -1,36 +1,145 @@
 {% extends 'base.html' %}
 {% load static i18n uikit %}
 {% block title %}{% trans "Collections" %} • {{ SITE_NAME }}{% endblock %}
+{% block meta_description %}{% blocktrans %}Explore our edits — curated collections of made-on-demand fashion, grouped by mood and moment.{% endblocktrans %}{% endblock %}
+{% block og_title %}{% trans "Collections" %} • {{ SITE_NAME }}{% endblock %}
+{% block og_description %}{% blocktrans %}Curated collections of made-on-demand fashion.{% endblocktrans %}{% endblock %}
 
 {% block content %}
-<section class="section-content padding-y">
+<section class="collx">
   <div class="container" style="max-width:1280px;">
-    <div class="text-center mb-5">
-      <div class="lux-eyebrow mb-2">{% trans "Curated" %}</div>
-      <h1 class="dash-title mb-1">{% trans "Collections" %}</h1>
-      <p class="text-muted">{% trans "Shop our edits, grouped by mood and moment." %}</p>
-    </div>
 
-    {% if collections %}
-    <div class="coll-grid">
-      {% for c in collections %}
-      <a href="{{ c.get_url }}" class="coll-card" data-reco-click="collection-{{ c.id }}">
-        <div class="coll-media">
-          {% if c.image %}<img src="{{ c.image }}" alt="{{ c.name }}" loading="lazy">
-          {% else %}<div class="coll-media-fallback">{% icon "bag" "ic" 34 %}</div>{% endif %}
+    {% if cards %}
+    <!-- Hero -->
+    <header class="collx-hero">
+      <div class="collx-hero-inner">
+        <div class="lux-eyebrow mb-2">{% icon "spark" "ic" 15 %} {% trans "The edit" %}</div>
+        <h1 class="collx-hero-title">{% trans "Collections" %}</h1>
+        <p class="collx-hero-sub">{% blocktrans %}Shop our edits, grouped by mood and moment — each piece printed on demand, less waste, always fresh.{% endblocktrans %}</p>
+        <div class="collx-hero-meta">
+          <span>{% blocktrans count n=collection_count %}{{ n }} collection{% plural %}{{ n }} collections{% endblocktrans %}</span>
+          <span class="dot">·</span>
+          <span>{% blocktrans count n=total_products %}{{ n }} piece{% plural %}{{ n }} pieces{% endblocktrans %}</span>
         </div>
-        <div class="coll-body">
-          <h3 class="coll-title">{{ c.name }}</h3>
-          {% if c.subtitle %}<p class="coll-sub">{{ c.subtitle }}</p>{% endif %}
-          <span class="coll-link">{% trans "Explore" %} {% icon "arrow-right" "ic" 14 %}</span>
+        <div class="collx-hero-cta">
+          <a href="{% url 'store' %}" class="btn btn-primary">{% trans "Shop all pieces" %} {% icon "arrow-right" "ic" 15 %}</a>
+          <a href="{% url 'merchandising:style_quiz' %}" class="btn btn-soft">{% trans "Take the style quiz" %}</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Featured collections -->
+    {% if featured %}
+    <div class="collx-featured">
+      {% for c in featured %}
+      <a href="{{ c.url }}" class="collx-feat" data-reco-click="collection-{{ c.obj.id }}">
+        <div class="collx-feat-media">
+          {% if c.image %}<img src="{{ c.image }}" alt="{{ c.name }}" loading="lazy">
+          {% else %}
+            <div class="collx-feat-collage">
+              {% for p in c.previews %}{% if p.cover_image %}<img src="{{ p.cover_image }}" alt="" loading="lazy">{% endif %}{% endfor %}
+            </div>
+          {% endif %}
+          <span class="collx-feat-badge">{% trans "Featured" %}</span>
+        </div>
+        <div class="collx-feat-body">
+          <h3 class="collx-feat-title">{{ c.name }}</h3>
+          {% if c.subtitle %}<p class="collx-feat-sub">{{ c.subtitle }}</p>{% endif %}
+          <div class="collx-feat-foot">
+            <span class="collx-count">{% blocktrans count n=c.count %}{{ n }} piece{% plural %}{{ n }} pieces{% endblocktrans %}</span>
+            <span class="collx-link">{% trans "Explore the edit" %} {% icon "arrow-right" "ic" 14 %}</span>
+          </div>
         </div>
       </a>
       {% endfor %}
     </div>
-    {% else %}
-    <div class="store-empty"><h3>{% trans "No collections yet" %}</h3>
-      <a href="{% url 'store' %}" class="btn btn-primary mt-3">{% trans "Browse products" %}</a></div>
     {% endif %}
+
+    <!-- All collections grid -->
+    <div class="collx-allhead">
+      <h2>{% trans "All collections" %}</h2>
+      <span class="text-muted">{% blocktrans count n=collection_count %}{{ n }} collection{% plural %}{{ n }} collections{% endblocktrans %}</span>
+    </div>
+    <div class="collx-grid">
+      {% for c in cards %}
+      <a href="{{ c.url }}" class="collx-card" data-reco-click="collection-{{ c.obj.id }}">
+        <div class="collx-card-media">
+          {% if c.image %}<img src="{{ c.image }}" alt="{{ c.name }}" loading="lazy">
+          {% elif c.previews %}
+            <div class="collx-card-collage">
+              {% for p in c.previews %}{% if p.cover_image %}<img src="{{ p.cover_image }}" alt="" loading="lazy">{% endif %}{% endfor %}
+            </div>
+          {% else %}<div class="collx-card-fallback">{% icon "bag" "ic" 30 %}</div>{% endif %}
+        </div>
+        <div class="collx-card-body">
+          <div class="collx-card-row">
+            <h3 class="collx-card-title">{{ c.name }}</h3>
+            <span class="collx-pill">{{ c.count }}</span>
+          </div>
+          {% if c.subtitle %}<p class="collx-card-sub">{{ c.subtitle }}</p>{% endif %}
+          <span class="collx-link">{% trans "Explore" %} {% icon "arrow-right" "ic" 13 %}</span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+
+    <!-- Editorial: made on demand -->
+    <section class="collx-editorial">
+      <div class="collx-ed-grid">
+        <div class="collx-ed-item">{% icon "leaf" "ic" 22 %}<h4>{% trans "Made on demand" %}</h4>
+          <p>{% blocktrans %}Each piece is printed only when you order — less overproduction, less waste.{% endblocktrans %}</p></div>
+        <div class="collx-ed-item">{% icon "spark" "ic" 22 %}<h4>{% trans "Curated drops" %}</h4>
+          <p>{% blocktrans %}Collections built around a mood, a season, a moment — not endless noise.{% endblocktrans %}</p></div>
+        <div class="collx-ed-item">{% icon "check" "ic" 22 %}<h4>{% trans "Designed for everyday" %}</h4>
+          <p>{% blocktrans %}Comfortable, durable staples meant to be worn, washed and loved.{% endblocktrans %}</p></div>
+      </div>
+    </section>
+
+    <!-- Discovery / AI -->
+    {% if ai_enabled %}
+    <section class="collx-discover">
+      <div>
+        <h3>{% trans "Not sure where to start?" %}</h3>
+        <p>{% blocktrans %}Ask our assistant to help you pick the right collection for your style.{% endblocktrans %}</p>
+      </div>
+      <button type="button" class="btn btn-primary" data-assistant-open
+              data-assistant-prompt="{% trans 'Help me choose a collection for my style' %}">
+        {% trans "Need help choosing?" %} {% icon "spark" "ic" 15 %}
+      </button>
+    </section>
+    {% endif %}
+
+    <!-- Light SEO / internal links -->
+    <nav class="collx-links" aria-label="{% trans 'Helpful links' %}">
+      <a href="{% url 'store' %}">{% trans "All products" %}</a>
+      <a href="{% url 'faq' %}">{% trans "FAQ" %}</a>
+      <a href="{% url 'returns:policy' %}">{% trans "Returns" %}</a>
+    </nav>
+
+    {% else %}
+    <!-- Empty state -->
+    <div class="collx-empty">
+      <div class="collx-empty-ic">{% icon "bag" "ic" 40 %}</div>
+      <h2>{% trans "Collections are on their way" %}</h2>
+      <p class="text-muted">{% blocktrans %}We're curating our first edits. In the meantime, explore the full catalogue.{% endblocktrans %}</p>
+      <a href="{% url 'store' %}" class="btn btn-primary mt-3">{% trans "Browse all products" %} {% icon "arrow-right" "ic" 15 %}</a>
+    </div>
+    {% endif %}
+
   </div>
 </section>
+
+{% if cards %}
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"CollectionPage",
+ "name":"{% trans 'Collections' %}","url":"{{ SITE_URL }}{{ request.path }}",
+ "mainEntity":{"@type":"ItemList","numberOfItems":{{ collection_count }},
+  "itemListElement":[{% for c in cards %}{"@type":"ListItem","position":{{ forloop.counter }},"name":"{{ c.name|escapejs }}","url":"{{ SITE_URL }}{{ c.url }}"}{% if not forloop.last %},{% endif %}{% endfor %}]}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
+ {"@type":"ListItem","position":1,"name":"{% trans 'Home' %}","item":"{{ SITE_URL }}/"},
+ {"@type":"ListItem","position":2,"name":"{% trans 'Collections' %}","item":"{{ SITE_URL }}{{ request.path }}"}]}
+</script>
+{% endif %}
 {% endblock %}
