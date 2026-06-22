@@ -1336,3 +1336,7 @@ body.has-sticky-cta .ai-assistant{bottom:78px;}
   .cookie-consent-actions{width:100%;}
   .cookie-consent-actions .btn{flex:1;}
 }
+
+/* Order tracking card */
+.tracking-card .tracking-ic{display:inline-grid;place-items:center;width:42px;height:42px;border-radius:50%;
+  background:var(--surface-2);color:var(--accent-2);flex:0 0 auto;}

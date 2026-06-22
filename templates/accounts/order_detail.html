@@ -60,6 +60,27 @@
             </div>
           </div>
 
+          <!-- Tracking -->
+          {% if order.is_ordered %}
+          <div class="dash-card tracking-card">
+            <div class="dash-card-body" style="display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;">
+              <span class="tracking-ic"><i class="fa fa-truck"></i></span>
+              {% if order.tracking_number %}
+                <div style="flex:1;min-width:200px;">
+                  <div style="font-weight:600;">{% trans "Your order is on its way" %}{% if order.carrier %} · {{ order.carrier }}{% endif %}</div>
+                  <div class="text-muted" style="font-size:.85rem;">{% trans "Tracking" %}: <strong>{{ order.tracking_number }}</strong></div>
+                </div>
+                {% if order.tracking_url %}<a href="{{ order.tracking_url }}" target="_blank" rel="noopener" class="btn btn-soft btn-sm">{% trans "Track parcel" %} <i class="fa fa-arrow-right ml-1"></i></a>{% endif %}
+              {% else %}
+                <div style="flex:1;min-width:200px;">
+                  <div style="font-weight:600;">{% trans "No tracking yet" %}</div>
+                  <div class="text-muted" style="font-size:.85rem;">{% trans "We'll email you a tracking link as soon as your order ships." %}</div>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+          {% endif %}
+
           <!-- Order help (owner-only support handoff) -->
           <div id="orderHelp" class="dash-card order-help-card" hidden>
             <div class="dash-card-body">
