@@ -274,6 +274,25 @@
                 </div>
               </div>
 
+              <!-- Made on demand: production & delivery transparency (safe data only) -->
+              <div class="pod-card mt-3">
+                <div class="pod-head">
+                  {% icon "leaf" "ic" 16 %}
+                  <span>{% trans "Made on demand" %}</span>
+                </div>
+                <p class="pod-lead">{% trans "Each piece is printed only when you order — less waste, always fresh." %}</p>
+                <div class="pod-chips">
+                  <span class="pod-chip">{% icon "spark" "ic" 14 %} {% trans "Printed to order" %}</span>
+                  {% if single_product.printify_provider_name %}
+                  <span class="pod-chip">{% icon "check" "ic" 14 %} {% trans "Vetted print partner" %}</span>
+                  {% endif %}
+                  <span class="pod-chip">{% icon "truck" "ic" 14 %}
+                    {% if shipping_quote and shipping_quote.eta_label %}{{ shipping_quote.eta_label }}{% else %}{% trans "Tracked delivery" %}{% endif %}</span>
+                  <span class="pod-chip">{% icon "returns" "ic" 14 %} {% blocktrans with d=RETURN_WINDOW_DAYS %}{{ d }}-day returns{% endblocktrans %}</span>
+                </div>
+                <p class="pod-note">{% trans "Because items are produced on demand, please allow a short production time before shipping. You'll get a tracking link by email as soon as your order ships." %}</p>
+              </div>
+
             </div>
           </form>
         </main>

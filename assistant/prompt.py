@@ -52,6 +52,17 @@ def build_context(knowledge, products, lang, order_context=None):
             comp = (getattr(p, "composition", "") or "").strip()
             if comp:
                 line += f" Composition: {comp[:120]}."
+            fit = (getattr(p, "fit_notes", "") or "").strip()
+            if fit:
+                line += f" Fit: {fit[:80]}."
+            care = (getattr(p, "care_instructions", "") or "").strip()
+            if care:
+                line += f" Care: {care[:80]}."
+            opts = (getattr(p, "printify_options_summary", "") or "").strip()
+            if opts:
+                line += f" Options: {opts[:80]}."
+            if getattr(p, "printify_blueprint_id", None):
+                line += " Made on demand (printed to order)."
             plines.append(line)
         blocks.append("PRODUCTS:\n" + "\n".join(plines))
     if order_context:

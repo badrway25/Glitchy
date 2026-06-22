@@ -1340,3 +1340,18 @@ body.has-sticky-cta .ai-assistant{bottom:78px;}
 /* Order tracking card */
 .tracking-card .tracking-ic{display:inline-grid;place-items:center;width:42px;height:42px;border-radius:50%;
   background:var(--surface-2);color:var(--accent-2);flex:0 0 auto;}
+
+/* Made-on-demand production transparency (PDP) */
+.pod-card{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);
+  padding:1rem 1.1rem;}
+.pod-head{display:flex;align-items:center;gap:.5rem;font-family:var(--font-display);font-weight:700;
+  font-size:1rem;color:var(--primary);}
+.pod-head .ic{color:var(--success);}
+.pod-lead{margin:.4rem 0 .7rem;font-size:.9rem;color:var(--muted);}
+.pod-chips{display:flex;flex-wrap:wrap;gap:.45rem;margin-bottom:.7rem;}
+.pod-chip{display:inline-flex;align-items:center;gap:.35rem;background:var(--surface);
+  border:1px solid var(--border);border-radius:999px;padding:.28rem .7rem;font-size:.78rem;
+  font-weight:600;color:var(--primary);}
+.pod-chip .ic{color:var(--accent-2);}
+.pod-note{margin:0;font-size:.8rem;color:var(--muted);line-height:1.5;}
+@media (max-width:576px){.pod-chips{gap:.35rem;}.pod-chip{font-size:.74rem;}}
