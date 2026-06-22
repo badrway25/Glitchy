@@ -197,3 +197,101 @@ class CouponRedemptionRecordTests(TestCase):
         self.assertEqual(CouponRedemption.objects.count(), 0)
         self.coupon.refresh_from_db()
         self.assertEqual(self.coupon.used_count, 0)
+
+
+class CouponRaceHardeningTests(TestCase):
+    """Phase 21: total per-user enforcement at the authoritative finalize gate."""
+    def setUp(self):
+        from django.contrib.auth import get_user_model
+        self.User = get_user_model()
+        self.coupon = Coupon.objects.create(code="ONE", discount_type="percent",
+                                            value=Decimal("10"), per_user_limit=1)
+
+    def _user(self, email="u@example.com"):
+        u = self.User.objects.create_user(email=email, first_name="U", last_name="U",
+                                          username=email.split("@")[0], password="pw12345!")
+        u.is_active = True; u.save()
+        return u
+
+    def _order(self, user, number, paid=True):
+        from orders.models import Order
+        return Order.objects.create(user=user, first_name="U", last_name="U", phone="1",
+                                    email=user.email, address_line_1="x", city="c", state="s",
+                                    country="US", order_total=90, tax=0, ip="127.0.0.1",
+                                    order_number=number, coupon_code="ONE", discount=10,
+                                    is_ordered=paid)
+
+    def test_two_paid_orders_same_user_redeem_once(self):
+        from .models import CouponRedemption
+        from .services import finalize_coupon_redemption
+        u = self._user()
+        a, b = self._order(u, "A1"), self._order(u, "B1")
+        finalize_coupon_redemption(a)
+        finalize_coupon_redemption(b)   # over per-user limit -> honored, not re-recorded
+        self.assertEqual(CouponRedemption.objects.filter(coupon=self.coupon).count(), 1)
+        self.coupon.refresh_from_db()
+        self.assertEqual(self.coupon.used_count, 1)
+
+    def test_duplicate_webhook_same_order_no_double_count(self):
+        from .models import CouponRedemption
+        from .services import finalize_coupon_redemption
+        a = self._order(self._user(), "A2")
+        finalize_coupon_redemption(a)
+        finalize_coupon_redemption(a)   # duplicate webhook / re-confirm
+        self.assertEqual(CouponRedemption.objects.filter(order=a).count(), 1)
+        self.coupon.refresh_from_db()
+        self.assertEqual(self.coupon.used_count, 1)
+
+    def test_global_usage_limit_enforced_at_finalize(self):
+        from .models import CouponRedemption
+        from .services import finalize_coupon_redemption
+        self.coupon.usage_limit = 1; self.coupon.per_user_limit = 0; self.coupon.save()
+        a = self._order(self._user("a@x.com"), "A3")
+        b = self._order(self._user("b@x.com"), "B3")
+        finalize_coupon_redemption(a)
+        finalize_coupon_redemption(b)   # global limit reached -> honored, not recorded
+        self.assertEqual(CouponRedemption.objects.filter(coupon=self.coupon).count(), 1)
+        self.coupon.refresh_from_db()
+        self.assertEqual(self.coupon.used_count, 1)
+
+    def test_unique_constraint_blocks_second_redemption_per_order(self):
+        from django.db import IntegrityError, transaction
+        from .models import CouponRedemption
+        a = self._order(self._user(), "A4")
+        CouponRedemption.objects.create(coupon=self.coupon, order=a, amount=Decimal("10"))
+        with self.assertRaises(IntegrityError):
+            with transaction.atomic():
+                CouponRedemption.objects.create(coupon=self.coupon, order=a, amount=Decimal("10"))
+
+    def test_place_order_guard_blocks_second_pending_order(self):
+        # User already has a pending (unpaid) order carrying ONE -> can't stash it again.
+        from django.contrib.sessions.backends.db import SessionStore
+        from .services import quote_for_order
+        u = self._user()
+        self._order(u, "PEND", paid=False)   # pending order already has coupon_code=ONE
+        sess = SessionStore(); sess["coupon_code"] = "ONE"; sess.save()
+
+        class Req:
+            user = u
+            session = sess
+        code, disc = quote_for_order(Req(), 100)
+        self.assertEqual(code, "")
+        self.assertEqual(disc, Decimal("0"))
+
+    def test_guest_session_one_time_at_finalize(self):
+        from orders.models import Order
+        from .models import CouponRedemption
+        from .services import finalize_coupon_redemption
+        o1 = Order.objects.create(first_name="G", last_name="G", phone="1", email="g@x.com",
+                                  address_line_1="x", city="c", state="s", country="US",
+                                  order_total=90, tax=0, ip="1", order_number="G1",
+                                  coupon_code="ONE", discount=10, is_ordered=True,
+                                  is_guest=True, session_key="sess-abc")
+        o2 = Order.objects.create(first_name="G", last_name="G", phone="1", email="g@x.com",
+                                  address_line_1="x", city="c", state="s", country="US",
+                                  order_total=90, tax=0, ip="1", order_number="G2",
+                                  coupon_code="ONE", discount=10, is_ordered=True,
+                                  is_guest=True, session_key="sess-abc")
+        finalize_coupon_redemption(o1)
+        finalize_coupon_redemption(o2)
+        self.assertEqual(CouponRedemption.objects.filter(coupon=self.coupon).count(), 1)

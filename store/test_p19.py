@@ -141,3 +141,41 @@ class AutocompleteSecurityTests(TestCase):
     def test_very_long_query_no_500(self):
         r = self.c.get(reverse("autocomplete"), {"q": "a" * 5000})
         self.assertEqual(r.status_code, 200)
+
+
+class RatingValidationTests(TestCase):
+    """Phase 21: rating must be 1–5 at the form, model and DB level."""
+    def setUp(self):
+        self.p = _product()
+        self.u = _user("rater@example.com")
+
+    def test_form_rejects_out_of_range(self):
+        from store.forms import ReviewForm
+        for bad in (0, 6, -1, 7.5):
+            form = ReviewForm(data={"subject": "x", "review": "y", "rating": bad})
+            self.assertFalse(form.is_valid(), f"rating {bad} should be invalid")
+            self.assertIn("rating", form.errors)
+
+    def test_form_accepts_valid(self):
+        from store.forms import ReviewForm
+        for good in (1, 3, 5):
+            form = ReviewForm(data={"subject": "x", "review": "y", "rating": good})
+            self.assertTrue(form.is_valid(), f"rating {good} should be valid")
+
+    def test_model_full_clean_rejects_out_of_range(self):
+        from django.core.exceptions import ValidationError
+        r = ReviewRating(product=self.p, user=self.u, subject="x", review="y", rating=6)
+        with self.assertRaises(ValidationError):
+            r.full_clean()
+
+    def test_db_constraint_rejects_out_of_range(self):
+        from django.db import IntegrityError, transaction
+        with self.assertRaises(IntegrityError):
+            with transaction.atomic():
+                ReviewRating.objects.create(product=self.p, user=self.u,
+                                            subject="x", review="y", rating=9)
+
+    def test_db_accepts_valid(self):
+        r = ReviewRating.objects.create(product=self.p, user=self.u,
+                                        subject="x", review="y", rating=4)
+        self.assertEqual(r.rating, 4)
