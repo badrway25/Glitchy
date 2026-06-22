@@ -37,6 +37,16 @@
   root.querySelectorAll("[data-ai-close]").forEach(function (b) { b.addEventListener("click", close); });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape" && root.classList.contains("is-open")) close(); });
 
+  // External openers (e.g. "Need help choosing?" on the collections page) can open the
+  // assistant and optionally pre-fill a prompt — without exposing anything sensitive.
+  document.querySelectorAll("[data-assistant-open]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      if (!root.classList.contains("is-open")) open();
+      var prompt = b.getAttribute("data-assistant-prompt");
+      if (prompt && input) { input.value = prompt; setTimeout(function () { input.focus(); }, 80); }
+    });
+  });
+
   function bubble(role, text) {
     var el = document.createElement("div");
     el.className = "ai-msg ai-msg-" + role;

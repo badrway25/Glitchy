@@ -1,7 +1,7 @@
 {% load static i18n %}
 <header class="section-header">
 
-  <nav class="navbar navbar-expand-lg navbar-light">
+  <nav class="navbar navbar-expand-lg navbar-light premium-nav">
     <div class="container">
 
       <!-- Brand -->
@@ -9,17 +9,29 @@
         <span class="brand-mark" aria-hidden="true"></span>{{ SITE_NAME }}
       </a>
 
-      <!-- Mobile search trigger (always visible on mobile) -->
-      <button class="nav-icon mobile-search-trigger d-lg-none" type="button"
-              data-mobile-search-open aria-label="{% trans 'Search' %}" title="{% trans 'Search' %}">
-        <i class="fa fa-search"></i>
-      </button>
-
       <!-- Toggler -->
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarMain"
               aria-controls="navbarMain" aria-expanded="false" aria-label="{% trans 'Toggle navigation' %}">
         <span class="navbar-toggler-icon"></span>
       </button>
+
+      <!-- Premium search — always visible (full-width on mobile, prominent on desktop) -->
+      <form action="{% url 'search' %}" method="GET" class="nav-search ac-wrap"
+            data-autocomplete data-ac-url="{% url 'autocomplete' %}" data-ac-viewall="{% trans 'View all results' %}"
+            data-ac-empty="{% trans 'No matches — try another term.' %}" role="search" autocomplete="off">
+        <div class="searchbar searchbar-xl">
+          <span class="icon"><i class="fa fa-search"></i></span>
+          <input class="form-control" type="text" name="keyword" role="combobox" aria-expanded="false"
+                 aria-autocomplete="list" aria-label="{% trans 'Search products' %}"
+                 placeholder="{% trans 'Search products, collections, colours…' %}"
+                 value="{{ request.GET.keyword|default:'' }}">
+          <button type="button" class="search-clear" data-search-clear hidden aria-label="{% trans 'Clear search' %}">
+            <i class="fa fa-times"></i>
+          </button>
+          <button type="submit" class="search-go" aria-label="{% trans 'Search' %}">{% trans "Search" %}</button>
+        </div>
+        <div class="ac-panel" role="listbox"></div>
+      </form>
 
       <div class="collapse navbar-collapse" id="navbarMain">
 
@@ -33,6 +45,11 @@
           <li class="nav-item">
             <a class="nav-link {% if 'collections' in request.path %}active{% endif %}"
                href="{% url 'merchandising:collections' %}">{% trans "Collections" %}</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link {% if request.GET.new == '1' %}active{% endif %}"
+               href="{% url 'store' %}?new=1">{% trans "New in" %}</a>
           </li>
 
           <li class="nav-item dropdown">
@@ -69,23 +86,6 @@
             </div>
           </li>
         </ul>
-
-        <!-- Center: search -->
-        <form action="{% url 'search' %}" method="GET" class="mx-lg-auto my-2 my-lg-0 w-100 ac-wrap" style="max-width:520px;"
-              data-autocomplete data-ac-url="{% url 'autocomplete' %}" data-ac-viewall="{% trans 'View all results' %}"
-              data-ac-empty="{% trans 'No matches — try another term.' %}" autocomplete="off">
-          <div class="searchbar">
-            <span class="icon"><i class="fa fa-search"></i></span>
-            <input class="form-control" type="text" name="keyword" role="combobox" aria-expanded="false"
-                   aria-autocomplete="list" aria-label="{% trans 'Search products' %}"
-                   placeholder="{% trans 'Search products, categories…' %}"
-                   value="{{ request.GET.keyword|default:'' }}">
-            <button type="button" class="search-clear" data-search-clear hidden aria-label="{% trans 'Clear search' %}">
-              <i class="fa fa-times"></i>
-            </button>
-          </div>
-          <div class="ac-panel" role="listbox"></div>
-        </form>
 
         <!-- Right: actions -->
         <div class="ml-lg-3 d-flex align-items-center mt-3 mt-lg-0">
@@ -138,27 +138,4 @@
       </div>
     </div>
   </nav>
-
-  <!-- Mobile search overlay (premium top sheet) -->
-  <div class="msearch" id="mobileSearch" hidden>
-    <div class="msearch-backdrop" data-mobile-search-close></div>
-    <div class="msearch-sheet" role="dialog" aria-modal="true" aria-label="{% trans 'Search products' %}">
-      <form action="{% url 'search' %}" method="GET" class="msearch-form ac-wrap" autocomplete="off"
-            data-autocomplete data-ac-url="{% url 'autocomplete' %}"
-            data-ac-viewall="{% trans 'View all results' %}" data-ac-empty="{% trans 'No matches — try another term.' %}">
-        <div class="msearch-bar">
-          <span class="msearch-ic"><i class="fa fa-search"></i></span>
-          <input class="msearch-input" type="text" name="keyword" role="combobox" aria-expanded="false"
-                 aria-autocomplete="list" aria-label="{% trans 'Search products' %}"
-                 placeholder="{% trans 'Search products, categories…' %}">
-          <button type="button" class="msearch-clear" data-search-clear hidden aria-label="{% trans 'Clear search' %}">
-            <i class="fa fa-times-circle"></i>
-          </button>
-          <button type="button" class="msearch-cancel" data-mobile-search-close>{% trans "Cancel" %}</button>
-        </div>
-        <div class="ac-panel msearch-panel" role="listbox"></div>
-      </form>
-    </div>
-  </div>
-
 </header>
