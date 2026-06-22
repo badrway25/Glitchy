@@ -40,6 +40,41 @@ def refresh_printify_status(modeladmin, request, queryset):
     messages.info(request, _("Refreshed Printify statuses."))
 
 
+def _fire(request, queryset, event_name, label, require_tracking=False):
+    """Operator-driven fulfillment email (works even without Printify connected)."""
+    from notifications.notify import notify_order_event
+    from notifications import events as ev
+    sent = skipped = 0
+    for order in queryset:
+        if require_tracking and not order.tracking_number:
+            skipped += 1
+            continue
+        try:
+            notify_order_event(order, getattr(ev, event_name))
+            sent += 1
+        except Exception:
+            skipped += 1
+    messages.info(request, _("%(label)s: sent %(s)d, skipped %(k)d.") % {"label": label, "s": sent, "k": skipped})
+
+
+@admin.action(description=_("Email: order in production"))
+def email_in_production(modeladmin, request, queryset):
+    for o in queryset:
+        if o.status != "In production":
+            o.status = "In production"; o.save(update_fields=["status"])
+    _fire(request, queryset, "ORDER_IN_PRODUCTION", _("In-production email"))
+
+
+@admin.action(description=_("Email: order shipped"))
+def email_shipped(modeladmin, request, queryset):
+    _fire(request, queryset, "ORDER_SHIPPED", _("Shipped email"))
+
+
+@admin.action(description=_("Email: tracking available (needs tracking number)"))
+def email_tracking(modeladmin, request, queryset):
+    _fire(request, queryset, "ORDER_TRACKING", _("Tracking email"), require_tracking=True)
+
+
 class MarginBandFilter(admin.SimpleListFilter):
     title = _("margin")
     parameter_name = "margin_band"
@@ -72,7 +107,8 @@ class OrderAdmin(admin.ModelAdmin):
     search_fields = ("order_number", "first_name", "last_name", "email", "phone",
                      "printify_order_id")
     inlines = [OrderProductInline]
-    actions = [accept_and_send, refresh_printify_status]
+    actions = [accept_and_send, refresh_printify_status,
+               email_in_production, email_shipped, email_tracking]
     readonly_fields = ("margin_breakdown",)
     fieldsets = (
         (None, {"fields": ("order_number", "user", "is_guest", "status", "is_ordered",

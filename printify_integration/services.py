@@ -314,6 +314,8 @@ def pull_order_statuses(limit=20, client=None) -> SyncLog:
     try:
         for order in orders:
             try:
+                old_status = order.printify_status or ""
+                had_tracking = bool(order.tracking_number)
                 data = client.get_order(order.printify_order_id)
                 fields = []
                 status = data.get("status")
@@ -335,6 +337,10 @@ def pull_order_statuses(limit=20, client=None) -> SyncLog:
                 if fields:
                     order.save(update_fields=fields + ["updated_at"])
                     updated += 1
+                    # Fire fulfillment emails on a real transition (best-effort, never breaks sync).
+                    from orders.fulfillment_notify import notify_fulfillment_transition
+                    notify_fulfillment_transition(order, old_status, order.printify_status or "",
+                                                  tracking_added=(not had_tracking and bool(order.tracking_number)))
             except Exception as exc:
                 errors += 1
                 logger.warning("Order pull error %s: %s", order.order_number, exc)
