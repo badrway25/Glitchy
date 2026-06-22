@@ -619,7 +619,7 @@
   "@context": "https://schema.org/",
   "@type": "Product",
   "name": "{{ single_product.product_name|escapejs }}",
-  "image": "{{ single_product.cover_image }}",
+  "image": "{% with img=single_product.cover_image %}{% if img|slice:':4' == 'http' %}{{ img|escapejs }}{% else %}{{ SITE_URL }}{{ img|escapejs }}{% endif %}{% endwith %}",
   "description": "{{ single_product.description|default:single_product.product_name|escapejs }}",
   "category": "{{ single_product.category.category_name|escapejs }}",
   "offers": {

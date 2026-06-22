@@ -12,8 +12,17 @@
   <meta property="og:title" content="{% block og_title %}{{ SITE_NAME }} — {{ SITE_TAGLINE }}{% endblock %}">
   <meta property="og:description" content="{% block og_description %}{{ SITE_TAGLINE }}{% endblock %}">
   <meta property="og:type" content="website">
+  <meta property="og:site_name" content="{{ SITE_NAME }}">
+  <meta property="og:url" content="{{ CANONICAL_URL }}">
+  <meta property="og:image" content="{% block og_image %}{{ SITE_URL }}{% static 'images/og-default.jpg' %}{% endblock %}">
+  <meta name="twitter:card" content="summary_large_image">
+
+  {# Canonical + EN/IT/FR hreflang alternates for international SEO #}
+  <link rel="canonical" href="{{ CANONICAL_URL }}">
+  {% for lang, href in HREFLANG_ALTERNATES %}<link rel="alternate" hreflang="{{ lang }}" href="{{ href }}">
+  {% endfor %}
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"Organization","name":"{{ SITE_NAME }}","description":"{{ SITE_TAGLINE }}"}
+  {"@context":"https://schema.org","@type":"Organization","name":"{{ SITE_NAME }}","url":"{{ SITE_URL }}","description":"{{ SITE_TAGLINE }}"}
   </script>
 
   <link href="{% static 'images/favicon.ico' %}" rel="shortcut icon" type="image/x-icon">

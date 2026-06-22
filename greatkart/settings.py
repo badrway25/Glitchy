@@ -57,6 +57,10 @@ DEBUG = env_bool("DJANGO_DEBUG", True)
 
 ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", ["127.0.0.1", "localhost"])
 
+# Canonical site origin (no trailing slash). Used for absolute URLs in sitemap.xml,
+# canonical tags, hreflang alternates and og:image. Set to the real domain in prod.
+SITE_URL = env("SITE_URL", "http://127.0.0.1:8799").rstrip("/")
+
 # Required for HTTPS POST/CSRF behind a domain (e.g. https://shop.example.com)
 CSRF_TRUSTED_ORIGINS = env_list("CSRF_TRUSTED_ORIGINS", [])
 
@@ -127,6 +131,7 @@ TEMPLATES = [
                 "greatkart.context_processors.site_globals",
                 "storefront.context_processors.announcement",
                 "wishlist.context_processors.wishlist_globals",
+                "greatkart.context_processors.seo_globals",
             ],
         },
     },

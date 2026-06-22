@@ -5,13 +5,15 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
-from . import views
+from . import views, seo
 from store.views import faq as faq_view
 
 # Non-localized routes: admin, language switch, and machine/API endpoints
 # (n8n webhooks must have stable, prefix-free URLs).
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("sitemap.xml", seo.sitemap_xml, name="sitemap"),
+    path("robots.txt", seo.robots_txt, name="robots"),
     path("i18n/", include("django.conf.urls.i18n")),   # set_language endpoint
     path("", include("notifications.urls")),           # /api/n8n/... + newsletter
     path("shipping/", include("shipping.urls")),       # country switcher

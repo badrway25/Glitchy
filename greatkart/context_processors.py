@@ -5,6 +5,28 @@ from django.conf import settings
 _ASSET_BASE = os.path.join(os.path.dirname(__file__), "static")
 
 
+def seo_globals(request):
+    """Canonical URL + EN/IT/FR hreflang alternates for the current page."""
+    site = getattr(settings, "SITE_URL", "").rstrip("/")
+    path = request.path or "/"
+    # Strip an active language prefix to get the unprefixed (EN) path.
+    unprefixed = path
+    for code in ("it", "fr"):
+        if path == f"/{code}" or path.startswith(f"/{code}/"):
+            unprefixed = path[len(code) + 1:] or "/"
+            break
+    return {
+        "SITE_URL": site,
+        "CANONICAL_URL": site + unprefixed,
+        "HREFLANG_ALTERNATES": [
+            ("en", site + unprefixed),
+            ("it", site + "/it" + unprefixed),
+            ("fr", site + "/fr" + unprefixed),
+            ("x-default", site + unprefixed),
+        ],
+    }
+
+
 def _asset_version():
     """Cache-busting token = newest mtime of our custom css/js assets."""
     latest = 0
