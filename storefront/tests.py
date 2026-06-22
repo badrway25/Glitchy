@@ -24,6 +24,16 @@ class AnalyticsEventTests(TestCase):
     def test_event_requires_post(self):
         self.assertEqual(self.client.get(reverse("storefront:event")).status_code, 405)
 
+    def test_p2_event_names_are_allowlisted(self):
+        # Phase 19/20 beacons (incl. autocomplete_select) must be accepted, not 400'd.
+        for name in ("autocomplete_select", "search_query", "wishlist_add",
+                     "coupon_apply", "support_order_help"):
+            r = self.client.post(reverse("storefront:event"),
+                                 data=json.dumps({"name": name, "meta": {}}),
+                                 content_type="application/json")
+            self.assertEqual(r.status_code, 200, f"{name} should be accepted")
+            self.assertTrue(AnalyticsEvent.objects.filter(name=name).exists())
+
 
 class AnnouncementTests(TestCase):
     def test_localized_message(self):

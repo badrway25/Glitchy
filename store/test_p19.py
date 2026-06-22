@@ -118,3 +118,26 @@ class FaqPageTests(TestCase):
         r = self.c.get(reverse("faq"))
         self.assertEqual(r.status_code, 200)
         self.assertNotContains(r, "<script>x</script>")
+
+
+class AutocompleteSecurityTests(TestCase):
+    def setUp(self):
+        self.c = Client()
+
+    def test_response_is_json_not_html(self):
+        # A product whose name contains markup must be returned as JSON data,
+        # never as an executable HTML document (so it can't run as script).
+        _product("xss-tee", "<script>alert(1)</script> Tee")
+        r = self.c.get(reverse("autocomplete"), {"q": "tee"})
+        self.assertEqual(r["Content-Type"].split(";")[0], "application/json")
+        # the raw markup is JSON-encoded data, not an HTML <script> element
+        import json
+        data = json.loads(r.content)
+        names = [x["name"] for x in data["results"]]
+        self.assertIn("<script>alert(1)</script> Tee", names)  # preserved as data
+        # and the response is not served as text/html
+        self.assertNotIn("text/html", r["Content-Type"])
+
+    def test_very_long_query_no_500(self):
+        r = self.c.get(reverse("autocomplete"), {"q": "a" * 5000})
+        self.assertEqual(r.status_code, 200)

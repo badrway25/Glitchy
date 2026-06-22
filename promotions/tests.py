@@ -129,3 +129,71 @@ class CouponPerUserTests(TestCase):
         CouponRedemption.objects.create(coupon=c, session_key=req.session.session_key,
                                         amount=Decimal("10"))
         self.assertFalse(apply(req, "ONCE", 100)["ok"])
+
+
+class CouponRedemptionRecordTests(TestCase):
+    """Redemption is deferred to the PAID state; finalize is atomic + idempotent."""
+    def setUp(self):
+        from django.contrib.auth import get_user_model
+        self.User = get_user_model()
+        self.coupon = Coupon.objects.create(code="REC", discount_type="percent",
+                                            value=Decimal("10"), per_user_limit=1)
+
+    def _user(self):
+        u = self.User.objects.create_user(email="r@example.com", first_name="R",
+                                          last_name="R", username="r", password="pw12345!")
+        u.is_active = True; u.save()
+        return u
+
+    def _req(self):
+        from django.contrib.sessions.backends.db import SessionStore
+        sess = SessionStore(); sess["coupon_code"] = "REC"; sess.save()
+
+        class Req:
+            pass
+        req = Req(); req.user = self._user(); req.session = sess
+        return req
+
+    def _order(self, user, number="OREC"):
+        from orders.models import Order
+        return Order.objects.create(user=user, first_name="R", last_name="R", phone="1",
+                                    email=user.email, address_line_1="x", city="c", state="s",
+                                    country="US", order_total=90, tax=0, ip="127.0.0.1",
+                                    order_number=number, coupon_code="REC", discount=10,
+                                    is_ordered=True)
+
+    def test_quote_does_not_record_redemption(self):
+        # At place_order we only validate + return the discount; NO redemption yet.
+        from .models import CouponRedemption
+        from .services import quote_for_order, SESSION_KEY
+        req = self._req()
+        code, disc = quote_for_order(req, 100)
+        self.assertEqual(code, "REC")
+        self.assertEqual(disc, Decimal("10.00"))
+        self.assertNotIn(SESSION_KEY, req.session)   # bound to the order now
+        self.assertEqual(CouponRedemption.objects.count(), 0)   # not burned yet
+
+    def test_finalize_records_once_and_is_idempotent(self):
+        from .models import CouponRedemption
+        from .services import finalize_coupon_redemption
+        order = self._order(self._user())
+        finalize_coupon_redemption(order)
+        self.coupon.refresh_from_db()
+        self.assertEqual(self.coupon.used_count, 1)
+        self.assertEqual(CouponRedemption.objects.filter(coupon=self.coupon).count(), 1)
+        # calling again (duplicate webhook / re-confirm) must NOT double-count
+        finalize_coupon_redemption(order)
+        self.coupon.refresh_from_db()
+        self.assertEqual(self.coupon.used_count, 1)
+        self.assertEqual(CouponRedemption.objects.filter(coupon=self.coupon).count(), 1)
+
+    def test_abandoned_order_does_not_burn_coupon(self):
+        # An unpaid (never-finalized) order records no redemption, so the one-time
+        # coupon is still available to the customer.
+        from .models import CouponRedemption
+        from .services import quote_for_order
+        req = self._req()
+        quote_for_order(req, 100)   # place_order path, no payment
+        self.assertEqual(CouponRedemption.objects.count(), 0)
+        self.coupon.refresh_from_db()
+        self.assertEqual(self.coupon.used_count, 0)
