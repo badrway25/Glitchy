@@ -123,7 +123,8 @@
               </div>
 
               {% if single_product.description %}
-                <p class="pdp-muted mb-0">{{ single_product.description }}</p>
+                {# description is sanitized to plain text at sync time; linebreaksbr is Django-safe #}
+                <div class="pdp-muted pdp-desc mb-0">{{ single_product.description|linebreaksbr }}</div>
               {% endif %}
 
               <!-- Shipping + returns reassurance -->
@@ -643,7 +644,7 @@
   "@type": "Product",
   "name": "{{ single_product.product_name|escapejs }}",
   "image": "{% with img=single_product.cover_image %}{% if img|slice:':4' == 'http' %}{{ img|escapejs }}{% else %}{{ SITE_URL }}{{ img|escapejs }}{% endif %}{% endwith %}",
-  "description": "{{ single_product.description|default:single_product.product_name|escapejs }}",
+  "description": "{{ single_product.meta_description|escapejs }}",
   "category": "{{ single_product.category.category_name|escapejs }}",
   "offers": {
     "@type": "Offer",

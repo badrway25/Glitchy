@@ -215,9 +215,10 @@ def _upsert_product(p: dict, fallback_category, settings_map, overwrite_category
     """Create or update a single Product from a Printify product dict."""
     from django.conf import settings as dj_settings
 
+    from .text import clean_printify_description
     p_id = str(p.get("id") or "")
     title = (p.get("title") or "").strip()
-    desc = (p.get("description") or "").strip()
+    desc = clean_printify_description(p.get("description"))   # strip raw HTML -> clean text
     if not p_id or not title:
         return None, False
 

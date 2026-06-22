@@ -83,6 +83,11 @@ class Product(models.Model):
             return False
         return (timezone.now() - self.created_date).days <= days
 
+    def meta_description(self, length=160):
+        """Clean single-line description for SEO meta / JSON-LD (no newlines, no HTML)."""
+        text = " ".join((self.description or self.product_name or "").split())
+        return (text[:length].rstrip() + "…") if len(text) > length else text
+
     def data_quality(self):
         """Admin-only 0–100 completeness score with a per-check breakdown.
         Never shown to customers (it can reference internal coverage)."""
