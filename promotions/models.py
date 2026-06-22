@@ -91,3 +91,10 @@ class CouponRedemption(models.Model):
         ordering = ["-created_at"]
         verbose_name = _("Coupon redemption")
         verbose_name_plural = _("Coupon redemptions")
+        constraints = [
+            # Idempotency: at most one redemption per (coupon, order) so a duplicate
+            # webhook / double-submitted checkout can never double-count.
+            models.UniqueConstraint(fields=["coupon", "order"],
+                                    condition=models.Q(order__isnull=False),
+                                    name="uniq_redemption_coupon_order"),
+        ]

@@ -234,6 +234,13 @@ def finalize_order_payment(*, order, payment, request=None):
     )
     order.save()
 
+    # Record the coupon redemption now that the order is paid (atomic, idempotent).
+    try:
+        from promotions.services import finalize_coupon_redemption
+        finalize_coupon_redemption(order)
+    except Exception:
+        logger.warning("coupon redemption recording skipped for %s", order.order_number)
+
     # Clear the cart (user OR guest).
     if order.user_id:
         CartItem.objects.filter(user_id=order.user_id).delete()

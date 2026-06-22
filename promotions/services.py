@@ -53,30 +53,49 @@ def applied_coupon(request, subtotal):
     return coupon, coupon.discount_for(subtotal)
 
 
-def record_redemption(request, order, subtotal):
-    """Finalise the session coupon against a placed order: re-validate, store a
-    CouponRedemption (user/session/order) and bump used_count. Returns the discount."""
+def quote_for_order(request, subtotal):
+    """At checkout / place_order: re-validate the session coupon (incl. per-user limit)
+    and return (code, discount) to stash on the pending order. Clears the session coupon
+    (it is now bound to this order). Does NOT record a redemption — that happens only when
+    the order is actually paid, so abandoned checkouts never burn a one-time coupon."""
     code = request.session.get(SESSION_KEY)
     if not code:
-        return Decimal("0")
+        return "", Decimal("0")
     coupon = Coupon.objects.filter(code=code).first()
     if not coupon:
         clear(request)
-        return Decimal("0")
+        return "", Decimal("0")
     ok, _reason = coupon.validate(subtotal, request=request)
     if not ok:
         clear(request)
-        return Decimal("0")
+        return "", Decimal("0")
     discount = coupon.discount_for(subtotal)
-    sk = request.session.session_key or ""
-    CouponRedemption.objects.create(
-        coupon=coupon, order=order, amount=discount,
-        user=request.user if request.user.is_authenticated else None,
-        session_key="" if request.user.is_authenticated else sk)
-    coupon.used_count = (coupon.used_count or 0) + 1
-    coupon.save(update_fields=["used_count"])
     clear(request)
-    return discount
+    return code, discount
+
+
+def finalize_coupon_redemption(order):
+    """Record the coupon redemption for a PAID order: atomic, idempotent, exactly-once.
+    Reads the code stashed on the order. Safe to call from the web flow OR the Stripe
+    webhook (get_or_create on (coupon, order) + row lock prevent double-counting)."""
+    from django.db import transaction
+    from django.db.models import F
+
+    code = (getattr(order, "coupon_code", "") or "").strip().upper()
+    if not code:
+        return Decimal("0")
+    with transaction.atomic():
+        coupon = Coupon.objects.select_for_update().filter(code=code).first()
+        if not coupon:
+            return Decimal("0")
+        _redemption, created = CouponRedemption.objects.get_or_create(
+            coupon=coupon, order=order,
+            defaults={"user": getattr(order, "user", None),
+                      "session_key": getattr(order, "session_key", "") or "",
+                      "amount": Decimal(str(getattr(order, "discount", 0) or 0))})
+        if created:
+            Coupon.objects.filter(pk=coupon.pk).update(used_count=F("used_count") + 1)
+    return Decimal(str(getattr(order, "discount", 0) or 0))
 
 
 def clear(request):

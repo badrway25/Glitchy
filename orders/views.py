@@ -482,11 +482,12 @@ def place_order(request, total=0, quantity=0):
     data.order_number = current_date + str(data.id)
     data.save(update_fields=["order_number"])
 
-    # Apply a session coupon (re-validated at checkout, anti-abuse enforced).
+    # Stash a validated session coupon on the pending order (re-validated, anti-abuse
+    # enforced). The redemption is recorded only once the order is PAID (finalize), so an
+    # abandoned checkout never consumes a usage / burns a one-time coupon.
     try:
-        from promotions.services import record_redemption, SESSION_KEY
-        code = request.session.get(SESSION_KEY)
-        discount = record_redemption(request, data, totals.items_subtotal)
+        from promotions.services import quote_for_order
+        code, discount = quote_for_order(request, totals.items_subtotal)
         if discount and discount > 0:
             data.discount = float(discount)
             data.coupon_code = (code or "")[:32]
