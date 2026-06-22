@@ -61,6 +61,15 @@ def build_context(knowledge, products, lang, order_context=None):
             opts = (getattr(p, "printify_options_summary", "") or "").strip()
             if opts:
                 line += f" Options: {opts[:80]}."
+            try:
+                colors = [v.variation_value for v in p.variation_set.colors()][:8]
+                sizes = [v.variation_value.upper() for v in p.variation_set.sizes()][:10]
+                if colors:
+                    line += f" Colours: {', '.join(colors)}."
+                if sizes:
+                    line += f" Sizes: {', '.join(sizes)}."
+            except Exception:
+                pass
             if getattr(p, "printify_blueprint_id", None):
                 line += " Made on demand (printed to order)."
             plines.append(line)

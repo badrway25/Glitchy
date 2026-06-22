@@ -286,6 +286,10 @@
                   {% if single_product.printify_provider_name %}
                   <span class="pod-chip">{% icon "check" "ic" 14 %} {% trans "Vetted print partner" %}</span>
                   {% endif %}
+                  {% with ncolors=single_product.variation_set.colors.count nsizes=single_product.variation_set.sizes.count %}
+                  {% if ncolors %}<span class="pod-chip">{% icon "spark" "ic" 14 %} {% blocktrans count c=ncolors %}{{ c }} colour{% plural %}{{ c }} colours{% endblocktrans %}</span>{% endif %}
+                  {% if nsizes %}<span class="pod-chip">{% icon "ruler" "ic" 14 %} {% blocktrans count s=nsizes %}{{ s }} size{% plural %}{{ s }} sizes{% endblocktrans %}</span>{% endif %}
+                  {% endwith %}
                   <span class="pod-chip">{% icon "truck" "ic" 14 %}
                     {% if shipping_quote and shipping_quote.eta_label %}{{ shipping_quote.eta_label }}{% else %}{% trans "Tracked delivery" %}{% endif %}</span>
                   <span class="pod-chip">{% icon "returns" "ic" 14 %} {% blocktrans with d=RETURN_WINDOW_DAYS %}{{ d }}-day returns{% endblocktrans %}</span>

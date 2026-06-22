@@ -99,3 +99,19 @@ class DashboardTests(TestCase):
     def test_dashboard_requires_staff(self):
         r = self.client.get("/admin/printify-dashboard/")
         self.assertIn(r.status_code, (301, 302))   # redirected to admin login
+
+
+class AIExpert2Tests(TestCase):
+    def test_context_lists_colours_sizes_without_costs(self):
+        from assistant.prompt import build_context
+        p = _product("AI", base_cost=7.77, printify_product_id="pp_secret")
+        Variation.objects.create(product=p, variation_category="color",
+                                 variation_value="Black", production_cost=6.66)
+        Variation.objects.create(product=p, variation_category="size", variation_value="m")
+        ctx = build_context([], [p], "en")
+        self.assertIn("Colours:", ctx)
+        self.assertIn("Black", ctx)
+        self.assertIn("Sizes:", ctx)
+        self.assertNotIn("7.77", ctx)
+        self.assertNotIn("6.66", ctx)
+        self.assertNotIn("pp_secret", ctx)
