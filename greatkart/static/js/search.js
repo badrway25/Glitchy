@@ -42,8 +42,17 @@
         .catch(function () {});
     }
 
+    var clearBtn = form.querySelector("[data-search-clear]");
+    function syncClear(){ if (clearBtn) clearBtn.hidden = !input.value.length; }
+    if (clearBtn) {
+      clearBtn.addEventListener("click", function () {
+        input.value = ""; lastQ = ""; close(); syncClear(); input.focus();
+      });
+    }
+
     input.addEventListener("input", function () {
       var q = input.value.trim();
+      syncClear();
       if (timer) clearTimeout(timer);
       if (q.length < 2) { close(); return; }
       timer = setTimeout(function () { if (q !== lastQ) { lastQ = q; fetchSuggest(q); } }, 220);
@@ -67,4 +76,32 @@
     document.addEventListener("click", function (e) { if (!form.contains(e.target)) close(); });
     input.addEventListener("focus", function () { if (items.length && input.value.trim().length >= 2) open(); });
   });
+
+  // Mobile search overlay (top sheet)
+  var overlay = document.getElementById("mobileSearch");
+  if (overlay) {
+    var mInput = overlay.querySelector('input[name="keyword"]');
+    function openOverlay() {
+      overlay.hidden = false;
+      document.body.style.overflow = "hidden";
+      requestAnimationFrame(function () {
+        overlay.classList.add("is-open");
+        if (mInput) mInput.focus();
+      });
+    }
+    function closeOverlay() {
+      overlay.classList.remove("is-open");
+      document.body.style.overflow = "";
+      setTimeout(function () { overlay.hidden = true; }, 250);
+    }
+    document.querySelectorAll("[data-mobile-search-open]").forEach(function (b) {
+      b.addEventListener("click", openOverlay);
+    });
+    overlay.querySelectorAll("[data-mobile-search-close]").forEach(function (b) {
+      b.addEventListener("click", closeOverlay);
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && overlay.classList.contains("is-open")) closeOverlay();
+    });
+  }
 })();
