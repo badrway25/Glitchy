@@ -14,40 +14,63 @@ from orders.models import OrderProduct
 
 
 def store(request, category_slug=None):
+    from store.filters import apply_filters, build_facets, active_chips
     category = None
-    products = Product.objects.filter(is_available=True).prefetch_related("gallery")
-
-    # Categories for sidebar
+    base = Product.objects.filter(is_available=True)
     all_categories = Category.objects.all().order_by("category_name")
 
     if category_slug:
         category = get_object_or_404(Category, slug=category_slug)
-        products = products.filter(category=category)
+        base = base.filter(category=category)
 
-    sort = request.GET.get("sort", "")
-    if sort == "price_asc":
-        products = products.order_by("price")
-    elif sort == "price_desc":
-        products = products.order_by("-price")
-    elif sort == "name_asc":
-        products = products.order_by("product_name")
-    elif sort == "name_desc":
-        products = products.order_by("-product_name")
-    elif sort == "newest":
-        products = products.order_by("-created_date")
-    else:
-        products = products.order_by("-created_date")
+    # Facets are computed from the category-scoped base (before color/size filters)
+    # so options never vanish when selected.
+    facets = build_facets(base)
+    products_qs, active, sort = apply_filters(request, base)
+    products_qs = products_qs.prefetch_related("gallery")
+    count = products_qs.count()
 
-    paginator = Paginator(products, 9)
-    page = request.GET.get("page")
-    paged_products = paginator.get_page(page)
+    # active collection (for a compact hero/breadcrumb)
+    active_collection = None
+    if active.get("collection"):
+        from merchandising.models import Collection
+        active_collection = Collection.objects.filter(slug=active["collection"], is_active=True).first()
+
+    # Analytics: distinguish a plain browse from a filtered/searched one.
+    if active:
+        _track_event(request, "filter_apply", {"n": str(len(active)),
+                     "keys": ",".join(sorted(active.keys()))[:80]})
+        if "keyword" in active:
+            _track_event(request, "search_with_filters", {"q": active["keyword"][:60]})
+        if count == 0:
+            _track_event(request, "filter_no_results", {"keys": ",".join(sorted(active.keys()))[:80]})
+
+    # No results with active filters -> show real recommendations to keep discovery alive.
+    recommendations = []
+    if count == 0 and active:
+        try:
+            from merchandising.recommendations import recommend_from_context
+            recommendations = recommend_from_context(request, limit=4)
+        except Exception:
+            recommendations = list(Product.objects.filter(is_available=True)
+                                   .order_by("-created_date")[:4])
+
+    paginator = Paginator(products_qs, 9)
+    paged_products = paginator.get_page(request.GET.get("page"))
 
     context = {
         "category": category,
-        "categories": all_categories,   # ✅ important
+        "categories": all_categories,
         "products": paged_products,
-        "product_count": products.count(),
+        "product_count": count,
         "sort": sort,
+        "facets": facets,
+        "active_filters": active,
+        "active_chips": active_chips(active),
+        "has_filters": bool(active),
+        "active_collection": active_collection,
+        "recommendations": recommendations,
+        "querystring": request.GET.urlencode(),
     }
     return render(request, "store/store.html", context)
 
