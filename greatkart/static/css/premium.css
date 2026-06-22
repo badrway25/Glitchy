@@ -1355,3 +1355,17 @@ body.has-sticky-cta .ai-assistant{bottom:78px;}
 .pod-chip .ic{color:var(--accent-2);}
 .pod-note{margin:0;font-size:.8rem;color:var(--muted);line-height:1.5;}
 @media (max-width:576px){.pod-chips{gap:.35rem;}.pod-chip{font-size:.74rem;}}
+
+/* PDP actions — keep buttons intact with long translated labels (e.g. FR "Enregistrer") */
+.pdp-actions{display:flex;gap:.6rem;flex-wrap:wrap;align-items:stretch;}
+.pdp-actions .btn{min-height:46px;display:inline-flex;align-items:center;justify-content:center;
+  white-space:nowrap;line-height:1.1;overflow-wrap:normal;}
+.wish-btn-pdp{flex:0 0 auto;white-space:nowrap;}
+.pdp-actions .btn-primary{flex:1 1 auto;}
+@media (max-width:480px){
+  /* stack full-width on small phones so any label always fits */
+  .pdp-actions{flex-direction:column;}
+  .pdp-actions .btn{width:100%;}
+}
+/* PDP description: preserve sanitized line breaks/bullets cleanly */
+.pdp-desc{white-space:normal;}
