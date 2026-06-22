@@ -172,11 +172,28 @@ class ProductImage(models.Model):
     is_default = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    # Printify image metadata (admin/data-quality; src is the original mockup URL)
+    printify_src = models.URLField(max_length=600, blank=True, default="")
+    printify_position = models.CharField(max_length=40, blank=True, default="")
+    printify_mockup_id = models.CharField(max_length=64, blank=True, default="")
+    printify_variant_ids = models.TextField(blank=True, default="",
+                                            help_text="Comma-separated Printify variant ids")
+    sort_order = models.IntegerField(default=0)
+
     class Meta:
-        ordering = ["-is_default", "id"]
+        ordering = ["-is_default", "sort_order", "id"]
 
     def __str__(self):
         return f"{self.product.product_name} image"
+
+    def display_url(self):
+        """Local file if downloaded, else the original Printify mockup URL, else empty."""
+        if self.image:
+            try:
+                return self.image.url
+            except Exception:
+                pass
+        return self.printify_src or ""
     
 class VariationManager(models.Manager):
     def colors(self):
@@ -200,11 +217,33 @@ class Variation(models.Model):
     # Per-variant production cost from Printify (used for accurate margins)
     production_cost = models.FloatField(default=0.0)
 
+    # Deep Printify variant metadata (admin/margin only — never customer-facing)
+    printify_sku = models.CharField(max_length=80, blank=True, default="")
+    printify_title = models.CharField(max_length=160, blank=True, default="")
+    printify_supplier_price = models.FloatField(default=0.0,
+                                                help_text="Printify retail price hint (admin)")
+    printify_is_enabled = models.BooleanField(default=True,
+                                              help_text="Disabled variants are admin-visible but not buyable")
+    printify_is_available = models.BooleanField(default=True)
+    printify_is_default = models.BooleanField(default=False)
+    printify_grams = models.IntegerField(default=0)
+    printify_synced_at = models.DateTimeField(blank=True, null=True)
 
     objects = VariationManager()
 
     def __str__(self):
         return self.variation_value
+
+    def margin(self):
+        """Admin margin hint per variant (price - production cost)."""
+        if not self.production_cost:
+            return None
+        return round(float(self.product.price) - float(self.production_cost), 2)
+
+    @property
+    def is_buyable(self):
+        """Customer-side: a variant is buyable only if enabled, available and active."""
+        return self.is_active and self.printify_is_enabled and self.printify_is_available
 
 
 class ReviewRating(models.Model):

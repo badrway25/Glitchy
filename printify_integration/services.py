@@ -108,6 +108,7 @@ def _sync_variations(product: Product, p: dict):
         for val in opt.get("values") or []:
             option_value_map[val.get("id")] = (opt_type, (val.get("title") or "").strip())
 
+    from django.utils import timezone
     _, prod_cost = _enabled_variant_info(p)
     created = updated = 0
     for v in p.get("variants") or []:
@@ -117,6 +118,16 @@ def _sync_variations(product: Product, p: dict):
         if not variant_id:
             continue
         v_cost = _cents_to_units(v.get("cost")) or prod_cost
+        meta = {
+            "printify_sku": (v.get("sku") or "")[:80],
+            "printify_title": (v.get("title") or "")[:160],
+            "printify_supplier_price": _cents_to_units(v.get("price")) or 0.0,
+            "printify_is_enabled": bool(v.get("is_enabled", True)),
+            "printify_is_available": bool(v.get("is_available", True)),
+            "printify_is_default": bool(v.get("is_default", False)),
+            "printify_grams": int(v.get("grams") or 0),
+            "printify_synced_at": timezone.now(),
+        }
         for oid in v.get("options") or []:
             mapped = option_value_map.get(oid)
             if not mapped:
@@ -132,7 +143,7 @@ def _sync_variations(product: Product, p: dict):
                 Variation.objects.create(
                     product=product, variation_category=opt_type, variation_value=opt_title,
                     is_active=True, printify_variant_id=variant_id, production_cost=v_cost,
-                )
+                    **meta)
                 created += 1
             else:
                 changed = False
@@ -145,6 +156,11 @@ def _sync_variations(product: Product, p: dict):
                 if not existing.is_active:
                     existing.is_active = True
                     changed = True
+                for k, val in meta.items():
+                    if getattr(existing, k) != val and not (k == "printify_synced_at"):
+                        setattr(existing, k, val)
+                        changed = True
+                existing.printify_synced_at = meta["printify_synced_at"]
                 if changed:
                     existing.save()
                     updated += 1
@@ -166,18 +182,27 @@ def _sync_images(product: Product, p: dict, refresh=False):
     if ProductImage.objects.filter(product=product).exists():
         return
     default_src = None
-    for img in images:
+    for idx, img in enumerate(images):
         url = img.get("src")
         if not url:
             continue
         is_def = bool(img.get("is_default"))
         if is_def and not default_src:
             default_src = url
+        meta = dict(
+            printify_src=url[:600],
+            printify_position=(img.get("position") or "")[:40],
+            printify_mockup_id=str(img.get("mockup_id") or "")[:64],
+            printify_variant_ids=",".join(str(x) for x in (img.get("variant_ids") or []))[:2000],
+            sort_order=int(img.get("order") or idx),
+        )
         dl = _download_image(url)
         if not dl:
+            # keep the metadata + original URL even if the download fails (graceful fallback)
+            ProductImage.objects.create(product=product, is_default=is_def, **meta)
             continue
         filename, content = dl
-        pi = ProductImage(product=product, is_default=is_def)
+        pi = ProductImage(product=product, is_default=is_def, **meta)
         pi.image.save(filename, ContentFile(content), save=True)
     if not product.images and default_src:
         dl = _download_image(default_src)
