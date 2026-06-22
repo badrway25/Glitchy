@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 from .models import (GeneralFAQ, Product, ProductFAQ, ProductImage, ReviewRating, Variation)
@@ -57,10 +58,10 @@ class ProductAdmin(admin.ModelAdmin):
         images = obj.gallery.count() if hasattr(obj, "gallery") else 0
         sc = dq["score"]
         scolor = "#16a34a" if sc >= 80 else ("#d97706" if sc >= 50 else "#dc2626")
-        rows = "".join(
+        rows = mark_safe("".join(
             f'<tr><td style="padding:2px 10px 2px 0;">{c["key"]}</td>'
             f'<td style="color:{"#16a34a" if c["ok"] else "#dc2626"};">'
-            f'{"✓" if c["ok"] else "✗"}</td></tr>' for c in dq["checks"])
+            f'{"✓" if c["ok"] else "✗"}</td></tr>' for c in dq["checks"]))
         return format_html(
             '<div style="font-size:13px;line-height:1.5;">'
             '<div style="font-size:22px;font-weight:800;color:{};margin-bottom:6px;">{}% '
@@ -71,7 +72,7 @@ class ProductAdmin(admin.ModelAdmin):
             scolor, sc, obj.printify_blueprint_title or "—", obj.printify_blueprint_id or "—",
             obj.printify_provider_name or "—", obj.printify_provider_id or "—",
             obj.printify_options_summary or "—", "yes" if obj.printify_visible else "no",
-            variants, with_cost, images, format_html(rows))
+            variants, with_cost, images, rows)
 
     @admin.action(description=_("Audit data quality (selected)"))
     def audit_data_quality(self, request, queryset):
