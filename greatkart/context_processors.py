@@ -29,6 +29,7 @@ def site_globals(request):
         "FREE_SHIPPING_THRESHOLD": getattr(settings, "SHIPPING_FREE_THRESHOLD", 0),
         "PAYPAL_CLIENT_ID": getattr(settings, "PAYPAL_CLIENT_ID", ""),
         "PAYPAL_CURRENCY": getattr(settings, "PAYPAL_CURRENCY", "EUR"),
+        "PAYPAL_ENABLED": getattr(settings, "PAYPAL_ENABLED", False),
         "STRIPE_CURRENCY": getattr(settings, "STRIPE_CURRENCY", "eur").upper(),
         "SUPPORT_EMAIL": getattr(settings, "SUPPORT_EMAIL", ""),
         "AI_ASSISTANT_ENABLED": getattr(settings, "AI_ASSISTANT_ENABLED", False),

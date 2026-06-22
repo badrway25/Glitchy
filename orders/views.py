@@ -1,3 +1,4 @@
+import logging
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
@@ -378,15 +379,30 @@ def payments(request):
         messages.error(request, "Order not found or already confirmed.")
         return JsonResponse({"error": "order_not_found"}, status=404)
 
-    # idempotent-ish Payment create
+    # SECURITY: never trust the client's "status". This endpoint serves PayPal, whose
+    # capture MUST be verified server-side against PayPal's API before we mark the order
+    # paid (amount + currency + COMPLETED). PayPal is fail-closed: if it isn't configured/
+    # enabled, no order can be finalized here. (Stripe uses its own server-verified intent
+    # + signed-webhook path and never reaches this endpoint.)
+    from .paypal import paypal_available, verify_capture
+    if not paypal_available():
+        logging.getLogger("orders").info("PayPal payment attempt while PayPal disabled (order %s)", order.order_number)
+        return JsonResponse({"error": "paypal_unavailable",
+                             "message": "PayPal is temporarily unavailable. Please use card."}, status=503)
+    ok, reason = verify_capture(trans_id, order.order_total, getattr(order, "currency", "") or settings.PAYPAL_CURRENCY)
+    if not ok:
+        logging.getLogger("orders").warning("PayPal capture rejected (%s) for order %s", reason, order.order_number)
+        return JsonResponse({"error": "payment_unverified", "reason": reason}, status=402)
+
+    # Verified: idempotent Payment create (amount comes from the order, not the client).
     payment, _created = Payment.objects.get_or_create(
         payment_id=trans_id,
         defaults={
             "user": order.user,
             "email": order.email,
-            "payment_method": method,
+            "payment_method": "PayPal",
             "amount_paid": str(order.order_total),
-            "status": status,
+            "status": "COMPLETED",
         }
     )
 

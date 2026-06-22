@@ -130,23 +130,27 @@
           <div class="pay-cta">
 
             <div class="pay-switch">
-              <button type="button" class="pay-tab active" data-paytab="paypal">
+              <button type="button" class="pay-tab active" data-paytab="stripe">
+                <i class="fa fa-credit-card mr-2"></i> {% trans "Card" %}
+              </button>
+              {% if PAYPAL_ENABLED %}
+              <button type="button" class="pay-tab" data-paytab="paypal">
                 <i class="fa fa-paypal mr-2"></i> PayPal
               </button>
-              <button type="button" class="pay-tab" data-paytab="stripe">
-                <i class="fa fa-credit-card mr-2"></i> Card
-              </button>
+              {% endif %}
             </div>
 
             <div class="pay-panels mt-3">
-              <div id="payPanelPaypal" class="pay-panel is-active">
+              {% if PAYPAL_ENABLED %}
+              <div id="payPanelPaypal" class="pay-panel">
                 <div id="paypal-button-container"></div>
                 <small class="text-muted d-block mt-2" style="font-size:13px;">
-                  After payment, your order will be confirmed automatically.
+                  {% trans "After payment, your order will be confirmed automatically." %}
                 </small>
               </div>
+              {% endif %}
 
-              <div id="payPanelStripe" class="pay-panel">
+              <div id="payPanelStripe" class="pay-panel is-active">
 				<form id="stripeForm">
 					<div id="stripe-payment-element"></div>
 
@@ -173,7 +177,7 @@
   </div>
 </section>
 
-{% if PAYPAL_CLIENT_ID %}<script src="https://www.paypal.com/sdk/js?client-id={{ PAYPAL_CLIENT_ID }}&currency={{ PAYPAL_CURRENCY }}&components=buttons"></script>{% endif %}
+{% if PAYPAL_ENABLED %}<script src="https://www.paypal.com/sdk/js?client-id={{ PAYPAL_CLIENT_ID }}&currency={{ PAYPAL_CURRENCY }}&components=buttons"></script>{% endif %}
 <script>
   window.__STRIPE_CREATE_INTENT_URL = "{% url 'stripe_create_intent' %}";
   window.__STRIPE_CONFIRM_URL = "{% url 'stripe_confirm' %}";

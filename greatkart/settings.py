@@ -226,7 +226,11 @@ try:
         MIDDLEWARE.insert(MIDDLEWARE.index(_sec_mw) + 1, "whitenoise.middleware.WhiteNoiseMiddleware")
     STORAGES = {
         "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
-        "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+        # WhiteNoise gzip/brotli compression + far-future caching, served straight from
+        # gunicorn (no nginx needed). We use the COMPRESSED (non-manifest) backend so a
+        # stray url()/source-map ref inside vendored CSS (bootstrap.css.map) can't break
+        # collectstatic; cache-busting for our own assets is already handled by ASSET_VERSION.
+        "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
     }
 except ImportError:
     pass
@@ -290,7 +294,12 @@ STRIPE_CURRENCY = env("STRIPE_CURRENCY", "eur")
 
 # PayPal (client id is a PUBLIC identifier, but kept configurable via env)
 PAYPAL_CLIENT_ID = env("PAYPAL_CLIENT_ID", "")
+PAYPAL_SECRET = env("PAYPAL_SECRET", "")          # server-side, required to VERIFY a payment
 PAYPAL_CURRENCY = env("PAYPAL_CURRENCY", "EUR")
+PAYPAL_API_BASE = env("PAYPAL_API_BASE", "https://api-m.sandbox.paypal.com")
+# PayPal stays OFF until server-side capture verification is configured (client id + secret).
+# It only flips on when explicitly enabled AND both credentials are present (see orders/paypal.py).
+PAYPAL_ENABLED = env_bool("PAYPAL_ENABLED", False) and bool(PAYPAL_CLIENT_ID) and bool(PAYPAL_SECRET)
 
 # Payment processing fee model (used for net-margin estimation)
 PAYMENT_FEE_PERCENT = float(env("PAYMENT_FEE_PERCENT", "1.5"))   # %
