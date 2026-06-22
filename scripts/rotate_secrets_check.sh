@@ -38,7 +38,11 @@ if [ "$(val AI_ASSISTANT_ENABLED)" = "True" ]; then
   AIK="$(val AI_API_KEY)"
   if [ -z "$AIK" ]; then echo "FAIL: AI_API_KEY empty while AI_ASSISTANT_ENABLED=True"; fail=$((fail+1));
   elif printf '%s' "$AIK" | grep -qiE "$PLACEHOLDER_RE"; then echo "FAIL: AI_API_KEY still a placeholder"; fail=$((fail+1));
-  else echo "ok  : AI_API_KEY set (rotate before prod — dev key is exposed)"; fi
+  # Explicit rotation gate: the dev key was exposed in chat, so staging/prod is BLOCKED
+  # until the owner revokes it, creates a new one, and sets OPENAI_KEY_ROTATED=True.
+  elif [ "$(val OPENAI_KEY_ROTATED)" != "True" ]; then
+    echo "FAIL: OpenAI key NOT rotated. Revoke the exposed key, create a new one, then set OPENAI_KEY_ROTATED=True"; fail=$((fail+1));
+  else echo "ok  : AI_API_KEY set and OPENAI_KEY_ROTATED=True"; fi
 else
   echo "ok  : AI assistant disabled (AI_API_KEY not required)"
 fi

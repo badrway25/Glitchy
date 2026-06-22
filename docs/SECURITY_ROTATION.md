@@ -75,3 +75,18 @@ Operational guardrails already enforced in code:
 - [ ] n8n Header Auth credential created and attached to webhook nodes.
 - [ ] `PRINTIFY_PUSH_ENABLED=True` only when ready to create real Printify orders.
 - [ ] Logs do not contain secrets (we log status codes + truncated errors only).
+
+## OpenAI key rotation gate (operational)
+
+`scripts/rotate_secrets_check.sh` now **fails** (blocks staging/prod) while `AI_ASSISTANT_ENABLED=True`
+unless `OPENAI_KEY_ROTATED=True`. The dev key was shared in chat and must be treated as exposed.
+
+Procedure (owner only — the key is never committed, never printed):
+1. Revoke the current key at https://platform.openai.com/api-keys
+2. Create a new **project-scoped** key with a hard monthly spend limit
+3. Put it only in `.env` / the secrets manager — never in git
+4. Set `OPENAI_KEY_ROTATED=True` in the same environment file
+5. Run `bash scripts/rotate_secrets_check.sh` (must show 0 failures)
+6. Never commit `.env`
+
+Until step 4–5 pass, **staging is blocked** by design.
