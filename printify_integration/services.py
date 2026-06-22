@@ -260,6 +260,11 @@ def _upsert_product(p: dict, fallback_category, settings_map, overwrite_category
 
     _sync_images(obj, p, refresh=refresh_images)
     _sync_variations(obj, p)
+    try:
+        from .profiles import import_print_areas
+        import_print_areas(obj, p)
+    except Exception:
+        pass
     return obj, is_new
 
 
