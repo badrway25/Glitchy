@@ -58,6 +58,16 @@ class AnalyticsEvent(models.Model):
         ("search_query", "search_query"),
         ("autocomplete_select", "autocomplete_select"),
         ("support_order_help", "support_order_help"),
+        ("recommendation_view", "recommendation_view"),
+        ("recommendation_click", "recommendation_click"),
+        ("outfit_view", "outfit_view"),
+        ("outfit_add_to_cart", "outfit_add_to_cart"),
+        ("style_quiz_start", "style_quiz_start"),
+        ("style_quiz_complete", "style_quiz_complete"),
+        ("filter_apply", "filter_apply"),
+        ("collection_view", "collection_view"),
+        ("notification_signup", "notification_signup"),
+        ("high_intent_user", "high_intent_user"),
     ]
 
     name = models.CharField(max_length=32, db_index=True)

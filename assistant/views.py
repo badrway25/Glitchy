@@ -15,18 +15,18 @@ from .models import AssistantFeedback, AssistantMessage
 logger = logging.getLogger("assistant")
 
 QUICK_QUESTIONS = [
-    {"key": "shipping", "en": "How long does shipping take?",
-     "it": "Quanto dura la spedizione?", "fr": "Quels sont les délais de livraison ?"},
+    {"key": "choose", "en": "Help me choose a product",
+     "it": "Aiutami a scegliere un prodotto", "fr": "Aidez-moi à choisir un produit"},
+    {"key": "goes_with", "en": "What goes well with this item?",
+     "it": "Cosa sta bene con questo articolo?", "fr": "Qu'est-ce qui va bien avec cet article ?"},
+    {"key": "gift", "en": "Do you have gift ideas?",
+     "it": "Avete idee regalo?", "fr": "Avez-vous des idées cadeaux ?"},
+    {"key": "save", "en": "How do I save items for later?",
+     "it": "Come salvo gli articoli per dopo?", "fr": "Comment enregistrer des articles pour plus tard ?"},
+    {"key": "sizing", "en": "Can you help me find my size?",
+     "it": "Puoi aiutarmi a trovare la taglia?", "fr": "Pouvez-vous m'aider à trouver ma taille ?"},
     {"key": "returns", "en": "How do returns work?",
      "it": "Come funzionano i resi?", "fr": "Comment fonctionnent les retours ?"},
-    {"key": "sizing", "en": "How do I choose my size?",
-     "it": "Come scelgo la taglia?", "fr": "Comment choisir ma taille ?"},
-    {"key": "guest", "en": "Can I buy as a guest?",
-     "it": "Posso comprare come ospite?", "fr": "Puis-je acheter en tant qu'invité ?"},
-    {"key": "payments", "en": "Which payment methods do you accept?",
-     "it": "Quali metodi di pagamento accettate?", "fr": "Quels moyens de paiement acceptez-vous ?"},
-    {"key": "tracking", "en": "Where do I find my tracking?",
-     "it": "Dove trovo il tracking?", "fr": "Où trouver le suivi de ma commande ?"},
 ]
 
 
