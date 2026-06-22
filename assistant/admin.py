@@ -27,7 +27,9 @@ class AssistantMessageInline(admin.TabularInline):
 
 @admin.register(AssistantConversation)
 class AssistantConversationAdmin(admin.ModelAdmin):
-    list_display = ("id", "account", "language", "created_at")
+    from greatkart.admin_pii import masked_user_email_column
+    masked_account = masked_user_email_column("account")
+    list_display = ("id", "masked_account", "language", "created_at")
     list_filter = ("language", "created_at")
     readonly_fields = ("session_key", "account", "language", "ip_hash", "created_at")
     inlines = [AssistantMessageInline]

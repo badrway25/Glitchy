@@ -2,13 +2,15 @@ from django.contrib import admin, messages
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
+from greatkart.admin_pii import masked_email_column
 from .dispatcher import resend_event
 from .models import NewsletterSubscriber, OutboundEvent, SupportMessage
 
 
 @admin.register(OutboundEvent)
 class OutboundEventAdmin(admin.ModelAdmin):
-    list_display = ("event_type", "recipient_email", "status_badge", "attempts",
+    masked_recipient = masked_email_column("recipient_email", _("Recipient"))
+    list_display = ("event_type", "masked_recipient", "status_badge", "attempts",
                     "response_status", "created_at")
     list_filter = ("status", "event_type", "language")
     search_fields = ("recipient_email", "event_type", "order__order_number")
@@ -38,7 +40,8 @@ class OutboundEventAdmin(admin.ModelAdmin):
 
 @admin.register(SupportMessage)
 class SupportMessageAdmin(admin.ModelAdmin):
-    list_display = ("from_email", "subject", "status", "linked_order", "is_auto_replied",
+    masked_from = masked_email_column("from_email", _("From"))
+    list_display = ("masked_from", "subject", "status", "linked_order", "is_auto_replied",
                     "received_at")
     list_filter = ("status", "is_auto_replied", "language")
     search_fields = ("from_email", "subject", "body_text", "message_id")
@@ -53,6 +56,7 @@ class SupportMessageAdmin(admin.ModelAdmin):
 
 @admin.register(NewsletterSubscriber)
 class NewsletterSubscriberAdmin(admin.ModelAdmin):
-    list_display = ("email", "language", "consent", "welcomed", "unsubscribed", "created_at")
+    masked_email = masked_email_column("email")
+    list_display = ("masked_email", "language", "consent", "welcomed", "unsubscribed", "created_at")
     list_filter = ("language", "consent", "unsubscribed", "welcomed")
     search_fields = ("email",)

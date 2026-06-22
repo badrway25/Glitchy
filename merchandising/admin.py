@@ -47,7 +47,9 @@ class OutfitAdmin(admin.ModelAdmin):
 
 @admin.register(ProductNotificationSignup)
 class ProductNotificationSignupAdmin(admin.ModelAdmin):
-    list_display = ("email", "product", "notify_type", "notified", "created_at")
+    from greatkart.admin_pii import masked_email_column
+    masked_email = masked_email_column("email")
+    list_display = ("masked_email", "product", "notify_type", "notified", "created_at")
     list_filter = ("notify_type", "notified", "created_at")
     search_fields = ("email", "product__product_name")
     readonly_fields = ("email", "product", "variant", "notify_type", "consent",

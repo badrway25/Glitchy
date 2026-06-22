@@ -100,7 +100,7 @@ class OrderProductInline(admin.TabularInline):
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     change_list_template = "admin/orders/order_changelist.html"
-    list_display = ("order_number", "email", "actor", "status", "is_ordered",
+    list_display = ("order_number", "masked_email", "actor", "status", "is_ordered",
                     "total_display", "margin_display", "margin_pct_display",
                     "refunded_display", "printify_status", "created_at")
     list_filter = ("status", "is_ordered", "is_guest", MarginBandFilter, "created_at")
@@ -127,9 +127,19 @@ class OrderAdmin(admin.ModelAdmin):
                                                "tracking_url", "carrier")}),
     )
 
+    @admin.display(description=_("Email"))
+    def masked_email(self, obj):
+        from greatkart.pii import mask_email
+        return mask_email(obj.email)
+
     @admin.display(description=_("Customer"))
     def actor(self, obj):
-        return _("Guest") if obj.is_guest else (obj.user.email if obj.user else "—")
+        from greatkart.pii import mask_email, mask_name
+        if obj.is_guest:
+            return _("Guest")
+        if obj.user:
+            return mask_email(obj.user.email)
+        return mask_name(obj.first_name, obj.last_name) or "—"
 
     @admin.display(description=_("Total"))
     def total_display(self, obj):

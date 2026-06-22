@@ -14,7 +14,9 @@ class CouponAdmin(admin.ModelAdmin):
 
 @admin.register(CouponRedemption)
 class CouponRedemptionAdmin(admin.ModelAdmin):
-    list_display = ("coupon", "user", "amount", "order", "created_at")
+    from greatkart.admin_pii import masked_user_email_column
+    masked_user = masked_user_email_column("user")
+    list_display = ("coupon", "masked_user", "amount", "order", "created_at")
     list_filter = ("coupon", "created_at")
     search_fields = ("coupon__code", "user__email")
     readonly_fields = ("coupon", "user", "session_key", "order", "amount", "created_at")
