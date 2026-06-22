@@ -40,6 +40,23 @@ ENTRIES = [
                    "prodotti reali. Non posso inventare prodotti o sconti, ma posso indicarti queste selezioni.",
          answer_fr="Oui — voir la page Collections (Nouvelle saison, Essentiels, Idées cadeaux, etc.), chacune avec "
                    "de vrais produits. Je ne peux pas inventer de produits ni de remises, mais je peux vous orienter."),
+    dict(key="filters", category="shopping", priority=5,
+         keywords="filter filters color colour size price rating sale new in stock sort search narrow refine find",
+         question="How do I filter or narrow down products?",
+         question_it="Come filtro o restringo i prodotti?",
+         question_fr="Comment filtrer ou affiner les produits ?",
+         answer="On the Store page use the Filters panel (or the Filters button on mobile) to narrow by "
+                "category, price, colour, size, rating, on-sale, new arrivals and in-stock — they combine and "
+                "the page URL is shareable. Use Sort for newest, price or top-rated. If nothing matches, remove "
+                "a filter chip or clear all; I only show real catalogue products and never invent stock or discounts.",
+         answer_it="Nella pagina Store usa il pannello Filtri (o il pulsante Filtri su mobile) per restringere per "
+                   "categoria, prezzo, colore, taglia, valutazione, in saldo, nuovi arrivi e disponibilità — si combinano "
+                   "e l'URL è condivisibile. Usa Ordina per novità, prezzo o più votati. Se non trovi nulla, rimuovi un "
+                   "filtro o azzera tutto; mostro solo prodotti reali e non invento disponibilità o sconti.",
+         answer_fr="Sur la page Store, utilisez le panneau Filtres (ou le bouton Filtres sur mobile) pour affiner par "
+                   "catégorie, prix, couleur, taille, note, en solde, nouveautés et disponibilité — ils se combinent et "
+                   "l'URL est partageable. Utilisez Trier pour nouveautés, prix ou mieux notés. Si rien ne correspond, "
+                   "retirez un filtre ou tout effacer ; je n'affiche que de vrais produits, sans inventer de stock ni de remise."),
     dict(key="complete_look", category="shopping", priority=4,
          keywords="complete look outfit bundle together style add selected match goes with",
          question="What is 'Complete the look'?",
