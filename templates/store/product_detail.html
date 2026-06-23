@@ -122,9 +122,9 @@
                 {% endif %}
               </div>
 
-              {% if single_product.description %}
-                {# description is sanitized to plain text at sync time; linebreaksbr is Django-safe #}
-                <div class="pdp-muted pdp-desc mb-0">{{ single_product.description|linebreaksbr }}</div>
+              {% if product_description %}
+                {# Localized (cached translation) or clean EN source; both sanitized plain text. #}
+                <div class="pdp-muted pdp-desc mb-0">{{ product_description|linebreaksbr }}</div>
               {% endif %}
 
               <!-- Shipping + returns reassurance -->
@@ -639,7 +639,7 @@
   "@type": "Product",
   "name": "{{ single_product.product_name|escapejs }}",
   "image": "{% with img=single_product.cover_image %}{% if img|slice:':4' == 'http' %}{{ img|escapejs }}{% else %}{{ SITE_URL }}{{ img|escapejs }}{% endif %}{% endwith %}",
-  "description": "{{ single_product.meta_description|escapejs }}",
+  "description": "{{ product_meta_description|escapejs }}",
   "category": "{{ single_product.category.category_name|escapejs }}",
   "offers": {
     "@type": "Offer",

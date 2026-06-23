@@ -29,9 +29,9 @@ class OpenAIProvider:
     def available(self):
         return bool(self.api_key)
 
-    def complete(self, system_prompt, history):
-        messages = [{"role": "system", "content": system_prompt}]
-        messages.extend(history)
+    def chat(self, messages, max_tokens=None, temperature=0.2):
+        """Low-level Chat Completions call. Returns the assistant message content.
+        Logs status codes only — never the response body or the key."""
         try:
             resp = requests.post(
                 self.ENDPOINT,
@@ -40,8 +40,8 @@ class OpenAIProvider:
                 json={
                     "model": self.model,
                     "messages": messages,
-                    "max_tokens": self.max_tokens,
-                    "temperature": 0.2,
+                    "max_tokens": max_tokens or self.max_tokens,
+                    "temperature": temperature,
                 },
                 timeout=self.timeout,
             )
@@ -60,6 +60,11 @@ class OpenAIProvider:
         except (ValueError, KeyError, IndexError) as exc:
             logger.warning("assistant openai bad payload")
             raise ProviderError("payload") from exc
+
+    def complete(self, system_prompt, history):
+        messages = [{"role": "system", "content": system_prompt}]
+        messages.extend(history)
+        return self.chat(messages, max_tokens=self.max_tokens, temperature=0.2)
 
 
 class FallbackProvider:

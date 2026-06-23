@@ -88,6 +88,33 @@ class Product(models.Model):
         text = " ".join((self.description or self.product_name or "").split())
         return (text[:length].rstrip() + "…") if len(text) > length else text
 
+    def description_source_hash(self):
+        """Stable hash of the (English) clean source description. When the source changes
+        on re-sync, the hash changes and any cached translation is treated as stale."""
+        import hashlib
+        return hashlib.sha256((self.description or "").encode("utf-8")).hexdigest()[:16]
+
+    def description_for(self, lang):
+        """Localized product description for the active language.
+
+        Served ONLY from the cached translation when it is fresh (status done + source
+        hash matches); otherwise falls back to the clean English source. Never calls
+        OpenAI in the request path — translations are produced offline by the
+        `translate_printify_descriptions` management command. Output is plain text
+        (same sanitization contract as `description`), safe for `|linebreaksbr`."""
+        lang = (lang or "en")[:2]
+        if lang == "en" or not self.description:
+            return self.description
+        tr = (self.description_translations
+              .filter(language=lang, status="done", source_hash=self.description_source_hash())
+              .first())
+        return tr.translated_text if (tr and tr.translated_text) else self.description
+
+    def meta_description_for(self, lang, length=160):
+        """Localized single-line SEO description (uses the cached translation when fresh)."""
+        text = " ".join((self.description_for(lang) or self.product_name or "").split())
+        return (text[:length].rstrip() + "…") if len(text) > length else text
+
     def data_quality(self):
         """Admin-only 0–100 completeness score with a per-check breakdown.
         Never shown to customers (it can reference internal coverage)."""
@@ -170,6 +197,49 @@ class Product(models.Model):
         if reviews['count'] is not None:
             count = int(reviews['count'])
         return count
+
+
+class ProductDescriptionTranslation(models.Model):
+    """Cached, hash-invalidated translation of a product's (English) clean description.
+
+    One row per (product, language). `source_hash` records the English source at
+    translation time; when the source changes on re-sync the hash no longer matches and
+    the row is treated as stale (re-translated in place by the management command).
+    The PDP/AI never translate in-request — they only read fresh rows, else fall back
+    to the clean English source. No HTML, no internal IDs/costs, no secrets are stored."""
+
+    STATUS_DONE = "done"
+    STATUS_PENDING = "pending"
+    STATUS_ERROR = "error"
+    STATUS_CHOICES = [
+        (STATUS_DONE, "Done"),
+        (STATUS_PENDING, "Pending"),
+        (STATUS_ERROR, "Error"),
+    ]
+
+    product = models.ForeignKey(Product, on_delete=models.CASCADE,
+                                related_name="description_translations")
+    language = models.CharField(max_length=5, help_text="Target language code, e.g. 'it', 'fr'")
+    source_hash = models.CharField(max_length=64,
+                                   help_text="Hash of the English source at translation time")
+    translated_text = models.TextField(blank=True, default="")
+    status = models.CharField(max_length=12, choices=STATUS_CHOICES, default=STATUS_DONE)
+    error_code = models.CharField(max_length=40, blank=True, default="",
+                                  help_text="Safe error code only (never raw provider output/keys)")
+    translated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("product", "language")
+        indexes = [models.Index(fields=["product", "language"])]
+        verbose_name = "Product description translation"
+
+    def __str__(self):
+        return f"Product #{self.product_id} [{self.language}] · {self.status}"
+
+    def is_fresh(self):
+        return (self.status == self.STATUS_DONE
+                and self.source_hash == self.product.description_source_hash())
+
 
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="gallery")

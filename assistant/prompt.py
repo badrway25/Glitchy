@@ -67,7 +67,12 @@ def build_context(knowledge, products, lang, order_context=None, collections=Non
         for p in products:
             cat = p.category.category_name if p.category_id else ""
             line = f"- {p.product_name} ({cat}) — {sym} {p.price}"
-            desc = (getattr(p, "description", "") or "").strip()
+            # Use the localized (cached) description for the active language when available,
+            # so the assistant answers in/about the same language the shopper is browsing.
+            if hasattr(p, "description_for"):
+                desc = (p.description_for(lang) or "").strip()
+            else:
+                desc = (getattr(p, "description", "") or "").strip()
             if desc:
                 line += f". {desc[:160]}"
             comp = (getattr(p, "composition", "") or "").strip()

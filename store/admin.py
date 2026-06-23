@@ -3,7 +3,8 @@ from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
-from .models import (GeneralFAQ, Product, ProductFAQ, ProductImage, ReviewRating, Variation)
+from .models import (GeneralFAQ, Product, ProductDescriptionTranslation, ProductFAQ,
+                     ProductImage, ReviewRating, Variation)
 
 
 class ProductImageInline(admin.TabularInline):
@@ -18,6 +19,17 @@ class VariationInline(admin.TabularInline):
               "printify_variant_id", "production_cost")
 
 
+class DescriptionTranslationInline(admin.TabularInline):
+    model = ProductDescriptionTranslation
+    extra = 0
+    fields = ("language", "status", "freshness", "translated_at", "translated_text", "error_code")
+    readonly_fields = ("freshness", "translated_at")
+
+    @admin.display(description=_("Up to date"), boolean=True)
+    def freshness(self, obj):
+        return obj.is_fresh() if obj and obj.pk else False
+
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ("product_name", "price", "base_cost", "margin_hint", "quality_score",
@@ -28,8 +40,8 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = ("product_name", "sku", "printify_product_id")
     prepopulated_fields = {"slug": ("product_name",)}
     readonly_fields = ("printify_synced_at", "printify_sync_error", "printify_panel")
-    inlines = [ProductImageInline, VariationInline]
-    actions = ["resync_from_printify", "audit_data_quality"]
+    inlines = [ProductImageInline, VariationInline, DescriptionTranslationInline]
+    actions = ["resync_from_printify", "audit_data_quality", "translate_missing_descriptions"]
     fieldsets = (
         (None, {"fields": ("product_name", "slug", "category", "description")}),
         (_("Pricing & stock"), {"fields": ("price", "compare_at_price", "base_cost",
@@ -116,6 +128,37 @@ class ProductAdmin(admin.ModelAdmin):
                 err += 1
         self.message_user(request, _("Resynced %(ok)d product(s), %(err)d error(s).") % {
             "ok": ok, "err": err})
+
+    @admin.action(description=_("Translate missing descriptions (IT/FR)"))
+    def translate_missing_descriptions(self, request, queryset):
+        from assistant import translation
+
+        if not translation.translation_available():
+            self.message_user(request, _("OpenAI key not configured — no translations made."),
+                              level="warning")
+            return
+        wrote = failed = 0
+        for product in queryset:
+            for lang in translation.SUPPORTED_TARGET_LANGS:
+                res = translation.ensure_product_translation(product, lang, apply=True)
+                if res["action"] == "translated":
+                    wrote += 1
+                elif res["action"] == "failed":
+                    failed += 1
+        self.message_user(request, _("Translations written: %(w)d, failed: %(f)d.") % {
+            "w": wrote, "f": failed})
+
+
+@admin.register(ProductDescriptionTranslation)
+class ProductDescriptionTranslationAdmin(admin.ModelAdmin):
+    list_display = ("product", "language", "status", "is_fresh", "translated_at")
+    list_filter = ("language", "status")
+    search_fields = ("product__product_name",)
+    readonly_fields = ("source_hash", "translated_at")
+
+    @admin.display(boolean=True, description=_("Up to date"))
+    def is_fresh(self, obj):
+        return obj.is_fresh()
 
 
 @admin.register(Variation)

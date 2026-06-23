@@ -159,6 +159,9 @@ def product_detail(request, category_slug, product_slug):
         'outfit_desc': outfit.description_for(lang) if outfit else "",
         'outfit_products': list(outfit.active_products()) if outfit else [],
         'notify_me_enabled': single_product.stock <= 0 or not single_product.is_available,
+        # Localized description: cached OpenAI translation when fresh, else clean EN source.
+        'product_description': single_product.description_for(lang),
+        'product_meta_description': single_product.meta_description_for(lang),
     }
     return render(request, 'store/product_detail.html', context)
 
