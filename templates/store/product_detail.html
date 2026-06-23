@@ -146,17 +146,18 @@
     {% if single_product.variation_set.colors %}
       <input type="hidden" name="color" id="colorInput" required>
 
-      <div class="dropdown custom-select-dd" data-vg-wrap="color">
-        <button class="btn custom-select-btn dropdown-toggle"
+      <div class="dropdown custom-select-dd" data-vg-wrap="color" data-csdd>
+        <button class="btn custom-select-btn"
                 type="button"
                 id="colorDropdown"
-                data-toggle="dropdown"
-                aria-haspopup="true"
+                data-csdd-toggle
+                aria-haspopup="listbox"
                 aria-expanded="false">
           <span id="colorLabel">{% trans "Select color" %}</span>
+          <i class="fa fa-chevron-down csdd-caret" aria-hidden="true"></i>
         </button>
 
-        <div class="dropdown-menu" aria-labelledby="colorDropdown">
+        <div class="dropdown-menu" role="listbox" aria-labelledby="colorDropdown">
           {% for i in single_product.variation_set.colors %}
             <button class="dropdown-item" type="button"
                     data-target-input="colorInput"
@@ -184,17 +185,18 @@
     {% if single_product.variation_set.sizes %}
       <input type="hidden" name="size" id="sizeInput" required>
 
-      <div class="dropdown custom-select-dd" data-vg-wrap="size">
-        <button class="btn custom-select-btn dropdown-toggle"
+      <div class="dropdown custom-select-dd" data-vg-wrap="size" data-csdd>
+        <button class="btn custom-select-btn"
                 type="button"
                 id="sizeDropdown"
-                data-toggle="dropdown"
-                aria-haspopup="true"
+                data-csdd-toggle
+                aria-haspopup="listbox"
                 aria-expanded="false">
           <span id="sizeLabel">{% trans "Select size" %}</span>
+          <i class="fa fa-chevron-down csdd-caret" aria-hidden="true"></i>
         </button>
 
-        <div class="dropdown-menu" aria-labelledby="sizeDropdown">
+        <div class="dropdown-menu" role="listbox" aria-labelledby="sizeDropdown">
           {% for i in single_product.variation_set.sizes %}
             <button class="dropdown-item" type="button"
                     data-target-input="sizeInput"

@@ -1912,3 +1912,96 @@ body.has-sticky-cta .ai-assistant{bottom:78px;}
 :root[data-theme="dark"] .pay-tab.active,:root[data-theme="dark"] .pay-tab.is-active{color:var(--text)!important;}
 /* Checkout summary: never trap the CTA on mobile (consolidate duplicate sticky rule) */
 @media (max-width:991.98px){.summary-card,.checkout-summary{position:static!important;}}
+
+/* ============ Phase 45 — Store filter hover: refined, no invasive gold ============ */
+/* Root cause: native checkbox/radio accent-color was gold (--accent), so Chrome tinted
+   their hover/active state yellow across the colour/size/rating sections. Use the brand
+   espresso so checked controls read premium and the hover tint is neutral, not yellow. */
+.filter-form .rating-opt input,
+.filter-form .toggle-opt input,
+.filter-form .chip-opt input{accent-color:var(--primary);}
+:root[data-theme="dark"] .filter-form .rating-opt input,
+:root[data-theme="dark"] .filter-form .toggle-opt input{accent-color:var(--accent);}
+/* Whole rows never get a section-wide background; only a subtle, rounded row hover on the
+   genuinely clickable label. */
+.filter-form .rating-opt,
+.filter-form .toggle-opt{border-radius:var(--radius-sm);transition:background var(--tr);}
+.filter-form .rating-opt:hover,
+.filter-form .toggle-opt:hover{background:var(--surface-2);}
+/* Colour/size chip hover: neutral stronger border, not gold */
+.chip-opt:hover span{border-color:var(--border-strong,rgba(0,0,0,.22));}
+:root[data-theme="dark"] .chip-opt:hover span{border-color:rgba(243,238,228,.32);}
+/* The section containers themselves must never react to hover */
+.filter-form .filter-section:hover,
+.filter-form .filter-body:hover,
+.filter-form .filter-head:hover{background:transparent;}
+
+/* ============ Phase 45 — Cart surfaces: transparent card, no card-in-card ============ */
+/* Outer cart container is transparent — only the .cart-item mini-cards carry surface/border,
+   so there's no "card inside a card with too many borders". */
+.cart-card{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;}
+.cart-card-head{margin:0 0 .6rem!important;padding:0 .4rem!important;border-bottom:0!important;
+  background:transparent!important;}
+/* Empty cart: airy, no bordered inner card */
+.cart-empty-card{border:0!important;background:transparent!important;box-shadow:none!important;}
+/* Quantity stepper: no heavy border/shadow — stays elegant and functional */
+.qty-control{border:0!important;background:transparent!important;box-shadow:none!important;padding:0!important;}
+.qty-input{border:0!important;background:transparent!important;box-shadow:none!important;font-weight:600;}
+:root[data-theme="dark"] .qty-input{color:var(--text)!important;}
+
+/* ============ Phase 45 — Colour/size variant dropdowns styled like .sortx ============ */
+.custom-select-btn{
+  height:46px!important;border:1px solid var(--border)!important;background:var(--surface)!important;
+  color:var(--text)!important;border-radius:var(--radius-pill)!important;
+  display:inline-flex!important;align-items:center;justify-content:space-between;gap:.5rem;width:100%;
+  padding:0 1.05rem!important;font-family:var(--font-ui);font-weight:600;font-size:.9rem;
+  transition:border-color .2s var(--ease),background .2s var(--ease)!important;}
+.custom-select-btn:hover{border-color:var(--accent)!important;background:var(--surface-2)!important;}
+.custom-select-btn:focus,.custom-select-btn:focus-visible{outline:2px solid var(--accent)!important;
+  outline-offset:2px;box-shadow:none!important;border-color:var(--accent)!important;}
+.csdd-caret{font-size:.6rem;color:var(--muted);transition:transform .2s var(--ease);flex:0 0 auto;}
+.custom-select-dd.is-open .csdd-caret{transform:rotate(180deg);}
+/* Menu: vanilla-controlled visibility (always display:block, shown via .is-open) */
+.custom-select-dd .dropdown-menu{display:block!important;position:absolute;top:calc(100% + 8px);left:0;right:0;
+  min-width:100%;border:1px solid var(--border)!important;border-radius:var(--radius)!important;
+  background:var(--surface)!important;box-shadow:var(--shadow-lg)!important;padding:.4rem!important;margin:0!important;
+  z-index:1400;opacity:0;visibility:hidden;transform:translateY(-6px);
+  transition:opacity .18s var(--ease),transform .18s var(--ease),visibility .18s;}
+.custom-select-dd.is-open .dropdown-menu{opacity:1;visibility:visible;transform:translateY(0);}
+.custom-select-dd .dropdown-item{border-radius:var(--radius-sm)!important;padding:.55rem .7rem!important;
+  font-size:.88rem;color:var(--text)!important;background:transparent!important;transition:background .15s var(--ease);}
+.custom-select-dd .dropdown-item:hover,.custom-select-dd .dropdown-item:focus{
+  background:var(--surface-2)!important;color:var(--primary)!important;}
+.custom-select-dd .dropdown-item.is-active{background:var(--surface-2)!important;color:var(--accent-2)!important;font-weight:600;}
+/* Dark mode: warm brand surface (override theme.css's cool blue-dark) */
+:root[data-theme="dark"] .custom-select-btn{background:var(--surface)!important;color:var(--text)!important;
+  border-color:var(--border)!important;}
+:root[data-theme="dark"] .custom-select-dd .dropdown-menu{background:var(--surface)!important;
+  border-color:var(--border)!important;box-shadow:var(--shadow-lg)!important;}
+:root[data-theme="dark"] .custom-select-dd .dropdown-item{color:var(--text)!important;}
+:root[data-theme="dark"] .custom-select-dd .dropdown-item:hover{background:var(--surface-2)!important;color:var(--text)!important;}
+:root[data-theme="dark"] .custom-select-dd .dropdown-item.is-active{color:var(--accent)!important;}
+
+/* ============ Phase 45 — Navbar fits at 1280 (no cut cart/wishlist/account) ============ */
+@media (min-width:992px){
+  /* ROOT CAUSE: Bootstrap's .navbar-collapse defaults to flex-grow:1, so the menu+actions
+     cluster ate all the slack and squashed the search. Force it to content width so the
+     search can claim the remaining space at a comfortable, readable size. */
+  /* Kill Bootstrap's space-between gaps; search absorbs the slack so the actions sit
+     immediately after the menu and never overflow. */
+  .premium-nav > .container{justify-content:flex-start!important;}
+  .premium-nav .navbar-collapse{flex:0 0 auto!important;width:auto!important;margin-left:0!important;}
+  .premium-nav .nav-search{flex:1 1 auto!important;min-width:200px!important;max-width:none!important;margin:0 .85rem!important;}
+  .premium-nav .navbar-nav.mr-3{margin-right:.5rem!important;}
+  .premium-nav .navbar-nav .nav-link{padding-left:.55rem!important;padding-right:.55rem!important;white-space:nowrap;}
+  .premium-nav .ml-lg-3{margin-left:.5rem!important;}
+  .premium-nav .nav-icon{margin-left:.3rem!important;margin-right:.3rem!important;}
+}
+/* Mid-desktop (992–1199): a touch more compaction; search stays usable */
+@media (min-width:992px) and (max-width:1199.98px){
+  .premium-nav .nav-search{min-width:170px!important;max-width:340px!important;margin:0 .55rem!important;}
+  .premium-nav .navbar-nav .nav-link{padding-left:.35rem!important;padding-right:.35rem!important;font-size:.9rem;}
+  .premium-nav .nav-icon{margin-left:.18rem!important;margin-right:.18rem!important;}
+  .premium-nav .searchbar-xl .form-control{padding-right:64px!important;}
+  .premium-nav .search-go{padding:0 .55rem!important;font-size:.72rem!important;}
+}
