@@ -334,8 +334,14 @@ img{max-width:100%;}
 .pdp-sticky-cta .btn{flex:1;max-width:62%;}
 @media (max-width:768px){.pdp-sticky-cta{display:flex;}body.has-sticky-cta{padding-bottom:70px;}}
 .ymal-card{background:var(--surface);border:var(--border);border-radius:var(--radius);overflow:hidden;
-  transition:transform var(--tr),box-shadow var(--tr);}
+  transition:transform var(--tr),box-shadow var(--tr);
+  display:flex;flex-direction:column;height:100%;}                 /* equal-height everywhere */
 .ymal-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-soft);}
+.ymal-card > .p-3{display:flex;flex-direction:column;flex:1;}        /* body fills, price sinks */
+.ymal-card .price{margin-top:auto;}
+.ymal-card .product-title{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.4em;}
+/* Recently-viewed grid: stretch the inner card to the row height */
+.rv-grid{align-items:stretch;}
 
 /* ---- Mobile nav drawer ---- */
 @media (max-width:991px){
@@ -1130,17 +1136,20 @@ body.has-sticky-cta .ai-assistant{bottom:78px;}
 .ctl-wrap{background:linear-gradient(180deg,var(--surface-2),var(--surface));border:var(--border);
   border-radius:var(--radius);padding:clamp(1.3rem,3vw,2rem);box-shadow:var(--shadow-soft);}
 .ctl-head{margin-bottom:1.2rem;}
-.ctl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1rem;margin-bottom:1.2rem;}
-.ctl-item{margin:0;cursor:pointer;display:block;}
+.ctl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1rem;margin-bottom:1.2rem;
+  align-items:stretch;}
+.ctl-item{margin:0;cursor:pointer;display:flex;}            /* stretch the card to the row height */
 .ctl-item input{position:absolute;opacity:0;pointer-events:none;}
-.ctl-card{position:relative;display:block;border:2px solid transparent;border-radius:var(--radius-sm);
+.ctl-card{position:relative;display:flex;flex-direction:column;width:100%;height:100%;
+  border:2px solid transparent;border-radius:var(--radius-sm);
   background:var(--surface);overflow:hidden;transition:border-color var(--tr),transform var(--tr);box-shadow:var(--shadow-soft);}
 .ctl-item:hover .ctl-card{transform:translateY(-3px);}
 .ctl-item input:checked + .ctl-card{border-color:var(--accent);}
 .ctl-item input:disabled + .ctl-card{opacity:.95;}
 .ctl-card img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;}
-.ctl-name{display:block;padding:.6rem .7rem 0;font-size:.8rem;font-weight:600;line-height:1.25;}
-.ctl-price{display:block;padding:.15rem .7rem .7rem;font-size:.85rem;color:var(--accent-2);font-weight:700;}
+.ctl-name{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  padding:.6rem .7rem 0;font-size:.8rem;font-weight:600;line-height:1.25;min-height:2.5em;}
+.ctl-price{display:block;margin-top:auto;padding:.15rem .7rem .7rem;font-size:.85rem;color:var(--accent-2);font-weight:700;}
 .ctl-check{position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:50%;background:var(--accent);
   color:#fff;display:none;place-items:center;}
 .ctl-item input:checked + .ctl-card .ctl-check{display:grid;}
@@ -1844,3 +1853,62 @@ body.has-sticky-cta .ai-assistant{bottom:78px;}
   background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(243,238,228,0.9)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
 :root[data-theme="dark"] .navbar-toggler{border-color:rgba(243,238,228,.28);}
+
+/* ============ Phase 44 — Variant guard modal + invalid selector state ============ */
+.vg-backdrop{position:fixed;inset:0;z-index:2000;display:flex;align-items:center;justify-content:center;
+  padding:1.2rem;background:rgba(20,18,15,.55);backdrop-filter:blur(3px);
+  opacity:0;transition:opacity .2s var(--ease);}
+.vg-backdrop.is-open{opacity:1;}
+.vg-backdrop[hidden]{display:none;}
+.vg-modal{position:relative;width:100%;max-width:380px;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg,18px);box-shadow:0 30px 70px rgba(0,0,0,.35);padding:1.8rem 1.5rem 1.5rem;
+  text-align:center;transform:translateY(10px) scale(.98);transition:transform .22s var(--ease);}
+.vg-backdrop.is-open .vg-modal{transform:none;}
+.vg-icon{width:54px;height:54px;margin:0 auto .9rem;border-radius:50%;display:grid;place-items:center;
+  background:var(--surface-2);color:var(--accent-2);}
+.vg-title{font-family:var(--font-display);font-size:1.12rem;font-weight:700;margin:0 0 .5rem;color:var(--text);}
+.vg-msg{font-size:.92rem;color:var(--muted);margin:0 0 1.25rem;line-height:1.5;}
+.vg-cta{width:100%;}
+.vg-close{position:absolute;top:.7rem;right:.7rem;width:32px;height:32px;border:none;border-radius:50%;
+  background:var(--surface-2);color:var(--muted);display:grid;place-items:center;cursor:pointer;
+  transition:background var(--tr),color var(--tr);}
+.vg-close:hover{background:var(--border-soft,rgba(0,0,0,.06));color:var(--text);}
+/* Highlighted (missing) selector */
+.custom-select-dd.vg-invalid .custom-select-btn{border-color:#dc2626!important;
+  box-shadow:0 0 0 3px rgba(220,38,38,.18)!important;animation:vg-shake .3s var(--ease);}
+@keyframes vg-shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-4px);}75%{transform:translateX(4px);}}
+:root[data-theme="dark"] .custom-select-dd.vg-invalid .custom-select-btn{border-color:#f87171!important;
+  box-shadow:0 0 0 3px rgba(248,113,113,.22)!important;}
+:root[data-theme="dark"] .vg-close:hover{background:rgba(255,255,255,.10);}
+@media (prefers-reduced-motion:reduce){.custom-select-dd.vg-invalid .custom-select-btn{animation:none;}}
+
+/* ============ Phase 44 — Cart & checkout premium + dark-mode fixes ============ */
+/* Free-shipping progress track: light-tinted track is invisible on dark surfaces */
+:root[data-theme="dark"] .free-ship-bar{background:rgba(255,255,255,.12)!important;}
+/* Coupon 'applied' chip: readable success on dark */
+:root[data-theme="dark"] .coupon-applied{background:rgba(52,211,153,.12)!important;
+  border-color:rgba(52,211,153,.30)!important;color:#34d399!important;}
+:root[data-theme="dark"] .coupon-applied .coupon-code{color:#34d399!important;}
+/* Remove button (cart trash) — brighter danger on dark, generic (not just <a>) */
+:root[data-theme="dark"] .btn-remove,
+:root[data-theme="dark"] .cart-remove a,
+:root[data-theme="dark"] .wish-btn-pdp.text-danger{color:#f87171!important;border-color:rgba(248,113,113,.32)!important;}
+/* Quantity stepper hover — brand gold, not legacy blue */
+.qty-btn:hover,.qty-control .qty-btn:hover{border-color:var(--accent)!important;
+  background:var(--surface-2)!important;color:var(--primary)!important;}
+:root[data-theme="dark"] .qty-btn:hover{color:var(--text)!important;}
+/* Native country select on checkout — dark-aware + premium chevron */
+.checkout-grid select.form-control,select#countryInput{
+  background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='%238a8174' d='M4 6l4 4 4-4'/%3e%3c/svg%3e");
+  background-repeat:no-repeat;background-position:right .8rem center;background-size:14px;
+  -webkit-appearance:none;appearance:none;padding-right:2.2rem;}
+:root[data-theme="dark"] select#countryInput,
+:root[data-theme="dark"] .checkout-grid select.form-control{
+  background-color:var(--surface-2)!important;color:var(--text)!important;border-color:var(--border)!important;}
+:root[data-theme="dark"] select#countryInput option{background:#272219;color:var(--text);}
+/* Payment method tab — brand gold active state instead of hardcoded blue */
+.pay-tab.active,.pay-tab.is-active{border-color:var(--accent)!important;background:var(--surface-2)!important;
+  color:var(--primary)!important;}
+:root[data-theme="dark"] .pay-tab.active,:root[data-theme="dark"] .pay-tab.is-active{color:var(--text)!important;}
+/* Checkout summary: never trap the CTA on mobile (consolidate duplicate sticky rule) */
+@media (max-width:991.98px){.summary-card,.checkout-summary{position:static!important;}}
