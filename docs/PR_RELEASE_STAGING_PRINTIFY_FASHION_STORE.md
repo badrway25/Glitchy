@@ -57,7 +57,7 @@ See `STAGING_ACTIVATION_CHECKLIST.md` (20 steps) + `INTEGRATIONS_ACTIVATION_RUNB
 
 ## No-secrets checklist
 - [ ] `git ls-files | grep -x .env` → empty
-- [ ] `git log -p --all -S sk-proj-` → empty · Printify JWT not in history
+- [ ] history scan for the OpenAI key prefix (`sk` + `-proj-`) → empty · Printify JWT not in history
 - [ ] Logs contain status codes + truncated errors only
 
 ## Suggested commands (NOT executed — no remote configured)
