@@ -266,11 +266,9 @@
                       <li class="mb-2">{% icon "ruler" "ic" 17 %}<span><strong>{% trans "Fit" %}:</strong> {{ single_product.fit_notes }}</span></li>
                     {% endif %}
                     <li class="mb-2">{% icon "spark" "ic" 17 %}<span><strong>{% trans "Care" %}:</strong> {% if single_product.care_instructions %}{{ single_product.care_instructions }}{% else %}{% trans "Machine wash cold, do not tumble dry." %}{% endif %}</span></li>
-                    <li class="mb-2">{% icon "ruler" "ic" 17 %}<span><strong>{% trans "Sizes" %}:</strong>
+                    <li>{% icon "ruler" "ic" 17 %}<span><strong>{% trans "Sizes" %}:</strong>
                       {% for s in single_product.variation_set.sizes %}{{ s.variation_value|upper }}{% if not forloop.last %}, {% endif %}{% empty %}{% trans "One size" %}{% endfor %}</span>
                     </li>
-                    <li class="mb-2">{% icon "truck" "ic" 17 %}<span><strong>{% trans "Shipping" %}:</strong> {% blocktrans with c=ship_country_name %}Calculated at checkout for {{ c }}.{% endblocktrans %}{% if shipping_quote %} {{ shipping_quote.eta_label }}.{% endif %}</span></li>
-                    <li>{% icon "returns" "ic" 17 %}<span><strong>{% trans "Returns" %}:</strong> <a href="{% url 'returns:policy' %}">{% blocktrans with d=RETURN_WINDOW_DAYS %}Free returns within {{ d }} days{% endblocktrans %}</a></span></li>
                   </ul>
                 </div>
               </div>
@@ -291,9 +289,6 @@
                   {% if ncolors %}<span class="pod-chip">{% icon "spark" "ic" 14 %} {% blocktrans count c=ncolors %}{{ c }} colour{% plural %}{{ c }} colours{% endblocktrans %}</span>{% endif %}
                   {% if nsizes %}<span class="pod-chip">{% icon "ruler" "ic" 14 %} {% blocktrans count s=nsizes %}{{ s }} size{% plural %}{{ s }} sizes{% endblocktrans %}</span>{% endif %}
                   {% endwith %}
-                  <span class="pod-chip">{% icon "truck" "ic" 14 %}
-                    {% if shipping_quote and shipping_quote.eta_label %}{{ shipping_quote.eta_label }}{% else %}{% trans "Tracked delivery" %}{% endif %}</span>
-                  <span class="pod-chip">{% icon "returns" "ic" 14 %} {% blocktrans with d=RETURN_WINDOW_DAYS %}{{ d }}-day returns{% endblocktrans %}</span>
                 </div>
                 <p class="pod-note">{% trans "Because items are produced on demand, please allow a short production time before shipping. You'll get a tracking link by email as soon as your order ships." %}</p>
               </div>
