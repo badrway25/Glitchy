@@ -1260,7 +1260,8 @@ body.has-sticky-cta .ai-assistant{bottom:78px;}
 .chip-opt span{display:inline-flex;align-items:center;gap:.3rem;padding:.4rem .7rem;border:var(--border);
   border-radius:var(--radius-pill);font-size:.8rem;background:var(--surface-2);transition:all var(--tr);}
 .chip-opt span em{font-style:normal;color:var(--muted);font-size:.72rem;}
-.chip-opt:hover span{border-color:var(--accent);}
+.chip-opt:hover span{border-color:rgba(28,26,23,.30);}   /* neutral hover border, NOT gold */
+:root[data-theme="dark"] .chip-opt:hover span{border-color:rgba(243,238,228,.34);}
 .chip-opt input:checked + span{background:var(--primary);color:#fff;border-color:var(--primary);}
 .chip-opt input:checked + span em{color:rgba(255,255,255,.7);}
 .chip-opt input:focus-visible + span{box-shadow:var(--focus-ring);}
@@ -1919,18 +1920,18 @@ body.has-sticky-cta .ai-assistant{bottom:78px;}
    espresso so checked controls read premium and the hover tint is neutral, not yellow. */
 .filter-form .rating-opt input,
 .filter-form .toggle-opt input,
-.filter-form .chip-opt input{accent-color:var(--primary);}
+.filter-form .chip-opt input{accent-color:var(--primary)!important;}
+/* Dark mode: keep native controls neutral (espresso/cream), NOT gold — this is what
+   produced the lingering yellow tint on the rating/size/colour controls in dark mode. */
 :root[data-theme="dark"] .filter-form .rating-opt input,
-:root[data-theme="dark"] .filter-form .toggle-opt input{accent-color:var(--accent);}
+:root[data-theme="dark"] .filter-form .toggle-opt input,
+:root[data-theme="dark"] .filter-form .chip-opt input{accent-color:#e7e0d2!important;}
 /* Whole rows never get a section-wide background; only a subtle, rounded row hover on the
    genuinely clickable label. */
 .filter-form .rating-opt,
 .filter-form .toggle-opt{border-radius:var(--radius-sm);transition:background var(--tr);}
 .filter-form .rating-opt:hover,
 .filter-form .toggle-opt:hover{background:var(--surface-2);}
-/* Colour/size chip hover: neutral stronger border, not gold */
-.chip-opt:hover span{border-color:var(--border-strong,rgba(0,0,0,.22));}
-:root[data-theme="dark"] .chip-opt:hover span{border-color:rgba(243,238,228,.32);}
 /* The section containers themselves must never react to hover */
 .filter-form .filter-section:hover,
 .filter-form .filter-body:hover,
