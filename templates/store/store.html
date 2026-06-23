@@ -61,11 +61,11 @@
         </div>
 
         <div class="store-actions">
-          <div class="dropdown">
-            <button class="btn btn-soft dropdown-toggle sort-btn" type="button"
-                    id="sortDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <i class="fa fa-sort mr-2"></i>
-              <span id="sortLabel">
+          <!-- Self-contained sort dropdown (vanilla JS, no Bootstrap/jQuery dependency) -->
+          <div class="sortx" data-sortx>
+            <button class="sortx-btn" type="button" data-sortx-toggle aria-haspopup="listbox" aria-expanded="false">
+              <i class="fa fa-sort sortx-lead" aria-hidden="true"></i>
+              <span class="sortx-label">
                 {% if sort == "price_asc" %}{% trans "Price: low to high" %}
                 {% elif sort == "price_desc" %}{% trans "Price: high to low" %}
                 {% elif sort == "rating" %}{% trans "Top rated" %}
@@ -73,14 +73,15 @@
                 {% elif sort == "newest" %}{% trans "Newest" %}
                 {% else %}{% trans "Sort: recommended" %}{% endif %}
               </span>
+              <i class="fa fa-chevron-down sortx-caret" aria-hidden="true"></i>
             </button>
-            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="sortDropdown">
-              <a class="dropdown-item d-flex justify-content-between {% if not sort %}active{% endif %}" href="?{% qs_set sort='' %}"><span>{% trans "Sort: recommended" %}</span>{% if not sort %}<i class="fa fa-check"></i>{% endif %}</a>
-              <a class="dropdown-item d-flex justify-content-between {% if sort == 'newest' %}active{% endif %}" href="?{% qs_set sort='newest' %}"><span>{% trans "Newest" %}</span>{% if sort == 'newest' %}<i class="fa fa-check"></i>{% endif %}</a>
-              <a class="dropdown-item d-flex justify-content-between {% if sort == 'price_asc' %}active{% endif %}" href="?{% qs_set sort='price_asc' %}"><span>{% trans "Price: low to high" %}</span>{% if sort == 'price_asc' %}<i class="fa fa-check"></i>{% endif %}</a>
-              <a class="dropdown-item d-flex justify-content-between {% if sort == 'price_desc' %}active{% endif %}" href="?{% qs_set sort='price_desc' %}"><span>{% trans "Price: high to low" %}</span>{% if sort == 'price_desc' %}<i class="fa fa-check"></i>{% endif %}</a>
-              <a class="dropdown-item d-flex justify-content-between {% if sort == 'rating' %}active{% endif %}" href="?{% qs_set sort='rating' %}"><span>{% trans "Top rated" %}</span>{% if sort == 'rating' %}<i class="fa fa-check"></i>{% endif %}</a>
-              <a class="dropdown-item d-flex justify-content-between {% if sort == 'name_asc' %}active{% endif %}" href="?{% qs_set sort='name_asc' %}"><span>{% trans "Name: A → Z" %}</span>{% if sort == 'name_asc' %}<i class="fa fa-check"></i>{% endif %}</a>
+            <div class="sortx-menu" role="listbox">
+              <a class="sortx-item {% if not sort %}is-active{% endif %}" role="option" href="?{% qs_set sort='' %}"><span>{% trans "Sort: recommended" %}</span>{% if not sort %}<i class="fa fa-check"></i>{% endif %}</a>
+              <a class="sortx-item {% if sort == 'newest' %}is-active{% endif %}" role="option" href="?{% qs_set sort='newest' %}"><span>{% trans "Newest" %}</span>{% if sort == 'newest' %}<i class="fa fa-check"></i>{% endif %}</a>
+              <a class="sortx-item {% if sort == 'price_asc' %}is-active{% endif %}" role="option" href="?{% qs_set sort='price_asc' %}"><span>{% trans "Price: low to high" %}</span>{% if sort == 'price_asc' %}<i class="fa fa-check"></i>{% endif %}</a>
+              <a class="sortx-item {% if sort == 'price_desc' %}is-active{% endif %}" role="option" href="?{% qs_set sort='price_desc' %}"><span>{% trans "Price: high to low" %}</span>{% if sort == 'price_desc' %}<i class="fa fa-check"></i>{% endif %}</a>
+              <a class="sortx-item {% if sort == 'rating' %}is-active{% endif %}" role="option" href="?{% qs_set sort='rating' %}"><span>{% trans "Top rated" %}</span>{% if sort == 'rating' %}<i class="fa fa-check"></i>{% endif %}</a>
+              <a class="sortx-item {% if sort == 'name_asc' %}is-active{% endif %}" role="option" href="?{% qs_set sort='name_asc' %}"><span>{% trans "Name: A → Z" %}</span>{% if sort == 'name_asc' %}<i class="fa fa-check"></i>{% endif %}</a>
             </div>
           </div>
 

@@ -47,5 +47,19 @@
     document.querySelectorAll("[data-filter-clear]").forEach(function (a) {
       a.addEventListener("click", function () { if (window.gkTrack) window.gkTrack("filter_clear", {}); });
     });
+
+    // Self-contained sort dropdown (no Bootstrap) — one toggle, robust open/close.
+    document.querySelectorAll("[data-sortx]").forEach(function (root) {
+      var btn = root.querySelector("[data-sortx-toggle]");
+      if (!btn) return;
+      function close() { root.classList.remove("is-open"); btn.setAttribute("aria-expanded", "false"); }
+      function open() { root.classList.add("is-open"); btn.setAttribute("aria-expanded", "true"); }
+      btn.addEventListener("click", function (e) {
+        e.stopPropagation();                       // don't let the document handler immediately re-close
+        root.classList.contains("is-open") ? close() : open();
+      });
+      document.addEventListener("click", function (e) { if (!root.contains(e.target)) close(); });
+      document.addEventListener("keydown", function (e) { if (e.key === "Escape") close(); });
+    });
   });
 })();
