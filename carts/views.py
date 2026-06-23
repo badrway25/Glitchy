@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from accounts.models import Address
 from django.http import HttpResponse
 from django.contrib import messages
+from django.utils.translation import gettext as _
 
 
 def _cart_id(request):
@@ -13,6 +14,22 @@ def _cart_id(request):
     if not cart:
         cart = request.session.create()
     return cart
+
+
+def _missing_required_variations(product, matched):
+    """Variation categories the product OFFERS (colour/size) that weren't selected.
+
+    Used to reject an under-specified add-to-cart server-side (the PDP modal is the UX
+    layer; this is the authoritative guard). The cart qty-stepper re-posts the chosen
+    variations, so it never trips this; one-size products offer no colour/size and pass.
+    """
+    matched_cats = {v.variation_category.lower() for v in matched}
+    missing = []
+    if product.variation_set.colors().exists() and "color" not in matched_cats:
+        missing.append("color")
+    if product.variation_set.sizes().exists() and "size" not in matched_cats:
+        missing.append("size")
+    return missing
 
 
 def add_cart(request, product_id):
@@ -37,6 +54,10 @@ def add_cart(request, product_id):
                     product_variation.append(variation)
                 except Variation.DoesNotExist:
                     pass
+
+        if request.method == 'POST' and _missing_required_variations(product, product_variation):
+            messages.error(request, _("Please choose a colour and size before adding this item to your cart."))
+            return redirect(product.get_url())
 
         is_cart_item_exists = CartItem.objects.filter(product=product, user=current_user).exists()
 
@@ -96,6 +117,10 @@ def add_cart(request, product_id):
                 product_variation.append(variation)
             except Variation.DoesNotExist:
                 pass
+
+    if request.method == 'POST' and _missing_required_variations(product, product_variation):
+        messages.error(request, _("Please choose a colour and size before adding this item to your cart."))
+        return redirect(product.get_url())
 
     try:
         cart = Cart.objects.get(cart_id=_cart_id(request))

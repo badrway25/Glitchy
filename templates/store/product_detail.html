@@ -146,7 +146,7 @@
     {% if single_product.variation_set.colors %}
       <input type="hidden" name="color" id="colorInput" required>
 
-      <div class="dropdown custom-select-dd">
+      <div class="dropdown custom-select-dd" data-vg-wrap="color">
         <button class="btn custom-select-btn dropdown-toggle"
                 type="button"
                 id="colorDropdown"
@@ -184,7 +184,7 @@
     {% if single_product.variation_set.sizes %}
       <input type="hidden" name="size" id="sizeInput" required>
 
-      <div class="dropdown custom-select-dd">
+      <div class="dropdown custom-select-dd" data-vg-wrap="size">
         <button class="btn custom-select-btn dropdown-toggle"
                 type="button"
                 id="sizeDropdown"
@@ -212,6 +212,24 @@
 
 </div>
 
+<!-- Missing-variant guard: localized strings + premium modal (blocks add-to-cart) -->
+<script type="application/json" id="vgI18n">{
+  "title": "{% trans 'Please choose your options' %}",
+  "both": "{% trans 'Choose a colour and size before adding this item to your cart.' %}",
+  "color": "{% trans 'Choose a colour before adding this item to your cart.' %}",
+  "size": "{% trans 'Choose a size before adding this item to your cart.' %}",
+  "cta": "{% trans 'Choose options' %}",
+  "close": "{% trans 'Close' %}"
+}</script>
+<div class="vg-backdrop" id="variantGuard" hidden>
+  <div class="vg-modal" role="dialog" aria-modal="true" aria-labelledby="vgTitle" aria-describedby="vgMsg">
+    <button class="vg-close" type="button" data-vg-close aria-label="{% trans 'Close' %}">{% icon "close" "ic" 18 %}</button>
+    <div class="vg-icon">{% icon "sliders" "ic" 26 %}</div>
+    <h3 class="vg-title" id="vgTitle">{% trans "Please choose your options" %}</h3>
+    <p class="vg-msg" id="vgMsg" aria-live="polite"></p>
+    <button class="btn btn-primary vg-cta" type="button" data-vg-confirm>{% trans "Choose options" %}</button>
+  </div>
+</div>
 
               <!-- actions -->
               <div class="pdp-actions">
