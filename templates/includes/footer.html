@@ -36,8 +36,9 @@
 
         <!-- Brand -->
         <div class="col-lg-4 col-md-12 mb-4 mb-lg-0 footer-brand-col">
-          <a class="footer-brand brand-word" href="{% url 'home' %}">
-            <span class="brand-mark" aria-hidden="true"></span>{{ SITE_NAME }}
+          <a class="footer-brand brand-logo-footer" href="{% url 'home' %}" aria-label="{{ SITE_NAME }}">
+            <img src="{% static 'images/brand/logo-glitchy-footer-light.png' %}"
+                 alt="{{ SITE_NAME }} fashion store" width="200" height="43">
           </a>
           <p class="footer-desc">
             {% trans "Curated essentials, designed for everyday comfort. Premium quality, fast shipping, easy returns." %}
