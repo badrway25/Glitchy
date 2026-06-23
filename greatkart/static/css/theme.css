@@ -548,8 +548,10 @@ body.has-fixed-navbar{ padding-top: var(--nav-h, 72px); }
   align-items:center;
   justify-content:center;
 }
-.pdp-actions .btn-primary{ flex: 1; }
-.pdp-actions .btn-soft{ width: 54px; }
+.pdp-actions .btn-primary{ flex: 1 1 auto; min-width: 0; }
+/* Save button is content-sized (holds a heart icon + a translated label like FR "Enregistrer").
+   Width must NOT be pinned — premium.css owns the full responsive layout. */
+.pdp-actions .btn-soft{ width: auto; }
 
 @media (min-width: 992px){
   .pdp-sticky{

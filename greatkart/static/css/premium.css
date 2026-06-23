@@ -1356,14 +1356,26 @@ body.has-sticky-cta .ai-assistant{bottom:78px;}
 .pod-note{margin:0;font-size:.8rem;color:var(--muted);line-height:1.5;}
 @media (max-width:576px){.pod-chips{gap:.35rem;}.pod-chip{font-size:.74rem;}}
 
-/* PDP actions — keep buttons intact with long translated labels (e.g. FR "Enregistrer") */
-.pdp-actions{display:flex;gap:.6rem;flex-wrap:wrap;align-items:stretch;}
-.pdp-actions .btn{min-height:46px;display:inline-flex;align-items:center;justify-content:center;
-  white-space:nowrap;line-height:1.1;overflow-wrap:normal;}
-.wish-btn-pdp{flex:0 0 auto;white-space:nowrap;}
-.pdp-actions .btn-primary{flex:1 1 auto;}
+/* PDP actions — premium, content-sized buttons that never clip translated labels
+   (EN "Save" / IT "Salva" / FR "Enregistrer" / "Enregistré"). Root cause was a fixed
+   54px width in theme.css; here premium.css owns the full responsive layout. */
+.pdp-actions{display:flex;flex-wrap:wrap;align-items:stretch;gap:.6rem;}
+.pdp-actions .btn{box-sizing:border-box;min-height:48px;display:inline-flex;align-items:center;
+  justify-content:center;gap:.5rem;white-space:nowrap;line-height:1.1;padding:.66rem 1.15rem;}
+.pdp-actions .btn-primary{flex:1 1 auto;min-width:0;}            /* primary absorbs the row, can shrink */
+/* The Save chip: static, auto width (override theme.css 54px), icon+label always inside */
+.pdp-actions .wish-btn-pdp{flex:0 0 auto;width:auto;height:auto;position:static;
+  border-radius:var(--radius-sm);font-weight:600;letter-spacing:.02em;}
+.pdp-actions .wish-btn-pdp i{flex:0 0 auto;font-size:1rem;line-height:1;}
+.pdp-actions .wish-btn-pdp [data-wishlist-label]{flex:0 1 auto;}
+.pdp-actions .wish-btn-pdp:hover{border-color:var(--accent)!important;color:var(--primary)!important;}
+.pdp-actions .wish-btn-pdp.is-active{background:var(--accent-soft,rgba(202,165,106,.14))!important;
+  border-color:var(--accent)!important;}
+.pdp-actions .wish-btn-pdp.is-active i{color:var(--accent-2)!important;}
+:root[data-theme="dark"] .pdp-actions .wish-btn-pdp{color:var(--text)!important;}
+:root[data-theme="dark"] .pdp-actions .wish-btn-pdp.is-active i{color:#facc15!important;}
 @media (max-width:480px){
-  /* stack full-width on small phones so any label always fits */
+  /* stack full-width on small phones so any label always fits comfortably */
   .pdp-actions{flex-direction:column;}
   .pdp-actions .btn{width:100%;}
 }
@@ -1809,3 +1821,26 @@ body.has-sticky-cta .ai-assistant{bottom:78px;}
 :root[data-theme="dark"] .btn-outline-dark:hover{ color:#15130f !important; }
 :root[data-theme="dark"] .ai-fab svg,
 :root[data-theme="dark"] .ai-send svg{ fill:#15130f !important; stroke:#15130f !important; }
+
+/* ============ Phase 43 — Draggable AI FAB ============ */
+.ai-fab{cursor:grab;touch-action:none;}                 /* draggable hint + no page-scroll on touch-drag */
+.ai-assistant.is-dragging .ai-fab{cursor:grabbing;}
+.ai-assistant.has-custom-pos{right:auto!important;bottom:auto!important;}  /* inline left/top take over */
+.ai-assistant.is-dragging{transition:none;}
+.ai-assistant.is-dragging .ai-fab{transform:none!important;box-shadow:0 18px 40px rgba(0,0,0,.4);}
+.ai-assistant.is-dragging .ai-fab:hover{transform:none!important;}
+@media (max-width:575.98px){ .ai-fab{cursor:pointer;} }  /* drag disabled on the mobile bottom-sheet */
+
+/* AI assistant chat panel header — was --primary (inverts to light) + white text (Phase 43) */
+:root[data-theme="dark"] .ai-head{background:var(--surface-2)!important;color:var(--text)!important;
+  border-bottom:1px solid var(--border);}
+:root[data-theme="dark"] .ai-head-title{color:var(--text)!important;}
+:root[data-theme="dark"] .ai-head-sub{color:var(--muted)!important;}
+:root[data-theme="dark"] .ai-head-close{background:rgba(255,255,255,.12)!important;color:var(--text)!important;}
+:root[data-theme="dark"] .ai-head-close:hover{background:rgba(255,255,255,.22)!important;}
+
+/* Hamburger (mobile menu) icon — Bootstrap's dark stroke is invisible on the dark navbar (Phase 43) */
+:root[data-theme="dark"] .navbar-toggler-icon{
+  background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(243,238,228,0.9)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+:root[data-theme="dark"] .navbar-toggler{border-color:rgba(243,238,228,.28);}

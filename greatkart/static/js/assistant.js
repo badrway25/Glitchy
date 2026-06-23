@@ -17,6 +17,7 @@
   var form = document.getElementById("aiForm");
   var input = document.getElementById("aiText");
   var loaded = false, busy = false;
+  var dragMoved = false;   // set true by the drag module when a real drag (not a click) happened
 
   function open() {
     panel.hidden = false;
@@ -32,6 +33,7 @@
     setTimeout(function () { panel.hidden = true; }, 220);
   }
   toggle.addEventListener("click", function () {
+    if (dragMoved) { dragMoved = false; return; }   // a drag just ended — don't toggle the panel
     root.classList.contains("is-open") ? close() : open();
   });
   root.querySelectorAll("[data-ai-close]").forEach(function (b) { b.addEventListener("click", close); });
@@ -46,6 +48,91 @@
       if (prompt && input) { input.value = prompt; setTimeout(function () { input.focus(); }, 80); }
     });
   });
+
+  /* ---- Draggable FAB (pointer events, persisted, viewport-clamped) ----
+     Moves the ROOT container (#aiAssistant); the panel is anchored to it and follows.
+     A movement threshold distinguishes a click (opens chat) from a drag (repositions). */
+  (function setupDrag() {
+    var DRAG_KEY = "aiFabPos.v1";
+    var MARGIN = 10, THRESHOLD = 5;
+    var down = false, startX = 0, startY = 0, originLeft = 0, originTop = 0;
+
+    function isMobileSheet() { return window.matchMedia("(max-width:575.98px)").matches; }
+
+    function clamp(left, top) {
+      var w = root.offsetWidth, h = root.offsetHeight;
+      left = Math.max(MARGIN, Math.min(left, window.innerWidth - w - MARGIN));
+      top = Math.max(MARGIN, Math.min(top, window.innerHeight - h - MARGIN));
+      return { left: left, top: top };
+    }
+    function applyPos(left, top) {
+      var p = clamp(left, top);
+      root.classList.add("has-custom-pos");
+      root.style.left = p.left + "px";
+      root.style.top = p.top + "px";
+      return p;
+    }
+    function clearPos() {
+      root.classList.remove("has-custom-pos");
+      root.style.left = ""; root.style.top = "";
+    }
+    function restorePos() {
+      if (isMobileSheet()) { clearPos(); return; }
+      try {
+        var p = JSON.parse(localStorage.getItem(DRAG_KEY));
+        if (p && typeof p.left === "number" && typeof p.top === "number") applyPos(p.left, p.top);
+      } catch (e) {}
+    }
+
+    toggle.addEventListener("pointerdown", function (e) {
+      if ((e.button !== undefined && e.button !== 0) || isMobileSheet()) return;
+      down = true; dragMoved = false;
+      var r = root.getBoundingClientRect();
+      originLeft = r.left; originTop = r.top;
+      startX = e.clientX; startY = e.clientY;
+      try { toggle.setPointerCapture(e.pointerId); } catch (_) {}
+    });
+    toggle.addEventListener("pointermove", function (e) {
+      if (!down) return;
+      var dx = e.clientX - startX, dy = e.clientY - startY;
+      if (!dragMoved && Math.hypot(dx, dy) < THRESHOLD) return;
+      dragMoved = true; root.classList.add("is-dragging");
+      if (root.classList.contains("is-open")) close();   // collapse panel while repositioning
+      applyPos(originLeft + dx, originTop + dy);
+    });
+    function endDrag(e) {
+      if (!down) return; down = false;
+      try { toggle.releasePointerCapture(e.pointerId); } catch (_) {}
+      root.classList.remove("is-dragging");
+      if (dragMoved) {
+        var r = root.getBoundingClientRect();
+        try { localStorage.setItem(DRAG_KEY, JSON.stringify({ left: r.left, top: r.top })); } catch (_) {}
+      }
+    }
+    toggle.addEventListener("pointerup", endDrag);
+    toggle.addEventListener("pointercancel", endDrag);
+
+    // Double-click resets to the default corner position.
+    toggle.addEventListener("dblclick", function () {
+      clearPos();
+      try { localStorage.removeItem(DRAG_KEY); } catch (_) {}
+    });
+
+    // Keep on-screen across viewport resizes / breakpoint changes.
+    var rt;
+    window.addEventListener("resize", function () {
+      clearTimeout(rt);
+      rt = setTimeout(function () {
+        if (isMobileSheet()) { clearPos(); return; }
+        if (root.classList.contains("has-custom-pos")) {
+          var r = root.getBoundingClientRect();
+          applyPos(r.left, r.top);
+        }
+      }, 120);
+    });
+
+    restorePos();
+  })();
 
   function bubble(role, text) {
     var el = document.createElement("div");
