@@ -54,6 +54,29 @@ def _download_image(url: str, timeout: int = 30):
         return None
 
 
+def _resolve_fallback_category(fallback_category_name="T-Shirts") -> Category:
+    """Resolve the COMMERCIAL fallback category without ever creating a technical
+    "Printify" category. Order: PRINTIFY_DEFAULT_CATEGORY_SLUG (an existing commercial
+    category) -> any existing public category -> create from the given commercial name."""
+    from django.conf import settings as dj_settings
+
+    slug = (getattr(dj_settings, "PRINTIFY_DEFAULT_CATEGORY_SLUG", "") or "").strip()
+    if slug:
+        cat = Category.objects.filter(slug=slug).first()
+        if cat:
+            return cat
+    cat = Category.objects.filter(is_public=True).order_by("id").first()
+    if cat:
+        return cat
+    # last resort (empty store): create a commercial category, never "Printify"
+    name = fallback_category_name if fallback_category_name.lower() != "printify" else "T-Shirts"
+    cat, _ = Category.objects.get_or_create(
+        category_name=name,
+        defaults={"slug": slugify(name) or "t-shirts", "is_public": True},
+    )
+    return cat
+
+
 def _category_for(p: dict, fallback: Category, settings_map: dict) -> Category:
     bp = p.get("blueprint_id")
     try:
@@ -66,12 +89,8 @@ def _category_for(p: dict, fallback: Category, settings_map: dict) -> Category:
     cat = Category.objects.filter(slug=cat_slug).first()
     if cat:
         return cat
-    name = cat_slug.replace("-", " ").title()
-    cat, _ = Category.objects.get_or_create(
-        slug=cat_slug,
-        defaults={"category_name": name, "description": "Auto-created from Printify blueprint mapping"},
-    )
-    return cat
+    # mapped slug missing -> use the commercial fallback (never auto-create a technical bucket)
+    return fallback
 
 
 def _enabled_variant_info(p: dict):
@@ -272,7 +291,7 @@ def _upsert_product(p: dict, fallback_category, settings_map, overwrite_category
 # --------------------------------------------------------------------------- #
 # Public services
 # --------------------------------------------------------------------------- #
-def sync_products(*, limit=50, max_pages=20, fallback_category_name="Printify",
+def sync_products(*, limit=50, max_pages=20, fallback_category_name="T-Shirts",
                   refresh_images=False, client=None) -> SyncLog:
     from django.conf import settings as dj_settings
 
@@ -281,10 +300,8 @@ def sync_products(*, limit=50, max_pages=20, fallback_category_name="Printify",
     settings_map = getattr(dj_settings, "PRINTIFY_BLUEPRINT_CATEGORY_MAP", {}) or {}
     overwrite_category = bool(getattr(dj_settings, "PRINTIFY_SYNC_OVERWRITE_CATEGORY", False))
 
-    fallback_category, _ = Category.objects.get_or_create(
-        category_name=fallback_category_name,
-        defaults={"slug": slugify(fallback_category_name), "description": "Imported from Printify"},
-    )
+    # Commercial fallback — never a technical "Printify" category.
+    fallback_category = _resolve_fallback_category(fallback_category_name)
 
     created = updated = errors = 0
     try:
@@ -325,10 +342,7 @@ def resync_product(product: Product, client=None) -> SyncLog:
     log = SyncLog.objects.create(kind=SyncLog.KIND_SINGLE)
     client = client or get_client()
     settings_map = getattr(dj_settings, "PRINTIFY_BLUEPRINT_CATEGORY_MAP", {}) or {}
-    fallback_category, _ = Category.objects.get_or_create(
-        category_name="Printify",
-        defaults={"slug": "printify", "description": "Imported from Printify"},
-    )
+    fallback_category = _resolve_fallback_category()   # commercial, never "Printify"
     try:
         if not product.printify_product_id:
             raise PrintifyError("Product has no printify_product_id")

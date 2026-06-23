@@ -34,7 +34,7 @@ def _entries():
     with translation.override("en"):
         for p in Product.objects.filter(is_available=True):
             items.append((p.get_url(), "weekly", "0.8"))
-        for c in Category.objects.all():
+        for c in Category.public.all():   # exclude technical categories from sitemap
             items.append((c.get_url(), "weekly", "0.7"))
         for col in Collection.objects.filter(is_active=True):
             items.append((col.get_url(), "weekly", "0.6"))

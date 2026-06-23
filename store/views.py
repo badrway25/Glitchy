@@ -17,10 +17,11 @@ def store(request, category_slug=None):
     from store.filters import apply_filters, build_facets, active_chips
     category = None
     base = Product.objects.filter(is_available=True)
-    all_categories = Category.objects.all().order_by("category_name")
+    all_categories = Category.public.all().order_by("category_name")
 
     if category_slug:
-        category = get_object_or_404(Category, slug=category_slug)
+        # public only — a technical category (e.g. Printify) 404s instead of rendering
+        category = get_object_or_404(Category, slug=category_slug, is_public=True)
         base = base.filter(category=category)
 
     # Facets are computed from the category-scoped base (before color/size filters)

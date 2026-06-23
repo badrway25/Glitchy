@@ -287,6 +287,9 @@ PRINTIFY_BLUEPRINT_CATEGORY_MAP = {
     706: "t-shirt",
 }
 PRINTIFY_SYNC_OVERWRITE_CATEGORY = False
+# Commercial fallback category (slug of an EXISTING customer-facing category) used when a
+# Printify blueprint has no mapping. The sync must NEVER create a technical "Printify" category.
+PRINTIFY_DEFAULT_CATEGORY_SLUG = env("PRINTIFY_DEFAULT_CATEGORY_SLUG", "t-shirt")
 # Rotation gates: both the OpenAI and Printify credentials were shared in chat (exposed).
 # Staging/prod is blocked until the owner revokes each, issues a new one, and flips these.
 OPENAI_KEY_ROTATED = env_bool("OPENAI_KEY_ROTATED", False)

@@ -9,7 +9,8 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--limit", type=int, default=50)
         parser.add_argument("--max-pages", type=int, default=20)
-        parser.add_argument("--category", type=str, default="Printify")
+        parser.add_argument("--category", type=str, default="T-Shirts",
+                            help="Commercial fallback category for unmapped blueprints (never 'Printify').")
         parser.add_argument("--refresh-images", action="store_true")
 
     def handle(self, *args, **opts):
