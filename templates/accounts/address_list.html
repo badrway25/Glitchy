@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static i18n %}
+{% load static i18n uikit %}
 {% block title %}{% trans "My addresses" %} • {{ SITE_NAME }}{% endblock %}
 
 {% block content %}
@@ -53,10 +53,11 @@
                         </button>
                       </form>
                       {% endif %}
-                      <form method="post" action="{% url 'address_delete' a.id %}" class="m-0"
-                            onsubmit="return confirm('{% trans 'Delete this address?' %}')">
+                      <form method="post" action="{% url 'address_delete' a.id %}" class="m-0" id="delAddr{{ a.id }}">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-soft btn-sm text-danger">
+                        <button type="button" class="btn btn-soft btn-sm text-danger" data-del-address
+                                data-form="delAddr{{ a.id }}"
+                                data-name="{{ a.first_name }} {{ a.last_name }}">
                           <i class="fa fa-trash mr-1"></i>{% trans "Delete" %}
                         </button>
                       </form>
@@ -82,4 +83,45 @@
     </div>
   </div>
 </section>
+
+<!-- Premium delete-address confirmation modal -->
+<div class="vg-backdrop" id="addrDeleteModal" hidden>
+  <div class="vg-modal" role="dialog" aria-modal="true" aria-labelledby="addrDelTitle">
+    <button class="vg-close" type="button" data-addrdel-close aria-label="{% trans 'Close' %}">{% icon "close" "ic" 18 %}</button>
+    <div class="vg-icon" style="color:#dc2626;background:rgba(220,38,38,.10);"><i class="fa fa-trash"></i></div>
+    <h3 class="vg-title" id="addrDelTitle">{% trans "Delete this address?" %}</h3>
+    <p class="vg-msg" id="addrDelName"></p>
+    <div style="display:flex;gap:.6rem;">
+      <button type="button" class="btn btn-soft" style="flex:1;" data-addrdel-close>{% trans "Cancel" %}</button>
+      <button type="button" class="btn btn-primary" style="flex:1;background:#dc2626!important;border-color:#dc2626!important;color:#fff!important;" data-addrdel-confirm>{% trans "Delete" %}</button>
+    </div>
+  </div>
+</div>
+
+{% block extra_js %}
+<script>
+(function () {
+  "use strict";
+  var modal = document.getElementById("addrDeleteModal");
+  if (!modal) return;
+  var nameEl = document.getElementById("addrDelName");
+  var targetForm = null;
+  function open(){ modal.hidden = false; requestAnimationFrame(function(){ modal.classList.add("is-open"); }); }
+  function close(){ modal.classList.remove("is-open"); setTimeout(function(){ modal.hidden = true; }, 200); targetForm = null; }
+  document.querySelectorAll("[data-del-address]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      targetForm = document.getElementById(btn.getAttribute("data-form"));
+      if (nameEl) nameEl.textContent = btn.getAttribute("data-name") || "";
+      open();
+    });
+  });
+  modal.addEventListener("click", function (e) {
+    if (e.target === modal || (e.target.closest && e.target.closest("[data-addrdel-close]"))) close();
+  });
+  var confirmBtn = modal.querySelector("[data-addrdel-confirm]");
+  if (confirmBtn) confirmBtn.addEventListener("click", function () { if (targetForm) targetForm.submit(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !modal.hidden) close(); });
+})();
+</script>
+{% endblock %}
 {% endblock %}

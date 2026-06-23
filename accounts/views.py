@@ -2,6 +2,8 @@ from .forms import RegistrationForm
 from .models import Account
 from django.contrib import messages, auth
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+from django.utils.translation import gettext as _
 from django.http import HttpResponse
 
 # Verification email
@@ -227,7 +229,9 @@ def address_edit(request, address_id):
     return render(request, "accounts/address_form.html", {"form": form, "mode": "edit", "addr": addr})
 
 @login_required(login_url="login")
+@require_POST
 def address_delete(request, address_id):
+    # Ownership-scoped + POST-only: a GET can no longer delete via link/prefetch/CSRF.
     addr = get_object_or_404(Address, id=address_id, user=request.user)
     was_default = addr.is_default
     addr.delete()
@@ -239,16 +243,17 @@ def address_delete(request, address_id):
             next_addr.is_default = True
             next_addr.save(update_fields=["is_default"])
 
-    messages.success(request, "Address removed.")
+    messages.success(request, _("Address removed."))
     return redirect("address_list")
 
 @login_required(login_url="login")
+@require_POST
 def address_set_default(request, address_id):
     addr = get_object_or_404(Address, id=address_id, user=request.user)
     Address.objects.filter(user=request.user, is_default=True).update(is_default=False)
     addr.is_default = True
     addr.save(update_fields=["is_default"])
-    messages.success(request, "Default address updated.")
+    messages.success(request, _("Default address updated."))
     return redirect("address_list")
 
 
