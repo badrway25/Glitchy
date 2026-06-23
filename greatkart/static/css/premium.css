@@ -1680,3 +1680,132 @@ body.has-sticky-cta .ai-assistant{bottom:78px;}
 .filter-section .range-row{gap:.6rem;margin-top:.2rem;}
 .filter-actions{margin-top:1.1rem;display:flex;gap:.6rem;}
 .chips-bar{gap:.5rem;margin:.25rem 0 1.1rem;}
+
+/* ==================== Phase 42 — Dark mode visibility & contrast ==================== */
+/* In dark mode --primary is a LIGHT surface; any component using it as a background with
+   white text becomes invisible. Force DARK text on those light surfaces. */
+:root[data-theme="dark"] .btn-primary,
+:root[data-theme="dark"] .summary-cta,
+:root[data-theme="dark"] .btn.btn-primary,
+:root[data-theme="dark"] .hero-copy .btn-primary,
+:root[data-theme="dark"] .search-go,
+:root[data-theme="dark"] .badge-new,
+:root[data-theme="dark"] .p-chip-top,
+:root[data-theme="dark"] .ctl-tag{ color:#15130f !important; }
+:root[data-theme="dark"] .btn-primary:hover,
+:root[data-theme="dark"] .btn.btn-primary:hover,
+:root[data-theme="dark"] .summary-cta:hover{ color:#15130f !important; }   /* hover bg = gold */
+
+/* Soft/outline buttons: readable light text on dark surface */
+:root[data-theme="dark"] .btn-soft,
+:root[data-theme="dark"] .btn.btn-soft{ color:var(--text) !important; }
+
+/* Rating + reviews pills: dark surface, light text, accent-tinted icons */
+:root[data-theme="dark"] .pdp-pill{ background:var(--surface-2) !important; color:var(--text) !important; }
+:root[data-theme="dark"] .pdp-pill-text{ color:var(--text) !important; }
+:root[data-theme="dark"] .pdp-pill--rating{ background:rgba(245,158,11,.12) !important; border:1px solid rgba(245,158,11,.32) !important; }
+:root[data-theme="dark"] .pdp-pill--rating .stars i{ color:#facc15 !important; }
+:root[data-theme="dark"] .pdp-pill--reviews{ background:rgba(96,165,250,.12) !important; border:1px solid rgba(96,165,250,.30) !important; }
+:root[data-theme="dark"] .score-count{ color:var(--muted) !important; }
+
+/* Premium star rating component: brighter gold + visible empty stars */
+:root[data-theme="dark"] .rating-stars{ color:rgba(243,238,228,.22); }
+:root[data-theme="dark"] .rating-stars-fill{ color:#facc15; }
+:root[data-theme="dark"] .rating-meta{ color:var(--muted); }
+
+/* Hardcoded slate text on the PDP delivery line */
+:root[data-theme="dark"] .pdp-trust{ color:var(--muted) !important; }
+:root[data-theme="dark"] .pdp-trust i{ color:var(--accent) !important; }
+
+/* Inline mint 'returns' badge near the rating -> dark-friendly green */
+:root[data-theme="dark"] .badge-pill[style*="ecfdf5"]{
+  background:rgba(16,185,129,.14) !important; color:#34d399 !important; border-color:rgba(52,211,153,.35) !important; }
+
+/* Newsletter inputs were hardcoded white */
+:root[data-theme="dark"] .news-field,
+:root[data-theme="dark"] .news-input{ background:var(--surface-2) !important; color:var(--text) !important;
+  border:1px solid var(--border-strong) !important; }
+:root[data-theme="dark"] .news-input::placeholder,
+:root[data-theme="dark"] .news-field input::placeholder{ color:var(--muted) !important; }
+
+/* Sort dropdown menu + items already token-based; ensure check/active readable */
+:root[data-theme="dark"] .sortx-menu{ background:var(--surface) !important; }
+:root[data-theme="dark"] .sortx-item.is-active{ color:var(--accent) !important; }
+
+/* Collection featured/feat badges (gold bg) -> dark text for contrast */
+:root[data-theme="dark"] .collx-feat-badge,
+:root[data-theme="dark"] .cdx-badge{ color:#15130f !important; }
+:root[data-theme="dark"] .cdx-hero:not(.has-img) .cdx-badge{ color:var(--text) !important; }
+
+/* AI assistant FAB ("Ask"): light bg in dark mode → dark text + icon */
+:root[data-theme="dark"] .ai-fab{ color:#15130f !important; }
+:root[data-theme="dark"] .ai-fab i,
+:root[data-theme="dark"] .ai-fab .ic,
+:root[data-theme="dark"] .ai-fab-badge{ color:#15130f !important; }
+:root[data-theme="dark"] .ai-fab svg{ fill:#15130f !important; stroke:#15130f !important; }
+:root[data-theme="dark"] .ai-fab:hover,
+:root[data-theme="dark"] .ai-fab:hover i,
+:root[data-theme="dark"] .ai-fab:hover .ai-fab-badge{ color:#15130f !important; }
+
+/* Active category in filters: light bg in dark mode → dark text */
+:root[data-theme="dark"] .cat-item.active,
+:root[data-theme="dark"] .cat-item.active span,
+:root[data-theme="dark"] .cat-item.active .text-muted,
+:root[data-theme="dark"] .filter-form .cat-item.active{ color:#15130f !important; }
+
+/* Cart 'Remove' (danger link): brighter on dark */
+:root[data-theme="dark"] .cart-remove a,
+:root[data-theme="dark"] a[onclick*="cart"]{ color:#f87171 !important; }
+
+/* ============ Phase 42 (consolidated) — dark mode: --primary inverts to LIGHT ============ */
+/* Full-width brand BANDS: in dark mode use a dark surface (not inverted-light) so light
+   text + gold accents stay readable and elegant. */
+:root[data-theme="dark"] .announce-bar,
+:root[data-theme="dark"] .lux-strip,
+:root[data-theme="dark"] .faq-cta{
+  background:var(--surface-2) !important; color:var(--text) !important;
+  border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+}
+:root[data-theme="dark"] .announce-text,
+:root[data-theme="dark"] .lux-strip .lux-item,
+:root[data-theme="dark"] .faq-cta,
+:root[data-theme="dark"] .faq-cta p,
+:root[data-theme="dark"] .faq-cta h2,
+:root[data-theme="dark"] .faq-cta h3{ color:var(--text) !important; }
+:root[data-theme="dark"] .lux-strip .lux-item i,
+:root[data-theme="dark"] .lux-strip .lux-item .ic{ color:var(--accent) !important; }
+
+/* Small INVERTED controls keep the light --primary bg → text/icons must be DARK */
+:root[data-theme="dark"] .btn-primary,
+:root[data-theme="dark"] .summary-cta,
+:root[data-theme="dark"] .btn.btn-primary,
+:root[data-theme="dark"] .btn-dark,
+:root[data-theme="dark"] .hero-copy .btn-primary,
+:root[data-theme="dark"] .search-go,
+:root[data-theme="dark"] .news-btn,
+:root[data-theme="dark"] .quick-add,
+:root[data-theme="dark"] .badge-new,
+:root[data-theme="dark"] .p-chip-top,
+:root[data-theme="dark"] .ctl-tag,
+:root[data-theme="dark"] .cat-item.active,
+:root[data-theme="dark"] .cat-item.active span,
+:root[data-theme="dark"] .cat-item.active .text-muted,
+:root[data-theme="dark"] .filter-form .cat-item.active,
+:root[data-theme="dark"] .pagination .page-item.active .page-link,
+:root[data-theme="dark"] .quiz-opt input:checked + span,
+:root[data-theme="dark"] .chip-opt input:checked + span,
+:root[data-theme="dark"] .collx-chip.is-active,
+:root[data-theme="dark"] .ai-fab,
+:root[data-theme="dark"] .ai-fab i,
+:root[data-theme="dark"] .ai-fab .ic,
+:root[data-theme="dark"] .ai-fab-badge,
+:root[data-theme="dark"] .ai-msg-user .ai-bubble,
+:root[data-theme="dark"] .ai-send,
+:root[data-theme="dark"] .ai-send i,
+:root[data-theme="dark"] .btn-primary:hover,
+:root[data-theme="dark"] .btn.btn-primary:hover,
+:root[data-theme="dark"] .summary-cta:hover,
+:root[data-theme="dark"] .btn-outline-primary:hover,
+:root[data-theme="dark"] .btn-outline-dark:hover{ color:#15130f !important; }
+:root[data-theme="dark"] .ai-fab svg,
+:root[data-theme="dark"] .ai-send svg{ fill:#15130f !important; stroke:#15130f !important; }
