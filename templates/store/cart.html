@@ -79,7 +79,7 @@
 
                 <div class="cart-actions-mobile d-md-none">
                   <a href="{% url 'remove_cart_item' cart_item.product.id cart_item.id %}"
-                     onclick="return confirm('{% trans 'Remove this item from your cart?' %}')"
+                     data-cart-remove data-name="{{ cart_item.product.product_name|truncatechars:42 }}"
                      class="btn btn-remove btn-remove-sm">
                     <i class="fa fa-trash"></i><span>{% trans "Remove" %}</span>
                   </a>
@@ -110,7 +110,7 @@
 
             <div class="cart-remove d-none d-md-flex" style="flex-direction:column;gap:.4rem;align-items:flex-end;">
               <a href="{% url 'remove_cart_item' cart_item.product.id cart_item.id %}"
-                 onclick="return confirm('{% trans 'Remove this item from your cart?' %}')"
+                 data-cart-remove data-name="{{ cart_item.product.product_name|truncatechars:42 }}"
                  class="btn btn-remove">
                 <i class="fa fa-trash"></i><span>{% trans "Remove" %}</span>
               </a>
@@ -221,4 +221,46 @@
 
   </div>
 </section>
+
+<!-- Premium "remove from cart" confirmation modal (replaces window.confirm) -->
+<div class="vg-backdrop" id="cartRemoveModal" hidden>
+  <div class="vg-modal" role="dialog" aria-modal="true" aria-labelledby="cartRemoveTitle" aria-describedby="cartRemoveSub">
+    <button class="vg-close" type="button" data-cartremove-close aria-label="{% trans 'Close' %}">{% icon "close" "ic" 18 %}</button>
+    <div class="vg-icon" style="color:#dc2626;background:rgba(220,38,38,.10);"><i class="fa fa-trash"></i></div>
+    <h3 class="vg-title" id="cartRemoveTitle">{% trans "Remove this item from your cart?" %}</h3>
+    <p class="vg-msg" id="cartRemoveSub">{% trans "You can always add it again later." %}</p>
+    <p class="vg-item-name" id="cartRemoveName" style="font-weight:600;color:var(--text);margin:-.6rem 0 1.1rem;"></p>
+    <div style="display:flex;gap:.6rem;">
+      <button type="button" class="btn btn-soft" style="flex:1;" data-cartremove-close>{% trans "Cancel" %}</button>
+      <a href="#" id="cartRemoveConfirm" class="btn btn-primary" style="flex:1;background:#dc2626!important;border-color:#dc2626!important;color:#fff!important;">{% trans "Remove" %}</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  "use strict";
+  var modal = document.getElementById("cartRemoveModal");
+  if (!modal) return;
+  var nameEl = document.getElementById("cartRemoveName");
+  var confirmLink = document.getElementById("cartRemoveConfirm");
+  function open(){ modal.hidden = false; requestAnimationFrame(function(){ modal.classList.add("is-open"); });
+    setTimeout(function(){ confirmLink && confirmLink.focus(); }, 40); }
+  function close(){ modal.classList.remove("is-open"); setTimeout(function(){ modal.hidden = true; }, 200); }
+  document.querySelectorAll("[data-cart-remove]").forEach(function (link) {
+    link.addEventListener("click", function (e) {
+      e.preventDefault();
+      confirmLink.setAttribute("href", link.getAttribute("href"));
+      if (nameEl) nameEl.textContent = link.getAttribute("data-name") || "";
+      open();
+    });
+  });
+  modal.addEventListener("click", function (e) {
+    if (e.target === modal || (e.target.closest && e.target.closest("[data-cartremove-close]"))) close();
+  });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !modal.hidden) close(); });
+})();
+</script>
 {% endblock %}
