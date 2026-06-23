@@ -9,6 +9,12 @@
           data-wishlist-toggle data-product-id="{{ p.id }}" aria-label="{% trans 'Save to wishlist' %}"><i class="fa fa-heart"></i></button>
   <div class="p-3">
     <a href="{{ p.get_url }}" class="product-title d-block mb-1" style="font-size:.9rem;">{{ p.product_name|truncatechars:42 }}</a>
+    {% if p.countReview %}
+    <div class="card-rating" role="img" aria-label="{% blocktrans with r=p.averageReview|floatformat:1 c=p.countReview %}Rated {{ r }} out of 5 from {{ c }} reviews{% endblocktrans %}">
+      <span class="rating-stars"><span class="rating-stars-fill" style="width:{% widthratio p.averageReview 5 100 %}%"></span></span>
+      <span class="rating-meta">{{ p.averageReview|floatformat:1 }} <em>({{ p.countReview }})</em></span>
+    </div>
+    {% endif %}
     <div class="price" style="font-size:1rem;">{{ CURRENCY_SYMBOL }} {{ p.price }}{% if p.on_sale %} <span class="text-muted" style="text-decoration:line-through;font-size:.85rem;">{{ CURRENCY_SYMBOL }} {{ p.compare_at_price }}</span>{% endif %}</div>
   </div>
 </div>

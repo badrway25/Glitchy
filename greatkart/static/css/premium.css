@@ -1580,3 +1580,50 @@ body.has-sticky-cta .ai-assistant{bottom:78px;}
 .collx-clear{grid-column:1/-1;display:inline-flex;align-items:center;gap:.35rem;justify-self:start;
   margin-top:.3rem;font-size:.82rem;font-weight:600;color:var(--accent-2);text-decoration:none;}
 .collx-clear:hover{color:var(--primary);}
+
+/* ============ Real Glitchy logo — navbar + footer (Phase 40) ============ */
+.brand-logo{display:inline-flex;align-items:center;padding:0;line-height:0;flex:0 0 auto;}
+.brand-logo .brand-img{height:30px;width:auto;max-width:none;flex:0 0 auto;}
+.brand-logo .brand-img-dark{display:block;}
+.brand-logo .brand-img-light{display:none;}
+:root[data-theme="dark"] .brand-logo .brand-img-dark{display:none;}
+:root[data-theme="dark"] .brand-logo .brand-img-light{display:block;}
+.brand-logo:hover{opacity:.9;transition:opacity .18s var(--ease);}
+.brand-logo-footer{display:inline-block;line-height:0;}
+.brand-logo-footer img{height:42px;width:auto;display:block;}
+@media (max-width:575px){.brand-logo .brand-img{height:26px;}}
+
+/* ============ Hover/motion hygiene (Phase 40) ============ */
+/* On touch devices, transform-based hovers can "stick" after a tap — disable them. */
+@media (hover:none){
+  .p-card:hover,.product-card:hover,.collx-card:hover,.collx-feat:hover,.cdx-related-card:hover,
+  .ymal-card:hover,.lux-feature:hover{transform:none;}
+  .p-card:hover .p-media img,.product-card:hover img,.collx-feat-collage:hover img{transform:none;}
+}
+
+/* ============ Premium rating component (Phase 40) ============ */
+.card-rating{display:flex;align-items:center;gap:.4rem;margin:.15rem 0 .4rem;}
+.rating-stars{position:relative;display:inline-block;font-size:13px;line-height:1;letter-spacing:2px;
+  color:var(--border);font-family:Arial,sans-serif;}
+.rating-stars::before{content:"★★★★★";}
+.rating-stars-fill{position:absolute;top:0;left:0;height:100%;overflow:hidden;white-space:nowrap;
+  color:#e0a82e;}
+.rating-stars-fill::before{content:"★★★★★";}
+.rating-meta{font-size:.74rem;color:var(--muted);font-weight:600;}
+.rating-meta em{font-style:normal;font-weight:500;opacity:.85;}
+
+/* ============ Sort dropdown — premium, single clean chevron (Phase 40) ============ */
+.store-actions .sort-btn.dropdown-toggle{display:inline-flex;align-items:center;gap:.5rem;
+  padding:.5rem .95rem;border-radius:var(--radius-pill);font-weight:600;font-size:.86rem;}
+.store-actions .sort-btn.dropdown-toggle::after{margin-left:.35rem;border:none;width:auto;height:auto;
+  content:"\f078";font-family:"Font Awesome 5 Free";font-weight:900;font-size:.62rem;color:var(--muted);
+  transition:transform .2s var(--ease);vertical-align:middle;}
+.store-actions .sort-btn.dropdown-toggle[aria-expanded="true"]::after{transform:rotate(180deg);}
+.store-actions .dropdown-menu{border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:var(--shadow-lg);padding:.4rem;margin-top:.4rem;min-width:230px;}
+.store-actions .dropdown-menu .dropdown-item{border-radius:var(--radius-sm);padding:.5rem .7rem;
+  font-size:.86rem;color:var(--text);transition:background .15s var(--ease);}
+.store-actions .dropdown-menu .dropdown-item:hover,
+.store-actions .dropdown-menu .dropdown-item:focus{background:var(--surface-2);color:var(--primary);}
+.store-actions .dropdown-menu .dropdown-item.active{background:var(--surface-2);color:var(--accent-2);font-weight:600;}
+.store-actions .dropdown-menu .dropdown-item.active .fa-check{color:var(--accent-2);}

@@ -198,10 +198,10 @@
 
 
                     {% if product.countReview %}
-                      <span class="pill">
-                        {% icon "star" "ic" 14 %}
-                        {{ product.averageReview|floatformat:1 }} ({{ product.countReview }})
-                      </span>
+                      <div class="card-rating" role="img" aria-label="{% blocktrans with r=product.averageReview|floatformat:1 c=product.countReview %}Rated {{ r }} out of 5 from {{ c }} reviews{% endblocktrans %}">
+                        <span class="rating-stars"><span class="rating-stars-fill" style="width:{% widthratio product.averageReview 5 100 %}%"></span></span>
+                        <span class="rating-meta">{{ product.averageReview|floatformat:1 }} <em>({{ product.countReview }})</em></span>
+                      </div>
                     {% else %}
                       <span class="pill">{% icon "spark" "ic" 14 %} {% trans "New" %}</span>
                     {% endif %}
