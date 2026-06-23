@@ -140,3 +140,6 @@ p42-*.png
 p42-light-regression.png
 
 p43-*.png
+
+p44-*.png
+.playwright-mcp/
