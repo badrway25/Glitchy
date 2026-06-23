@@ -34,7 +34,7 @@
     <div class="d-flex flex-wrap justify-content-center text-center" style="gap:10px 38px;">
       <span class="lux-item">{% icon "truck" "ic" 18 %}{% blocktrans with t=FREE_SHIPPING_THRESHOLD %}Free shipping over {{ t }}{% endblocktrans %} {{ CURRENCY_SYMBOL }}</span>
       <span class="lux-item">{% icon "returns" "ic" 18 %}{% blocktrans with d=RETURN_WINDOW_DAYS %}{{ d }}-day free returns{% endblocktrans %}</span>
-      <span class="lux-item">{% icon "leaf" "ic" 18 %}{% trans "Premium, ethically printed" %}</span>
+      <span class="lux-item">{% icon "leaf" "ic" 18 %}{% trans "Ethically printed on demand" %}</span>
       <span class="lux-item">{% icon "lock" "ic" 18 %}{% trans "Secure checkout" %}</span>
     </div>
   </div>
@@ -98,24 +98,16 @@
         <p class="text-muted mb-0" style="font-size:.9rem;">{% trans "Printed only when you order — less waste, always fresh." %}</p>
       </div></div>
       <div class="col-6 col-lg-3 d-flex"><div class="lux-feature w-100 p-4">
-        <div class="lux-ic mb-3">{% icon "returns" "ic" 22 %}</div>
-        <h4 class="mb-1">{% blocktrans with d=RETURN_WINDOW_DAYS %}{{ d }}-day returns{% endblocktrans %}</h4>
-        <p class="text-muted mb-0" style="font-size:.9rem;">{% trans "Changed your mind? Send it back, free and easy." %}</p>
+        <div class="lux-ic mb-3">{% icon "card" "ic" 22 %}</div>
+        <h4 class="mb-1">{% trans "Honest pricing" %}</h4>
+        <p class="text-muted mb-0" style="font-size:.9rem;">{% trans "Fair prices with no inflated markups — what you pay reflects the piece." %}</p>
       </div></div>
       <div class="col-6 col-lg-3 d-flex"><div class="lux-feature w-100 p-4">
-        <div class="lux-ic mb-3">{% icon "shield" "ic" 22 %}</div>
-        <h4 class="mb-1">{% trans "Secure & simple" %}</h4>
-        <p class="text-muted mb-0" style="font-size:.9rem;">{% trans "Encrypted checkout, guest-friendly, no account required." %}</p>
+        <div class="lux-ic mb-3">{% icon "spark" "ic" 22 %}</div>
+        <h4 class="mb-1">{% trans "Designed to last" %}</h4>
+        <p class="text-muted mb-0" style="font-size:.9rem;">{% trans "Timeless cuts and durable prints, built to stay in your rotation." %}</p>
       </div></div>
     </div>
-  </div>
-</section>
-
-<!-- EDITORIAL QUOTE -->
-<section class="home-section" style="padding-top:0;">
-  <div class="container text-center" style="max-width:760px;">
-    <div class="lux-eyebrow mb-3">{% trans "Our philosophy" %}</div>
-    <p class="lux-quote mb-0">{% trans "“Fewer, better things — pieces you reach for again and again, not just once.”" %}</p>
   </div>
 </section>
 
