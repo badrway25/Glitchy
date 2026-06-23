@@ -96,8 +96,8 @@ class FilterHoverTests(TestCase):
     def test_filter_accent_not_gold(self):
         css = CSS.read_text(encoding="utf-8")
         # native control accent-color switched from gold (--accent) to brand primary
-        self.assertIn(".filter-form .rating-opt input,\n.filter-form .toggle-opt input,\n"
-                      ".filter-form .chip-opt input{accent-color:var(--primary);}", css)
+        # (Phase 49 hardened this with !important; match robustly)
+        self.assertIn(".filter-form .chip-opt input{accent-color:var(--primary)", css)
 
     def test_no_section_wide_hover(self):
         css = CSS.read_text(encoding="utf-8")
