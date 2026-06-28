@@ -33,6 +33,13 @@ local Windows dev machine; **no real staging host exists**.
 - Filter "yellow hover" fixed at the real root cause (invalid `border-color:var(--border-strong)` shorthand + gold `accent-color` in dark).
 
 ## 3. What is PARTIAL
+- **Pre-order shipping estimates** (Phase 51): the cart/checkout now show an
+  estimated **cost + delivery window before checkout** via a 3-tier estimator
+  (live Printify `orders/shipping.json` → cached catalog profile → local
+  fallback). **Live mode is OFF by default** (`SHIPPING_USE_PRINTIFY=False`), so
+  today estimates come from cached profiles / fallback; transit times are honest
+  documented estimates (the API returns cost, not time). No order is created.
+  See `docs/PRINTIFY_PREORDER_SHIPPING_ESTIMATES_2026.md`.
 - **Printify data**: real but **cached** (not live-verified per request); a live audit showed **stale variant counts** (Printify 18 enabled vs site 12 buyable) → needs a re-sync.
 - **Checkout**: functional but missing premium polish (step indicator, inline field errors, address autocomplete, saved-card UX) and a webhook test on a public URL.
 - **Catalog**: only **2 real Printify products** (Sweet Dreams, New Day) + **3 demo/seed products** (ATX Jeans, RXN Blue Shirt, Great Tshirt — not synced, ~40% data quality).
