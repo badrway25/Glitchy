@@ -19,9 +19,6 @@ from .services import finalize_order_payment
 import datetime
 import json
 
-from reportlab.lib.pagesizes import A4
-from reportlab.pdfgen import canvas
-from reportlab.lib.units import mm
 
 import stripe
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -266,91 +263,17 @@ def invoice_pdf(request, order_number):
     order = get_object_or_404(Order, order_number=order_number, is_ordered=True)
     if not _can_access_order(request, order):
         return HttpResponse("Not authorized", status=403)
-    items = OrderProduct.objects.filter(order=order)
+    items = OrderProduct.objects.filter(order=order).select_related("product").prefetch_related("variations")
 
-    response = HttpResponse(content_type="application/pdf")
-    response["Content-Disposition"] = f'attachment; filename="invoice_{order.order_number}.pdf"'
+    from .receipt_pdf import build_receipt_pdf
+    pdf = build_receipt_pdf(order, items)
 
-    c = canvas.Canvas(response, pagesize=A4)
-    width, height = A4
-
-    x = 18 * mm
-    y = height - 20 * mm
-
-    # Header
-    c.setFont("Helvetica-Bold", 16)
-    c.drawString(x, y, "Invoice")
-    y -= 8 * mm
-
-    c.setFont("Helvetica", 10)
-    c.drawString(x, y, f"Order: #{order.order_number}")
-    y -= 5 * mm
-    c.drawString(x, y, f"Date: {order.created_at.strftime('%Y-%m-%d %H:%M')}")
-    y -= 10 * mm
-
-    # Customer
-    c.setFont("Helvetica-Bold", 11)
-    c.drawString(x, y, "Invoiced to")
-    y -= 6 * mm
-
-    c.setFont("Helvetica", 10)
-    c.drawString(x, y, f"{order.first_name} {order.last_name}")
-    y -= 5 * mm
-    address2 = f" {order.address_line_2}" if order.address_line_2 else ""
-    c.drawString(x, y, f"{order.address_line_1}{address2}".strip())
-    y -= 5 * mm
-    c.drawString(x, y, f"{order.city}, {order.state},{order.postal_code},  {order.country}")
-    y -= 5 * mm
-    c.drawString(x, y, f"{order.email} • {order.phone}")
-    y -= 12 * mm
-
-    # Table header
-    c.setFont("Helvetica-Bold", 10)
-    c.drawString(x, y, "Product")
-    c.drawString(x + 120 * mm, y, "Qty")
-    c.drawRightString(width - x, y, "Total")
-    y -= 6 * mm
-    c.line(x, y, width - x, y)
-    y -= 8 * mm
-
-    # Items
-    c.setFont("Helvetica", 10)
-    for it in items:
-        if y < 30 * mm:
-            c.showPage()
-            y = height - 20 * mm
-            c.setFont("Helvetica", 10)
-
-        line_total = float(it.product_price) * int(it.quantity)
-        c.drawString(x, y, it.product.product_name[:45])
-        c.drawString(x + 120 * mm, y, str(it.quantity))
-        c.drawRightString(width - x, y, f"€ {line_total:.2f}")
-        y -= 5 * mm
-
-        vars_qs = it.variations.all()
-        if vars_qs.exists():
-            vars_str = ", ".join([f"{v.variation_category}: {v.variation_value}" for v in vars_qs])[:80]
-            c.setFont("Helvetica-Oblique", 9)
-            c.drawString(x, y, vars_str)
-            c.setFont("Helvetica", 10)
-            y -= 6 * mm
-        else:
-            y -= 2 * mm
-
-    y -= 2 * mm
-    c.line(x, y, width - x, y)
-    y -= 10 * mm
-
-    subtotal = float(order.items_subtotal) or (float(order.order_total) - float(order.tax) - float(order.shipping_cost))
-    c.setFont("Helvetica", 10)
-    c.drawRightString(width - x, y, f"Subtotal: € {subtotal:.2f}")
-    y -= 6 * mm
-    c.drawRightString(width - x, y, f"Shipping: € {float(order.shipping_cost):.2f}")
-    y -= 6 * mm
-    c.drawRightString(width - x, y, f"Tax: € {float(order.tax):.2f}")
-    y -= 6 * mm
-    c.setFont("Helvetica-Bold", 11)
-    c.drawRightString(width - x, y, f"Grand Total: € {float(order.order_total):.2f}")
+    # ?disposition=inline -> render in-browser (preview); default -> download.
+    inline = (request.GET.get("disposition") or "").lower() == "inline"
+    response = HttpResponse(pdf, content_type="application/pdf")
+    disp = "inline" if inline else "attachment"
+    response["Content-Disposition"] = f'{disp}; filename="receipt_{order.order_number}.pdf"'
+    return response
 
     c.showPage()
     c.save()
