@@ -191,6 +191,13 @@ def methods_in_order() -> list:
                         ["standard", "priority", "express", "economy"]))
 
 
+# Translation markers: method labels are looked up dynamically from settings,
+# which makemessages cannot see — list the literals here so they get extracted.
+_METHOD_LABEL_MARKERS = (
+    _("Standard"), _("Priority"), _("Express"), _("Economy"), _("Printify Express"),
+)
+
+
 def _method_label(method: str) -> str:
     labels = getattr(settings, "SHIPPING_METHOD_LABELS", {})
     return _(labels.get(method, method.replace("_", " ").title()))

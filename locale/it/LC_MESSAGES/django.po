@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: greatkart 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-23 14:35+0200\n"
+"POT-Creation-Date: 2026-06-28 11:01+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -32,6 +32,8 @@ msgid "Default address updated."
 msgstr "Indirizzo predefinito aggiornato."
 
 #: .\assistant\models.py:17 .\templates\includes\footer.html:79
+#: .\templates\includes\shipping_estimator.html:18
+#: .\templates\includes\shipping_estimator.html:70
 #: .\templates\legal\terms.html:12
 #: .\templates\notifications\email\transactional.html:89
 #: .\templates\orders\payments.html:115 .\templates\store\cart.html:175
@@ -50,8 +52,8 @@ msgstr "Resi"
 msgid "Refunds"
 msgstr "Rimborsi"
 
-#: .\assistant\models.py:20 .\templates\store\cart.html:215
-#: .\templates\store\checkout.html:207
+#: .\assistant\models.py:20 .\templates\store\cart.html:199
+#: .\templates\store\checkout.html:199
 msgid "Payments"
 msgstr "Pagamenti"
 
@@ -144,10 +146,18 @@ msgstr ""
 msgid "Sorry, something went wrong. Please try again or contact support."
 msgstr "Spiacenti, qualcosa è andato storto. Riprova o contatta l'assistenza."
 
-#: .\carts\views.py:59 .\carts\views.py:122
+#: .\carts\views.py:60 .\carts\views.py:123
 msgid "Please choose a colour and size before adding this item to your cart."
 msgstr ""
 "Scegli colore e taglia prima di aggiungere questo articolo al carrello."
+
+#: .\carts\views.py:260
+msgid "Too many requests. Please wait a moment."
+msgstr "Troppe richieste. Attendi un momento."
+
+#: .\carts\views.py:271 .\templates\includes\shipping_estimator.html:16
+msgid "Please choose a delivery country."
+msgstr "Scegli un paese di consegna."
 
 #: .\greatkart\settings.py:204
 msgid "English"
@@ -255,7 +265,7 @@ msgstr "Ti scriveremo via email — niente spam, promesso."
 msgid "Recipient"
 msgstr "Destinatario"
 
-#: .\notifications\admin.py:21 .\printify_integration\admin.py:37
+#: .\notifications\admin.py:21 .\printify_integration\admin.py:74
 #: .\returns\admin.py:40 .\templates\accounts\dashboard.html:111
 #: .\templates\accounts\my_orders.html:40
 #: .\templates\accounts\transactions.html:100
@@ -535,28 +545,49 @@ msgstr "Costo di spedizione"
 msgid "Payment fee"
 msgstr "Commissione di pagamento"
 
-#: .\printify_integration\admin.py:16
+#: .\printify_integration\admin.py:17
 msgid "ETA"
 msgstr "Tempi"
 
-#: .\printify_integration\admin.py:45
+#: .\printify_integration\admin.py:41
+msgid "Source"
+msgstr "Origine"
+
+#: .\printify_integration\admin.py:50
+#: .\templates\accounts\order_detail.html:124
+msgid "Delivery"
+msgstr "Consegna"
+
+#: .\printify_integration\admin.py:54
+msgid "Fresh"
+msgstr "Aggiornato"
+
+#: .\printify_integration\admin.py:58
+msgid "Purge expired estimate cache rows"
+msgstr "Elimina le stime scadute dalla cache"
+
+#: .\printify_integration\admin.py:63
+msgid "Purged %(n)d expired estimate row(s)."
+msgstr "Eliminate %(n)d stime scadute."
+
+#: .\printify_integration\admin.py:82
 msgid "Duration"
 msgstr "Durata"
 
-#: .\printify_integration\admin.py:50
+#: .\printify_integration\admin.py:87
 msgid "Run a full Printify product sync now"
 msgstr "Esegui ora una sincronizzazione completa dei prodotti Printify"
 
-#: .\printify_integration\admin.py:53
+#: .\printify_integration\admin.py:90
 #, python-format
 msgid "Product sync finished: +%(c)d ~%(u)d (errors %(e)d)."
 msgstr "Sincronizzazione prodotti completata: +%(c)d ~%(u)d (errori %(e)d)."
 
-#: .\printify_integration\admin.py:56
+#: .\printify_integration\admin.py:93
 msgid "Pull Printify order statuses now"
 msgstr "Recupera ora gli stati degli ordini Printify"
 
-#: .\printify_integration\admin.py:59
+#: .\printify_integration\admin.py:96
 #, python-format
 msgid "Order pull finished: %(u)d updated (errors %(e)d)."
 msgstr "Recupero ordini completato: %(u)d aggiornati (errori %(e)d)."
@@ -609,13 +640,91 @@ msgstr "Registro di sincronizzazione Printify"
 msgid "Printify shipping profiles"
 msgstr "Registri di sincronizzazione Printify"
 
-#: .\printify_integration\models.py:103
+#: .\printify_integration\models.py:122
+msgid "Printify shipping estimate (cached)"
+msgstr "Stima spedizione Printify (in cache)"
+
+#: .\printify_integration\models.py:123
+msgid "Printify shipping estimates (cached)"
+msgstr "Stime spedizione Printify (in cache)"
+
+#: .\printify_integration\models.py:152
 msgid "Printify print area"
 msgstr "Registro di sincronizzazione Printify"
 
-#: .\printify_integration\models.py:104
+#: .\printify_integration\models.py:153
 msgid "Printify print areas"
 msgstr "Registro di sincronizzazione Printify"
+
+#: .\printify_integration\shipping_estimator.py:49 .\shipping\services.py:42
+#, python-format
+msgid "%(a)d–%(b)d business days"
+msgstr "%(a)d–%(b)d giorni lavorativi"
+
+#: .\printify_integration\shipping_estimator.py:50 .\shipping\services.py:41
+#, python-format
+msgid "%(d)d business days"
+msgstr "%(d)d giorni lavorativi"
+
+#: .\printify_integration\shipping_estimator.py:104
+msgid "Estimated by Printify"
+msgstr "Stima di Printify"
+
+#: .\printify_integration\shipping_estimator.py:107
+msgid "Estimated"
+msgstr "Stimato"
+
+#: .\printify_integration\shipping_estimator.py:108
+msgid "Unavailable"
+msgstr "Non disponibile"
+
+#: .\printify_integration\shipping_estimator.py:137
+#: .\templates\includes\shipping_estimator.html:20
+#: .\templates\orders\payments.html:115 .\templates\store\cart.html:176
+#: .\templates\store\checkout.html:183
+msgid "Free"
+msgstr "Gratuita"
+
+#: .\printify_integration\shipping_estimator.py:197
+msgid "Standard"
+msgstr "Standard"
+
+#: .\printify_integration\shipping_estimator.py:197
+msgid "Priority"
+msgstr "Prioritaria"
+
+#: .\printify_integration\shipping_estimator.py:197
+msgid "Express"
+msgstr "Express"
+
+#: .\printify_integration\shipping_estimator.py:197
+msgid "Economy"
+msgstr "Economy"
+
+#: .\printify_integration\shipping_estimator.py:197
+msgid "Printify Express"
+msgstr "Printify Express"
+
+#: .\printify_integration\shipping_estimator.py:312
+msgid "Final shipping may vary slightly after address validation."
+msgstr "La spedizione finale può variare leggermente dopo la verifica dell'indirizzo."
+
+#: .\printify_integration\shipping_estimator.py:314
+#: .\templates\includes\shipping_estimator.html:73
+msgid "Some items use estimated shipping data."
+msgstr "Alcuni articoli usano dati di spedizione stimati."
+
+#: .\printify_integration\shipping_estimator.py:317
+msgid "Estimated delivery — not guaranteed."
+msgstr "Consegna stimata — non garantita."
+
+#: .\printify_integration\shipping_estimator.py:453
+msgid "Add an item to estimate delivery."
+msgstr "Aggiungi un articolo per stimare la consegna."
+
+#: .\printify_integration\shipping_estimator.py:461 .\shipping\services.py:68
+msgid "We do not ship to this country yet."
+msgstr "Non spediamo ancora in questo Paese."
 
 #: .\promotions\models.py:14
 msgid "Percentage"
@@ -870,20 +979,6 @@ msgstr "Canada"
 msgid "Australia"
 msgstr "Australia"
 
-#: .\shipping\services.py:41
-#, python-format
-msgid "%(d)d business days"
-msgstr "%(d)d giorni lavorativi"
-
-#: .\shipping\services.py:42
-#, python-format
-msgid "%(a)d–%(b)d business days"
-msgstr "%(a)d–%(b)d giorni lavorativi"
-
-#: .\shipping\services.py:68
-msgid "We do not ship to this country yet."
-msgstr "Non spediamo ancora in questo Paese."
-
 #: .\shipping\services.py:81 .\templates\store\product_detail.html:132
 msgid "Free shipping"
 msgstr "Spedizione gratuita"
@@ -960,37 +1055,37 @@ msgstr "Chiave OpenAI non configurata — nessuna traduzione effettuata."
 msgid "Translations written: %(w)d, failed: %(f)d."
 msgstr "Traduzioni scritte: %(w)d, fallite: %(f)d."
 
-#: .\store\views.py:219
+#: .\store\views.py:220
 msgid "Shipping & delivery"
 msgstr "Indirizzo di spedizione"
 
-#: .\store\views.py:219 .\templates\includes\footer.html:78
+#: .\store\views.py:220 .\templates\includes\footer.html:78
 #: .\templates\returns\policy.html:3 .\templates\returns\policy.html:11
 #: .\templates\returns\policy.html:15
 msgid "Returns & refunds"
 msgstr "Resi e rimborsi"
 
-#: .\store\views.py:220
+#: .\store\views.py:221
 msgid "Payments & security"
 msgstr "Pagamento ricevuto"
 
-#: .\store\views.py:220
+#: .\store\views.py:221
 msgid "Orders & tracking"
 msgstr "Consegna / tracciamento"
 
-#: .\store\views.py:221
+#: .\store\views.py:222
 msgid "Account & wishlist"
 msgstr "Account e preferiti"
 
-#: .\store\views.py:221
+#: .\store\views.py:222
 msgid "Sizing & products"
 msgstr "Risincronizzazione singolo prodotto"
 
-#: .\store\views.py:222
+#: .\store\views.py:223
 msgid "Coupons & offers"
 msgstr "Coupon"
 
-#: .\store\views.py:222
+#: .\store\views.py:223
 msgid "Support & assistant"
 msgstr "Carrello"
 
@@ -1086,7 +1181,7 @@ msgid "Save address"
 msgstr "Usa indirizzo salvato"
 
 #: .\templates\accounts\address_form.html:75
-#: .\templates\accounts\address_list.html:95 .\templates\store\cart.html:234
+#: .\templates\accounts\address_list.html:95 .\templates\store\cart.html:218
 msgid "Cancel"
 msgstr "Annullato"
 
@@ -1121,7 +1216,7 @@ msgstr "Aggiungi un indirizzo per velocizzare il prossimo checkout."
 
 #: .\templates\accounts\address_list.html:90
 #: .\templates\includes\assistant_widget.html:24
-#: .\templates\store\cart.html:228 .\templates\store\product_detail.html:224
+#: .\templates\store\cart.html:212 .\templates\store\product_detail.html:224
 #: .\templates\store\product_detail.html:228
 #: .\templates\store\product_detail.html:636 .\templates\store\store.html:127
 msgid "Close"
@@ -1425,10 +1520,6 @@ msgstr "Invia al supporto"
 msgid "Ask the assistant"
 msgstr "Chiedi all'assistente"
 
-#: .\templates\accounts\order_detail.html:124
-msgid "Delivery"
-msgstr "Consegna"
-
 #: .\templates\accounts\order_detail.html:140
 #: .\templates\orders\order_complete.html:164
 #: .\templates\orders\payments.html:4
@@ -1445,6 +1536,8 @@ msgid "No payment attached."
 msgstr "Nessun pagamento associato."
 
 #: .\templates\accounts\order_detail.html:154
+#: .\templates\includes\shipping_estimator.html:17
+#: .\templates\includes\shipping_estimator.html:69
 #: .\templates\notifications\email\transactional.html:88
 #: .\templates\orders\order_complete.html:230
 #: .\templates\orders\payments.html:114 .\templates\store\cart.html:51
@@ -1972,8 +2065,7 @@ msgstr "FAQ"
 msgid "Contact"
 msgstr "Contatti"
 
-#: .\templates\includes\footer.html:85 .\templates\store\cart.html:185
-#: .\templates\store\checkout.html:191
+#: .\templates\includes\footer.html:85
 msgid "Ship to"
 msgstr "Spedisci in"
 
@@ -1994,7 +2086,7 @@ msgstr "Resi entro %(d)s giorni"
 msgid "Secure Checkout"
 msgstr "Pagamento sicuro"
 
-#: .\templates\includes\footer.html:96 .\templates\store\cart.html:211
+#: .\templates\includes\footer.html:96 .\templates\store\cart.html:195
 msgid "Support 7/7"
 msgstr "Assistenza 7/7"
 
@@ -2082,6 +2174,57 @@ msgstr "Esci"
 #: .\templates\includes\navbar.html:135
 msgid "Cart"
 msgstr "Carrello"
+
+#: .\templates\includes\shipping_estimator.html:14
+msgid "Could not estimate shipping. Please try again."
+msgstr "Impossibile stimare la spedizione. Riprova."
+
+#: .\templates\includes\shipping_estimator.html:15
+msgid "Network error. Please check your connection and try again."
+msgstr "Errore di rete. Controlla la connessione e riprova."
+
+#: .\templates\includes\shipping_estimator.html:19
+#: .\templates\includes\shipping_estimator.html:71
+msgid "Estimated total"
+msgstr "Totale stimato"
+
+#: .\templates\includes\shipping_estimator.html:23
+#: .\templates\includes\shipping_estimator.html:51
+msgid "Estimate delivery"
+msgstr "Stima consegna"
+
+#: .\templates\includes\shipping_estimator.html:24
+msgid "Before checkout"
+msgstr "Prima del checkout"
+
+#: .\templates\includes\shipping_estimator.html:26
+msgid ""
+"Enter your delivery country and postal code to estimate shipping before "
+"checkout."
+msgstr "Inserisci paese e CAP per stimare la spedizione prima del checkout."
+
+#: .\templates\includes\shipping_estimator.html:33
+#: .\templates\store\checkout.html:112
+msgid "Country"
+msgstr "Paese"
+
+#: .\templates\includes\shipping_estimator.html:35
+msgid "Delivery country"
+msgstr "Paese di consegna"
+
+#: .\templates\includes\shipping_estimator.html:43
+#: .\templates\includes\shipping_estimator.html:46
+#: .\templates\store\checkout.html:108
+msgid "Postal code"
+msgstr "CAP"
+
+#: .\templates\includes\shipping_estimator.html:46
+msgid "e.g. 20100"
+msgstr "es. 20100"
+
+#: .\templates\includes\shipping_estimator.html:67
+msgid "Shipping options"
+msgstr "Opzioni di spedizione"
 
 #: .\templates\legal\_legal_base.html:9
 #: .\templates\merchandising\collection.html:15
@@ -2455,8 +2598,8 @@ msgstr "Prezzo: dal più alto"
 msgid "Printed on demand"
 msgstr "Stampato su ordinazione"
 
-#: .\templates\merchandising\collection.html:74 .\templates\store\cart.html:209
-#: .\templates\store\checkout.html:212 .\templates\store\product_detail.html:75
+#: .\templates\merchandising\collection.html:74 .\templates\store\cart.html:193
+#: .\templates\store\checkout.html:204 .\templates\store\product_detail.html:75
 #, python-format
 msgid "%(d)s-day returns"
 msgstr "Resi entro %(d)s giorni"
@@ -2994,11 +3137,6 @@ msgstr "Esplora tutto"
 msgid "View"
 msgstr "Vedi"
 
-#: .\templates\orders\payments.html:115 .\templates\store\cart.html:176
-#: .\templates\store\checkout.html:183
-msgid "Free"
-msgstr "Gratuita"
-
 #: .\templates\orders\payments.html:134
 msgid "Card"
 msgstr "Carta"
@@ -3132,8 +3270,8 @@ msgstr ""
 "al reso."
 
 #: .\templates\returns\request.html:73 .\templates\returns\status.html:61
-#: .\templates\store\cart.html:25 .\templates\store\cart.html:205
-#: .\templates\store\checkout.html:203 .\templates\wishlist\saved_items.html:14
+#: .\templates\store\cart.html:25 .\templates\store\cart.html:189
+#: .\templates\store\checkout.html:195 .\templates\wishlist\saved_items.html:14
 msgid "Continue shopping"
 msgstr "Continua lo shopping"
 
@@ -3250,7 +3388,7 @@ msgid "No image"
 msgstr "Nessuna immagine"
 
 #: .\templates\store\cart.html:84 .\templates\store\cart.html:115
-#: .\templates\store\cart.html:157 .\templates\store\cart.html:235
+#: .\templates\store\cart.html:157 .\templates\store\cart.html:219
 #: .\templates\wishlist\_saved_card.html:14
 msgid "Remove"
 msgstr "Rimuovi"
@@ -3304,28 +3442,24 @@ msgstr "CAP"
 msgid "Discount"
 msgstr "Account"
 
-#: .\templates\store\cart.html:192
-msgid "Estimated delivery"
-msgstr "Consegna stimata"
-
-#: .\templates\store\cart.html:201 .\templates\store\checkout.html:3
+#: .\templates\store\cart.html:185 .\templates\store\checkout.html:3
 #: .\templates\store\checkout.html:12
 msgid "Checkout"
 msgstr "Procedi all'ordine"
 
-#: .\templates\store\cart.html:203
+#: .\templates\store\cart.html:187
 msgid "No account needed — checkout as a guest."
 msgstr "Nessun account necessario — acquista come ospite."
 
-#: .\templates\store\cart.html:210
+#: .\templates\store\cart.html:194
 msgid "Secure payments"
 msgstr "Pagamenti sicuri"
 
-#: .\templates\store\cart.html:230
+#: .\templates\store\cart.html:214
 msgid "Remove this item from your cart?"
 msgstr "Vuoi rimuovere questo articolo dal carrello?"
 
-#: .\templates\store\cart.html:231
+#: .\templates\store\cart.html:215
 msgid "You can always add it again later."
 msgstr "Potrai sempre aggiungerlo di nuovo più tardi."
 
@@ -3404,14 +3538,6 @@ msgstr "Città"
 msgid "State"
 msgstr "Provincia"
 
-#: .\templates\store\checkout.html:108
-msgid "Postal code"
-msgstr "CAP"
-
-#: .\templates\store\checkout.html:112
-msgid "Country"
-msgstr "Paese"
-
 #: .\templates\store\checkout.html:114
 msgid "Select country"
 msgstr "Seleziona Paese"
@@ -3436,29 +3562,11 @@ msgstr "Puoi creare un account dopo l'acquisto per tracciare il tuo ordine."
 msgid "each"
 msgstr "cad."
 
-#: .\templates\store\checkout.html:195
-msgid "We don't ship to this country yet — choose another at checkout."
-msgstr ""
-"Non spediamo ancora in questo paese — scegline un altro al checkout.Non "
-"spediamo ancora in questo paese — scegline un altro al checkout.Non spediamo "
-"ancora in questo paese — scegline un altro al checkout.Non spediamo ancora "
-"in questo paese — scegline un altro al checkout.Non spediamo ancora in "
-"questo paese — scegline un altro al checkout.Non spediamo ancora in questo "
-"paese — scegline un altro al checkout.Non spediamo ancora in questo paese — "
-"scegline un altro al checkout.Non spediamo ancora in questo paese — scegline "
-"un altro al checkout.Non spediamo ancora in questo paese — scegline un altro "
-"al checkout.Non spediamo ancora in questo paese — scegline un altro al "
-"checkout.Non spediamo ancora in questo paese — scegline un altro al "
-"checkout.Non spediamo ancora in questo paese — scegline un altro al "
-"checkout.Non spediamo ancora in questo paese — scegline un altro al "
-"checkout.Non spediamo ancora in questo Paese — scegline un altro al momento "
-"del pagamento."
-
-#: .\templates\store\checkout.html:201
+#: .\templates\store\checkout.html:193
 msgid "Continue to payment"
 msgstr "Procedi al pagamento"
 
-#: .\templates\store\checkout.html:212
+#: .\templates\store\checkout.html:204
 msgid "Secure payment"
 msgstr "Pagamento sicuro"
 
@@ -3918,6 +4026,24 @@ msgstr "Articoli dei preferiti"
 #: .\wishlist\views.py:67
 msgid "Saved for later."
 msgstr "Salvato per dopo."
+
+#~ msgid "We don't ship to this country yet — choose another at checkout."
+#~ msgstr ""
+#~ "Non spediamo ancora in questo paese — scegline un altro al checkout.Non "
+#~ "spediamo ancora in questo paese — scegline un altro al checkout.Non "
+#~ "spediamo ancora in questo paese — scegline un altro al checkout.Non "
+#~ "spediamo ancora in questo paese — scegline un altro al checkout.Non "
+#~ "spediamo ancora in questo paese — scegline un altro al checkout.Non "
+#~ "spediamo ancora in questo paese — scegline un altro al checkout.Non "
+#~ "spediamo ancora in questo paese — scegline un altro al checkout.Non "
+#~ "spediamo ancora in questo paese — scegline un altro al checkout.Non "
+#~ "spediamo ancora in questo paese — scegline un altro al checkout.Non "
+#~ "spediamo ancora in questo paese — scegline un altro al checkout.Non "
+#~ "spediamo ancora in questo paese — scegline un altro al checkout.Non "
+#~ "spediamo ancora in questo paese — scegline un altro al checkout.Non "
+#~ "spediamo ancora in questo paese — scegline un altro al checkout.Non "
+#~ "spediamo ancora in questo Paese — scegline un altro al momento del "
+#~ "pagamento."
 
 #~ msgid "Premium, ethically printed"
 #~ msgstr "Premium, stampa etica"
