@@ -37,9 +37,22 @@ def toggle(request):
 
 
 def saved_items(request):
+    q = (request.GET.get("q") or "").strip()[:60]
+    wishlist_items = list(services.items(request, saved_for_later=False))
+    saved_for_later = list(services.items(request, saved_for_later=True))
+    if q:
+        ql = q.lower()
+
+        def _match(it):
+            name = (getattr(getattr(it, "product", None), "product_name", "") or "").lower()
+            return ql in name
+        wishlist_items = [it for it in wishlist_items if _match(it)]
+        saved_for_later = [it for it in saved_for_later if _match(it)]
     return render(request, "wishlist/saved_items.html", {
-        "wishlist_items": services.items(request, saved_for_later=False),
-        "saved_for_later": services.items(request, saved_for_later=True),
+        "wishlist_items": wishlist_items,
+        "saved_for_later": saved_for_later,
+        "q": q,
+        "has_query": bool(q),
     })
 
 

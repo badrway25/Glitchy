@@ -21,10 +21,29 @@
       </div>
     {% endif %}
 
+    <form method="get" class="portal-filters" role="search" style="margin-bottom:1.4rem;">
+      <div class="pf-search">
+        <i class="fa fa-magnifying-glass pf-search-ic" aria-hidden="true"></i>
+        <input type="text" name="q" value="{{ q }}" class="pf-input" maxlength="60"
+               placeholder="{% trans 'Search your saved items' %}" aria-label="{% trans 'Search saved items' %}">
+      </div>
+      <div class="pf-controls">
+        <button type="submit" class="btn btn-primary pf-go">{% trans "Search" %}</button>
+        {% if has_query %}<a href="{% url 'wishlist:saved' %}" class="btn btn-soft pf-clear">{% trans "Clear" %}</a>{% endif %}
+      </div>
+    </form>
+
     {% if wishlist_items or saved_for_later %}
       <div class="rv-grid">
         {% for it in wishlist_items %}{% include 'wishlist/_saved_card.html' with p=it.product %}{% endfor %}
         {% for it in saved_for_later %}{% include 'wishlist/_saved_card.html' with p=it.product saved=1 %}{% endfor %}
+      </div>
+    {% elif has_query %}
+      <div class="store-empty">
+        <div class="store-empty-ic">{% icon "search" "ic" 30 %}</div>
+        <h3 class="mb-2">{% trans "No saved items match your search" %}</h3>
+        <p class="text-muted mb-4">{% trans "Try a different keyword or clear the search." %}</p>
+        <a href="{% url 'wishlist:saved' %}" class="btn btn-soft">{% trans "Clear search" %}</a>
       </div>
     {% else %}
       <div class="store-empty">
