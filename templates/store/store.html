@@ -98,9 +98,27 @@
 </div>
 
 
+    <!-- Category editorial hero -->
+    {% if category %}
+    <section class="cat-hero" data-reveal>
+      <div class="cat-hero-eyebrow">{% trans "Collection" %}</div>
+      <h1 class="cat-hero-title">{{ category.category_name }}</h1>
+      <p class="cat-hero-sub">
+        {% if category.description %}{{ category.description|striptags|truncatewords:32 }}
+        {% else %}{% blocktrans with c=category.category_name %}Explore our {{ c }} edit — made on demand, printed just for you.{% endblocktrans %}{% endif %}
+      </p>
+      <div class="cat-hero-meta">
+        <span class="cat-hero-chip">{% icon "box" "ic" 14 %} {% blocktrans count n=product_count %}{{ n }} style{% plural %}{{ n }} styles{% endblocktrans %}</span>
+        <span class="cat-hero-chip">{% icon "leaf" "ic" 14 %} {% trans "Made on demand" %}</span>
+        <span class="cat-hero-chip">{% icon "truck" "ic" 14 %} {% trans "Ships worldwide" %}</span>
+      </div>
+    </section>
+    {% endif %}
+
     <!-- Active filter chips -->
     {% if active_chips %}
     <div class="chips-bar" aria-label="{% trans 'Active filters' %}">
+      <span class="chips-lead">{% blocktrans count n=product_count %}Showing {{ n }} style{% plural %}Showing {{ n }} styles{% endblocktrans %}</span>
       {% for chip in active_chips %}
         <a class="filter-chip-active" href="?{% qs_remove chip.param chip.value %}">
           {{ chip.label }} <span class="chip-x">{% icon "close" "ic" 12 %}</span>
@@ -118,10 +136,11 @@
       <span class="filter-result-count">{% blocktrans count n=product_count %}{{ n }} result{% plural %}{{ n }} results{% endblocktrans %}</span>
     </div>
 
-    <!-- Mobile filter drawer -->
+    <!-- Mobile filter bottom sheet -->
     <div class="filter-drawer" id="filterDrawer" hidden>
       <div class="filter-drawer-backdrop" data-drawer-close></div>
       <div class="filter-drawer-panel" role="dialog" aria-modal="true" aria-label="{% trans 'Filters' %}">
+        <div class="filter-drawer-handle" aria-hidden="true"></div>
         <div class="filter-drawer-head">
           <span class="h6 m-0">{% trans "Filters" %}</span>
           <button class="btn btn-link p-0" type="button" data-drawer-close aria-label="{% trans 'Close' %}">{% icon "close" %}</button>
@@ -129,7 +148,20 @@
         <div class="filter-drawer-body">
           {% include 'store/_filters.html' %}
         </div>
+        <div class="filter-sheet-footer">
+          <a class="btn btn-soft" href="{% if category %}{{ category.get_url }}{% else %}{% url 'store' %}{% endif %}" data-filter-clear>{% trans "Clear" %}</a>
+          <button class="btn btn-primary" type="button" data-sheet-apply>{% trans "Show results" %} · {{ product_count }}</button>
+        </div>
       </div>
+    </div>
+
+    <!-- Continue your search (saved filters, JS-populated) -->
+    <div class="lxf-saved" data-lxf-saved>
+      <span class="lxf-saved-text">{% trans "Continue your search" %}</span>
+      <span class="lxf-saved-actions">
+        <a class="btn btn-primary" href="#" data-lxf-saved-link>{% trans "Resume" %}</a>
+        <button class="btn btn-soft" type="button" data-lxf-saved-dismiss>{% trans "Dismiss" %}</button>
+      </span>
     </div>
 
     <div class="row">
@@ -137,7 +169,6 @@
       <!-- SIDEBAR FILTERS -->
       <aside class="col-lg-3 mb-4 shop-aside">
         <div class="filter-card">
-          <div class="filter-card-head"><span class="h6 m-0">{% trans "Filters" %}</span></div>
           {% include 'store/_filters.html' %}
         </div>
       </aside>
@@ -242,6 +273,13 @@
                   <a href="{% url 'merchandising:collections' %}" class="btn btn-soft">{% trans "Browse collections" %}</a>
                   <button type="button" class="btn btn-soft" onclick="document.getElementById('aiToggle')?.click()">{% icon "headset" "ic" 15 %} {% trans "Ask the assistant" %}</button>
                 </div>
+                {% if categories %}
+                <div class="lxf-empty-suggest" aria-label="{% trans 'Browse categories' %}">
+                  {% for c in categories|slice:":6" %}
+                    <a href="{{ c.get_url }}">{{ c.category_name }}</a>
+                  {% endfor %}
+                </div>
+                {% endif %}
               </div>
 
               {% if recommendations %}

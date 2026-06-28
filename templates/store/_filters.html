@@ -1,92 +1,145 @@
-{% load i18n uikit %}
-{# Real server-side filter form -> shareable GET URL. Used by desktop aside + mobile drawer. #}
-<form class="filter-form" method="get" action="{% if category %}{{ category.get_url }}{% else %}{% url 'store' %}{% endif %}" data-filter-form>
+{% load i18n uikit shopfilters %}
+{% comment %}Luxury server-side filter form -> shareable GET URL. Desktop aside +
+mobile sheet. Sections collapsible (button + region, aria-expanded/controls);
+store-luxury.js adds animation + per-section counts. Works without JS.{% endcomment %}
+<form class="filter-form lxf" method="get"
+      action="{% if category %}{{ category.get_url }}{% else %}{% url 'store' %}{% endif %}"
+      data-filter-form data-lxf-form>
   {% if active_filters.keyword %}<input type="hidden" name="keyword" value="{{ active_filters.keyword }}">{% endif %}
 
-  <!-- Categories -->
-  <div class="filter-section">
-    <div class="filter-head"><h6>{% icon "tag" "ic" 16 %} {% trans "Category" %}</h6></div>
-    <div class="filter-body cat-list">
-      <a class="cat-item {% if not category %}active{% endif %}" href="{% url 'store' %}">{% trans "All products" %}</a>
-      {% for c in categories %}
-        <a class="cat-item {% if category and category.id == c.id %}active{% endif %}" href="{{ c.get_url }}">{{ c.category_name }}</a>
-      {% endfor %}
-    </div>
+  <div class="lxf-intro">
+    <div class="lxf-intro-title">{% icon "sliders" "ic" 16 %} {% trans "Refine your look" %}</div>
+    <p class="lxf-intro-sub">{% trans "Narrow the edit to find your pieces faster." %}</p>
   </div>
 
-  <!-- Price -->
-  <div class="filter-section">
-    <div class="filter-head"><h6>{% icon "card" "ic" 16 %} {% trans "Price" %}</h6></div>
-    <div class="filter-body">
-      <div class="range-row">
-        <input type="number" name="min_price" class="form-control" inputmode="numeric" min="0"
-               placeholder="{% trans 'Min' %} {{ facets.price.lo }}" value="{{ active_filters.min_price|default_if_none:'' }}">
-        <span class="range-dash">–</span>
-        <input type="number" name="max_price" class="form-control" inputmode="numeric" min="0"
-               placeholder="{% trans 'Max' %} {{ facets.price.hi }}" value="{{ active_filters.max_price|default_if_none:'' }}">
+  <!-- Category -->
+  <section class="lxf-section" data-lxf-section>
+    <button type="button" class="lxf-head" data-lxf-toggle aria-expanded="true" aria-controls="lxf-cat">
+      <span class="lxf-head-l">{% icon "tag" "ic" 15 %}<span>{% trans "Category" %}</span></span>
+      <span class="lxf-chev" aria-hidden="true">{% icon "chevron-down" "ic" 16 %}</span>
+    </button>
+    <div class="lxf-body" id="lxf-cat" data-lxf-body>
+      <div class="cat-list lxf-cats">
+        <a class="cat-item {% if not category %}active{% endif %}" href="{% url 'store' %}">{% trans "All products" %}</a>
+        {% for c in categories %}
+          <a class="cat-item {% if category and category.id == c.id %}active{% endif %}" href="{{ c.get_url }}">{{ c.category_name }}</a>
+        {% endfor %}
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- Colour (only options that exist) -->
-  {% if facets.colors %}
-  <div class="filter-section">
-    <div class="filter-head"><h6>{% icon "spark" "ic" 16 %} {% trans "Colour" %}</h6></div>
-    <div class="filter-body chip-opts">
-      {% for c in facets.colors %}
-        <label class="chip-opt">
-          <input type="checkbox" name="color" value="{{ c.value }}" {% if c.value in active_filters.color %}checked{% endif %}>
-          <span>{{ c.value|capfirst }} <em>{{ c.count }}</em></span>
+  <!-- Price -->
+  <section class="lxf-section" data-lxf-section data-lxf-group="price">
+    <button type="button" class="lxf-head" data-lxf-toggle aria-expanded="true" aria-controls="lxf-price">
+      <span class="lxf-head-l">{% icon "card" "ic" 15 %}<span>{% trans "Price" %}</span>
+        <span class="lxf-count" data-lxf-count hidden></span></span>
+      <span class="lxf-chev" aria-hidden="true">{% icon "chevron-down" "ic" 16 %}</span>
+    </button>
+    <div class="lxf-body" id="lxf-price" data-lxf-body>
+      <div class="lxf-price-row">
+        <label class="lxf-price-field">
+          <span class="lxf-cur">{{ CURRENCY_SYMBOL }}</span>
+          <input type="number" name="min_price" inputmode="numeric" min="0"
+                 placeholder="{{ facets.price.lo|default:'Min' }}" aria-label="{% trans 'Minimum price' %}"
+                 value="{{ active_filters.min_price|default_if_none:'' }}">
         </label>
-      {% endfor %}
+        <span class="lxf-dash">–</span>
+        <label class="lxf-price-field">
+          <span class="lxf-cur">{{ CURRENCY_SYMBOL }}</span>
+          <input type="number" name="max_price" inputmode="numeric" min="0"
+                 placeholder="{{ facets.price.hi|default:'Max' }}" aria-label="{% trans 'Maximum price' %}"
+                 value="{{ active_filters.max_price|default_if_none:'' }}">
+        </label>
+      </div>
     </div>
-  </div>
+  </section>
+
+  <!-- Colour -->
+  {% if facets.colors %}
+  <section class="lxf-section" data-lxf-section data-lxf-group="color">
+    <button type="button" class="lxf-head" data-lxf-toggle aria-expanded="true" aria-controls="lxf-color">
+      <span class="lxf-head-l">{% icon "spark" "ic" 15 %}<span>{% trans "Colour" %}</span>
+        <span class="lxf-count" data-lxf-count hidden></span></span>
+      <span class="lxf-chev" aria-hidden="true">{% icon "chevron-down" "ic" 16 %}</span>
+    </button>
+    <div class="lxf-body" id="lxf-color" data-lxf-body>
+      <div class="lxf-swatches">
+        {% for c in facets.colors %}
+          <label class="lxf-swatch {% if c.value|is_light_color %}is-light{% endif %}"
+                 title="{{ c.value|capfirst }} · {{ c.count }}">
+            <input type="checkbox" name="color" value="{{ c.value }}" {% if c.value in active_filters.color %}checked{% endif %}>
+            <span class="lxf-dot" style="background:{{ c.value|color_hex }};"></span>
+            <span class="lxf-sw-name">{{ c.value|capfirst }} <em>{{ c.count }}</em></span>
+          </label>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
   {% endif %}
 
-  <!-- Size (only options that exist) -->
+  <!-- Size -->
   {% if facets.sizes %}
-  <div class="filter-section">
-    <div class="filter-head"><h6>{% icon "ruler" "ic" 16 %} {% trans "Size" %}</h6></div>
-    <div class="filter-body chip-opts">
-      {% for s in facets.sizes %}
-        <label class="chip-opt chip-opt-sq">
-          <input type="checkbox" name="size" value="{{ s.value }}" {% if s.value in active_filters.size %}checked{% endif %}>
-          <span>{{ s.value|upper }}</span>
-        </label>
-      {% endfor %}
+  <section class="lxf-section" data-lxf-section data-lxf-group="size">
+    <button type="button" class="lxf-head" data-lxf-toggle aria-expanded="true" aria-controls="lxf-size">
+      <span class="lxf-head-l">{% icon "ruler" "ic" 15 %}<span>{% trans "Size" %}</span>
+        <span class="lxf-count" data-lxf-count hidden></span></span>
+      <span class="lxf-chev" aria-hidden="true">{% icon "chevron-down" "ic" 16 %}</span>
+    </button>
+    <div class="lxf-body" id="lxf-size" data-lxf-body>
+      <div class="lxf-pills">
+        {% for s in facets.sizes %}
+          <label class="lxf-pill">
+            <input type="checkbox" name="size" value="{{ s.value }}" {% if s.value in active_filters.size %}checked{% endif %}>
+            <span>{{ s.value|upper }}</span>
+          </label>
+        {% endfor %}
+      </div>
     </div>
-  </div>
+  </section>
   {% endif %}
 
   <!-- Rating -->
-  <div class="filter-section">
-    <div class="filter-head"><h6>{% icon "star" "ic" 16 %} {% trans "Rating" %}</h6></div>
-    <div class="filter-body rating-opts">
-      {% for r in "4321"|make_list %}
-        <label class="rating-opt">
-          <input type="radio" name="rating" value="{{ r }}" {% if active_filters.rating|stringformat:'s' == r %}checked{% endif %}>
-          <span>{{ r }}★ {% trans "& up" %}</span>
+  <section class="lxf-section" data-lxf-section>
+    <button type="button" class="lxf-head" data-lxf-toggle aria-expanded="true" aria-controls="lxf-rating">
+      <span class="lxf-head-l">{% icon "star" "ic" 15 %}<span>{% trans "Rating" %}</span></span>
+      <span class="lxf-chev" aria-hidden="true">{% icon "chevron-down" "ic" 16 %}</span>
+    </button>
+    <div class="lxf-body" id="lxf-rating" data-lxf-body>
+      <div class="lxf-pills lxf-rating">
+        {% for r in "4321"|make_list %}
+          <label class="lxf-pill lxf-pill-rating">
+            <input type="radio" name="rating" value="{{ r }}" {% if active_filters.rating|stringformat:'s' == r %}checked{% endif %}>
+            <span>{{ r }}★+</span>
+          </label>
+        {% endfor %}
+        <label class="lxf-pill lxf-pill-rating">
+          <input type="radio" name="rating" value="" {% if not active_filters.rating %}checked{% endif %}><span>{% trans "Any" %}</span>
         </label>
-      {% endfor %}
-      <label class="rating-opt"><input type="radio" name="rating" value="" {% if not active_filters.rating %}checked{% endif %}><span>{% trans "Any" %}</span></label>
+      </div>
     </div>
-  </div>
+  </section>
 
-  <!-- Toggles -->
-  <div class="filter-section">
-    <div class="filter-head"><h6>{% icon "check" "ic" 16 %} {% trans "More" %}</h6></div>
-    <div class="filter-body toggle-opts">
-      <label class="toggle-opt"><input type="checkbox" name="sale" value="1" {% if active_filters.sale %}checked{% endif %}> {% trans "On sale" %} <em>{{ facets.sale_count }}</em></label>
-      <label class="toggle-opt"><input type="checkbox" name="new" value="1" {% if active_filters.new %}checked{% endif %}> {% trans "New arrivals" %} <em>{{ facets.new_count }}</em></label>
-      <label class="toggle-opt"><input type="checkbox" name="in_stock" value="1" {% if active_filters.in_stock %}checked{% endif %}> {% trans "In stock" %} <em>{{ facets.instock_count }}</em></label>
+  <!-- Availability / more -->
+  <section class="lxf-section" data-lxf-section data-lxf-group="more">
+    <button type="button" class="lxf-head" data-lxf-toggle aria-expanded="true" aria-controls="lxf-more">
+      <span class="lxf-head-l">{% icon "check" "ic" 15 %}<span>{% trans "Availability" %}</span>
+        <span class="lxf-count" data-lxf-count hidden></span></span>
+      <span class="lxf-chev" aria-hidden="true">{% icon "chevron-down" "ic" 16 %}</span>
+    </button>
+    <div class="lxf-body" id="lxf-more" data-lxf-body>
+      <div class="lxf-toggles">
+        <label class="lxf-toggle"><input type="checkbox" name="in_stock" value="1" {% if active_filters.in_stock %}checked{% endif %}><span class="lxf-toggle-ui"></span><span class="lxf-toggle-lab">{% trans "In stock" %} <em>{{ facets.instock_count }}</em></span></label>
+        <label class="lxf-toggle"><input type="checkbox" name="sale" value="1" {% if active_filters.sale %}checked{% endif %}><span class="lxf-toggle-ui"></span><span class="lxf-toggle-lab">{% trans "On sale" %} <em>{{ facets.sale_count }}</em></span></label>
+        <label class="lxf-toggle"><input type="checkbox" name="new" value="1" {% if active_filters.new %}checked{% endif %}><span class="lxf-toggle-ui"></span><span class="lxf-toggle-lab">{% trans "New arrivals" %} <em>{{ facets.new_count }}</em></span></label>
+      </div>
     </div>
-  </div>
+  </section>
 
   {% if active_filters.collection %}<input type="hidden" name="collection" value="{{ active_filters.collection }}">{% endif %}
   {% if sort %}<input type="hidden" name="sort" value="{{ sort }}">{% endif %}
 
-  <div class="filter-actions">
-    <button class="btn btn-primary" type="submit">{% trans "Apply" %} <span class="filter-count">· {{ product_count }}</span></button>
-    <a class="btn btn-soft" href="{% if category %}{{ category.get_url }}{% else %}{% url 'store' %}{% endif %}">{% trans "Clear all" %}</a>
+  <div class="filter-actions lxf-actions">
+    <button class="btn btn-primary" type="submit">{% trans "Show results" %} <span class="filter-count">· {{ product_count }}</span></button>
+    <a class="btn btn-soft lxf-clear" href="{% if category %}{{ category.get_url }}{% else %}{% url 'store' %}{% endif %}" data-filter-clear>{% trans "Clear all" %}</a>
   </div>
 </form>
