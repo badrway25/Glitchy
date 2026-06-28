@@ -25,6 +25,16 @@ local Windows dev machine; **no real staging host exists**.
 | Security | ✅ Strong (dev) | No secrets in git, push/shipping/payments OFF. Key rotation still pending. |
 
 ## 2. What is genuinely COMPLETE
+- **Luxury store filters + motion** (Phase 56): the `/store` left rail is
+  **redesigned** — editorial "Refine your look" header, **collapsible** sections
+  (persisted), **circular colour swatches**, **size/rating pills**, **availability
+  toggle switches**, premium currency price inputs, per-section count badges.
+  Mobile filter is now a **bottom sheet** (drag handle, sticky Clear/Show-results
+  footer, focus trap). Added **scroll-reveal motion** (IntersectionObserver,
+  reduced-motion safe), **category editorial heroes**, and 2 smart features
+  (**Continue your search** localStorage banner + real-category **smart empty
+  state**). 482 tests green. See
+  `docs/LUXURY_STORE_FILTERS_MOTION_EXPERIENCE_2026.md`.
 - **Ultra-premium interaction polish** (Phase 55): checkout **step indicator**
   (Bag → Details → Payment) + sticky desktop summary; **Quick View focus trap**
   (full a11y); elegant **taupe button inversion** (sort + soft buttons, no more
