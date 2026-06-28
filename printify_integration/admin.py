@@ -2,7 +2,8 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
-from .models import PrintifyPrintArea, PrintifyShippingProfile, SyncLog
+from .models import (PrintifyPrintArea, PrintifyShippingEstimateCache,
+                     PrintifyShippingProfile, SyncLog)
 from .services import pull_order_statuses, sync_products
 
 
@@ -24,6 +25,42 @@ class PrintifyPrintAreaAdmin(admin.ModelAdmin):
                     "variant_count", "last_synced_at")
     list_filter = ("position", "has_print_file")
     search_fields = ("product__product_name",)
+
+
+@admin.register(PrintifyShippingEstimateCache)
+class PrintifyShippingEstimateCacheAdmin(admin.ModelAdmin):
+    """Ops view of recent pre-order estimates. Read-only; rows expire on their TTL.
+    Contains no PII — only a country code, postal PREFIX and per-method costs."""
+    list_display = ("country_code", "postal_prefix", "shipping_method", "source_badge",
+                    "shipping_cost", "currency", "delivery", "fresh", "created_at")
+    list_filter = ("source", "currency", "country_code", "shipping_method")
+    search_fields = ("country_code", "postal_prefix")
+    readonly_fields = [f.name for f in PrintifyShippingEstimateCache._meta.fields]
+    actions = ["purge_expired"]
+
+    @admin.display(description=_("Source"))
+    def source_badge(self, obj):
+        colors = {"live_printify": "#16a34a", "cached_profile": "#0ea5e9",
+                  "local_fallback": "#d97706", "unavailable": "#64748b"}
+        return format_html(
+            '<span style="background:{};color:#fff;padding:2px 8px;border-radius:999px;'
+            'font-size:11px;font-weight:600;">{}</span>',
+            colors.get(obj.source, "#64748b"), obj.source)
+
+    @admin.display(description=_("Delivery"))
+    def delivery(self, obj):
+        return f"{obj.delivery_days_min}-{obj.delivery_days_max}d"
+
+    @admin.display(boolean=True, description=_("Fresh"))
+    def fresh(self, obj):
+        return obj.is_fresh
+
+    @admin.action(description=_("Purge expired estimate cache rows"))
+    def purge_expired(self, request, queryset):
+        from django.utils import timezone
+        n, _x = PrintifyShippingEstimateCache.objects.filter(
+            expires_at__lte=timezone.now()).delete()
+        self.message_user(request, _("Purged %(n)d expired estimate row(s).") % {"n": n})
 
 
 @admin.register(SyncLog)
