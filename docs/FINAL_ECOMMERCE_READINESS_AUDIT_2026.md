@@ -25,6 +25,14 @@ local Windows dev machine; **no real staging host exists**.
 | Security | ✅ Strong (dev) | No secrets in git, push/shipping/payments OFF. Key rotation still pending. |
 
 ## 2. What is genuinely COMPLETE
+- **Premium customer portal** (Phase 53): dashboard (KPI bug fixed), orders with
+  search/filter/sort + premium cards, **Billing & receipts** center, premium
+  **PDF order receipt** (EN/IT/FR, logo, Paid/Pending, shipping line, preview +
+  download), wishlist search, validated address book, and **site-wide premium
+  dropdowns** (`premium-select.js`). **End-to-end tests** across BE/IT/FR/US + an
+  unsupported-country edge, plus portal **data-isolation** tests (a user cannot
+  see/download/delete another user's order/receipt/address). No new migration.
+  See `docs/CUSTOMER_PORTAL_PREMIUM_E2E_2026.md`.
 - Frontend UX/UI: navbar, footer, logo, home (de-duplicated), PDP, cart, collections, variant dropdowns, sort dropdown, draggable AI assistant, dark/light, mobile.
 - i18n EN/IT/FR for all customer-facing copy; compiled, no corruption.
 - Cart flows (add/remove-with-modal/qty/coupon/empty) and guest checkout to Stripe **TEST**.
