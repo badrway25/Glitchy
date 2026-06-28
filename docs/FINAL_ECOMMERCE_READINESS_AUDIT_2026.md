@@ -25,6 +25,12 @@ local Windows dev machine; **no real staging host exists**.
 | Security | ✅ Strong (dev) | No secrets in git, push/shipping/payments OFF. Key rotation still pending. |
 
 ## 2. What is genuinely COMPLETE
+- **Premium language switcher** (Phase 57): the navbar dropdown now shows the
+  **language name only** (English / Italiano / Français — no "EN/IT/FR" codes) on a
+  **flag-inspired full-width background** (green/white/red, blue/white/red, sober
+  navy/white/red), CSS-only (no flag images), readable in light & dark, with gold
+  selected ring + check, `aria-current`, and full-width mobile rendering. See
+  `docs/PREMIUM_LANGUAGE_DROPDOWN_2026.md`.
 - **Luxury store filters + motion** (Phase 56): the `/store` left rail is
   **redesigned** — editorial "Refine your look" header, **collapsible** sections
   (persisted), **circular colour swatches**, **size/rating pills**, **availability
