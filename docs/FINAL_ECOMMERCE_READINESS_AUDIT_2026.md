@@ -25,6 +25,13 @@ local Windows dev machine; **no real staging host exists**.
 | Security | ✅ Strong (dev) | No secrets in git, push/shipping/payments OFF. Key rotation still pending. |
 
 ## 2. What is genuinely COMPLETE
+- **"Wow" polish + smart features** (Phase 54): real **Product Quick View**
+  drawer (desktop) / bottom sheet (mobile) with delivery estimate + premium
+  variant dropdowns; **search recent (localStorage) + popular (real categories)**;
+  **price-proximity** recommendations + "Pairs well with" badge; heart-pop +
+  `prefers-reduced-motion`; wishlist JS delegation. No new migration. 450 tests
+  green. See `docs/WOW_ECOMMERCE_POLISH_SMART_FEATURES_2026.md`. (Size guide is
+  generic — provider-specific charts still TODO.)
 - **Premium customer portal** (Phase 53): dashboard (KPI bug fixed), orders with
   search/filter/sort + premium cards, **Billing & receipts** center, premium
   **PDF order receipt** (EN/IT/FR, logo, Paid/Pending, shipping line, preview +
