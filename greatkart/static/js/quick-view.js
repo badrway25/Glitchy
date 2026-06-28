@@ -90,6 +90,14 @@
       });
   }
 
+  function focusables() {
+    if (!root) return [];
+    return Array.prototype.slice.call(root.querySelectorAll(
+      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]),' +
+      ' textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'))
+      .filter(function (el) { return el.offsetParent !== null || el === document.activeElement; });
+  }
+
   document.addEventListener("click", function (e) {
     var trig = e.target.closest && e.target.closest("[data-quick-view]");
     if (!trig) return;
@@ -98,6 +106,15 @@
     if (id) load(id, trig);
   });
   document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape" && root && !root.hidden) close();
+    if (!root || root.hidden) return;
+    if (e.key === "Escape") { close(); return; }
+    // Focus trap: keep Tab / Shift+Tab within the open drawer.
+    if (e.key === "Tab") {
+      var f = focusables();
+      if (!f.length) return;
+      var first = f[0], last = f[f.length - 1], a = document.activeElement;
+      if (e.shiftKey && (a === first || !root.contains(a))) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && (a === last || !root.contains(a))) { e.preventDefault(); first.focus(); }
+    }
   });
 })();
