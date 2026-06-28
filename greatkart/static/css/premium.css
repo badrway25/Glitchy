@@ -102,10 +102,8 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
   transition:background .2s var(--ease),color .2s var(--ease),border-color .2s var(--ease)!important;}
 /* Invert on hover (no more "white on white"): fills with the brand primary and
    flips the text to the page bg — works in light and dark. */
-.btn-soft:hover,.btn.btn-soft:hover{background:var(--btn-elegant)!important;color:#fff!important;
-  border-color:var(--btn-elegant)!important;}
-/* Win over the dark-mode base color override on hover (keeps text readable). */
-:root[data-theme="dark"] .btn-soft:hover,:root[data-theme="dark"] .btn.btn-soft:hover{color:#fff!important;}
+/* Subtle hover (only the Sort button uses the gold inversion). */
+.btn-soft:hover,.btn.btn-soft:hover{background:var(--surface-2)!important;border-color:var(--accent)!important;}
 .btn-dark{background:var(--primary)!important;border-color:var(--primary)!important;}
 .btn-link{color:var(--accent-2)!important;}
 
