@@ -21,87 +21,51 @@
               <div class="text-muted">{% trans "All your completed purchases." %}</div>
             </div>
             <div class="dash-actions">
-              <a href="{% url 'store' %}" class="btn btn-soft">
-                <i class="fa fa-bag-shopping mr-2"></i>{% trans "Shop" %}
+              <a href="{% url 'billing' %}" class="btn btn-soft btn-icontext">
+                <i class="fa fa-file-invoice" aria-hidden="true"></i><span>{% trans "Receipts" %}</span>
+              </a>
+              <a href="{% url 'store' %}" class="btn btn-soft btn-icontext">
+                <i class="fa fa-bag-shopping" aria-hidden="true"></i><span>{% trans "Shop" %}</span>
               </a>
             </div>
           </div>
 
           <div class="dash-card">
             <div class="dash-card-body">
+              {% include 'accounts/_portal_filters.html' %}
 
               {% if orders %}
-                <div class="table-responsive">
-                  <table class="table dash-table">
-                    <thead>
-                      <tr>
-                        <th>{% trans "Order" %}</th>
-                        <th>{% trans "Date" %}</th>
-                        <th>{% trans "Status" %}</th>
-                        <th class="text-right">{% trans "Total" %}</th>
-                        <th class="text-right">{% trans "Action" %}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {% for o in orders %}
-                        <tr>
-                          <td>
-                            <div class="ord-id">#{{ o.order_number }}</div>
-                            <div class="text-muted" style="font-size:12px;">
-                              {% if o.payment %}{{ o.payment.payment_method }}{% else %}{% trans "Payment pending" %}{% endif %}
-                            </div>
-                          </td>
-
-                          <td>{{ o.created_at|date:"M d, Y" }}</td>
-
-                          <td>
-                            {% if o.status == 'Completed' %}
-                              <span class="badge-soft badge-soft-success">{% trans "Completed" %}</span>
-                            {% elif o.status == 'Cancelled' %}
-                              <span class="badge-soft badge-soft-danger">{% trans "Cancelled" %}</span>
-                            {% elif o.status == 'Accepted' %}
-                              <span class="badge-soft badge-soft-info">{% trans "Packed" %}</span>
-                            {% else %}
-                              <span class="badge-soft badge-soft-warning">{% trans "Confirmed" %}</span>
-                            {% endif %}
-                          </td>
-
-                          <td class="text-right" style="font-weight:900;">€ {{ o.order_total|floatformat:2 }}</td>
-
-                          <td class="text-right">
-                            <a href="{% url 'order_detail' o.order_number %}" class="btn btn-soft btn-sm">{% trans "Details" %}</a>
-                          </td>
-                        </tr>
-                      {% endfor %}
-                    </tbody>
-                  </table>
+                <div class="order-cards">
+                  {% for o in orders %}
+                    <article class="order-card">
+                      <div class="oc-main">
+                        <div class="oc-id-row">
+                          <span class="oc-id">#{{ o.order_number }}</span>
+                          {% include 'accounts/_order_status_badge.html' with o=o %}
+                        </div>
+                        <div class="oc-meta">
+                          <span class="oc-chip"><i class="fa fa-calendar-o" aria-hidden="true"></i>{{ o.created_at|date:"M d, Y" }}</span>
+                          <span class="oc-chip"><i class="fa fa-credit-card" aria-hidden="true"></i>{% if o.payment %}{{ o.payment.payment_method }}{% else %}{% trans "Payment pending" %}{% endif %}</span>
+                        </div>
+                      </div>
+                      <div class="oc-amount">€ {{ o.order_total|floatformat:2 }}</div>
+                      <div class="oc-actions">
+                        <a href="{% url 'order_detail' o.order_number %}" class="btn btn-soft btn-sm">{% trans "Details" %}</a>
+                        <a href="{% url 'invoice_pdf' o.order_number %}" class="btn btn-soft btn-sm oc-pdf"
+                           title="{% trans 'Download receipt' %}"><i class="fa fa-download" aria-hidden="true"></i><span>{% trans "Receipt" %}</span></a>
+                      </div>
+                    </article>
+                  {% endfor %}
                 </div>
 
-                {% if orders.has_other_pages %}
-                  <nav class="mt-3">
-                    <ul class="pagination justify-content-center">
-                      {% if orders.has_previous %}
-                        <li class="page-item"><a class="page-link" href="?page={{ orders.previous_page_number }}">«</a></li>
-                      {% else %}
-                        <li class="page-item disabled"><span class="page-link">«</span></li>
-                      {% endif %}
-
-                      {% for i in orders.paginator.page_range %}
-                        {% if orders.number == i %}
-                          <li class="page-item active"><span class="page-link">{{ i }}</span></li>
-                        {% else %}
-                          <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
-                        {% endif %}
-                      {% endfor %}
-
-                      {% if orders.has_next %}
-                        <li class="page-item"><a class="page-link" href="?page={{ orders.next_page_number }}">»</a></li>
-                      {% else %}
-                        <li class="page-item disabled"><span class="page-link">»</span></li>
-                      {% endif %}
-                    </ul>
-                  </nav>
-                {% endif %}
+                {% include 'accounts/_portal_pagination.html' with page_obj=orders querystring=querystring %}
+              {% elif has_filters %}
+                <div class="dash-empty">
+                  <div class="dash-empty-icon"><i class="fa fa-magnifying-glass"></i></div>
+                  <h4>{% trans "No orders match your filters" %}</h4>
+                  <p class="text-muted mb-3">{% trans "Try a different search or clear the filters." %}</p>
+                  <a href="{% url 'my_orders' %}" class="btn btn-soft">{% trans "Clear filters" %}</a>
+                </div>
               {% else %}
                 <div class="dash-empty">
                   <div class="dash-empty-icon"><i class="fa fa-box-open"></i></div>

@@ -43,8 +43,11 @@
             </div>
 
             <div class="dash-actions">
+              <a href="{% url 'invoice_pdf' order.order_number %}?disposition=inline" target="_blank" rel="noopener" class="btn btn-soft">
+                <i class="fa fa-eye mr-2"></i>{% trans "Preview receipt" %}
+              </a>
               <a href="{% url 'invoice_pdf' order.order_number %}" class="btn btn-soft">
-                <i class="fa fa-file-pdf mr-2"></i>{% trans "PDF invoice" %}
+                <i class="fa fa-file-pdf mr-2"></i>{% trans "Download receipt" %}
               </a>
               {% if order.is_ordered %}
                 <a href="{% url 'returns:request' order.order_number %}" class="btn btn-soft">
@@ -155,6 +158,16 @@
                       <span>€ {{ subtotal|floatformat:2 }}</span>
                     </div>
                     <div class="line">
+                      <span class="text-muted">{% trans "Shipping" %}</span>
+                      <span>{% if order.shipping_cost %}€ {{ order.shipping_cost|floatformat:2 }}{% else %}{% trans "Free" %}{% endif %}</span>
+                    </div>
+                    {% if order.discount %}
+                    <div class="line">
+                      <span class="text-muted">{% trans "Discount" %}{% if order.coupon_code %} ({{ order.coupon_code }}){% endif %}</span>
+                      <span>− € {{ order.discount|floatformat:2 }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="line">
                       <span class="text-muted">{% trans "Tax" %}</span>
                       <span>€ {{ order.tax|floatformat:2 }}</span>
                     </div>
@@ -162,6 +175,12 @@
                       <span>{% trans "Grand total" %}</span>
                       <span>€ {{ order.order_total|floatformat:2 }}</span>
                     </div>
+                    {% if order.shipping_min_days and order.shipping_max_days %}
+                    <div class="od-eta text-muted">
+                      <i class="fa fa-clock" aria-hidden="true"></i>
+                      {% blocktrans with a=order.shipping_min_days b=order.shipping_max_days %}Estimated delivery: {{ a }}–{{ b }} business days{% endblocktrans %}
+                    </div>
+                    {% endif %}
                   </div>
                 </div>
               </div>

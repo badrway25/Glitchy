@@ -2100,3 +2100,123 @@ body.has-sticky-cta .ai-assistant{bottom:78px;}
   .se-fields{grid-template-columns:1fr;}
   .ship-estimator{padding:.95rem .95rem 1.05rem;}
 }
+
+/* ============================================================ *
+ * Customer portal — premium orders / billing / receipts        *
+ * Tokens auto-invert in dark mode.                             *
+ * ============================================================ */
+/* When the portal sidebar stacks above the main content (<992px), give it
+   clear separation so the "Log out" button isn't glued to the page heading. */
+@media (max-width:991.98px){
+  .acc-sticky{position:static!important;top:auto!important;margin-bottom:1.25rem;}
+}
+/* Search + filter bar */
+.portal-filters{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-bottom:1.1rem;}
+.pf-search{position:relative;flex:1 1 260px;min-width:200px;}
+.pf-search-ic{position:absolute;left:.85rem;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.85rem;}
+.pf-input{width:100%;background:var(--surface);color:var(--text);border:var(--border);border-radius:10px;
+  padding:.6rem .8rem .6rem 2.2rem;font-size:.9rem;transition:border-color .15s ease,box-shadow .15s ease;}
+.pf-input:focus{outline:none;border:1px solid var(--accent);box-shadow:0 0 0 3px rgba(166,130,76,.20);}
+.pf-controls{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
+.pf-select-wrap{position:relative;margin:0;}
+.pf-select-wrap::after{content:"";position:absolute;right:.7rem;top:50%;width:.45rem;height:.45rem;
+  border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:translateY(-65%) rotate(45deg);pointer-events:none;}
+.pf-select{appearance:none;-webkit-appearance:none;background:var(--surface);color:var(--text);border:var(--border);
+  border-radius:10px;padding:.6rem 1.9rem .6rem .8rem;font-size:.88rem;cursor:pointer;}
+.pf-select:focus{outline:none;border:1px solid var(--accent);box-shadow:0 0 0 3px rgba(166,130,76,.20);}
+:root[data-theme="dark"] .pf-input:focus,:root[data-theme="dark"] .pf-select:focus{box-shadow:0 0 0 3px rgba(202,165,106,.24);}
+.pf-go,.pf-clear{white-space:nowrap;}
+
+/* Order cards */
+.order-cards,.receipt-cards{display:flex;flex-direction:column;gap:.7rem;}
+.order-card,.receipt-card{display:flex;align-items:center;gap:1rem;padding:.95rem 1.05rem;border:var(--border);
+  border-radius:12px;background:var(--surface);transition:border-color .15s ease,box-shadow .15s ease,transform .15s ease;}
+.order-card:hover,.receipt-card:hover{border:1px solid rgba(28,26,23,.22);box-shadow:0 10px 28px rgba(28,26,23,.07);}
+:root[data-theme="dark"] .order-card:hover,:root[data-theme="dark"] .receipt-card:hover{border:1px solid rgba(243,238,228,.24);box-shadow:0 12px 30px rgba(0,0,0,.4);}
+.oc-main,.rc-main{flex:1;min-width:0;}
+.oc-id-row,.rc-id-row{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-bottom:.4rem;}
+.oc-id,.rc-id{font-weight:800;color:var(--text);font-size:.98rem;letter-spacing:.01em;}
+.oc-meta,.rc-meta{display:flex;gap:.5rem;flex-wrap:wrap;}
+.oc-chip{display:inline-flex;align-items:center;gap:.35rem;font-size:.76rem;color:var(--muted);
+  background:var(--surface-2);border:var(--border);border-radius:999px;padding:.18rem .55rem;}
+.oc-amount{font-weight:900;font-size:1.05rem;color:var(--text);white-space:nowrap;}
+.oc-actions,.rc-actions{display:flex;gap:.45rem;flex-wrap:wrap;justify-content:flex-end;}
+.oc-pdf span,.rc-actions span{margin-left:.35rem;}
+.rc-icon{flex:0 0 auto;width:44px;height:44px;border-radius:11px;display:grid;place-items:center;
+  background:rgba(166,130,76,.12);color:var(--accent);font-size:1.1rem;}
+:root[data-theme="dark"] .rc-icon{background:rgba(202,165,106,.16);}
+
+/* Billing honest-wording note */
+.billing-note{display:flex;align-items:center;gap:.55rem;font-size:.84rem;color:var(--muted);
+  background:var(--surface-2);border:var(--border);border-radius:10px;padding:.6rem .85rem;margin-bottom:1rem;}
+.billing-note i{color:var(--accent);}
+
+/* Estimated-delivery line in order totals */
+.od-eta{display:flex;align-items:center;gap:.45rem;font-size:.82rem;margin-top:.5rem;}
+
+/* Pagination */
+.portal-pagination{display:flex;gap:.35rem;justify-content:center;margin-top:1.2rem;flex-wrap:wrap;}
+.pp-link{min-width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;padding:0 .6rem;
+  border:var(--border);border-radius:9px;background:var(--surface);color:var(--text);font-size:.88rem;
+  text-decoration:none;transition:border-color .15s ease,background .15s ease;}
+.pp-link:hover{border:1px solid var(--accent);}
+.pp-link.is-active{background:var(--primary);color:var(--bg);border:1px solid var(--primary);font-weight:700;}
+.pp-link.is-disabled{opacity:.45;pointer-events:none;}
+
+@media (max-width:575.98px){
+  /* Cards: more separation between them + breathing room inside when wrapped. */
+  .order-cards,.receipt-cards{gap:.95rem;}
+  .order-card,.receipt-card{flex-wrap:wrap;align-items:flex-start;gap:.55rem .85rem;padding:1rem;}
+  .oc-amount{order:2;}
+  .oc-actions,.rc-actions{order:3;width:100%;justify-content:flex-start;margin-top:.15rem;}
+  /* Filter bar: stack tightly. Reset the search flex-basis so it does NOT become
+     260px tall on the column axis (that caused the large search↔dropdown gap). */
+  .portal-filters{flex-direction:column;align-items:stretch;gap:.55rem;}
+  .pf-search{flex:0 0 auto;width:100%;}
+  .pf-controls{gap:.5rem;}
+  .pf-select-wrap{flex:1 1 0;}
+  .pf-select{width:100%;}
+  .pf-go,.pf-clear{flex:0 0 auto;}
+}
+
+/* ============================================================ *
+ * Premium select — custom dropdown for all native <select>     *
+ * (JS: premium-select.js keeps the native select for submit)   *
+ * ============================================================ */
+.pmsel{position:relative;display:block;width:100%;}
+.pmsel-native{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;
+  overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;opacity:0;pointer-events:none;}
+.pmsel-btn{display:flex;align-items:center;justify-content:space-between;gap:.6rem;width:100%;
+  background:var(--surface);color:var(--text);border:var(--border);border-radius:10px;
+  padding:.6rem .8rem;font-size:.9rem;line-height:1.2;cursor:pointer;text-align:left;
+  transition:border-color .15s ease,box-shadow .15s ease;}
+.pmsel-btn:hover{border:1px solid rgba(28,26,23,.26);}
+:root[data-theme="dark"] .pmsel-btn:hover{border:1px solid rgba(243,238,228,.28);}
+.pmsel-btn:focus-visible{outline:none;border:1px solid var(--accent);box-shadow:0 0 0 3px rgba(166,130,76,.22);}
+:root[data-theme="dark"] .pmsel-btn:focus-visible{box-shadow:0 0 0 3px rgba(202,165,106,.26);}
+.pmsel.is-open .pmsel-btn{border:1px solid var(--accent);box-shadow:0 0 0 3px rgba(166,130,76,.16);}
+.pmsel-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pmsel-label.is-placeholder{color:var(--muted);}
+.pmsel-caret{flex:0 0 auto;color:var(--muted);display:inline-flex;transition:transform .2s ease;}
+.pmsel.is-open .pmsel-caret{transform:rotate(180deg);color:var(--accent);}
+
+.pmsel-menu{list-style:none;margin:0;padding:.34rem;position:absolute;z-index:60;left:0;right:0;
+  top:calc(100% + 6px);min-width:100%;max-height:288px;overflow:auto;background:var(--surface);
+  border:var(--border);border-radius:12px;box-shadow:var(--shadow);animation:pmsel-in .14s ease;}
+@keyframes pmsel-in{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:none;}}
+.pmsel-opt{display:flex;align-items:center;gap:.5rem;padding:.55rem .6rem;border-radius:8px;cursor:pointer;
+  font-size:.9rem;color:var(--text);user-select:none;}
+.pmsel-opt:hover,.pmsel-opt.is-active{background:var(--surface-2);}
+.pmsel-opt[aria-selected="true"]{font-weight:600;}
+.pmsel-opt[aria-disabled="true"]{opacity:.45;cursor:not-allowed;}
+.pmsel-check{flex:0 0 16px;width:16px;display:inline-flex;align-items:center;justify-content:center;
+  color:var(--accent);opacity:0;transition:opacity .12s ease;}
+.pmsel-opt[aria-selected="true"] .pmsel-check{opacity:1;}
+.pmsel-opt-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+/* Hide redundant native carets on wrappers once enhanced. */
+.pf-select-wrap:has(.pmsel)::after,
+.se-select-wrap:has(.pmsel)::after{content:none;}
+/* In the portal filter row, let the enhanced selects share space. */
+.pf-select-wrap{display:block;}
+.pf-controls .pf-select-wrap{flex:1 1 0;min-width:120px;}

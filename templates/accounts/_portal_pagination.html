@@ -1,0 +1,18 @@
+{% load i18n %}
+{% if page_obj.has_other_pages %}
+<nav class="portal-pagination" aria-label="{% trans 'Pagination' %}">
+  {% if page_obj.has_previous %}
+    <a class="pp-link" href="?page={{ page_obj.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}" aria-label="{% trans 'Previous' %}">«</a>
+  {% else %}<span class="pp-link is-disabled">«</span>{% endif %}
+  {% for i in page_obj.paginator.page_range %}
+    {% if page_obj.number == i %}
+      <span class="pp-link is-active" aria-current="page">{{ i }}</span>
+    {% else %}
+      <a class="pp-link" href="?page={{ i }}{% if querystring %}&{{ querystring }}{% endif %}">{{ i }}</a>
+    {% endif %}
+  {% endfor %}
+  {% if page_obj.has_next %}
+    <a class="pp-link" href="?page={{ page_obj.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}" aria-label="{% trans 'Next' %}">»</a>
+  {% else %}<span class="pp-link is-disabled">»</span>{% endif %}
+</nav>
+{% endif %}

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: greatkart 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-28 11:01+0200\n"
+"POT-Creation-Date: 2026-06-28 15:51+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -23,17 +23,43 @@ msgstr ""
 msgid "Email"
 msgstr "E-mail"
 
-#: .\accounts\views.py:246
+#: .\accounts\forms.py:17 .\templates\store\checkout.html:114
+msgid "Select country"
+msgstr "Sélectionner un pays"
+
+#: .\accounts\forms.py:18 .\templates\includes\shipping_estimator.html:37
+#: .\templates\store\checkout.html:112
+msgid "Country"
+msgstr "Pays"
+
+#: .\accounts\forms.py:29
+msgid "Optional"
+msgstr "Facultatif"
+
+#: .\accounts\forms.py:35
+msgid "Please enter a city."
+msgstr "Veuillez saisir une ville."
+
+#: .\accounts\forms.py:42
+msgid "Please enter a postal code."
+msgstr "Veuillez saisir un code postal."
+
+#: .\accounts\forms.py:48
+msgid "Please enter a valid phone number."
+msgstr "Veuillez saisir un numéro de téléphone valide."
+
+#: .\accounts\views.py:316
 msgid "Address removed."
 msgstr "Adresse supprimée."
 
-#: .\accounts\views.py:256
+#: .\accounts\views.py:326
 msgid "Default address updated."
 msgstr "Adresse par défaut mise à jour."
 
-#: .\assistant\models.py:17 .\templates\includes\footer.html:79
+#: .\assistant\models.py:17 .\templates\accounts\order_detail.html:161
+#: .\templates\includes\footer.html:79
 #: .\templates\includes\shipping_estimator.html:18
-#: .\templates\includes\shipping_estimator.html:70
+#: .\templates\includes\shipping_estimator.html:74
 #: .\templates\legal\terms.html:12
 #: .\templates\notifications\email\transactional.html:89
 #: .\templates\orders\payments.html:115 .\templates\store\cart.html:175
@@ -65,7 +91,7 @@ msgstr "Tailles"
 msgid "Account"
 msgstr "Compte"
 
-#: .\assistant\models.py:23 .\templates\accounts\order_detail.html:71
+#: .\assistant\models.py:23 .\templates\accounts\order_detail.html:74
 msgid "Tracking"
 msgstr "Suivi"
 
@@ -191,7 +217,7 @@ msgstr "Pièces"
 msgid "Completeness"
 msgstr "Terminée"
 
-#: .\merchandising\admin.py:52
+#: .\merchandising\admin.py:52 .\templates\accounts\billing.html:58
 msgid "Preview"
 msgstr "avis"
 
@@ -267,7 +293,6 @@ msgstr "Destinataire"
 
 #: .\notifications\admin.py:21 .\printify_integration\admin.py:74
 #: .\returns\admin.py:40 .\templates\accounts\dashboard.html:111
-#: .\templates\accounts\my_orders.html:40
 #: .\templates\accounts\transactions.html:100
 #: .\templates\orders\order_complete.html:186
 msgid "Status"
@@ -288,7 +313,6 @@ msgstr "De"
 
 #: .\notifications\admin.py:52 .\returns\admin.py:36
 #: .\templates\accounts\dashboard.html:110
-#: .\templates\accounts\my_orders.html:38
 #: .\templates\accounts\transactions.html:95
 #: .\templates\returns\request.html:17 .\templates\returns\status.html:9
 msgid "Order"
@@ -349,7 +373,7 @@ msgid "Update from %(brand)s"
 msgstr "Actualité de %(brand)s"
 
 #: .\notifications\models.py:18 .\templates\accounts\dashboard.html:130
-#: .\templates\accounts\order_detail.html:146
+#: .\templates\accounts\order_detail.html:149
 msgid "Pending"
 msgstr "En attente"
 
@@ -491,7 +515,6 @@ msgid "Guest"
 msgstr "Invité"
 
 #: .\orders\admin.py:144 .\templates\accounts\dashboard.html:112
-#: .\templates\accounts\my_orders.html:41
 #: .\templates\notifications\email\transactional.html:91
 #: .\templates\orders\order_complete.html:198
 #: .\templates\store\product_detail.html:356
@@ -542,7 +565,7 @@ msgid "Source"
 msgstr "Source"
 
 #: .\printify_integration\admin.py:50
-#: .\templates\accounts\order_detail.html:124
+#: .\templates\accounts\order_detail.html:127
 msgid "Delivery"
 msgstr "Livraison"
 
@@ -555,6 +578,7 @@ msgid "Purge expired estimate cache rows"
 msgstr "Purger les estimations expirées du cache"
 
 #: .\printify_integration\admin.py:63
+#, python-format
 msgid "Purged %(n)d expired estimate row(s)."
 msgstr "%(n)d estimation(s) expirée(s) purgée(s)."
 
@@ -667,51 +691,52 @@ msgstr "Estimé"
 msgid "Unavailable"
 msgstr "Indisponible"
 
-#: .\printify_integration\shipping_estimator.py:137
+#: .\printify_integration\shipping_estimator.py:130
+#: .\templates\accounts\order_detail.html:162
 #: .\templates\includes\shipping_estimator.html:20
 #: .\templates\orders\payments.html:115 .\templates\store\cart.html:176
 #: .\templates\store\checkout.html:183
 msgid "Free"
 msgstr "Gratuite"
 
-#: .\printify_integration\shipping_estimator.py:197
+#: .\printify_integration\shipping_estimator.py:190
 msgid "Standard"
 msgstr "Standard"
 
-#: .\printify_integration\shipping_estimator.py:197
+#: .\printify_integration\shipping_estimator.py:190
 msgid "Priority"
 msgstr "Prioritaire"
 
-#: .\printify_integration\shipping_estimator.py:197
+#: .\printify_integration\shipping_estimator.py:190
 msgid "Express"
 msgstr "Express"
 
-#: .\printify_integration\shipping_estimator.py:197
+#: .\printify_integration\shipping_estimator.py:190
 msgid "Economy"
 msgstr "Économique"
 
-#: .\printify_integration\shipping_estimator.py:197
+#: .\printify_integration\shipping_estimator.py:190
 msgid "Printify Express"
 msgstr "Printify Express"
 
-#: .\printify_integration\shipping_estimator.py:312
+#: .\printify_integration\shipping_estimator.py:328
 msgid "Final shipping may vary slightly after address validation."
 msgstr "Le montant final peut légèrement varier après validation de l'adresse."
 
-#: .\printify_integration\shipping_estimator.py:314
-#: .\templates\includes\shipping_estimator.html:73
+#: .\printify_integration\shipping_estimator.py:330
+#: .\templates\includes\shipping_estimator.html:77
 msgid "Some items use estimated shipping data."
 msgstr "Certains articles utilisent des données d'expédition estimées."
 
-#: .\printify_integration\shipping_estimator.py:317
+#: .\printify_integration\shipping_estimator.py:333
 msgid "Estimated delivery — not guaranteed."
 msgstr "Livraison estimée — non garantie."
 
-#: .\printify_integration\shipping_estimator.py:453
+#: .\printify_integration\shipping_estimator.py:473
 msgid "Add an item to estimate delivery."
 msgstr "Ajoutez un article pour estimer la livraison."
 
-#: .\printify_integration\shipping_estimator.py:461 .\shipping\services.py:68
+#: .\printify_integration\shipping_estimator.py:481 .\shipping\services.py:68
 msgid "We do not ship to this country yet."
 msgstr "Nous ne livrons pas encore dans ce pays."
 
@@ -1076,6 +1101,100 @@ msgstr "Événement analytique"
 msgid "Analytics events"
 msgstr "Événements analytiques"
 
+#: .\templates\accounts\_order_status_badge.html:1
+#: .\templates\accounts\_portal_filters.html:18
+#: .\templates\accounts\dashboard.html:82
+#: .\templates\accounts\dashboard.html:137
+#: .\templates\accounts\order_detail.html:26
+msgid "Completed"
+msgstr "Terminée"
+
+#: .\templates\accounts\_order_status_badge.html:1
+#: .\templates\accounts\_portal_filters.html:19
+#: .\templates\accounts\dashboard.html:139
+#: .\templates\accounts\order_detail.html:28
+#: .\templates\orders\order_complete.html:104
+#: .\templates\orders\order_complete.html:140
+msgid "Cancelled"
+msgstr "Annulée"
+
+#: .\templates\accounts\_order_status_badge.html:1
+#: .\templates\accounts\_portal_filters.html:17
+#: .\templates\accounts\dashboard.html:141
+#: .\templates\accounts\order_detail.html:30
+#: .\templates\orders\order_complete.html:88
+#: .\templates\orders\order_complete.html:124
+msgid "Packed"
+msgstr "Préparée"
+
+#: .\templates\accounts\_order_status_badge.html:1
+#: .\templates\accounts\_portal_filters.html:16
+#: .\templates\accounts\dashboard.html:143
+#: .\templates\accounts\order_detail.html:32
+#: .\templates\orders\order_complete.html:80
+#: .\templates\orders\order_complete.html:116
+msgid "Confirmed"
+msgstr "Confirmée"
+
+#: .\templates\accounts\_portal_filters.html:9
+msgid "Search by order # or product"
+msgstr "Rechercher par n° de commande ou produit"
+
+#: .\templates\accounts\_portal_filters.html:10
+msgid "Search orders"
+msgstr "Rechercher des commandes"
+
+#: .\templates\accounts\_portal_filters.html:14
+msgid "Filter by status"
+msgstr "Filtrer par statut"
+
+#: .\templates\accounts\_portal_filters.html:15
+msgid "All statuses"
+msgstr "Tous les statuts"
+
+#: .\templates\accounts\_portal_filters.html:23
+msgid "Sort orders"
+msgstr "Trier les commandes"
+
+#: .\templates\accounts\_portal_filters.html:24
+msgid "Newest first"
+msgstr "Plus récents"
+
+#: .\templates\accounts\_portal_filters.html:25
+msgid "Oldest first"
+msgstr "Plus anciens"
+
+#: .\templates\accounts\_portal_filters.html:26
+msgid "Highest total"
+msgstr "Total le plus élevé"
+
+#: .\templates\accounts\_portal_filters.html:27
+msgid "Lowest total"
+msgstr "Total le plus bas"
+
+#: .\templates\accounts\_portal_filters.html:30
+#: .\templates\accounts\transactions.html:86 .\templates\store\_filters.html:89
+#: .\templates\store\cart.html:164
+msgid "Apply"
+msgstr "Appliquer"
+
+#: .\templates\accounts\_portal_filters.html:32
+#: .\templates\wishlist\saved_items.html:32
+msgid "Clear"
+msgstr "Effacer"
+
+#: .\templates\accounts\_portal_pagination.html:3
+msgid "Pagination"
+msgstr "Pagination"
+
+#: .\templates\accounts\_portal_pagination.html:5
+msgid "Previous"
+msgstr "Précédent"
+
+#: .\templates\accounts\_portal_pagination.html:15
+msgid "Next"
+msgstr "Suivant"
+
 #: .\templates\accounts\_sidebar.html:14
 #: .\templates\accounts\transactions.html:24
 msgid "Overview"
@@ -1088,26 +1207,31 @@ msgstr "Aperçu"
 msgid "My orders"
 msgstr "Mes commandes"
 
-#: .\templates\accounts\_sidebar.html:24 .\templates\includes\navbar.html:128
+#: .\templates\accounts\_sidebar.html:24 .\templates\accounts\billing.html:4
+#: .\templates\accounts\billing.html:20
+msgid "Billing & receipts"
+msgstr "Facturation et reçus"
+
+#: .\templates\accounts\_sidebar.html:29 .\templates\includes\navbar.html:128
 #: .\templates\wishlist\saved_items.html:3
 #: .\templates\wishlist\saved_items.html:11
 msgid "Saved items"
 msgstr "0 article"
 
-#: .\templates\accounts\_sidebar.html:30
+#: .\templates\accounts\_sidebar.html:35
 #: .\templates\accounts\address_list.html:3
 #: .\templates\accounts\address_list.html:18
 msgid "My addresses"
 msgstr "Mes adresses"
 
-#: .\templates\accounts\_sidebar.html:35
+#: .\templates\accounts\_sidebar.html:40
 #: .\templates\accounts\transactions.html:4
 #: .\templates\accounts\transactions.html:30
 #: .\templates\accounts\transactions.html:46
 msgid "Transactions"
 msgstr "Transactions"
 
-#: .\templates\accounts\_sidebar.html:41
+#: .\templates\accounts\_sidebar.html:46
 #: .\templates\accounts\transactions.html:36
 msgid "Log out"
 msgstr "Se déconnecter"
@@ -1189,6 +1313,55 @@ msgstr "Fermer"
 msgid "Delete this address?"
 msgstr "Supprimer cette adresse ?"
 
+#: .\templates\accounts\billing.html:21
+msgid "Download a receipt for any of your orders."
+msgstr "Téléchargez le reçu de l'une de vos commandes."
+
+#: .\templates\accounts\billing.html:25
+#: .\templates\admin\orders\order_changelist.html:5
+msgid "Orders"
+msgstr "Commandes"
+
+#: .\templates\accounts\billing.html:35
+msgid "These are order receipts (not fiscal invoices)."
+msgstr "Ce sont des reçus de commande (pas des factures fiscales)."
+
+#: .\templates\accounts\billing.html:47 .\templates\accounts\my_orders.html:55
+msgid "Receipt"
+msgstr "Reçu"
+
+#: .\templates\accounts\billing.html:60
+msgid "Download"
+msgstr "Télécharger"
+
+#: .\templates\accounts\billing.html:70
+msgid "No receipts match your filters"
+msgstr "Aucun reçu ne correspond à vos filtres"
+
+#: .\templates\accounts\billing.html:71 .\templates\accounts\my_orders.html:66
+msgid "Try a different search or clear the filters."
+msgstr "Essayez une autre recherche ou effacez les filtres."
+
+#: .\templates\accounts\billing.html:72 .\templates\accounts\my_orders.html:67
+#: .\templates\store\store.html:240
+msgid "Clear filters"
+msgstr "Effacer la recherche"
+
+#: .\templates\accounts\billing.html:77
+msgid "No receipts yet"
+msgstr "Aucun reçu pour l'instant"
+
+#: .\templates\accounts\billing.html:78
+msgid "Your order receipts will appear here after your first purchase."
+msgstr "Vos reçus apparaîtront ici après votre premier achat."
+
+#: .\templates\accounts\billing.html:79 .\templates\accounts\dashboard.html:164
+#: .\templates\accounts\my_orders.html:74
+#: .\templates\accounts\transactions.html:186 .\templates\store\cart.html:37
+#: .\templates\wishlist\saved_items.html:53
+msgid "Browse products"
+msgstr "Parcourir les produits"
+
 #: .\templates\accounts\dashboard.html:4 .\templates\includes\navbar.html:117
 msgid "Dashboard"
 msgstr "Tableau de bord"
@@ -1202,7 +1375,7 @@ msgid "Track your orders, payments and deliveries."
 msgstr "Suivez vos commandes, paiements et livraisons."
 
 #: .\templates\accounts\dashboard.html:32
-#: .\templates\accounts\my_orders.html:25
+#: .\templates\accounts\my_orders.html:28
 #: .\templates\accounts\transactions.html:51
 #: .\templates\includes\footer.html:56
 msgid "Shop"
@@ -1237,13 +1410,6 @@ msgstr "Dépensé"
 msgid "New / Accepted"
 msgstr "Nouvelle / Acceptée"
 
-#: .\templates\accounts\dashboard.html:82
-#: .\templates\accounts\dashboard.html:137
-#: .\templates\accounts\my_orders.html:59
-#: .\templates\accounts\order_detail.html:26
-msgid "Completed"
-msgstr "Terminée"
-
 #: .\templates\accounts\dashboard.html:86
 msgid "Delivered"
 msgstr "Livrée"
@@ -1261,59 +1427,27 @@ msgid "See all"
 msgstr "Tout voir"
 
 #: .\templates\accounts\dashboard.html:113
-#: .\templates\accounts\my_orders.html:42
 #: .\templates\accounts\transactions.html:101
 msgid "Action"
 msgstr "Action"
 
-#: .\templates\accounts\dashboard.html:139
-#: .\templates\accounts\my_orders.html:61
-#: .\templates\accounts\order_detail.html:28
-#: .\templates\orders\order_complete.html:104
-#: .\templates\orders\order_complete.html:140
-msgid "Cancelled"
-msgstr "Annulée"
-
-#: .\templates\accounts\dashboard.html:141
-#: .\templates\accounts\my_orders.html:63
-#: .\templates\accounts\order_detail.html:30
-#: .\templates\orders\order_complete.html:88
-#: .\templates\orders\order_complete.html:124
-msgid "Packed"
-msgstr "Préparée"
-
-#: .\templates\accounts\dashboard.html:143
-#: .\templates\accounts\my_orders.html:65
-#: .\templates\accounts\order_detail.html:32
-#: .\templates\orders\order_complete.html:80
-#: .\templates\orders\order_complete.html:116
-msgid "Confirmed"
-msgstr "Confirmée"
-
 #: .\templates\accounts\dashboard.html:151
-#: .\templates\accounts\my_orders.html:72
-#: .\templates\accounts\order_detail.html:103
+#: .\templates\accounts\my_orders.html:53
+#: .\templates\accounts\order_detail.html:106
 #: .\templates\accounts\transactions.html:142 .\templates\home.html:72
 #: .\templates\home.html:161 .\templates\orders\order_complete.html:286
 msgid "Details"
 msgstr "Détails"
 
 #: .\templates\accounts\dashboard.html:162
-#: .\templates\accounts\my_orders.html:108
+#: .\templates\accounts\my_orders.html:72
 msgid "No orders yet"
 msgstr "Aucune commande"
 
 #: .\templates\accounts\dashboard.html:163
-#: .\templates\accounts\my_orders.html:109
+#: .\templates\accounts\my_orders.html:73
 msgid "Start shopping to see your orders here."
 msgstr "Commencez vos achats pour voir vos commandes ici."
-
-#: .\templates\accounts\dashboard.html:164
-#: .\templates\accounts\my_orders.html:110
-#: .\templates\accounts\transactions.html:186 .\templates\store\cart.html:37
-#: .\templates\wishlist\saved_items.html:34
-msgid "Browse products"
-msgstr "Parcourir les produits"
 
 #: .\templates\accounts\forgotPassword.html:16
 msgid "Forgot Password"
@@ -1378,14 +1512,22 @@ msgstr "Mot de passe oublié ?"
 msgid "All your completed purchases."
 msgstr "Tous vos achats effectués."
 
-#: .\templates\accounts\my_orders.html:39
-#: .\templates\accounts\transactions.html:96
-msgid "Date"
-msgstr "Date"
+#: .\templates\accounts\my_orders.html:25
+msgid "Receipts"
+msgstr "Reçus"
 
-#: .\templates\accounts\my_orders.html:51
+#: .\templates\accounts\my_orders.html:48
 msgid "Payment pending"
 msgstr "Paiement en attente"
+
+#: .\templates\accounts\my_orders.html:55
+#: .\templates\accounts\order_detail.html:50
+msgid "Download receipt"
+msgstr "Télécharger le reçu"
+
+#: .\templates\accounts\my_orders.html:65
+msgid "No orders match your filters"
+msgstr "Aucune commande ne correspond à vos filtres"
 
 #: .\templates\accounts\order_detail.html:4
 msgid "Order details"
@@ -1403,42 +1545,42 @@ msgid "Placed on %(d)s"
 msgstr "Passée le %(d)s"
 
 #: .\templates\accounts\order_detail.html:47
-msgid "PDF invoice"
-msgstr "Facture PDF"
+msgid "Preview receipt"
+msgstr "Aperçu du reçu"
 
-#: .\templates\accounts\order_detail.html:51 .\templates\returns\request.html:3
+#: .\templates\accounts\order_detail.html:54 .\templates\returns\request.html:3
 #: .\templates\returns\request.html:16
 msgid "Request a return"
 msgstr "Demander un retour"
 
-#: .\templates\accounts\order_detail.html:55
-#: .\templates\accounts\order_detail.html:87
+#: .\templates\accounts\order_detail.html:58
+#: .\templates\accounts\order_detail.html:90
 msgid "Need help with this order?"
 msgstr "Besoin d'aide pour cette commande ?"
 
-#: .\templates\accounts\order_detail.html:58
+#: .\templates\accounts\order_detail.html:61
 msgid "Back to orders"
 msgstr "Retour aux commandes"
 
-#: .\templates\accounts\order_detail.html:70
+#: .\templates\accounts\order_detail.html:73
 msgid "Your order is on its way"
 msgstr "Votre commande est en route"
 
-#: .\templates\accounts\order_detail.html:73
+#: .\templates\accounts\order_detail.html:76
 msgid "Track parcel"
 msgstr "Suivre le colis"
 
-#: .\templates\accounts\order_detail.html:76
+#: .\templates\accounts\order_detail.html:79
 msgid "No tracking yet"
 msgstr "Pas encore de suivi"
 
-#: .\templates\accounts\order_detail.html:77
+#: .\templates\accounts\order_detail.html:80
 msgid "We'll email you a tracking link as soon as your order ships."
 msgstr ""
 "Nous vous enverrons un lien de suivi par e-mail dès l'expédition de votre "
 "commande."
 
-#: .\templates\accounts\order_detail.html:88
+#: .\templates\accounts\order_detail.html:91
 msgid ""
 "Tell us what's wrong and our team will email you. You can also ask our "
 "assistant."
@@ -1446,57 +1588,57 @@ msgstr ""
 "Indiquez-nous ce qui ne va pas et notre équipe vous écrira par e-mail. Vous "
 "pouvez aussi interroger notre assistant."
 
-#: .\templates\accounts\order_detail.html:93
+#: .\templates\accounts\order_detail.html:96
 msgid "Topic"
 msgstr "Sujet"
 
-#: .\templates\accounts\order_detail.html:95
+#: .\templates\accounts\order_detail.html:98
 msgid "Delivery / tracking"
 msgstr "Livraison / suivi"
 
-#: .\templates\accounts\order_detail.html:96
+#: .\templates\accounts\order_detail.html:99
 msgid "Return or refund"
 msgstr "Retour ou remboursement"
 
-#: .\templates\accounts\order_detail.html:97
+#: .\templates\accounts\order_detail.html:100
 msgid "Wrong or damaged item"
 msgstr "Article erroné ou endommagé"
 
-#: .\templates\accounts\order_detail.html:98
+#: .\templates\accounts\order_detail.html:101
 msgid "Something else"
 msgstr "Autre chose"
 
-#: .\templates\accounts\order_detail.html:105
+#: .\templates\accounts\order_detail.html:108
 msgid "Describe the issue (optional)…"
 msgstr "Décrivez le problème (facultatif)…"
 
-#: .\templates\accounts\order_detail.html:108
+#: .\templates\accounts\order_detail.html:111
 msgid "Send to support"
 msgstr "Envoyer au support"
 
-#: .\templates\accounts\order_detail.html:110 .\templates\store\faq.html:53
+#: .\templates\accounts\order_detail.html:113 .\templates\store\faq.html:53
 #: .\templates\store\store.html:242
 msgid "Ask the assistant"
 msgstr "Demander à l'assistant"
 
-#: .\templates\accounts\order_detail.html:140
+#: .\templates\accounts\order_detail.html:143
 #: .\templates\orders\order_complete.html:164
 #: .\templates\orders\payments.html:4
 msgid "Payment"
 msgstr "Paiement"
 
-#: .\templates\accounts\order_detail.html:144
+#: .\templates\accounts\order_detail.html:147
 #, python-format
 msgid "Transaction: %(id)s"
 msgstr "Transaction : %(id)s"
 
-#: .\templates\accounts\order_detail.html:147
+#: .\templates\accounts\order_detail.html:150
 msgid "No payment attached."
 msgstr "Aucun paiement associé."
 
-#: .\templates\accounts\order_detail.html:154
+#: .\templates\accounts\order_detail.html:157
 #: .\templates\includes\shipping_estimator.html:17
-#: .\templates\includes\shipping_estimator.html:69
+#: .\templates\includes\shipping_estimator.html:73
 #: .\templates\notifications\email\transactional.html:88
 #: .\templates\orders\order_complete.html:230
 #: .\templates\orders\payments.html:114 .\templates\store\cart.html:51
@@ -1504,7 +1646,12 @@ msgstr "Aucun paiement associé."
 msgid "Subtotal"
 msgstr "Sous-total"
 
-#: .\templates\accounts\order_detail.html:158
+#: .\templates\accounts\order_detail.html:166 .\templates\store\cart.html:172
+#: .\templates\store\checkout.html:179
+msgid "Discount"
+msgstr "Compte"
+
+#: .\templates\accounts\order_detail.html:171
 #: .\templates\notifications\email\transactional.html:90
 #: .\templates\orders\order_complete.html:234
 #: .\templates\orders\payments.html:116 .\templates\store\cart.html:178
@@ -1512,25 +1659,29 @@ msgstr "Sous-total"
 msgid "Tax"
 msgstr "TVA"
 
-#: .\templates\accounts\order_detail.html:162
+#: .\templates\accounts\order_detail.html:175
 #: .\templates\orders\order_complete.html:238
 #: .\templates\orders\payments.html:117 .\templates\store\cart.html:179
 #: .\templates\store\checkout.html:186
 msgid "Grand total"
 msgstr "Total général"
 
-#: .\templates\accounts\order_detail.html:176
+#: .\templates\accounts\order_detail.html:181
+msgid "Estimated delivery: %(a)s–%(b)s business days"
+msgstr "Livraison estimée : %(a)s–%(b)s jours ouvrables"
+
+#: .\templates\accounts\order_detail.html:195
 msgid "Item"
 msgstr "Article"
 
-#: .\templates\accounts\order_detail.html:177
+#: .\templates\accounts\order_detail.html:196
 #: .\templates\orders\order_complete.html:197
 #: .\templates\returns\request.html:54 .\templates\returns\status.html:45
 #: .\templates\store\checkout.html:168
 msgid "Qty"
 msgstr "Qté"
 
-#: .\templates\accounts\order_detail.html:178
+#: .\templates\accounts\order_detail.html:197
 #: .\templates\store\_filters.html:19
 msgid "Price"
 msgstr "Prix"
@@ -1600,10 +1751,9 @@ msgstr "Tous les statuts"
 msgid "All methods"
 msgstr "Tous les modes de paiement"
 
-#: .\templates\accounts\transactions.html:86 .\templates\store\_filters.html:89
-#: .\templates\store\cart.html:164
-msgid "Apply"
-msgstr "Appliquer"
+#: .\templates\accounts\transactions.html:96
+msgid "Date"
+msgstr "Date"
 
 #: .\templates\accounts\transactions.html:97
 msgid "Method"
@@ -1625,10 +1775,6 @@ msgstr "Aucune transaction"
 #: .\templates\accounts\transactions.html:185
 msgid "When you pay for an order, it will appear here."
 msgstr "Lorsque vous réglez une commande, elle apparaît ici."
-
-#: .\templates\admin\orders\order_changelist.html:5
-msgid "Orders"
-msgstr "Commandes"
 
 #: .\templates\admin\orders\order_changelist.html:12
 msgid "Total sales"
@@ -2067,11 +2213,11 @@ msgstr "Rechercher des produits"
 msgid "Search products, collections…"
 msgstr "Rechercher produits, collections…"
 
-#: .\templates\includes\navbar.html:31
+#: .\templates\includes\navbar.html:31 .\templates\wishlist\saved_items.html:46
 msgid "Clear search"
 msgstr "Effacer la recherche"
 
-#: .\templates\includes\navbar.html:34
+#: .\templates\includes\navbar.html:34 .\templates\wishlist\saved_items.html:31
 msgid "Search"
 msgstr "Recherche"
 
@@ -2124,12 +2270,12 @@ msgid "Network error. Please check your connection and try again."
 msgstr "Erreur réseau. Vérifiez votre connexion et réessayez."
 
 #: .\templates\includes\shipping_estimator.html:19
-#: .\templates\includes\shipping_estimator.html:71
+#: .\templates\includes\shipping_estimator.html:75
 msgid "Estimated total"
 msgstr "Total estimé"
 
 #: .\templates\includes\shipping_estimator.html:23
-#: .\templates\includes\shipping_estimator.html:51
+#: .\templates\includes\shipping_estimator.html:55
 msgid "Estimate delivery"
 msgstr "Estimer la livraison"
 
@@ -2141,28 +2287,25 @@ msgstr "Avant le paiement"
 msgid ""
 "Enter your delivery country and postal code to estimate shipping before "
 "checkout."
-msgstr "Indiquez le pays et le code postal pour estimer la livraison avant le paiement."
+msgstr ""
+"Indiquez le pays et le code postal pour estimer la livraison avant le "
+"paiement."
 
-#: .\templates\includes\shipping_estimator.html:33
-#: .\templates\store\checkout.html:112
-msgid "Country"
-msgstr "Pays"
-
-#: .\templates\includes\shipping_estimator.html:35
+#: .\templates\includes\shipping_estimator.html:39
 msgid "Delivery country"
 msgstr "Pays de livraison"
 
-#: .\templates\includes\shipping_estimator.html:43
-#: .\templates\includes\shipping_estimator.html:46
+#: .\templates\includes\shipping_estimator.html:47
+#: .\templates\includes\shipping_estimator.html:50
 #: .\templates\store\checkout.html:108
 msgid "Postal code"
 msgstr "Code postal"
 
-#: .\templates\includes\shipping_estimator.html:46
+#: .\templates\includes\shipping_estimator.html:50
 msgid "e.g. 20100"
 msgstr "ex. 20100"
 
-#: .\templates\includes\shipping_estimator.html:67
+#: .\templates\includes\shipping_estimator.html:71
 msgid "Shipping options"
 msgstr "Options de livraison"
 
@@ -3326,10 +3469,6 @@ msgstr "appliqué"
 msgid "Promo code"
 msgstr "Code postal"
 
-#: .\templates\store\cart.html:172 .\templates\store\checkout.html:179
-msgid "Discount"
-msgstr "Compte"
-
 #: .\templates\store\cart.html:185 .\templates\store\checkout.html:3
 #: .\templates\store\checkout.html:12
 msgid "Checkout"
@@ -3412,10 +3551,6 @@ msgstr "Ville"
 #: .\templates\store\checkout.html:104
 msgid "State"
 msgstr "Région"
-
-#: .\templates\store\checkout.html:114
-msgid "Select country"
-msgstr "Sélectionner un pays"
 
 #: .\templates\store\checkout.html:123
 msgid "Order note (optional)"
@@ -3836,10 +3971,6 @@ msgstr "Essayez de retirer un filtre pour voir plus."
 msgid "There are no products in this view right now."
 msgstr "Il n'y a aucun produit dans cette vue pour le moment."
 
-#: .\templates\store\store.html:240
-msgid "Clear filters"
-msgstr "Effacer la recherche"
-
 #: .\templates\store\store.html:241
 msgid "Browse collections"
 msgstr "Pas encore de collections"
@@ -3870,11 +4001,27 @@ msgstr "Se connecter"
 msgid "to keep them on your account."
 msgstr "pour les conserver sur votre compte."
 
-#: .\templates\wishlist\saved_items.html:32
+#: .\templates\wishlist\saved_items.html:28
+msgid "Search your saved items"
+msgstr "Rechercher dans vos articles enregistrés"
+
+#: .\templates\wishlist\saved_items.html:28
+msgid "Search saved items"
+msgstr "Rechercher des articles enregistrés"
+
+#: .\templates\wishlist\saved_items.html:44
+msgid "No saved items match your search"
+msgstr "Aucun article enregistré ne correspond à votre recherche"
+
+#: .\templates\wishlist\saved_items.html:45
+msgid "Try a different keyword or clear the search."
+msgstr "Essayez un autre mot-clé ou effacez la recherche."
+
+#: .\templates\wishlist\saved_items.html:51
 msgid "No saved items yet"
 msgstr "Utiliser une adresse enregistrée"
 
-#: .\templates\wishlist\saved_items.html:33
+#: .\templates\wishlist\saved_items.html:52
 msgid "Tap the heart on any product to save it here for later."
 msgstr ""
 "Touchez le cœur sur n'importe quel produit pour l'enregistrer ici pour plus "
@@ -3888,9 +4035,12 @@ msgstr "Article de la liste de favoris"
 msgid "Wishlist items"
 msgstr "Articles de la liste de favoris"
 
-#: .\wishlist\views.py:67
+#: .\wishlist\views.py:80
 msgid "Saved for later."
 msgstr "Enregistré pour plus tard."
+
+#~ msgid "PDF invoice"
+#~ msgstr "Facture PDF"
 
 #~ msgid "We don't ship to this country yet — choose another at checkout."
 #~ msgstr ""
@@ -3956,9 +4106,6 @@ msgstr "Enregistré pour plus tard."
 
 #~ msgid "In stock only"
 #~ msgstr "En stock uniquement"
-
-#~ msgid "Try a different search, or browse the full collection."
-#~ msgstr "Essayez une autre recherche ou parcourez toute la collection."
 
 #~ msgid "Nothing here yet"
 #~ msgstr "Aucune commande"

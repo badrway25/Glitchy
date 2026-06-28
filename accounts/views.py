@@ -99,19 +99,89 @@ def dashboard(request):
     return render(request, "accounts/dashboard.html", context)
 
 
+# Customer-facing order statuses (the model's STATUS choices).
+ORDER_STATUS_OPTIONS = ["New", "Accepted", "Completed", "Cancelled"]
+
+# Order list sort options -> (label key, ORM ordering). Whitelisted so the
+# `sort` query param can never inject an arbitrary field.
+ORDER_SORT_OPTIONS = {
+    "recent": ("Newest first", "-created_at"),
+    "oldest": ("Oldest first", "created_at"),
+    "high": ("Highest total", "-order_total"),
+    "low": ("Lowest total", "order_total"),
+}
+
+
+def _filter_sort_orders(request, base_qs):
+    """Shared search + status + sort for the orders / billing lists.
+
+    Search matches the order number or any purchased product name. Status is
+    validated against the model choices; sort against a whitelist."""
+    q = (request.GET.get("q") or "").strip()[:60]
+    status = (request.GET.get("status") or "").strip()
+    sort = (request.GET.get("sort") or "recent").strip()
+
+    qs = base_qs
+    if status in ORDER_STATUS_OPTIONS:
+        qs = qs.filter(status=status)
+    if q:
+        qs = qs.filter(
+            Q(order_number__icontains=q) |
+            Q(orderproduct__product__product_name__icontains=q)
+        ).distinct()
+    ordering = ORDER_SORT_OPTIONS.get(sort, ORDER_SORT_OPTIONS["recent"])[1]
+    qs = qs.order_by(ordering)
+    return qs, {"q": q, "status": status if status in ORDER_STATUS_OPTIONS else "",
+                "sort": sort if sort in ORDER_SORT_OPTIONS else "recent"}
+
+
 @login_required(login_url='login')
 def my_orders(request):
     user = request.user
-    orders_qs = Order.objects.filter(user=user, is_ordered=True).order_by('-created_at')
+    base = Order.objects.filter(user=user, is_ordered=True).select_related("payment")
+    orders_qs, active = _filter_sort_orders(request, base)
 
     paginator = Paginator(orders_qs, 10)
-    page = request.GET.get("page")
-    orders = paginator.get_page(page)
+    orders = paginator.get_page(request.GET.get("page"))
+
+    # Preserve filters across pagination links.
+    params = request.GET.copy()
+    params.pop("page", None)
 
     context = {
         "orders": orders,
+        "q": active["q"], "status": active["status"], "sort": active["sort"],
+        "status_options": ORDER_STATUS_OPTIONS,
+        "sort_options": {k: v[0] for k, v in ORDER_SORT_OPTIONS.items()},
+        "has_filters": bool(active["q"] or active["status"] or active["sort"] != "recent"),
+        "querystring": params.urlencode(),
     }
     return render(request, "accounts/my_orders.html", context)
+
+
+@login_required(login_url="login")
+def billing(request):
+    """Billing / receipts center — every placed order has a downloadable receipt
+    (PDF). Honest wording: these are order receipts, not fiscal invoices."""
+    user = request.user
+    base = Order.objects.filter(user=user, is_ordered=True).select_related("payment")
+    orders_qs, active = _filter_sort_orders(request, base)
+
+    paginator = Paginator(orders_qs, 10)
+    receipts = paginator.get_page(request.GET.get("page"))
+
+    params = request.GET.copy()
+    params.pop("page", None)
+
+    context = {
+        "receipts": receipts,
+        "q": active["q"], "status": active["status"], "sort": active["sort"],
+        "status_options": ORDER_STATUS_OPTIONS,
+        "sort_options": {k: v[0] for k, v in ORDER_SORT_OPTIONS.items()},
+        "has_filters": bool(active["q"] or active["status"] or active["sort"] != "recent"),
+        "querystring": params.urlencode(),
+    }
+    return render(request, "accounts/billing.html", context)
 
 
 @login_required(login_url='login')

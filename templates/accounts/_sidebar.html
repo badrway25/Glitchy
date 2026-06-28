@@ -19,6 +19,11 @@
       <i class="fa fa-box"></i> {% trans "My orders" %}
     </a>
 
+    <a class="acc-link {% if request.resolver_match.url_name == 'billing' %}active{% endif %}"
+       href="{% url 'billing' %}">
+      <i class="fa fa-file-invoice"></i> {% trans "Billing & receipts" %}
+    </a>
+
     <a class="acc-link {% if request.resolver_match.url_name == 'saved' %}active{% endif %}"
        href="{% url 'wishlist:saved' %}">
       <i class="fa fa-heart"></i> {% trans "Saved items" %}

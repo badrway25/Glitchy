@@ -73,7 +73,7 @@
                     <div class="kpi-label">{% trans "In progress" %}</div>
                     <div class="kpi-icon"><i class="fa fa-clock"></i></div>
                   </div>
-                  <div class="kpi-value">{{ in_progress }}</div>
+                  <div class="kpi-value">{{ pending_count }}</div>
                   <div class="kpi-sub text-muted">{% trans "New / Accepted" %}</div>
                 </div>
 
@@ -82,7 +82,7 @@
                     <div class="kpi-label">{% trans "Completed" %}</div>
                     <div class="kpi-icon"><i class="fa fa-check-circle"></i></div>
                   </div>
-                  <div class="kpi-value">{{ completed }}</div>
+                  <div class="kpi-value">{{ completed_count }}</div>
                   <div class="kpi-sub text-muted">{% trans "Delivered" %}</div>
                 </div>
               </div>

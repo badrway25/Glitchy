@@ -1,0 +1,34 @@
+{% load i18n %}
+{% comment %}Premium search + status + sort bar for orders / billing. GET form,
+server-validated (see accounts.views._filter_sort_orders).{% endcomment %}
+<form method="get" class="portal-filters" role="search">
+  <div class="pf-search">
+    <i class="fa fa-magnifying-glass pf-search-ic" aria-hidden="true"></i>
+    <input type="text" name="q" value="{{ q }}" class="pf-input" maxlength="60"
+           placeholder="{% trans 'Search by order # or product' %}"
+           aria-label="{% trans 'Search orders' %}">
+  </div>
+  <div class="pf-controls">
+    <label class="pf-select-wrap">
+      <select name="status" class="pf-select" aria-label="{% trans 'Filter by status' %}">
+        <option value="">{% trans "All statuses" %}</option>
+        <option value="New" {% if status == 'New' %}selected{% endif %}>{% trans "Confirmed" %}</option>
+        <option value="Accepted" {% if status == 'Accepted' %}selected{% endif %}>{% trans "Packed" %}</option>
+        <option value="Completed" {% if status == 'Completed' %}selected{% endif %}>{% trans "Completed" %}</option>
+        <option value="Cancelled" {% if status == 'Cancelled' %}selected{% endif %}>{% trans "Cancelled" %}</option>
+      </select>
+    </label>
+    <label class="pf-select-wrap">
+      <select name="sort" class="pf-select" aria-label="{% trans 'Sort orders' %}">
+        <option value="recent" {% if sort == 'recent' %}selected{% endif %}>{% trans "Newest first" %}</option>
+        <option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>{% trans "Oldest first" %}</option>
+        <option value="high" {% if sort == 'high' %}selected{% endif %}>{% trans "Highest total" %}</option>
+        <option value="low" {% if sort == 'low' %}selected{% endif %}>{% trans "Lowest total" %}</option>
+      </select>
+    </label>
+    <button type="submit" class="btn btn-primary pf-go">{% trans "Apply" %}</button>
+    {% if has_filters %}
+      <a href="{{ request.path }}" class="btn btn-soft pf-clear">{% trans "Clear" %}</a>
+    {% endif %}
+  </div>
+</form>

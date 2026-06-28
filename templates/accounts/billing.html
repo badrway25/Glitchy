@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+
+{% block title %}{% trans "Billing & receipts" %}{% endblock %}
+
+{% block content %}
+<section class="section-content padding-y">
+  <div class="container" style="max-width: 1280px;">
+    <div class="row g-4">
+
+      <aside class="col-lg-3">
+        {% include 'accounts/_sidebar.html' %}
+      </aside>
+
+      <main class="col-lg-9">
+        <div class="acc-layout">
+
+          <div class="dash-top">
+            <div>
+              <h1 class="dash-title">{% trans "Billing & receipts" %}</h1>
+              <div class="text-muted">{% trans "Download a receipt for any of your orders." %}</div>
+            </div>
+            <div class="dash-actions">
+              <a href="{% url 'my_orders' %}" class="btn btn-soft btn-icontext">
+                <i class="fa fa-box" aria-hidden="true"></i><span>{% trans "Orders" %}</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="dash-card">
+            <div class="dash-card-body">
+
+              <div class="billing-note">
+                <i class="fa fa-circle-info" aria-hidden="true"></i>
+                {% trans "These are order receipts (not fiscal invoices)." %}
+              </div>
+
+              {% include 'accounts/_portal_filters.html' %}
+
+              {% if receipts %}
+                <div class="receipt-cards">
+                  {% for o in receipts %}
+                    <article class="receipt-card">
+                      <div class="rc-icon"><i class="fa fa-file-pdf" aria-hidden="true"></i></div>
+                      <div class="rc-main">
+                        <div class="rc-id-row">
+                          <span class="rc-id">{% trans "Receipt" %} #{{ o.order_number }}</span>
+                          {% include 'accounts/_order_status_badge.html' with o=o %}
+                        </div>
+                        <div class="rc-meta">
+                          <span class="oc-chip"><i class="fa fa-calendar-o" aria-hidden="true"></i>{{ o.created_at|date:"M d, Y" }}</span>
+                          <span class="oc-chip"><i class="fa fa-coins" aria-hidden="true"></i>€ {{ o.order_total|floatformat:2 }}</span>
+                          {% if o.payment %}<span class="oc-chip"><i class="fa fa-circle-check" aria-hidden="true"></i>{{ o.payment.payment_method }}</span>{% endif %}
+                        </div>
+                      </div>
+                      <div class="rc-actions">
+                        <a href="{% url 'invoice_pdf' o.order_number %}?disposition=inline" target="_blank" rel="noopener"
+                           class="btn btn-soft btn-sm"><i class="fa fa-eye" aria-hidden="true"></i><span>{% trans "Preview" %}</span></a>
+                        <a href="{% url 'invoice_pdf' o.order_number %}"
+                           class="btn btn-primary btn-sm"><i class="fa fa-download" aria-hidden="true"></i><span>{% trans "Download" %}</span></a>
+                      </div>
+                    </article>
+                  {% endfor %}
+                </div>
+
+                {% include 'accounts/_portal_pagination.html' with page_obj=receipts querystring=querystring %}
+              {% elif has_filters %}
+                <div class="dash-empty">
+                  <div class="dash-empty-icon"><i class="fa fa-magnifying-glass"></i></div>
+                  <h4>{% trans "No receipts match your filters" %}</h4>
+                  <p class="text-muted mb-3">{% trans "Try a different search or clear the filters." %}</p>
+                  <a href="{% url 'billing' %}" class="btn btn-soft">{% trans "Clear filters" %}</a>
+                </div>
+              {% else %}
+                <div class="dash-empty">
+                  <div class="dash-empty-icon"><i class="fa fa-file-invoice"></i></div>
+                  <h4>{% trans "No receipts yet" %}</h4>
+                  <p class="text-muted mb-3">{% trans "Your order receipts will appear here after your first purchase." %}</p>
+                  <a href="{% url 'store' %}" class="btn btn-primary">{% trans "Browse products" %}</a>
+                </div>
+              {% endif %}
+
+            </div>
+          </div>
+
+        </div>
+      </main>
+
+    </div>
+  </div>
+</section>
+{% endblock %}
