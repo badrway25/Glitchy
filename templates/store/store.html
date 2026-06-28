@@ -180,9 +180,10 @@
     {% with hover=product.hover_image %}{% if hover %}<img class="p-img-2" src="{{ hover }}" alt="" loading="lazy" aria-hidden="true">{% endif %}{% endwith %}
   </a>
 
-  <a href="{{ product.get_url }}" class="quick-add" aria-label="{% trans 'View' %} {{ product.product_name }}">
+  <button type="button" class="quick-add" data-quick-view="{{ product.id }}"
+          aria-label="{% trans 'Quick view' %}: {{ product.product_name }}">
     {% icon "bag" "ic" 16 %} {% trans "Quick view" %}
-  </a>
+  </button>
 </div>
 
 

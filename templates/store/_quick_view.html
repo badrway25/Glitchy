@@ -1,0 +1,79 @@
+{% load static i18n uikit %}
+{% comment %}Lightweight product fragment for the Quick View drawer (store grid).
+Customer-facing data only — no internal Printify ids/costs.{% endcomment %}
+<div class="qv" data-qv-product="{{ p.id }}">
+  <a class="qv-media" href="{{ p.get_url }}" aria-label="{{ p.product_name }}">
+    <img src="{% if p.cover_image %}{{ p.cover_image }}{% else %}{% static 'images/placeholder.png' %}{% endif %}"
+         alt="{{ p.product_name }}" loading="lazy" decoding="async">
+    {% if not p.is_available or p.stock <= 0 %}<span class="qv-badge qv-badge-out">{% trans "Sold out" %}</span>
+    {% elif p.on_sale %}<span class="qv-badge qv-badge-sale">{% trans "Sale" %}</span>{% endif %}
+  </a>
+
+  <div class="qv-body">
+    <div class="qv-head">
+      <a href="{{ p.get_url }}" class="qv-title">{{ p.product_name }}</a>
+      <button type="button" class="wish-btn {% if p.id in WISHLIST_IDS %}is-active{% endif %}"
+              data-wishlist-toggle data-product-id="{{ p.id }}"
+              aria-label="{% trans 'Save to wishlist' %}"><i class="fa fa-heart"></i></button>
+    </div>
+
+    {% if review_count %}
+      <div class="qv-rating">
+        <span class="rating-stars"><span class="rating-stars-fill" style="width:{% widthratio review_avg 5 100 %}%"></span></span>
+        <span class="rating-meta">{{ review_avg|floatformat:1 }} <em>({{ review_count }})</em></span>
+      </div>
+    {% else %}
+      <span class="pill">{% icon "spark" "ic" 13 %} {% trans "New" %}</span>
+    {% endif %}
+
+    <div class="qv-price">{{ CURRENCY_SYMBOL }} {{ p.price }}
+      {% if p.on_sale %}<span class="qv-was">{{ CURRENCY_SYMBOL }} {{ p.compare_at_price }}</span>{% endif %}
+    </div>
+
+    <form class="qv-form" action="{% url 'add_cart' p.id %}" method="post" data-qv-form
+          data-msg="{% trans 'Please choose a colour and size first.' %}">
+      {% csrf_token %}
+      <div class="qv-fields">
+        {% if colors %}
+        <label class="qv-field">
+          <span class="qv-lab">{% trans "Color" %}</span>
+          <select name="color" required aria-label="{% trans 'Color' %}">
+            <option value="">{% trans "Select color" %}</option>
+            {% for c in colors %}<option value="{{ c.variation_value }}">{{ c.variation_value|capfirst }}</option>{% endfor %}
+          </select>
+        </label>
+        {% endif %}
+        {% if sizes %}
+        <label class="qv-field">
+          <span class="qv-lab">{% trans "Size" %}</span>
+          <select name="size" required aria-label="{% trans 'Size' %}">
+            <option value="">{% trans "Select size" %}</option>
+            {% for s in sizes %}<option value="{{ s.variation_value }}">{{ s.variation_value|upper }}</option>{% endfor %}
+          </select>
+        </label>
+        {% endif %}
+      </div>
+
+      <p class="qv-err" data-qv-err hidden role="alert"></p>
+
+      {% if p.stock <= 0 or not p.is_available %}
+        <button type="button" class="btn btn-primary btn-block" disabled>{% trans "Out of stock" %}</button>
+      {% else %}
+        <button type="submit" class="btn btn-primary btn-block qv-add">
+          <i class="fa fa-shopping-cart mr-2" aria-hidden="true"></i>{% trans "Add to cart" %}
+        </button>
+      {% endif %}
+    </form>
+
+    {% if shipping_quote and shipping_quote.available %}
+    <div class="qv-deliv">
+      {% icon "truck" "ic" 15 %}
+      <span>{% trans "Estimated delivery" %}: <strong>{{ shipping_quote.eta_label }}</strong>
+        {% if shipping_quote.free %}· {% trans "Free shipping" %}{% endif %}</span>
+    </div>
+    {% endif %}
+
+    <a href="{{ p.get_url }}" class="qv-full">{% trans "View full details" %} <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+    <p class="qv-trust">{% icon "leaf" "ic" 13 %} {% trans "Made on demand · printed just for you" %}</p>
+  </div>
+</div>

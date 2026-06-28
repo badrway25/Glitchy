@@ -3,7 +3,7 @@ from django.conf import settings
 from .models import Product, ReviewRating
 from category.models import Category
 from carts.models import CartItem
-from django.db.models import Q
+from django.db.models import Q, Avg
 
 from carts.views import _cart_id
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
@@ -165,6 +165,35 @@ def product_detail(request, category_slug, product_slug):
         'product_meta_description': single_product.meta_description_for(lang),
     }
     return render(request, 'store/product_detail.html', context)
+
+
+def quick_view(request, product_id):
+    """Lightweight product fragment for the store Quick View drawer.
+
+    Renders only customer-facing data (image, title, price, rating, colour/size,
+    a delivery estimate and add-to-cart) so shoppers can act without leaving the
+    store grid. Never exposes internal Printify ids/costs; never creates an order.
+    """
+    product = get_object_or_404(Product, id=product_id, is_available=True)
+
+    reviews = ReviewRating.objects.filter(product_id=product.id, status=True)
+    review_count = reviews.count()
+    review_avg = round(reviews.aggregate(a=Avg("rating"))["a"] or 0, 1)
+
+    from shipping.geo import detect_country
+    from shipping.services import fallback_quote
+    shipping_quote = fallback_quote(detect_country(request), total_quantity=1,
+                                    subtotal=product.price)
+
+    context = {
+        "p": product,
+        "colors": product.variation_set.colors(),
+        "sizes": product.variation_set.sizes(),
+        "review_count": review_count,
+        "review_avg": review_avg,
+        "shipping_quote": shipping_quote,
+    }
+    return render(request, "store/_quick_view.html", context)
 
 
 def search(request):

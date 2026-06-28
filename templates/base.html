@@ -53,7 +53,7 @@
   {% block extra_css %}{% endblock %}
 </head>
 
-<body>
+<body data-qv-error="{% trans 'Could not load this product. Please try again.' %}">
 
   {% include 'includes/announcement_bar.html' %}
 
@@ -80,6 +80,7 @@
   <script src="{% static 'js/variant-guard.js' %}?v={{ ASSET_VERSION }}"></script>
   <script src="{% static 'js/variant-select.js' %}?v={{ ASSET_VERSION }}"></script>
   <script src="{% static 'js/premium-select.js' %}?v={{ ASSET_VERSION }}"></script>
+  <script src="{% static 'js/quick-view.js' %}?v={{ ASSET_VERSION }}"></script>
 
   {% block extra_js %}{% endblock %}
 
