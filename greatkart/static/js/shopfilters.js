@@ -4,19 +4,28 @@
   document.addEventListener("DOMContentLoaded", function () {
     var drawer = document.getElementById("filterDrawer");
     if (drawer) {
-      function open() {
+      var panel = drawer.querySelector(".filter-drawer-panel");
+      var lastOpener = null;
+      function focusables() {
+        return Array.prototype.slice.call(panel.querySelectorAll(
+          'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea,[tabindex]:not([tabindex="-1"])'
+        )).filter(function (el) { return el.offsetParent !== null; });
+      }
+      function open(e) {
+        lastOpener = (e && e.currentTarget) || document.activeElement;
         drawer.hidden = false;
         document.body.style.overflow = "hidden";
         requestAnimationFrame(function () {
           drawer.classList.add("is-open");
-          var first = drawer.querySelector("input, a, button");
-          if (first) first.focus();
+          var f = focusables();
+          if (f.length) f[0].focus();
         });
       }
       function close() {
         drawer.classList.remove("is-open");
         document.body.style.overflow = "";
-        setTimeout(function () { drawer.hidden = true; }, 250);
+        setTimeout(function () { drawer.hidden = true; }, 280);
+        if (lastOpener && lastOpener.focus) lastOpener.focus();
       }
       document.querySelectorAll("[data-open-filters]").forEach(function (b) {
         b.addEventListener("click", open);
@@ -24,8 +33,21 @@
       drawer.querySelectorAll("[data-drawer-close]").forEach(function (b) {
         b.addEventListener("click", close);
       });
+      // "Show results" in the sticky footer submits the in-sheet filter form.
+      var applyBtn = drawer.querySelector("[data-sheet-apply]");
+      if (applyBtn) applyBtn.addEventListener("click", function () {
+        var form = drawer.querySelector("[data-filter-form]");
+        if (form) form.requestSubmit ? form.requestSubmit() : form.submit();
+      });
       document.addEventListener("keydown", function (e) {
-        if (e.key === "Escape" && drawer.classList.contains("is-open")) close();
+        if (!drawer.classList.contains("is-open")) return;
+        if (e.key === "Escape") { close(); return; }
+        if (e.key === "Tab") {  // focus trap
+          var f = focusables(); if (!f.length) return;
+          var first = f[0], last = f[f.length - 1], a = document.activeElement;
+          if (e.shiftKey && (a === first || !panel.contains(a))) { e.preventDefault(); last.focus(); }
+          else if (!e.shiftKey && (a === last || !panel.contains(a))) { e.preventDefault(); first.focus(); }
+        }
       });
     }
 
