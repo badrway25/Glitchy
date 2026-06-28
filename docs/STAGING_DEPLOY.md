@@ -6,6 +6,20 @@ no real Printify orders until staging is green and explicitly authorized.
 
 Branch to deploy: **`release/staging-printify-fashion-store`**.
 
+> ⚠️ **Release note (2026-06-28, Phase 51/52 — pre-order shipping estimates):** this
+> release adds DB migration **`printify_integration/0003_printifyshippingestimatecache`**
+> (additive: a new `PrintifyShippingEstimateCache` table). The next deploy is **NOT a
+> simple restart** — it must run:
+> ```bash
+> git pull                       # or fetch + checkout the release branch
+> python manage.py migrate       # REQUIRED — applies 0003
+> python manage.py collectstatic --noinput
+> # restart gunicorn, then live QA
+> ```
+> Keep `PRINTIFY_PUSH_ENABLED=False`. Enable `SHIPPING_USE_PRINTIFY=True` **only** in a
+> controlled staging environment (live shipping estimate is read-only — it never creates
+> an order); leave it `False` at rest.
+
 ---
 
 ## 0. Prerequisites on the staging host
