@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: greatkart 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-28 19:00+0200\n"
+"POT-Creation-Date: 2026-06-28 20:45+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1727,7 +1727,7 @@ msgid "Qty"
 msgstr "Qtà"
 
 #: .\templates\accounts\order_detail.html:197
-#: .\templates\store\_filters.html:34
+#: .\templates\store\_filters.html:35
 msgid "Price"
 msgstr "Prezzo"
 
@@ -1869,7 +1869,7 @@ msgstr ""
 msgid "Shop the collection"
 msgstr "Scopri la collezione"
 
-#: .\templates\home.html:22 .\templates\store\_filters.html:133
+#: .\templates\home.html:22 .\templates\store\_filters.html:134
 msgid "New arrivals"
 msgstr "Nuovi arrivi"
 
@@ -2257,10 +2257,17 @@ msgstr "Termini"
 msgid "Cookies"
 msgstr "Cookie"
 
-#: .\templates\includes\lang_switcher.html:6
-#: .\templates\includes\lang_switcher.html:11
+#: .\templates\includes\lang_switcher.html:9
+msgid "Change language"
+msgstr "Cambia lingua"
+
+#: .\templates\includes\lang_switcher.html:9
 msgid "Language"
 msgstr "Lingua"
+
+#: .\templates\includes\lang_switcher.html:14
+msgid "Choose language"
+msgstr "Scegli la lingua"
 
 #: .\templates\includes\navbar.html:17
 msgid "Toggle navigation"
@@ -2318,7 +2325,7 @@ msgstr "Esplora le categorie"
 
 #: .\templates\includes\navbar.html:74
 #: .\templates\merchandising\collections_index.html:158
-#: .\templates\store\_filters.html:23 .\templates\store\store.html:33
+#: .\templates\store\_filters.html:24 .\templates\store\store.html:33
 msgid "All products"
 msgstr "Tutti i prodotti"
 
@@ -2967,7 +2974,7 @@ msgid "Favourite colour?"
 msgstr "Colore preferito?"
 
 #: .\templates\merchandising\style_quiz.html:50
-#: .\templates\store\_filters.html:116
+#: .\templates\store\_filters.html:117
 msgid "Any"
 msgstr "Qualsiasi"
 
@@ -3459,59 +3466,59 @@ msgstr "Articoli"
 msgid "Note from our team:"
 msgstr "Nota dal nostro team:"
 
-#: .\templates\store\_filters.html:11
+#: .\templates\store\_filters.html:12
 msgid "Refine your look"
 msgstr "Affina il tuo stile"
 
-#: .\templates\store\_filters.html:12
+#: .\templates\store\_filters.html:13
 msgid "Narrow the edit to find your pieces faster."
 msgstr "Restringi la selezione per trovare i tuoi capi più in fretta."
 
-#: .\templates\store\_filters.html:18
+#: .\templates\store\_filters.html:19
 msgid "Category"
 msgstr "Categorie"
 
-#: .\templates\store\_filters.html:43
+#: .\templates\store\_filters.html:44
 msgid "Minimum price"
 msgstr "Prezzo minimo"
 
-#: .\templates\store\_filters.html:50
+#: .\templates\store\_filters.html:51
 msgid "Maximum price"
 msgstr "Prezzo massimo"
 
-#: .\templates\store\_filters.html:61
+#: .\templates\store\_filters.html:62
 msgid "Colour"
 msgstr "Colore"
 
-#: .\templates\store\_filters.html:84 .\templates\store\_quick_view.html:49
+#: .\templates\store\_filters.html:85 .\templates\store\_quick_view.html:49
 #: .\templates\store\_quick_view.html:50
 #: .\templates\store\product_detail.html:179
 #: .\templates\store\product_detail.html:643
 msgid "Size"
 msgstr "Taglia"
 
-#: .\templates\store\_filters.html:104
+#: .\templates\store\_filters.html:105
 msgid "Rating"
 msgstr "Valutazione"
 
-#: .\templates\store\_filters.html:125
+#: .\templates\store\_filters.html:126
 msgid "Availability"
 msgstr "Disponibilità"
 
-#: .\templates\store\_filters.html:131
+#: .\templates\store\_filters.html:132
 #: .\templates\store\product_detail.html:105
 msgid "In stock"
 msgstr "Disponibile"
 
-#: .\templates\store\_filters.html:132
+#: .\templates\store\_filters.html:133
 msgid "On sale"
 msgstr "In saldo"
 
-#: .\templates\store\_filters.html:142 .\templates\store\store.html:153
+#: .\templates\store\_filters.html:143 .\templates\store\store.html:153
 msgid "Show results"
 msgstr "Mostra risultati"
 
-#: .\templates\store\_filters.html:143 .\templates\store\store.html:127
+#: .\templates\store\_filters.html:144 .\templates\store\store.html:127
 msgid "Clear all"
 msgstr "Cancella"
 
@@ -4126,10 +4133,13 @@ msgid "Collection"
 msgstr "Collezione"
 
 #: .\templates\store\store.html:108
+#, python-format
 msgid "Explore our %(c)s edit — made on demand, printed just for you."
-msgstr "Esplora la nostra selezione %(c)s — prodotta su richiesta, stampata per te."
+msgstr ""
+"Esplora la nostra selezione %(c)s — prodotta su richiesta, stampata per te."
 
 #: .\templates\store\store.html:111
+#, python-format
 msgid "%(n)s style"
 msgid_plural "%(n)s styles"
 msgstr[0] "%(n)s stile"

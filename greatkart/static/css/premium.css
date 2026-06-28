@@ -2480,3 +2480,44 @@ body.has-sticky-cta .ai-assistant{bottom:78px;}
   .lxf-body,.lxf-chev,.reveal,.filter-drawer-panel,.lxf-dot{transition:none!important;}
   .reveal{opacity:1!important;transform:none!important;}
 }
+
+/* ============================================================ *
+ * Phase 57 — Premium language switcher (flag-inspired, subtle) *
+ * Language NAME only (no codes); refined tricolore washes that *
+ * stay readable in light & dark. Not kitsch.                   *
+ * ============================================================ */
+.lang-switcher .lang-pill .lang-name{font-weight:600;letter-spacing:.01em;font-size:.86rem;}
+/* Active pill carries a soft FULL-WIDTH flag wash */
+.lang-switcher .lang-pill.lang-it{background:linear-gradient(95deg,rgba(63,125,82,.16),rgba(243,238,228,.20) 50%,rgba(178,59,59,.16)),var(--surface);}
+.lang-switcher .lang-pill.lang-fr{background:linear-gradient(95deg,rgba(47,95,166,.16),rgba(243,238,228,.20) 50%,rgba(178,59,59,.16)),var(--surface);}
+.lang-switcher .lang-pill.lang-en{background:linear-gradient(95deg,rgba(31,42,68,.16),rgba(243,238,228,.18) 50%,rgba(178,59,59,.14)),var(--surface);}
+.lang-switcher .lang-pill:focus-visible{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(166,130,76,.25);}
+
+/* Refined menu shell */
+.lang-switcher .lang-menu{min-width:212px;padding:.4rem;border:var(--border);border-radius:14px;
+  background:var(--surface);box-shadow:var(--shadow);}
+.lang-switcher .lang-menu-head{padding:.4rem .7rem .55rem;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);font-weight:700;}
+
+/* Language option = name on a FULL-WIDTH flag-inspired background (green/white/red,
+   blue/white/red, navy/white/red). Soft enough to keep the name readable. */
+.lang-switcher .lang-opt{position:relative;display:flex;align-items:center;justify-content:space-between;
+  width:100%;padding:.62rem .85rem;margin:3px 0;border:0;border-radius:10px;
+  color:var(--text);font-size:.9rem;font-weight:600;cursor:pointer;
+  transition:filter .18s var(--ease),box-shadow .18s var(--ease);}
+/* Flag stays in ALL states (rest/hover/focus/active). !important defeats the
+   theme's .dropdown-item:hover/.active background override (which else wipes it). */
+.lang-switcher .lang-opt.lang-it,.lang-switcher .lang-opt.lang-it:hover,.lang-switcher .lang-opt.lang-it:focus,.lang-switcher .lang-opt.lang-it.active{background:linear-gradient(95deg,rgba(63,125,82,.30) 0%,rgba(243,238,228,.45) 50%,rgba(178,59,59,.30) 100%),var(--surface)!important;}
+.lang-switcher .lang-opt.lang-fr,.lang-switcher .lang-opt.lang-fr:hover,.lang-switcher .lang-opt.lang-fr:focus,.lang-switcher .lang-opt.lang-fr.active{background:linear-gradient(95deg,rgba(47,95,166,.30) 0%,rgba(243,238,228,.45) 50%,rgba(178,59,59,.30) 100%),var(--surface)!important;}
+.lang-switcher .lang-opt.lang-en,.lang-switcher .lang-opt.lang-en:hover,.lang-switcher .lang-opt.lang-en:focus,.lang-switcher .lang-opt.lang-en.active{background:linear-gradient(95deg,rgba(31,42,68,.28) 0%,rgba(243,238,228,.42) 50%,rgba(178,59,59,.24) 100%),var(--surface)!important;}
+.lang-switcher .lang-opt:hover{filter:saturate(1.35) brightness(1.02);}
+.lang-switcher .lang-opt.active{font-weight:800;box-shadow:0 0 0 1.5px var(--accent) inset;}
+.lang-switcher .lang-opt-check{color:var(--accent-2);font-size:.8rem;margin-left:.5rem;}
+.lang-switcher .lang-opt:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(166,130,76,.32);}
+/* dark: keep colour bands + central light band legible under light text */
+:root[data-theme="dark"] .lang-switcher .lang-opt.lang-it,:root[data-theme="dark"] .lang-switcher .lang-opt.lang-it:hover,:root[data-theme="dark"] .lang-switcher .lang-opt.lang-it:focus,:root[data-theme="dark"] .lang-switcher .lang-opt.lang-it.active{background:linear-gradient(95deg,rgba(79,152,102,.34) 0%,rgba(239,233,220,.26) 50%,rgba(207,90,82,.34) 100%),var(--surface)!important;}
+:root[data-theme="dark"] .lang-switcher .lang-opt.lang-fr,:root[data-theme="dark"] .lang-switcher .lang-opt.lang-fr:hover,:root[data-theme="dark"] .lang-switcher .lang-opt.lang-fr:focus,:root[data-theme="dark"] .lang-switcher .lang-opt.lang-fr.active{background:linear-gradient(95deg,rgba(63,114,192,.34) 0%,rgba(239,233,220,.26) 50%,rgba(207,90,82,.34) 100%),var(--surface)!important;}
+:root[data-theme="dark"] .lang-switcher .lang-opt.lang-en,:root[data-theme="dark"] .lang-switcher .lang-opt.lang-en:hover,:root[data-theme="dark"] .lang-switcher .lang-opt.lang-en:focus,:root[data-theme="dark"] .lang-switcher .lang-opt.lang-en.active{background:linear-gradient(95deg,rgba(47,66,110,.36) 0%,rgba(239,233,220,.22) 50%,rgba(207,90,82,.26) 100%),var(--surface)!important;}
+:root[data-theme="dark"] .lang-switcher .lang-pill.lang-it{background:linear-gradient(95deg,rgba(79,152,102,.20),rgba(239,233,220,.16) 50%,rgba(207,90,82,.20)),var(--surface);}
+:root[data-theme="dark"] .lang-switcher .lang-pill.lang-fr{background:linear-gradient(95deg,rgba(63,114,192,.20),rgba(239,233,220,.16) 50%,rgba(207,90,82,.20)),var(--surface);}
+:root[data-theme="dark"] .lang-switcher .lang-pill.lang-en{background:linear-gradient(95deg,rgba(47,66,110,.22),rgba(239,233,220,.14) 50%,rgba(207,90,82,.18)),var(--surface);}
