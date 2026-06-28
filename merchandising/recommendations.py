@@ -24,9 +24,13 @@ def recommend_for_product(product, limit=4):
                            ProductRelation.ALTERNATIVE]).select_related("to_product")]
     result = _dedupe(curated, exclude)
     if len(result) < limit:
-        same_cat = Product.objects.filter(is_available=True, category=product.category)\
-            .exclude(id=product.id).order_by("-created_date")
-        result = _dedupe(result + list(same_cat), exclude)
+        # Same category, ranked by PRICE PROXIMITY to the current product (closest
+        # price point first) then newest — a real, explainable signal, not random.
+        base_price = float(product.price or 0)
+        same_cat = list(Product.objects.filter(is_available=True, category=product.category)
+                        .exclude(id=product.id))
+        same_cat.sort(key=lambda p: (abs(float(p.price or 0) - base_price), -p.id))
+        result = _dedupe(result + same_cat, exclude)
     if len(result) < limit:
         newest = Product.objects.filter(is_available=True).exclude(id=product.id)\
             .order_by("-created_date")

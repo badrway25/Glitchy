@@ -21,7 +21,12 @@
       <!-- Premium search — always visible (full-width on mobile, prominent on desktop) -->
       <form action="{% url 'search' %}" method="GET" class="nav-search ac-wrap"
             data-autocomplete data-ac-url="{% url 'autocomplete' %}" data-ac-viewall="{% trans 'View all results' %}"
-            data-ac-empty="{% trans 'No matches — try another term.' %}" role="search" autocomplete="off">
+            data-ac-empty="{% trans 'No matches — try another term.' %}"
+            data-ac-recent-label="{% trans 'Recent searches' %}"
+            data-ac-popular-label="{% trans 'Popular' %}"
+            data-ac-clear-label="{% trans 'Clear' %}"
+            data-ac-popular="{% for c in links %}{{ c.category_name }}{% if not forloop.last %}|{% endif %}{% endfor %}"
+            role="search" autocomplete="off">
         <div class="searchbar searchbar-xl">
           <span class="icon"><i class="fa fa-search"></i></span>
           <input class="form-control" type="text" name="keyword" role="combobox" aria-expanded="false"

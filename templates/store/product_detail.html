@@ -325,7 +325,9 @@
     {% if ctl %}
     <section class="ctl-wrap mt-5" data-outfit-view>
       <div class="ctl-head">
-        <div class="lux-eyebrow mb-1">{% icon "spark" "ic" 15 %} {% trans "Complete the look" %}</div>
+        <div class="lux-eyebrow mb-1">{% icon "spark" "ic" 15 %} {% trans "Complete the look" %}
+          <span class="pairs-badge">{% trans "Pairs well with" %}</span>
+        </div>
         <h3 class="section-title m-0">{% if outfit_title %}{{ outfit_title }}{% else %}{% trans "Style it together" %}{% endif %}</h3>
         {% if outfit_desc %}<p class="text-muted mt-1 mb-0" style="font-size:.92rem;">{{ outfit_desc }}</p>{% endif %}
       </div>

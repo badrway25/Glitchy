@@ -13,6 +13,43 @@
     if (!input || !panel || !url) return;
     var timer = null, active = -1, items = [], lastQ = "";
 
+    // Recent (localStorage) + popular (server categories) — premium empty state.
+    var POP = (form.getAttribute("data-ac-popular") || "").split("|")
+      .map(function (s) { return s.trim(); }).filter(Boolean).slice(0, 8);
+    var recentLabel = form.getAttribute("data-ac-recent-label") || "Recent searches";
+    var popLabel = form.getAttribute("data-ac-popular-label") || "Popular";
+    var clearLabel = form.getAttribute("data-ac-clear-label") || "Clear";
+    function getRecent(){ try { return JSON.parse(localStorage.getItem("gk_recent_searches") || "[]"); } catch (e) { return []; } }
+    function saveRecent(q){
+      q = (q || "").trim(); if (q.length < 2) return;
+      try {
+        var a = getRecent().filter(function (x) { return x.toLowerCase() !== q.toLowerCase(); });
+        a.unshift(q); localStorage.setItem("gk_recent_searches", JSON.stringify(a.slice(0, 6)));
+      } catch (e) {}
+    }
+    function chip(term){ return '<a class="ac-chip" href="/store/search/?keyword=' + encodeURIComponent(term) + '">' + esc(term) + '</a>'; }
+    function renderEmpty(){
+      var rec = getRecent(), html = "";
+      if (rec.length) {
+        html += '<div class="ac-sec"><div class="ac-sec-head"><span>' + esc(recentLabel) +
+          '</span><button type="button" class="ac-clear-recent" data-ac-clear-recent>' + esc(clearLabel) +
+          '</button></div><div class="ac-chips">' + rec.map(chip).join("") + '</div></div>';
+      }
+      if (POP.length) {
+        html += '<div class="ac-sec"><div class="ac-sec-head"><span>' + esc(popLabel) +
+          '</span></div><div class="ac-chips">' + POP.map(chip).join("") + '</div></div>';
+      }
+      if (!html) return false;
+      panel.innerHTML = html; open(); items = [];
+      var cr = panel.querySelector("[data-ac-clear-recent]");
+      if (cr) cr.addEventListener("click", function (e) {
+        e.preventDefault();
+        try { localStorage.removeItem("gk_recent_searches"); } catch (_) {}
+        if (!renderEmpty()) close();
+      });
+      return true;
+    }
+
     function close(){ panel.classList.remove("is-open"); input.setAttribute("aria-expanded","false"); active = -1; }
     function open(){ panel.classList.add("is-open"); input.setAttribute("aria-expanded","true"); }
 
@@ -31,7 +68,7 @@
       panel.innerHTML = html; open(); active = -1;
       items = Array.prototype.slice.call(panel.querySelectorAll(".ac-item"));
       items.forEach(function (el) {
-        el.addEventListener("click", function () { track("autocomplete_select", { q: q, name: el.getAttribute("data-ac-select") }); });
+        el.addEventListener("click", function () { saveRecent(q); track("autocomplete_select", { q: q, name: el.getAttribute("data-ac-select") }); });
       });
     }
 
@@ -54,9 +91,13 @@
       var q = input.value.trim();
       syncClear();
       if (timer) clearTimeout(timer);
+      if (q.length === 0) { if (!renderEmpty()) close(); return; }
       if (q.length < 2) { close(); return; }
       timer = setTimeout(function () { if (q !== lastQ) { lastQ = q; fetchSuggest(q); } }, 220);
     });
+
+    // Persist the term to recent searches when the user searches.
+    form.addEventListener("submit", function () { saveRecent(input.value); });
 
     input.addEventListener("keydown", function (e) {
       if (!panel.classList.contains("is-open")) return;
@@ -74,7 +115,11 @@
     });
 
     document.addEventListener("click", function (e) { if (!form.contains(e.target)) close(); });
-    input.addEventListener("focus", function () { if (items.length && input.value.trim().length >= 2) open(); });
+    input.addEventListener("focus", function () {
+      var q = input.value.trim();
+      if (q.length >= 2 && items.length) open();
+      else if (q.length === 0) renderEmpty();
+    });
   });
 
   // Mobile search overlay (top sheet)
