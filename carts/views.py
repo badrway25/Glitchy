@@ -4,9 +4,10 @@ from .models import Cart, CartItem
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
 from accounts.models import Address
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
 from django.utils.translation import gettext as _
+from django.views.decorators.http import require_POST
 
 
 def _cart_id(request):
@@ -224,6 +225,59 @@ def _active_cart_items(request):
     if not cart:
         return CartItem.objects.none()
     return CartItem.objects.filter(cart=cart, is_active=True)
+
+
+def _estimate_throttled(request) -> bool:
+    """Soft per-session throttle for the shipping-estimate endpoint.
+
+    Generous limit (40 calls / 60s) so legitimate re-estimates never hit it; it
+    only blunts abusive loops. Best-effort: any cache problem fails open.
+    """
+    try:
+        from django.core.cache import cache
+        key = f"ship_estimate_rl:{_cart_id(request)}"
+        count = cache.get(key, 0)
+        if count >= 40:
+            return True
+        cache.set(key, count + 1, 60)
+    except Exception:
+        return False
+    return False
+
+
+@require_POST
+def shipping_estimate(request):
+    """Pre-order shipping estimate (cost + delivery time) for the current cart.
+
+    CSRF-protected, POST-only. Reads the cart SERVER-SIDE and never trusts any
+    client-supplied price or cost. Returns JSON; never creates an order.
+    """
+    from printify_integration.shipping_estimator import estimate_for_cart
+    from shipping.geo import set_manual_country
+
+    if _estimate_throttled(request):
+        return JsonResponse({"available": False, "errors_safe": ["rate_limited"],
+                             "disclaimer": str(_("Too many requests. Please wait a moment."))},
+                            status=429)
+
+    country = (request.POST.get("country") or "").strip().upper()[:2]
+    postal_code = (request.POST.get("postal_code") or "").strip()[:16]
+    region = (request.POST.get("region") or "").strip()[:64]
+    city = (request.POST.get("city") or "").strip()[:64]
+    method = (request.POST.get("shipping_method") or "").strip()[:24]
+
+    if len(country) != 2 or not country.isalpha():
+        return JsonResponse({"available": False, "errors_safe": ["invalid_country"],
+                             "disclaimer": str(_("Please choose a delivery country."))},
+                            status=200)
+
+    # Keep the session country in sync so the cart/checkout totals match the estimate.
+    set_manual_country(request, country)
+
+    cart_items = list(_active_cart_items(request))
+    result = estimate_for_cart(cart_items, country, postal_code=postal_code,
+                               region=region, city=city, shipping_method=method)
+    return JsonResponse(result.as_dict(), status=200)
 
 
 def cart(request, total=0, quantity=0, cart_items=None):

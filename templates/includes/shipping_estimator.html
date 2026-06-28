@@ -1,0 +1,79 @@
+{% load static i18n uikit %}
+{% comment %}
+Pre-order shipping estimator (cost + delivery time) — used on cart and checkout.
+Context vars (optional): ship_estimator_subtotal (Decimal), ship_estimator_variant
+("cart"|"checkout"). All dynamic strings come back localized from the JSON API.
+{% endcomment %}
+<div class="ship-estimator ship-estimator--{{ ship_estimator_variant|default:'cart' }}"
+     data-ship-estimator
+     data-endpoint="{% url 'shipping_estimate' %}"
+     data-subtotal="{{ ship_estimator_subtotal|default:0|stringformat:'.2f' }}"
+     data-currency="{{ CURRENCY_SYMBOL }}"
+     {% if ship_estimator_country_from %}data-country-from="{{ ship_estimator_country_from }}"{% endif %}
+     {% if ship_estimator_zip_from %}data-zip-from="{{ ship_estimator_zip_from }}"{% endif %}
+     data-msg-error="{% trans 'Could not estimate shipping. Please try again.' %}"
+     data-msg-network="{% trans 'Network error. Please check your connection and try again.' %}"
+     data-msg-country="{% trans 'Please choose a delivery country.' %}"
+     data-label-subtotal="{% trans 'Subtotal' %}"
+     data-label-shipping="{% trans 'Shipping' %}"
+     data-label-total="{% trans 'Estimated total' %}"
+     data-label-free="{% trans 'Free' %}">
+
+  <div class="se-head">
+    <span class="se-title">{% icon "truck" "ic" 16 %}{% trans "Estimate delivery" %}</span>
+    <span class="se-hint">{% trans "Before checkout" %}</span>
+  </div>
+  <p class="se-sub">{% trans "Enter your delivery country and postal code to estimate shipping before checkout." %}</p>
+
+  <form class="se-form" data-se-form novalidate>
+    {% csrf_token %}
+    {% if not ship_estimator_country_from %}
+    <div class="se-fields">
+      <label class="se-field se-field-country">
+        <span class="se-lab">{% trans "Country" %}</span>
+        <div class="se-select-wrap">
+          <select name="country" class="se-select" data-se-country aria-label="{% trans 'Delivery country' %}">
+            {% for code, name in ship_countries %}
+              <option value="{{ code }}" {% if code == ship_country %}selected{% endif %}>{{ name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </label>
+      <label class="se-field se-field-zip">
+        <span class="se-lab">{% trans "Postal code" %}</span>
+        <input type="text" name="postal_code" class="se-input" maxlength="16"
+               autocomplete="postal-code" inputmode="text" data-se-zip
+               placeholder="{% trans 'e.g. 20100' %}" aria-label="{% trans 'Postal code' %}">
+      </label>
+    </div>
+    {% endif %}
+    <button type="submit" class="btn btn-primary se-btn" data-se-submit>
+      <span class="se-btn-label">{% trans "Estimate delivery" %}</span>
+      <span class="se-spinner" data-se-spinner hidden aria-hidden="true"></span>
+    </button>
+  </form>
+
+  <!-- Loading skeleton -->
+  <div class="se-skeleton" data-se-skeleton hidden aria-hidden="true">
+    <div class="se-sk-row"></div><div class="se-sk-row"></div><div class="se-sk-row short"></div>
+  </div>
+
+  <!-- Result -->
+  <div class="se-result" data-se-result hidden>
+    <div class="se-source">
+      <span class="se-badge" data-se-badge></span>
+      <span class="se-deliv" data-se-deliv></span>
+    </div>
+    <div class="se-options" data-se-options role="radiogroup" aria-label="{% trans 'Shipping options' %}"></div>
+    <div class="se-totals">
+      <div class="se-line"><span data-se-tl-subtotal>{% trans "Subtotal" %}</span><span data-se-subtotal-val></span></div>
+      <div class="se-line"><span data-se-tl-shipping>{% trans "Shipping" %}</span><span data-se-shipping-val></span></div>
+      <div class="se-line se-grand"><span data-se-tl-total>{% trans "Estimated total" %}</span><span data-se-total-val></span></div>
+    </div>
+    <p class="se-mixed" data-se-mixed hidden>{% trans "Some items use estimated shipping data." %}</p>
+    <p class="se-disclaimer" data-se-disclaimer></p>
+  </div>
+
+  <!-- Error -->
+  <div class="se-error" data-se-error hidden role="alert"></div>
+</div>

@@ -179,23 +179,7 @@
             <div class="line grand"><span>{% trans "Grand total" %}</span><span>{{ CURRENCY_SYMBOL }} {{ grand_total }}</span></div>
           </div>
 
-          <div class="shipping-box shipping-inline">
-            <div class="ship-chip">
-              <i class="fa fa-truck"></i>
-              <span class="ship-label">{% trans "Ship to" %}</span>
-              <span class="ship-sep">·</span>
-              <span class="ship-value">{{ ship_country_name }}</span>
-            </div>
-            {% if shipping_quote %}
-            <div class="ship-chip">
-              <i class="fa fa-clock"></i>
-              <span class="ship-label">{% trans "Estimated delivery" %}</span>
-              <span class="ship-sep">·</span>
-              <span class="ship-value"><strong>{{ shipping_quote.eta_label }}</strong></span>
-            </div>
-            {% endif %}
-            <div class="mt-2">{% include 'includes/country_switcher.html' %}</div>
-          </div>
+          {% include 'includes/shipping_estimator.html' with ship_estimator_subtotal=total ship_estimator_variant='cart' %}
 
           <div class="summary-actions">
             <a href="{% url 'checkout' %}" class="btn btn-primary btn-block summary-cta">{% trans "Checkout" %}</a>
@@ -239,6 +223,7 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="{% static 'js/shipping-estimate.js' %}?v={{ ASSET_VERSION }}"></script>
 <script>
 (function () {
   "use strict";

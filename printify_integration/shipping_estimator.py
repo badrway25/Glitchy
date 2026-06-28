@@ -43,6 +43,13 @@ SOURCE_UNAVAILABLE = "unavailable"
 # --------------------------------------------------------------------------- #
 # DTOs
 # --------------------------------------------------------------------------- #
+def format_days_range(a: int, b: int) -> str:
+    """Localized 'A–B business days' (or 'N business days' when equal/single)."""
+    if a and b and a != b:
+        return _("%(a)d–%(b)d business days") % {"a": a, "b": b}
+    return _("%(d)d business days") % {"d": b or a}
+
+
 @dataclass
 class ShippingOption:
     method: str
@@ -56,7 +63,9 @@ class ShippingOption:
     selected: bool = False
 
     def as_dict(self) -> dict:
-        return asdict(self)
+        data = asdict(self)
+        data["delivery_label"] = format_days_range(self.delivery_days_min, self.delivery_days_max)
+        return data
 
 
 @dataclass
@@ -102,10 +111,7 @@ class ShippingEstimateResult:
     def delivery_label(self) -> str:
         if not self.available:
             return ""
-        a, b = self.delivery_days_min, self.delivery_days_max
-        if a and b and a != b:
-            return _("%(a)d–%(b)d business days") % {"a": a, "b": b}
-        return _("%(d)d business days") % {"d": b or a}
+        return format_days_range(self.delivery_days_min, self.delivery_days_max)
 
 
 # Module-level source constants (also mirrored on the model).

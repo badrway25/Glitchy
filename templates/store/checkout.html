@@ -186,15 +186,7 @@
               <div class="line grand"><span>{% trans "Grand total" %}</span><span>{{ CURRENCY_SYMBOL }} {{ grand_total }}</span></div>
             </div>
 
-            <div class="shipping-box">
-              <div class="ship-line">
-                <span><i class="fa fa-truck mr-1"></i>{% trans "Ship to" %} {{ ship_country_name }}</span>
-                <span class="text-muted">{% if shipping_quote %}{{ shipping_quote.eta_label }}{% endif %}</span>
-              </div>
-              {% if shipping_quote and not shipping_quote.available %}
-                <div class="ship-hint text-danger">{% trans "We don't ship to this country yet — choose another at checkout." %}</div>
-              {% endif %}
-            </div>
+            {% include 'includes/shipping_estimator.html' with ship_estimator_subtotal=total ship_estimator_variant='checkout' ship_estimator_country_from='countryInput' ship_estimator_zip_from='postalCodeInput' %}
 
             <div class="summary-actions">
               <button type="submit" name="submit" class="btn btn-primary btn-block">
@@ -218,4 +210,8 @@
     </form>
   </div>
 </section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/shipping-estimate.js' %}?v={{ ASSET_VERSION }}"></script>
 {% endblock %}

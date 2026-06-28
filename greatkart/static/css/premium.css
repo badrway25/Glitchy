@@ -2006,3 +2006,95 @@ body.has-sticky-cta .ai-assistant{bottom:78px;}
   .premium-nav .searchbar-xl .form-control{padding-right:64px!important;}
   .premium-nav .search-go{padding:0 .55rem!important;font-size:.72rem!important;}
 }
+
+/* ============================================================ *
+ * Pre-order shipping estimator (cart + checkout)               *
+ * Tokens auto-invert in dark mode; no gold accent-color on     *
+ * native controls (avoids the tinted-hover bug).               *
+ * ============================================================ */
+.ship-estimator{
+  margin-top:1.1rem;background:var(--surface);border:var(--border);
+  border-radius:var(--radius);padding:1.05rem 1.1rem 1.15rem;
+}
+.ship-estimator--checkout{margin-top:0;background:var(--surface-2);}
+.se-head{display:flex;align-items:center;justify-content:space-between;gap:.6rem;}
+.se-title{display:inline-flex;align-items:center;gap:.5rem;font-weight:700;color:var(--text);font-size:.98rem;}
+.se-title .ic{color:var(--accent);}
+.se-hint{font-size:.7rem;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);
+  border:var(--border);border-radius:999px;padding:.16rem .5rem;}
+.se-sub{margin:.5rem 0 .85rem;color:var(--muted);font-size:.84rem;line-height:1.45;}
+
+.se-form{margin:0;}
+.se-fields{display:grid;grid-template-columns:1.2fr .8fr;gap:.6rem;}
+.se-field{display:flex;flex-direction:column;gap:.3rem;margin:0;}
+.se-lab{font-size:.68rem;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:600;}
+.se-select-wrap{position:relative;}
+.se-select-wrap::after{content:"";position:absolute;right:.7rem;top:50%;width:.5rem;height:.5rem;
+  border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);
+  transform:translateY(-65%) rotate(45deg);pointer-events:none;}
+.se-select,.se-input{
+  width:100%;appearance:none;-webkit-appearance:none;background:var(--surface);color:var(--text);
+  border:var(--border);border-radius:8px;padding:.6rem .75rem;font-size:.9rem;line-height:1.2;
+  transition:border-color .15s ease,box-shadow .15s ease;
+}
+.se-select{padding-right:1.8rem;cursor:pointer;}
+.se-select:focus,.se-input:focus{
+  outline:none;border:1px solid var(--accent);box-shadow:0 0 0 3px rgba(166,130,76,.22);
+}
+:root[data-theme="dark"] .se-select:focus,
+:root[data-theme="dark"] .se-input:focus{box-shadow:0 0 0 3px rgba(202,165,106,.26);}
+.se-btn{margin-top:.7rem;width:100%;display:inline-flex;align-items:center;justify-content:center;gap:.55rem;}
+.se-spinner{width:15px;height:15px;border-radius:50%;border:2px solid rgba(255,255,255,.45);
+  border-top-color:#fff;animation:se-spin .7s linear infinite;display:inline-block;}
+@keyframes se-spin{to{transform:rotate(360deg);}}
+
+/* loading skeleton */
+.se-skeleton{margin-top:.9rem;display:flex;flex-direction:column;gap:.5rem;}
+.se-sk-row{height:14px;border-radius:6px;background:linear-gradient(90deg,
+  rgba(28,26,23,.06) 25%,rgba(28,26,23,.12) 37%,rgba(28,26,23,.06) 63%);
+  background-size:400% 100%;animation:se-shimmer 1.3s ease infinite;}
+.se-sk-row.short{width:55%;}
+:root[data-theme="dark"] .se-sk-row{background:linear-gradient(90deg,
+  rgba(243,238,228,.06) 25%,rgba(243,238,228,.13) 37%,rgba(243,238,228,.06) 63%);background-size:400% 100%;}
+@keyframes se-shimmer{0%{background-position:100% 0;}100%{background-position:0 0;}}
+
+/* result */
+.se-result{margin-top:1rem;animation:se-fade .25s ease;}
+@keyframes se-fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+.se-source{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.7rem;}
+.se-badge{font-size:.68rem;font-weight:700;letter-spacing:.03em;padding:.22rem .55rem;border-radius:999px;
+  background:var(--surface-2);color:var(--muted);border:var(--border);}
+.se-badge--live_printify{background:rgba(34,139,87,.12);color:#1f7a4d;border:1px solid rgba(34,139,87,.30);}
+:root[data-theme="dark"] .se-badge--live_printify{background:rgba(74,200,140,.14);color:#7fd6a6;border:1px solid rgba(74,200,140,.32);}
+.se-deliv{font-size:.82rem;font-weight:600;color:var(--text);}
+
+.se-options{display:flex;flex-direction:column;gap:.5rem;}
+.se-option{display:flex;align-items:center;gap:.7rem;padding:.6rem .75rem;border:var(--border);
+  border-radius:9px;cursor:pointer;background:var(--surface);transition:border-color .15s ease,background .15s ease;}
+.se-option:hover{border:1px solid rgba(28,26,23,.28);}
+:root[data-theme="dark"] .se-option:hover{border:1px solid rgba(243,238,228,.30);}
+.se-option.is-selected{border:1px solid var(--accent);background:rgba(166,130,76,.08);}
+:root[data-theme="dark"] .se-option.is-selected{background:rgba(202,165,106,.12);}
+.se-option:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(166,130,76,.22);}
+.se-option-radio{position:absolute;opacity:0;width:0;height:0;pointer-events:none;}
+.se-option-main{display:flex;flex-direction:column;gap:.12rem;flex:1;min-width:0;}
+.se-option-name{font-weight:600;color:var(--text);font-size:.9rem;}
+.se-option-eta{font-size:.76rem;color:var(--muted);}
+.se-option-price{font-weight:700;color:var(--text);font-size:.92rem;white-space:nowrap;}
+
+.se-totals{margin-top:.9rem;border-top:var(--border);padding-top:.75rem;display:flex;flex-direction:column;gap:.4rem;}
+.se-totals .se-line{display:flex;align-items:center;justify-content:space-between;font-size:.88rem;color:var(--muted);}
+.se-totals .se-line span:last-child{color:var(--text);font-weight:600;}
+.se-totals .se-grand{margin-top:.2rem;font-size:1rem;}
+.se-totals .se-grand span{color:var(--text)!important;font-weight:800;}
+.se-mixed{margin:.7rem 0 0;font-size:.76rem;color:#9a6b00;font-style:italic;}
+:root[data-theme="dark"] .se-mixed{color:#e0b34d;}
+.se-disclaimer{margin:.55rem 0 0;font-size:.74rem;color:var(--muted);line-height:1.4;}
+.se-error{margin-top:.9rem;padding:.65rem .8rem;border-radius:8px;font-size:.84rem;
+  background:rgba(220,38,38,.08);color:#b91c1c;border:1px solid rgba(220,38,38,.22);}
+:root[data-theme="dark"] .se-error{background:rgba(248,113,113,.12);color:#fca5a5;border:1px solid rgba(248,113,113,.28);}
+
+@media (max-width:575.98px){
+  .se-fields{grid-template-columns:1fr;}
+  .ship-estimator{padding:.95rem .95rem 1.05rem;}
+}
