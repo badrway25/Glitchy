@@ -17,6 +17,22 @@
       </a>
     </div>
 
+    <!-- Checkout progress -->
+    <ol class="checkout-steps" aria-label="{% trans 'Checkout progress' %}">
+      <li class="cstep is-done">
+        <span class="cstep-dot"><i class="fa fa-check" aria-hidden="true"></i></span>
+        <span class="cstep-label"><a href="{% url 'cart' %}">{% trans "Bag" %}</a></span>
+      </li>
+      <li class="cstep is-current" aria-current="step">
+        <span class="cstep-dot">2</span>
+        <span class="cstep-label">{% trans "Details & review" %}</span>
+      </li>
+      <li class="cstep">
+        <span class="cstep-dot">3</span>
+        <span class="cstep-label">{% trans "Payment" %}</span>
+      </li>
+    </ol>
+
     {% if is_guest %}
     <div class="guest-banner">
       <span class="guest-banner-text">

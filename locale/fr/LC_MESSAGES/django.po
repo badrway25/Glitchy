@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: greatkart 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-28 17:07+0200\n"
+"POT-Creation-Date: 2026-06-28 18:05+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,16 +19,16 @@ msgstr ""
 
 #: .\accounts\admin.py:22 .\orders\admin.py:130
 #: .\templates\legal\cookies.html:26 .\templates\legal\privacy.html:31
-#: .\templates\legal\terms.html:25 .\templates\store\checkout.html:84
+#: .\templates\legal\terms.html:25 .\templates\store\checkout.html:100
 msgid "Email"
 msgstr "E-mail"
 
-#: .\accounts\forms.py:17 .\templates\store\checkout.html:114
+#: .\accounts\forms.py:17 .\templates\store\checkout.html:130
 msgid "Select country"
 msgstr "Sélectionner un pays"
 
 #: .\accounts\forms.py:18 .\templates\includes\shipping_estimator.html:37
-#: .\templates\store\checkout.html:112
+#: .\templates\store\checkout.html:128
 msgid "Country"
 msgstr "Pays"
 
@@ -63,7 +63,7 @@ msgstr "Adresse par défaut mise à jour."
 #: .\templates\legal\terms.html:12
 #: .\templates\notifications\email\transactional.html:89
 #: .\templates\orders\payments.html:115 .\templates\store\cart.html:175
-#: .\templates\store\checkout.html:182
+#: .\templates\store\checkout.html:198
 msgid "Shipping"
 msgstr "Livraison"
 
@@ -79,7 +79,7 @@ msgid "Refunds"
 msgstr "Remboursements"
 
 #: .\assistant\models.py:20 .\templates\store\cart.html:199
-#: .\templates\store\checkout.html:199
+#: .\templates\store\checkout.html:215
 msgid "Payments"
 msgstr "Paiements"
 
@@ -696,7 +696,7 @@ msgstr "Indisponible"
 #: .\templates\accounts\order_detail.html:162
 #: .\templates\includes\shipping_estimator.html:20
 #: .\templates\orders\payments.html:115 .\templates\store\cart.html:176
-#: .\templates\store\checkout.html:183
+#: .\templates\store\checkout.html:199
 msgid "Free"
 msgstr "Gratuite"
 
@@ -1278,7 +1278,7 @@ msgstr "Annulée"
 msgid "Manage your saved delivery addresses."
 msgstr "Gérez vos adresses de livraison enregistrées."
 
-#: .\templates\accounts\address_list.html:36 .\templates\store\checkout.html:65
+#: .\templates\accounts\address_list.html:36 .\templates\store\checkout.html:81
 msgid "Default"
 msgstr "Par défaut"
 
@@ -1625,7 +1625,7 @@ msgstr "Demander à l'assistant"
 
 #: .\templates\accounts\order_detail.html:143
 #: .\templates\orders\order_complete.html:164
-#: .\templates\orders\payments.html:4
+#: .\templates\orders\payments.html:4 .\templates\store\checkout.html:32
 msgid "Payment"
 msgstr "Paiement"
 
@@ -1644,12 +1644,12 @@ msgstr "Aucun paiement associé."
 #: .\templates\notifications\email\transactional.html:88
 #: .\templates\orders\order_complete.html:230
 #: .\templates\orders\payments.html:114 .\templates\store\cart.html:51
-#: .\templates\store\cart.html:170 .\templates\store\checkout.html:177
+#: .\templates\store\cart.html:170 .\templates\store\checkout.html:193
 msgid "Subtotal"
 msgstr "Sous-total"
 
 #: .\templates\accounts\order_detail.html:166 .\templates\store\cart.html:172
-#: .\templates\store\checkout.html:179
+#: .\templates\store\checkout.html:195
 msgid "Discount"
 msgstr "Compte"
 
@@ -1657,14 +1657,14 @@ msgstr "Compte"
 #: .\templates\notifications\email\transactional.html:90
 #: .\templates\orders\order_complete.html:234
 #: .\templates\orders\payments.html:116 .\templates\store\cart.html:178
-#: .\templates\store\checkout.html:185
+#: .\templates\store\checkout.html:201
 msgid "Tax"
 msgstr "TVA"
 
 #: .\templates\accounts\order_detail.html:175
 #: .\templates\orders\order_complete.html:238
 #: .\templates\orders\payments.html:117 .\templates\store\cart.html:179
-#: .\templates\store\checkout.html:186
+#: .\templates\store\checkout.html:202
 msgid "Grand total"
 msgstr "Total général"
 
@@ -1680,7 +1680,7 @@ msgstr "Article"
 #: .\templates\accounts\order_detail.html:196
 #: .\templates\orders\order_complete.html:197
 #: .\templates\returns\request.html:54 .\templates\returns\status.html:45
-#: .\templates\store\checkout.html:168
+#: .\templates\store\checkout.html:184
 msgid "Qty"
 msgstr "Qté"
 
@@ -1689,11 +1689,11 @@ msgstr "Qté"
 msgid "Price"
 msgstr "Prix"
 
-#: .\templates\accounts\register.html:20 .\templates\store\checkout.html:76
+#: .\templates\accounts\register.html:20 .\templates\store\checkout.html:92
 msgid "First name"
 msgstr "Prénom"
 
-#: .\templates\accounts\register.html:24 .\templates\store\checkout.html:80
+#: .\templates\accounts\register.html:24 .\templates\store\checkout.html:96
 msgid "Last name"
 msgstr "Nom"
 
@@ -2312,7 +2312,7 @@ msgstr "Pays de livraison"
 
 #: .\templates\includes\shipping_estimator.html:47
 #: .\templates\includes\shipping_estimator.html:50
-#: .\templates\store\checkout.html:108
+#: .\templates\store\checkout.html:124
 msgid "Postal code"
 msgstr "Code postal"
 
@@ -2695,7 +2695,7 @@ msgid "Printed on demand"
 msgstr "Imprimé à la demande"
 
 #: .\templates\merchandising\collection.html:74 .\templates\store\cart.html:193
-#: .\templates\store\checkout.html:204 .\templates\store\product_detail.html:75
+#: .\templates\store\checkout.html:220 .\templates\store\product_detail.html:75
 #, python-format
 msgid "%(d)s-day returns"
 msgstr "Retours sous %(d)s jours"
@@ -3319,7 +3319,7 @@ msgstr ""
 
 #: .\templates\returns\request.html:73 .\templates\returns\status.html:61
 #: .\templates\store\cart.html:25 .\templates\store\cart.html:189
-#: .\templates\store\checkout.html:195 .\templates\wishlist\saved_items.html:14
+#: .\templates\store\checkout.html:211 .\templates\wishlist\saved_items.html:14
 msgid "Continue shopping"
 msgstr "Continuer mes achats"
 
@@ -3444,7 +3444,7 @@ msgstr "Fabriqué à la demande · imprimé pour vous"
 msgid "Shopping cart"
 msgstr "Panier"
 
-#: .\templates\store\cart.html:16 .\templates\store\checkout.html:146
+#: .\templates\store\cart.html:16 .\templates\store\checkout.html:162
 #, python-format
 msgid "%(c)s item"
 msgid_plural "%(c)s items"
@@ -3509,7 +3509,7 @@ msgstr "Options sélectionnées incluses"
 msgid "Save for later"
 msgstr "Enregistrer pour plus tard"
 
-#: .\templates\store\cart.html:132 .\templates\store\checkout.html:145
+#: .\templates\store\cart.html:132 .\templates\store\checkout.html:161
 msgid "Order summary"
 msgstr "Récapitulatif de la commande"
 
@@ -3563,85 +3563,97 @@ msgstr "Saisissez vos informations de facturation, puis passez au paiement."
 msgid "Back to cart"
 msgstr "Retour au panier"
 
-#: .\templates\store\checkout.html:23
+#: .\templates\store\checkout.html:21
+msgid "Checkout progress"
+msgstr "Progression du paiement"
+
+#: .\templates\store\checkout.html:24
+msgid "Bag"
+msgstr "Panier"
+
+#: .\templates\store\checkout.html:28
+msgid "Details & review"
+msgstr "Détails et vérification"
+
+#: .\templates\store\checkout.html:39
 msgid "You're checking out as a guest. No account needed."
 msgstr "Vous commandez en tant qu'invité. Aucun compte requis."
 
-#: .\templates\store\checkout.html:26
+#: .\templates\store\checkout.html:42
 msgid "Have an account? Sign in"
 msgstr "Vous avez un compte ? Connectez-vous"
 
-#: .\templates\store\checkout.html:39
+#: .\templates\store\checkout.html:55
 msgid "Billing address"
 msgstr "Adresse de facturation"
 
-#: .\templates\store\checkout.html:40
+#: .\templates\store\checkout.html:56
 msgid "Secure"
 msgstr "Sécurisé"
 
-#: .\templates\store\checkout.html:45
+#: .\templates\store\checkout.html:61
 msgid "Use saved address"
 msgstr "Utiliser une adresse enregistrée"
 
-#: .\templates\store\checkout.html:52
+#: .\templates\store\checkout.html:68
 msgid "Default:"
 msgstr "Par défaut :"
 
-#: .\templates\store\checkout.html:53
+#: .\templates\store\checkout.html:69
 msgid "Select an address"
 msgstr "Sélectionner une adresse"
 
-#: .\templates\store\checkout.html:70
+#: .\templates\store\checkout.html:86
 msgid "Pick one to autofill your billing details."
 msgstr ""
 "Sélectionnez-en une pour remplir automatiquement vos informations de "
 "facturation."
 
-#: .\templates\store\checkout.html:88
+#: .\templates\store\checkout.html:104
 msgid "Phone"
 msgstr "Téléphone"
 
-#: .\templates\store\checkout.html:92
+#: .\templates\store\checkout.html:108
 msgid "Address line 1"
 msgstr "Adresse ligne 1"
 
-#: .\templates\store\checkout.html:96
+#: .\templates\store\checkout.html:112
 msgid "Address line 2"
 msgstr "Adresse ligne 2"
 
-#: .\templates\store\checkout.html:100
+#: .\templates\store\checkout.html:116
 msgid "City"
 msgstr "Ville"
 
-#: .\templates\store\checkout.html:104
+#: .\templates\store\checkout.html:120
 msgid "State"
 msgstr "Région"
 
-#: .\templates\store\checkout.html:123
+#: .\templates\store\checkout.html:139
 msgid "Order note (optional)"
 msgstr "Note de commande (facultatif)"
 
-#: .\templates\store\checkout.html:125
+#: .\templates\store\checkout.html:141
 msgid "Delivery instructions, notes for the seller..."
 msgstr "Instructions de livraison, notes pour le vendeur..."
 
-#: .\templates\store\checkout.html:131
+#: .\templates\store\checkout.html:147
 msgid "Save / update my default address"
 msgstr "Enregistrer / mettre à jour mon adresse par défaut"
 
-#: .\templates\store\checkout.html:135
+#: .\templates\store\checkout.html:151
 msgid "You can create an account after checkout to track your order."
 msgstr "Vous pouvez créer un compte après la commande pour suivre votre colis."
 
-#: .\templates\store\checkout.html:168
+#: .\templates\store\checkout.html:184
 msgid "each"
 msgstr "l'unité"
 
-#: .\templates\store\checkout.html:193
+#: .\templates\store\checkout.html:209
 msgid "Continue to payment"
 msgstr "Passer au paiement"
 
-#: .\templates\store\checkout.html:204
+#: .\templates\store\checkout.html:220
 msgid "Secure payment"
 msgstr "Paiement sécurisé"
 
