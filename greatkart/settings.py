@@ -350,6 +350,38 @@ SHIPPING_GEOIP_API = env_bool("SHIPPING_GEOIP_API", False)
 
 
 # --------------------------------------------------------------------------- #
+# Pre-order shipping ESTIMATES (cost + delivery time shown BEFORE checkout)
+# --------------------------------------------------------------------------- #
+# Customer-facing methods, in display order. Each key matches a field returned
+# by Printify's order-shipping endpoint (POST .../orders/shipping.json, cents).
+SHIPPING_ESTIMATE_METHODS = env_list(
+    "SHIPPING_ESTIMATE_METHODS", ["standard", "priority", "express", "economy"])
+# Production / handling window (BUSINESS days) used when Printify handling time
+# is unknown. Printify's published guidance is ~2–7 business days for print-on-demand.
+SHIPPING_PRODUCTION_DAYS = (
+    int(env("SHIPPING_PRODUCTION_DAYS_MIN", "2")),
+    int(env("SHIPPING_PRODUCTION_DAYS_MAX", "7")),
+)
+# Transit window (BUSINESS days) per shipping method. The Printify API returns
+# shipping COST but NOT transit time, so these are honest, documented estimates
+# by method — always labelled "estimated" to the customer (never a guarantee).
+SHIPPING_METHOD_TRANSIT_DAYS = {
+    "economy":          (10, 30),
+    "standard":         (5, 20),
+    "priority":         (4, 12),
+    "express":          (2, 5),
+    "printify_express": (2, 5),
+}
+# Human label per method (translated at render time via gettext).
+SHIPPING_METHOD_LABELS = {
+    "economy": "Economy", "standard": "Standard", "priority": "Priority",
+    "express": "Express", "printify_express": "Printify Express",
+}
+# Live-estimate cache TTL (minutes). Live rates can drift, so keep it short.
+SHIPPING_ESTIMATE_CACHE_TTL_MINUTES = int(env("SHIPPING_ESTIMATE_CACHE_TTL_MINUTES", "180"))
+
+
+# --------------------------------------------------------------------------- #
 # Returns / refunds
 # --------------------------------------------------------------------------- #
 RETURN_WINDOW_DAYS = env_int("RETURN_WINDOW_DAYS", 14)

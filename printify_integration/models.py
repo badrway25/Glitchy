@@ -82,6 +82,55 @@ class PrintifyShippingProfile(models.Model):
         return f"bp{self.blueprint_id}/pr{self.print_provider_id} → {self.country_code}"
 
 
+class PrintifyShippingEstimateCache(models.Model):
+    """Short-TTL cache of a pre-order shipping estimate (cost + computed delivery
+    window) keyed by cart composition + coarse destination.
+
+    Privacy: stores NO full address and NO PII — only an ISO country code and a
+    postal-code PREFIX. `raw_response_safe` holds the per-method cost map (cents),
+    never a token, customer name, email, phone, or street address.
+    """
+    SOURCE_LIVE = "live_printify"
+    SOURCE_CACHED = "cached_profile"
+    SOURCE_LOCAL = "local_fallback"
+    SOURCE_UNAVAILABLE = "unavailable"
+
+    cart_hash = models.CharField(max_length=64, db_index=True)
+    country_code = models.CharField(max_length=4, db_index=True)
+    postal_prefix = models.CharField(max_length=8, blank=True, default="")
+    shipping_method = models.CharField(max_length=24, default="standard")
+    source = models.CharField(max_length=16, default=SOURCE_LOCAL)
+    currency = models.CharField(max_length=8, default="EUR")
+    shipping_cost = models.FloatField(default=0.0)
+    production_days_min = models.IntegerField(default=0)
+    production_days_max = models.IntegerField(default=0)
+    transit_days_min = models.IntegerField(default=0)
+    transit_days_max = models.IntegerField(default=0)
+    delivery_days_min = models.IntegerField(default=0)
+    delivery_days_max = models.IntegerField(default=0)
+    raw_response_safe = models.JSONField(default=dict, blank=True,
+                                         help_text="Per-method cost map (cents). No PII, no token.")
+    expires_at = models.DateTimeField(db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["cart_hash", "country_code", "postal_prefix", "shipping_method"],
+                         name="idx_ship_estimate_lookup"),
+        ]
+        ordering = ["-created_at"]
+        verbose_name = _("Printify shipping estimate (cached)")
+        verbose_name_plural = _("Printify shipping estimates (cached)")
+
+    def __str__(self):
+        return f"{self.country_code}/{self.postal_prefix or '—'} {self.shipping_method} ({self.source})"
+
+    @property
+    def is_fresh(self) -> bool:
+        from django.utils import timezone
+        return bool(self.expires_at and self.expires_at > timezone.now())
+
+
 class PrintifyPrintArea(models.Model):
     """Print area / placeholder coverage per product position (admin/data-quality only)."""
     product = models.ForeignKey("store.Product", on_delete=models.CASCADE,

@@ -125,6 +125,17 @@ class PrintifyClient:
     # ------------------------------------------------------------------ #
     # Orders / fulfilment
     # ------------------------------------------------------------------ #
+    def calculate_order_shipping(self, line_items, address_to, shop_id=None):
+        """Calculate the shipping cost of a *prospective* order WITHOUT creating it.
+
+        POST /shops/{id}/orders/shipping.json → {standard, express, priority,
+        economy, printify_express} as integer cents. This endpoint is read-only:
+        it never creates, queues, or pushes an order to production.
+        """
+        sid = shop_id or self.shop_id
+        return self._post(f"/shops/{sid}/orders/shipping.json",
+                          json={"line_items": line_items, "address_to": address_to})
+
     def create_order(self, payload, shop_id=None):
         sid = shop_id or self.shop_id
         return self._post(f"/shops/{sid}/orders.json", json=payload)
