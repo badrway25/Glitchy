@@ -25,7 +25,10 @@ Context vars (optional): ship_estimator_subtotal (Decimal), ship_estimator_varia
   </div>
   <p class="se-sub">{% trans "Enter your delivery country and postal code to estimate shipping before checkout." %}</p>
 
-  <form class="se-form" data-se-form novalidate>
+  {% comment %}A <div>, not a <form>: on checkout this widget lives INSIDE the
+  billing <form>, and nested forms are invalid HTML (the button would submit the
+  order). The estimate is fetch-based; the CSRF token is read from this input.{% endcomment %}
+  <div class="se-form" data-se-form>
     {% csrf_token %}
     {% if not ship_estimator_country_from %}
     <div class="se-fields">
@@ -47,11 +50,11 @@ Context vars (optional): ship_estimator_subtotal (Decimal), ship_estimator_varia
       </label>
     </div>
     {% endif %}
-    <button type="submit" class="btn btn-primary se-btn" data-se-submit>
+    <button type="button" class="btn btn-primary se-btn" data-se-submit>
       <span class="se-btn-label">{% trans "Estimate delivery" %}</span>
       <span class="se-spinner" data-se-spinner hidden aria-hidden="true"></span>
     </button>
-  </form>
+  </div>
 
   <!-- Loading skeleton -->
   <div class="se-skeleton" data-se-skeleton hidden aria-hidden="true">

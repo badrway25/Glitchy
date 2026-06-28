@@ -2013,10 +2013,12 @@ body.has-sticky-cta .ai-assistant{bottom:78px;}
  * native controls (avoids the tinted-hover bug).               *
  * ============================================================ */
 .ship-estimator{
-  margin-top:1.1rem;background:var(--surface);border:var(--border);
+  margin-top:1.1rem;margin-bottom:1.5rem;background:var(--surface);border:var(--border);
   border-radius:var(--radius);padding:1.05rem 1.1rem 1.15rem;
 }
 .ship-estimator--checkout{margin-top:0;background:var(--surface-2);}
+/* Clear separation from the Checkout CTA that follows the estimator. */
+.summary-card .ship-estimator + .summary-actions{margin-top:.5rem;}
 .se-head{display:flex;align-items:center;justify-content:space-between;gap:.6rem;}
 .se-title{display:inline-flex;align-items:center;gap:.5rem;font-weight:700;color:var(--text);font-size:.98rem;}
 .se-title .ic{color:var(--accent);}

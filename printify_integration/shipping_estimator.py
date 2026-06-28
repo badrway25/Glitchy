@@ -100,10 +100,10 @@ class ShippingEstimateResult:
 
     @property
     def source_label(self) -> str:
-        if self.source == ShippingEstimateResult_SOURCE_LIVE:
+        if self.source == SOURCE_LIVE:
             return _("Estimated by Printify")
-        if self.source in (ShippingEstimateResult_SOURCE_CACHED,
-                           ShippingEstimateResult_SOURCE_LOCAL):
+        if self.source in (SOURCE_CACHED,
+                           SOURCE_LOCAL):
             return _("Estimated")
         return _("Unavailable")
 
@@ -112,13 +112,6 @@ class ShippingEstimateResult:
         if not self.available:
             return ""
         return format_days_range(self.delivery_days_min, self.delivery_days_max)
-
-
-# Module-level source constants (also mirrored on the model).
-ShippingEstimateResult_SOURCE_LIVE = "live_printify"
-ShippingEstimateResult_SOURCE_CACHED = "cached_profile"
-ShippingEstimateResult_SOURCE_LOCAL = "local_fallback"
-ShippingEstimateResult_SOURCE_UNAVAILABLE = "unavailable"
 
 
 # --------------------------------------------------------------------------- #
@@ -308,11 +301,34 @@ def _delivery_window(method: str, handling_min=None, handling_max=None) -> dict:
     }
 
 
+def _window_from_profile(handling: int, min_delivery: int, max_delivery: int) -> dict:
+    """Delivery window from a catalog profile's OWN delivery range (no double-count).
+
+    production = handling; transit = the remainder up to the profile's delivery
+    range. Falls back to production + the generic transit map if the profile has
+    no usable delivery range.
+    """
+    pmin, pmax = _production_window()
+    handling = handling or pmin
+    if not (min_delivery and max_delivery and max_delivery >= handling):
+        return _delivery_window("standard", handling, handling)
+    tmin = max(0, min_delivery - handling)
+    tmax = max(0, max_delivery - handling)
+    today = timezone.localdate()
+    return {
+        "production_days_min": handling, "production_days_max": handling,
+        "transit_days_min": tmin, "transit_days_max": tmax,
+        "delivery_days_min": min_delivery, "delivery_days_max": max_delivery,
+        "estimated_delivery_from": add_business_days(today, min_delivery).isoformat(),
+        "estimated_delivery_to": add_business_days(today, max_delivery).isoformat(),
+    }
+
+
 def _disclaimer(source: str, mixed: bool) -> str:
     base = _("Final shipping may vary slightly after address validation.")
     if mixed:
         return _("Some items use estimated shipping data.") + " " + base
-    if source == ShippingEstimateResult_SOURCE_LIVE:
+    if source == SOURCE_LIVE:
         return base
     return _("Estimated delivery — not guaranteed.") + " " + base
 
@@ -368,9 +384,11 @@ def _live_cost_map(cart_items, country, postal_code, region, city):
 # Tier 2 — cached catalog profile
 # --------------------------------------------------------------------------- #
 def _cached_profile_cost(cart_items, country, total_qty):
-    """Build a single-method (standard) cost from PrintifyShippingProfile rows.
+    """Cost + delivery window from PrintifyShippingProfile rows (catalog data).
 
-    Returns (cost_float, handling_days) or (None, None) when no profile matches.
+    Returns a dict {cost, handling, min_delivery, max_delivery} or None. The
+    delivery range is the profile's OWN catalog estimate (not the generic transit
+    map), so the cached tier stays consistent with the rest of the storefront.
     """
     from .models import PrintifyShippingProfile
     country = (country or "").upper()
@@ -381,7 +399,7 @@ def _cached_profile_cost(cart_items, country, total_qty):
             first_product = p
             break
     if first_product is None:
-        return None, None
+        return None
 
     prof = (PrintifyShippingProfile.objects
             .filter(blueprint_id=first_product.printify_blueprint_id,
@@ -393,9 +411,11 @@ def _cached_profile_cost(cart_items, country, total_qty):
                         print_provider_id=first_product.printify_provider_id,
                         country_code="REST_OF_THE_WORLD").first())
     if prof is None:
-        return None, None
+        return None
     cost = float(prof.first_item_cost) + float(prof.additional_item_cost) * max(0, total_qty - 1)
-    return round(cost, 2), int(prof.handling_days or 0)
+    return {"cost": round(cost, 2), "handling": int(prof.handling_days or 0),
+            "min_delivery": int(prof.min_delivery_days or 0),
+            "max_delivery": int(prof.max_delivery_days or 0)}
 
 
 # --------------------------------------------------------------------------- #
@@ -448,7 +468,7 @@ def estimate_for_cart(cart_items, country, *, postal_code="", region="", city=""
     # Empty cart → nothing to estimate.
     if not cart_items:
         return ShippingEstimateResult(
-            available=False, source=ShippingEstimateResult_SOURCE_UNAVAILABLE,
+            available=False, source=SOURCE_UNAVAILABLE,
             country=country, currency=currency,
             disclaimer=_("Add an item to estimate delivery."),
             errors_safe=["empty_cart"])
@@ -456,7 +476,7 @@ def estimate_for_cart(cart_items, country, *, postal_code="", region="", city=""
     # Unsupported destination → honest, explicit unavailability.
     if not estimate_country_supported(country):
         return ShippingEstimateResult(
-            available=False, source=ShippingEstimateResult_SOURCE_UNAVAILABLE,
+            available=False, source=SOURCE_UNAVAILABLE,
             country=country, currency=currency,
             disclaimer=_("We do not ship to this country yet."),
             errors_safe=["country_unsupported"])
@@ -489,7 +509,7 @@ def estimate_for_cart(cart_items, country, *, postal_code="", region="", city=""
     cost_map, err = _live_cost_map(cart_items, country, postal_code, region, city)
     if cost_map:
         options, selected = _options_from_live(cost_map, free, selected)
-        result = _finalise(options, selected, ShippingEstimateResult_SOURCE_LIVE,
+        result = _finalise(options, selected, SOURCE_LIVE,
                            country, currency, free, mixed, errors)
         if use_cache:
             _write_cache(cache_key, country, postal_code, result)
@@ -498,13 +518,17 @@ def estimate_for_cart(cart_items, country, *, postal_code="", region="", city=""
         errors.append(err)
 
     # ---- Tier 2: cached catalog profile ----------------------------------- #
-    cost, handling = _cached_profile_cost(cart_items, country, total_qty)
-    if cost is not None:
-        hmin = handling or None
-        hmax = (handling + 5) if handling else None
-        opt, _win = _single_option(selected, cost, free, hmin, hmax)
-        result = _finalise([opt], selected, ShippingEstimateResult_SOURCE_CACHED,
-                           country, currency, free, mixed, errors)
+    prof = _cached_profile_cost(cart_items, country, total_qty)
+    if prof is not None:
+        win = _window_from_profile(prof["handling"], prof["min_delivery"], prof["max_delivery"])
+        cost = 0.0 if free else prof["cost"]
+        opt = ShippingOption(
+            method=selected, label=_method_label(selected), cost=cost,
+            cost_display=_money(cost), currency=currency,
+            delivery_days_min=win["delivery_days_min"], delivery_days_max=win["delivery_days_max"],
+            free=bool(free), selected=True)
+        result = _finalise([opt], selected, SOURCE_CACHED,
+                           country, currency, free, mixed, errors, win=win)
         if use_cache:
             _write_cache(cache_key, country, postal_code, result)
         return result
@@ -513,20 +537,23 @@ def estimate_for_cart(cart_items, country, *, postal_code="", region="", city=""
     fq = fallback_quote(country, total_quantity=total_qty, subtotal=subtotal)
     if not fq.available:
         return ShippingEstimateResult(
-            available=False, source=ShippingEstimateResult_SOURCE_UNAVAILABLE,
+            available=False, source=SOURCE_UNAVAILABLE,
             country=country, currency=currency, disclaimer=fq.message,
             errors_safe=errors + ["country_unsupported"])
-    opt, _win = _single_option(selected, fq.cost, fq.free or free)
-    result = _finalise([opt], selected, ShippingEstimateResult_SOURCE_LOCAL,
-                       country, currency, fq.free or free, mixed, errors)
+    opt, win = _single_option(selected, fq.cost, fq.free or free)
+    result = _finalise([opt], selected, SOURCE_LOCAL,
+                       country, currency, fq.free or free, mixed, errors, win=win)
     if use_cache:
         _write_cache(cache_key, country, postal_code, result)
     return result
 
 
-def _finalise(options, selected_method, source, country, currency, free, mixed, errors):
+def _finalise(options, selected_method, source, country, currency, free, mixed, errors, win=None):
     chosen = next((o for o in options if o.method == selected_method), options[0] if options else None)
-    win = _delivery_window(selected_method)
+    # Use the window the selected option was actually built with (it may carry a
+    # cached-profile handling time), so the header range matches the option.
+    if win is None:
+        win = _delivery_window(selected_method)
     today = timezone.localdate()
     result = ShippingEstimateResult(
         available=True, source=source, country=country, currency=currency,

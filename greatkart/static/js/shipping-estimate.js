@@ -30,7 +30,9 @@
       free: root.getAttribute("data-label-free") || "Free"
     };
 
-    var form = root.querySelector("[data-se-form]");
+    // `panel` is a <div>, not a <form> (the widget can sit inside the checkout
+    // billing form, where a nested form would be invalid HTML).
+    var panel = root.querySelector("[data-se-form]");
     // Fields may live inside the widget (cart) or in an external form (checkout
     // billing address). External ids take precedence when present.
     var countryFromId = root.getAttribute("data-country-from");
@@ -53,7 +55,7 @@
     var mixedEl = root.querySelector("[data-se-mixed]");
     var disclaimerEl = root.querySelector("[data-se-disclaimer]");
 
-    if (!form || !endpoint) return;
+    if (!panel || !submitBtn || !endpoint) return;
 
     var current = null; // last result payload
 
@@ -78,6 +80,8 @@
         if (sel) opt = o;
       });
       if (!opt) opt = current.options[0];
+      // Keep the header delivery label in sync with the chosen method.
+      if (delivEl && opt.delivery_label) delivEl.textContent = opt.delivery_label;
       // Update option chip states
       optionsEl.querySelectorAll("[data-se-opt]").forEach(function (el) {
         var on = el.getAttribute("data-se-opt") === opt.method;
@@ -173,7 +177,7 @@
       var body = new URLSearchParams();
       body.set("country", country);
       body.set("postal_code", (zipInput && zipInput.value || "").trim());
-      var tokenInput = form.querySelector("[name=csrfmiddlewaretoken]");
+      var tokenInput = panel.querySelector("[name=csrfmiddlewaretoken]");
       var token = (tokenInput && tokenInput.value) || getCookie("csrftoken");
       if (tokenInput) body.set("csrfmiddlewaretoken", tokenInput.value);
 
@@ -193,7 +197,11 @@
       });
     }
 
-    form.addEventListener("submit", function (e) { e.preventDefault(); estimate(); });
+    submitBtn.addEventListener("click", function (e) { e.preventDefault(); estimate(); });
+    // Allow Enter from the postal field to trigger an estimate (no form to submit).
+    if (zipInput) zipInput.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") { e.preventDefault(); estimate(); }
+    });
     // Re-estimate when the destination changes after a first estimate (keeps it live).
     if (countrySel) countrySel.addEventListener("change", function () {
       if (current) estimate();

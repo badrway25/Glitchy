@@ -129,6 +129,20 @@ class FallbackTierTests(TestCase):
         self.assertEqual(r.source, se.SOURCE_CACHED)
         self.assertEqual(r.shipping_cost, 7.0)  # 5 + 2*(2-1)
 
+    def test_cached_profile_window_matches_profile_and_option(self):
+        # Regression: the header delivery range must equal the profile's own range
+        # (no double-counting transit on top) and match the selected option.
+        PrintifyShippingProfile.objects.create(
+            blueprint_id=145, print_provider_id=29, country_code="IT",
+            first_item_cost=5.0, additional_item_cost=2.0, currency="EUR",
+            handling_days=10, min_delivery_days=13, max_delivery_days=18)
+        r = se.estimate_for_cart(self.cart, "IT", postal_code="20100", use_cache=False)
+        self.assertEqual((r.delivery_days_min, r.delivery_days_max), (13, 18))
+        self.assertEqual(r.production_days_min, 10)
+        opt = r.options[0]
+        self.assertEqual((opt.delivery_days_min, opt.delivery_days_max),
+                         (r.delivery_days_min, r.delivery_days_max))
+
     def test_local_fallback_when_no_profile(self):
         r = se.estimate_for_cart(self.cart, "IT", postal_code="20100", use_cache=False)
         self.assertEqual(r.source, se.SOURCE_LOCAL)
@@ -291,6 +305,18 @@ class EstimatorUITests(TestCase):
         self.assertIn('data-country-from="countryInput"', html)
         self.assertIn('data-zip-from="postalCodeInput"', html)
         self.assertNotIn("data-se-country", html)  # internal fields suppressed on checkout
+
+    def test_checkout_estimator_is_not_a_nested_form(self):
+        # Regression: a nested <form> inside the checkout billing form is invalid
+        # HTML and made the estimate button submit the order. It must be a <div>
+        # with a type="button" trigger.
+        self._populate()
+        with translation.override("en"):
+            html = self.client.get(reverse("checkout")).content.decode()
+        self.assertIn('<div class="se-form"', html)
+        self.assertIn('type="button" class="btn btn-primary se-btn" data-se-submit', html)
+        # The estimator must NOT be a (nested) form.
+        self.assertNotIn('<form class="se-form"', html)
 
     def test_localized_it(self):
         self._populate()
