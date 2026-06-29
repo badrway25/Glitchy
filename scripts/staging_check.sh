@@ -21,6 +21,10 @@ check() {
 echo "-- public pages (expect 200) --"
 for p in $PUBLIC; do check "$p" 200; done
 
+echo "-- checkout routing (real checkout is /cart/checkout/; empty cart 302s to store) --"
+check "/cart/checkout/" 302
+check "/checkout/" 302   # convenience redirect -> /cart/checkout/
+
 echo "-- admin requires login (expect 302 redirect) --"
 check "/admin/" 302
 

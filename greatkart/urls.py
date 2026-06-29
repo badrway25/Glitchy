@@ -6,6 +6,7 @@ from django.contrib import admin
 from django.urls import include, path
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
+from django.views.generic.base import RedirectView
 
 from . import views, seo
 from store.views import faq as faq_view
@@ -39,6 +40,10 @@ urlpatterns += i18n_patterns(
          extra_context={"legal_title": _("Cookie Policy")}), name="cookies"),
     path("", include("merchandising.urls")),       # collections, style-quiz, notify-me, outfit
     path("store/", include("store.urls")),
+    # Convenience/safety redirect: the real checkout lives at /cart/checkout/.
+    # A bookmarked or typed /checkout/ (or a naive smoke check) would 404 otherwise.
+    path("checkout/", RedirectView.as_view(pattern_name="checkout", permanent=False),
+         name="checkout_redirect"),
     path("cart/", include("carts.urls")),
     path("accounts/", include("accounts.urls")),
     path("orders/", include("orders.urls")),
