@@ -74,5 +74,20 @@
         card.addEventListener("mouseleave", function () { card.style.transform = ""; });
       });
     }
+
+    /* 4. Rotating tagline (reduced-motion: keep the first line only) -------- */
+    var rotator = document.querySelector("[data-rotator]");
+    if (rotator && !reduce) {
+      var rots = Array.prototype.slice.call(rotator.querySelectorAll(".rot"));
+      if (rots.length > 1) {
+        var ri = 0;
+        setInterval(function () {
+          if (reduceNow()) return;            // respect a mid-session toggle
+          rots[ri].classList.remove("is-on");
+          ri = (ri + 1) % rots.length;
+          rots[ri].classList.add("is-on");
+        }, 3800);
+      }
+    }
   });
 })();

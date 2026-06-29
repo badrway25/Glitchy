@@ -42,6 +42,11 @@
       <span class="hero-kicker">{% trans "New season" %}</span>
       <h1 class="hero-x-title">{% trans "Wear something worth keeping." %}</h1>
       <p class="hero-x-sub">{% trans "Considered essentials, made on demand. Premium fabrics, honest pricing, free 14-day returns." %}</p>
+      <div class="hero-rotator" aria-hidden="true" data-rotator>
+        <span class="rot is-on">{% trans "Premium tees. Printed on demand. Delivered transparently." %}</span>
+        <span class="rot">{% trans "Your style, estimated before checkout." %}</span>
+        <span class="rot">{% trans "Designed to feel refined. Built to be transparent." %}</span>
+      </div>
       <div class="hero-x-cta">
         <a href="{% url 'store' %}" class="btn btn-primary btn-icontext">
           <span>{% trans "Shop the collection" %}</span> <i class="fa fa-arrow-right ml-1"></i>
@@ -65,7 +70,7 @@
 
 {# ============================ TRUST STRIP ============================ #}
 <section class="lux-strip">
-  <div class="container py-3" style="max-width:1280px;">
+  <div class="container py-3" style="max-width:var(--container-max);">
     <div class="d-flex flex-wrap justify-content-center text-center" style="gap:10px 38px;">
       <span class="lux-item">{% icon "truck" "ic" 18 %}{% blocktrans with t=FREE_SHIPPING_THRESHOLD %}Free shipping over {{ t }}{% endblocktrans %} {{ CURRENCY_SYMBOL }}</span>
       <span class="lux-item">{% icon "returns" "ic" 18 %}{% blocktrans with d=RETURN_WINDOW_DAYS %}{{ d }}-day free returns{% endblocktrans %}</span>
@@ -75,9 +80,40 @@
   </div>
 </section>
 
+{# ============================ HOW GLITCHY WORKS ============================ #}
+<section class="home-section">
+  <div class="container" style="max-width:var(--container-max);">
+    <div class="text-center mb-4">
+      <div class="lux-eyebrow mb-2">{% trans "How it works" %}</div>
+      <h3 class="section-title mb-1">{% trans "How Glitchy works" %}</h3>
+      <div class="text-muted section-sub">{% trans "From your pick to your door, transparently" %}</div>
+    </div>
+    <div class="hiw">
+      <div class="hiw-step" data-reveal>
+        <div class="hiw-num">01</div>
+        <div class="hiw-ic">{% icon "spark" "ic" 22 %}</div>
+        <h4 class="hiw-title">{% trans "Choose your style" %}</h4>
+        <p class="hiw-text">{% trans "Browse premium pieces and pick your size and colour — no clutter, just the edit." %}</p>
+      </div>
+      <div class="hiw-step" data-reveal>
+        <div class="hiw-num">02</div>
+        <div class="hiw-ic">{% icon "package" "ic" 22 %}</div>
+        <h4 class="hiw-title">{% trans "Printed on demand" %}</h4>
+        <p class="hiw-text">{% trans "We produce your order only after you buy — less waste, always fresh." %}</p>
+      </div>
+      <div class="hiw-step" data-reveal>
+        <div class="hiw-num">03</div>
+        <div class="hiw-ic">{% icon "truck" "ic" 22 %}</div>
+        <h4 class="hiw-title">{% trans "Delivered with an estimate" %}</h4>
+        <p class="hiw-text">{% trans "See the cost and a delivery window before you pay — no hidden shipping." %}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 {# ============================ THE EDIT (category cards) ============================ #}
 <section class="home-section" id="the-edit">
-  <div class="container" style="max-width:1280px;">
+  <div class="container" style="max-width:var(--container-max);">
     <div class="text-center mb-4">
       <div class="lux-eyebrow mb-2">{% trans "The edit" %}</div>
       <h3 class="section-title mb-1">{% trans "Find your look" %}</h3>
@@ -138,7 +174,7 @@
 
 {# ============================ POPULAR ============================ #}
 <section class="home-section home-section-muted">
-  <div class="container" style="max-width:1280px;">
+  <div class="container" style="max-width:var(--container-max);">
     <div class="section-head">
       <div>
         <h3 class="section-title mb-1">{% trans "Popular products" %}</h3>
@@ -177,7 +213,7 @@
 
 {# ============================ EDITORIAL CRAFT BAND ============================ #}
 <section class="home-section" style="padding-top:0;">
-  <div class="container" style="max-width:1280px;">
+  <div class="container" style="max-width:var(--container-max);">
     <div class="lux-split">
       <div class="lux-split-media">
         <picture>
@@ -200,7 +236,7 @@
 
 {# ============================ WHY US ============================ #}
 <section class="home-section" style="padding-top:0;">
-  <div class="container" style="max-width:1280px;">
+  <div class="container" style="max-width:var(--container-max);">
     <div class="text-center mb-4">
       <div class="lux-eyebrow mb-2">{% trans "The Glitchy promise" %}</div>
       <h3 class="section-title mb-1">{% trans "Designed to be worn, made to last" %}</h3>
@@ -232,7 +268,7 @@
 
 {# ============================ LATEST ============================ #}
 <section class="home-section home-section-muted">
-  <div class="container" style="max-width:1280px;">
+  <div class="container" style="max-width:var(--container-max);">
     <div class="section-head">
       <div>
         <h3 class="section-title mb-1">{% trans "Latest arrivals" %}</h3>

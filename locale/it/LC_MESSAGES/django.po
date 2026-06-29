@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: greatkart 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-29 12:29+0200\n"
+"POT-Creation-Date: 2026-06-29 19:36+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -185,15 +185,15 @@ msgstr "Troppe richieste. Attendi un momento."
 msgid "Please choose a delivery country."
 msgstr "Scegli un paese di consegna."
 
-#: .\greatkart\settings.py:204
+#: .\greatkart\settings.py:216
 msgid "English"
 msgstr "Inglese"
 
-#: .\greatkart\settings.py:205
+#: .\greatkart\settings.py:217
 msgid "Italiano"
 msgstr "Italiano"
 
-#: .\greatkart\settings.py:206
+#: .\greatkart\settings.py:218
 msgid "Français"
 msgstr "Francese"
 
@@ -291,7 +291,7 @@ msgstr "Ti scriveremo via email — niente spam, promesso."
 msgid "Recipient"
 msgstr "Destinatario"
 
-#: .\notifications\admin.py:21 .\printify_integration\admin.py:74
+#: .\notifications\admin.py:21 .\printify_integration\admin.py:101
 #: .\returns\admin.py:40 .\templates\accounts\dashboard.html:111
 #: .\templates\accounts\transactions.html:100
 #: .\templates\orders\order_complete.html:186
@@ -401,7 +401,7 @@ msgstr "Evento in uscita"
 msgid "Outbound events (Django → n8n)"
 msgstr "Eventi in uscita (Django → n8n)"
 
-#: .\notifications\models.py:80 .\templates\home.html:253
+#: .\notifications\models.py:80 .\templates\home.html:293
 #: .\templates\store\_quick_view.html:27
 #: .\templates\store\product_detail.html:72 .\templates\store\store.html:198
 #: .\templates\store\store.html:239
@@ -569,115 +569,125 @@ msgstr "Costo di spedizione"
 msgid "Payment fee"
 msgstr "Commissione di pagamento"
 
-#: .\printify_integration\admin.py:17
+#: .\printify_integration\admin.py:18
 msgid "ETA"
 msgstr "Tempi"
 
-#: .\printify_integration\admin.py:41
+#: .\printify_integration\admin.py:42
 msgid "Source"
 msgstr "Origine"
 
-#: .\printify_integration\admin.py:50
+#: .\printify_integration\admin.py:51
 #: .\templates\accounts\order_detail.html:127
 msgid "Delivery"
 msgstr "Consegna"
 
-#: .\printify_integration\admin.py:54
+#: .\printify_integration\admin.py:55
 msgid "Fresh"
 msgstr "Aggiornato"
 
-#: .\printify_integration\admin.py:58
+#: .\printify_integration\admin.py:59
 msgid "Purge expired estimate cache rows"
 msgstr "Elimina le stime scadute dalla cache"
 
-#: .\printify_integration\admin.py:63
+#: .\printify_integration\admin.py:64
 #, python-format
 msgid "Purged %(n)d expired estimate row(s)."
 msgstr "Eliminate %(n)d stime scadute."
 
-#: .\printify_integration\admin.py:82
+#: .\printify_integration\admin.py:80
+msgid "Sync daemon"
+msgstr ""
+
+#: .\printify_integration\admin.py:109
 msgid "Duration"
 msgstr "Durata"
 
-#: .\printify_integration\admin.py:87
+#: .\printify_integration\admin.py:114
 msgid "Run a full Printify product sync now"
 msgstr "Esegui ora una sincronizzazione completa dei prodotti Printify"
 
-#: .\printify_integration\admin.py:90
+#: .\printify_integration\admin.py:117
 #, python-format
 msgid "Product sync finished: +%(c)d ~%(u)d (errors %(e)d)."
 msgstr "Sincronizzazione prodotti completata: +%(c)d ~%(u)d (errori %(e)d)."
 
-#: .\printify_integration\admin.py:93
+#: .\printify_integration\admin.py:120
 msgid "Pull Printify order statuses now"
 msgstr "Recupera ora gli stati degli ordini Printify"
 
-#: .\printify_integration\admin.py:96
+#: .\printify_integration\admin.py:123
 #, python-format
 msgid "Order pull finished: %(u)d updated (errors %(e)d)."
 msgstr "Recupero ordini completato: %(u)d aggiornati (errori %(e)d)."
 
-#: .\printify_integration\models.py:13
+#: .\printify_integration\models.py:34 .\printify_integration\models.py:35
+#, fuzzy
+#| msgid "Printify sync logs"
+msgid "Printify sync state"
+msgstr "Registri di sincronizzazione Printify"
+
+#: .\printify_integration\models.py:93
 msgid "Products sync"
 msgstr "Sincronizzazione prodotti"
 
-#: .\printify_integration\models.py:14
+#: .\printify_integration\models.py:94
 msgid "Variant costs sync"
 msgstr "Sincronizzazione costi varianti"
 
-#: .\printify_integration\models.py:15
+#: .\printify_integration\models.py:95
 msgid "Order status pull"
 msgstr "Recupero stato ordini"
 
-#: .\printify_integration\models.py:16
+#: .\printify_integration\models.py:96
 msgid "Single product resync"
 msgstr "Risincronizzazione singolo prodotto"
 
-#: .\printify_integration\models.py:24
+#: .\printify_integration\models.py:104
 msgid "Running"
 msgstr "In esecuzione"
 
-#: .\printify_integration\models.py:25 .\templates\base.html:96
+#: .\printify_integration\models.py:105 .\templates\base.html:96
 msgid "Success"
 msgstr "Operazione riuscita"
 
-#: .\printify_integration\models.py:26
+#: .\printify_integration\models.py:106
 msgid "Partial"
 msgstr "Parziale"
 
-#: .\printify_integration\models.py:27 .\templates\base.html:97
+#: .\printify_integration\models.py:107 .\templates\base.html:97
 msgid "Error"
 msgstr "Errore"
 
-#: .\printify_integration\models.py:41
+#: .\printify_integration\models.py:121
 msgid "Printify sync log"
 msgstr "Registro di sincronizzazione Printify"
 
-#: .\printify_integration\models.py:42
+#: .\printify_integration\models.py:122
 msgid "Printify sync logs"
 msgstr "Registri di sincronizzazione Printify"
 
-#: .\printify_integration\models.py:78
+#: .\printify_integration\models.py:158
 msgid "Printify shipping profile"
 msgstr "Registro di sincronizzazione Printify"
 
-#: .\printify_integration\models.py:79
+#: .\printify_integration\models.py:159
 msgid "Printify shipping profiles"
 msgstr "Registri di sincronizzazione Printify"
 
-#: .\printify_integration\models.py:122
+#: .\printify_integration\models.py:202
 msgid "Printify shipping estimate (cached)"
 msgstr "Stima spedizione Printify (in cache)"
 
-#: .\printify_integration\models.py:123
+#: .\printify_integration\models.py:203
 msgid "Printify shipping estimates (cached)"
 msgstr "Stime spedizione Printify (in cache)"
 
-#: .\printify_integration\models.py:152
+#: .\printify_integration\models.py:232
 msgid "Printify print area"
 msgstr "Registro di sincronizzazione Printify"
 
-#: .\printify_integration\models.py:153
+#: .\printify_integration\models.py:233
 msgid "Printify print areas"
 msgstr "Registro di sincronizzazione Printify"
 
@@ -1474,8 +1484,8 @@ msgstr "Azione"
 #: .\templates\accounts\dashboard.html:151
 #: .\templates\accounts\my_orders.html:53
 #: .\templates\accounts\order_detail.html:106
-#: .\templates\accounts\transactions.html:142 .\templates\home.html:166
-#: .\templates\home.html:259 .\templates\orders\order_complete.html:286
+#: .\templates\accounts\transactions.html:142 .\templates\home.html:205
+#: .\templates\home.html:299 .\templates\orders\order_complete.html:286
 msgid "Details"
 msgstr "Dettagli"
 
@@ -1873,141 +1883,192 @@ msgstr ""
 "Essenziali pensati con cura, prodotti su richiesta. Tessuti premium, prezzi "
 "trasparenti, resi gratuiti entro 14 giorni."
 
+#: .\templates\home.html:47
+msgid "Premium tees. Printed on demand. Delivered transparently."
+msgstr "T-shirt premium. Stampate su richiesta. Consegnate in trasparenza."
+
 #: .\templates\home.html:48
+msgid "Your style, estimated before checkout."
+msgstr "Il tuo stile, con stima prima del checkout."
+
+#: .\templates\home.html:49
+msgid "Designed to feel refined. Built to be transparent."
+msgstr "Pensati per essere raffinati. Costruiti per essere trasparenti."
+
+#: .\templates\home.html:53
 msgid "Shop the collection"
 msgstr "Scopri la collezione"
 
-#: .\templates\home.html:51
+#: .\templates\home.html:56
 msgid "View collections"
 msgstr "Vedi le collezioni"
 
-#: .\templates\home.html:54
+#: .\templates\home.html:59
 msgid "Why shop with us"
 msgstr "Perché acquistare da noi"
 
-#: .\templates\home.html:55 .\templates\home.html:72
+#: .\templates\home.html:60 .\templates\home.html:77
 #, python-format
 msgid "%(d)s-day free returns"
 msgstr "Resi gratuiti entro %(d)s giorni"
 
-#: .\templates\home.html:56 .\templates\home.html:208
+#: .\templates\home.html:61 .\templates\home.html:248
 msgid "Premium fabrics"
 msgstr "Tessuti premium"
 
-#: .\templates\home.html:57 .\templates\home.html:74
+#: .\templates\home.html:62 .\templates\home.html:79
 #: .\templates\store\cart.html:133
 msgid "Secure checkout"
 msgstr "Pagamento sicuro"
 
-#: .\templates\home.html:61
+#: .\templates\home.html:66
 msgid "Scroll to explore"
 msgstr "Scorri per esplorare"
 
-#: .\templates\home.html:62
+#: .\templates\home.html:67
 msgid "Scroll"
 msgstr "Scorri"
 
-#: .\templates\home.html:71
+#: .\templates\home.html:76
 #, python-format
 msgid "Free shipping over %(t)s"
 msgstr "Spedizione gratuita oltre %(t)s"
 
-#: .\templates\home.html:73
+#: .\templates\home.html:78
 msgid "Ethically printed on demand"
 msgstr "Stampato eticamente su ordinazione"
 
-#: .\templates\home.html:83 .\templates\merchandising\collections_index.html:30
+#: .\templates\home.html:88 .\templates\returns\policy.html:31
+msgid "How it works"
+msgstr "Come funziona"
+
+#: .\templates\home.html:89
+msgid "How Glitchy works"
+msgstr "Come funziona Glitchy"
+
+#: .\templates\home.html:90
+msgid "From your pick to your door, transparently"
+msgstr "Dalla tua scelta alla tua porta, in trasparenza"
+
+#: .\templates\home.html:96
+msgid "Choose your style"
+msgstr "Scegli il tuo stile"
+
+#: .\templates\home.html:97
+msgid ""
+"Browse premium pieces and pick your size and colour — no clutter, just the "
+"edit."
+msgstr "Esplora capi premium e scegli taglia e colore — niente confusione, solo la selezione."
+
+#: .\templates\home.html:102 .\templates\merchandising\collection.html:73
+msgid "Printed on demand"
+msgstr "Stampato su richiesta"
+
+#: .\templates\home.html:103
+msgid "We produce your order only after you buy — less waste, always fresh."
+msgstr "Produciamo il tuo ordine solo dopo l'acquisto — meno sprechi, sempre fresco."
+
+#: .\templates\home.html:108
+msgid "Delivered with an estimate"
+msgstr "Consegnato con una stima"
+
+#: .\templates\home.html:109
+msgid "See the cost and a delivery window before you pay — no hidden shipping."
+msgstr "Vedi il costo e una finestra di consegna prima di pagare — nessuna spedizione nascosta."
+
+#: .\templates\home.html:119
+#: .\templates\merchandising\collections_index.html:30
 msgid "The edit"
 msgstr "La selezione"
 
-#: .\templates\home.html:84
+#: .\templates\home.html:120
 msgid "Find your look"
 msgstr "Trova il tuo look"
 
-#: .\templates\home.html:85
+#: .\templates\home.html:121
 msgid "Three ways into the collection"
 msgstr "Tre modi per scoprire la collezione"
 
-#: .\templates\home.html:95
+#: .\templates\home.html:132
 msgid "Minimalist beige shirt on a hanger"
 msgstr "Camicia beige minimalista su una gruccia"
 
-#: .\templates\home.html:98
+#: .\templates\home.html:135
 msgid "New neutrals"
 msgstr "Nuovi neutri"
 
-#: .\templates\home.html:99
+#: .\templates\home.html:136
 msgid "Shirts"
 msgstr "Camicie"
 
-#: .\templates\home.html:100 .\templates\home.html:115
-#: .\templates\home.html:130 .\templates\merchandising\collection.html:103
+#: .\templates\home.html:137 .\templates\home.html:153
+#: .\templates\home.html:169 .\templates\merchandising\collection.html:103
 #: .\templates\merchandising\collections_index.html:124
 msgid "Explore"
 msgstr "Esplora"
 
-#: .\templates\home.html:110
+#: .\templates\home.html:148
 msgid "Model wearing a clean white everyday t-shirt"
 msgstr "Modella con una pulita t-shirt bianca da tutti i giorni"
 
-#: .\templates\home.html:113
+#: .\templates\home.html:151
 msgid "Everyday tees"
 msgstr "T-shirt per ogni giorno"
 
-#: .\templates\home.html:114
+#: .\templates\home.html:152
 msgid "T-shirts"
 msgstr "T-shirt"
 
-#: .\templates\home.html:125
+#: .\templates\home.html:164
 msgid "Moody evening look in low light"
 msgstr "Look serale d'atmosfera in penombra"
 
-#: .\templates\home.html:128
+#: .\templates\home.html:167
 msgid "After dark"
 msgstr "Dopo il tramonto"
 
-#: .\templates\home.html:129
+#: .\templates\home.html:168
 msgid "Jackets"
 msgstr "Giacche"
 
-#: .\templates\home.html:142
+#: .\templates\home.html:181
 msgid "Popular products"
 msgstr "Prodotti popolari"
 
-#: .\templates\home.html:143
+#: .\templates\home.html:182
 msgid "Customer favorites and trending items"
 msgstr "I preferiti dei clienti e gli articoli di tendenza"
 
-#: .\templates\home.html:146
+#: .\templates\home.html:185
 msgid "View all"
 msgstr "Vedi tutti"
 
-#: .\templates\home.html:160
+#: .\templates\home.html:199
 msgid "Top seller"
 msgstr "Più venduto"
 
-#: .\templates\home.html:161
+#: .\templates\home.html:200
 #, python-format
 msgid "%(n)s sold"
 msgid_plural "%(n)s sold"
 msgstr[0] "%(n)s venduto"
 msgstr[1] "%(n)s venduti"
 
-#: .\templates\home.html:185
+#: .\templates\home.html:225
 msgid "Close-up of premium soft cotton fabric, naturally draped"
 msgstr ""
 "Primo piano di un morbido tessuto di cotone premium, drappeggiato "
 "naturalmente"
 
-#: .\templates\home.html:189
+#: .\templates\home.html:229
 msgid "Crafted, not churned"
 msgstr "Curato, non prodotto in serie"
 
-#: .\templates\home.html:190
+#: .\templates\home.html:230
 msgid "Quality you can feel"
 msgstr "Una qualità che si sente"
 
-#: .\templates\home.html:191
+#: .\templates\home.html:231
 msgid ""
 "Considered cuts, durable fabrics and a finish made to last — pieces designed "
 "to stay in rotation, season after season."
@@ -2015,19 +2076,19 @@ msgstr ""
 "Tagli studiati, tessuti resistenti e una finitura fatta per durare — capi "
 "pensati per restare in rotazione, stagione dopo stagione."
 
-#: .\templates\home.html:192
+#: .\templates\home.html:232
 msgid "Explore the collection"
 msgstr "Esplora la collezione"
 
-#: .\templates\home.html:202
+#: .\templates\home.html:242
 msgid "The Glitchy promise"
 msgstr "La promessa Glitchy"
 
-#: .\templates\home.html:203
+#: .\templates\home.html:243
 msgid "Designed to be worn, made to last"
 msgstr "Pensati per essere indossati, fatti per durare"
 
-#: .\templates\home.html:209
+#: .\templates\home.html:249
 msgid "Heavyweight, soft-touch materials chosen for comfort and longevity."
 msgstr ""
 "Materiali pesanti e dal tatto morbido, scelti per comfort e durata nel "
@@ -2045,47 +2106,47 @@ msgstr ""
 "tempo.Materiali pesanti e dal tatto morbido, scelti per comfort e durata nel "
 "tempo."
 
-#: .\templates\home.html:213 .\templates\merchandising\collection.html:49
+#: .\templates\home.html:253 .\templates\merchandising\collection.html:49
 #: .\templates\merchandising\collections_index.html:133
 #: .\templates\store\product_detail.html:300 .\templates\store\store.html:112
 msgid "Made on demand"
 msgstr "Prodotti su richiesta"
 
-#: .\templates\home.html:214
+#: .\templates\home.html:254
 msgid "Printed only when you order — less waste, always fresh."
 msgstr "Stampati solo quando ordini — meno sprechi, sempre freschi."
 
-#: .\templates\home.html:218
+#: .\templates\home.html:258
 msgid "Honest pricing"
 msgstr "Prezzi onesti"
 
-#: .\templates\home.html:219
+#: .\templates\home.html:259
 msgid "Fair prices with no inflated markups — what you pay reflects the piece."
 msgstr ""
 "Prezzi equi senza ricarichi gonfiati — quello che paghi riflette il capo."
 
-#: .\templates\home.html:223
+#: .\templates\home.html:263
 msgid "Designed to last"
 msgstr "Pensati per durare"
 
-#: .\templates\home.html:224
+#: .\templates\home.html:264
 msgid "Timeless cuts and durable prints, built to stay in your rotation."
 msgstr ""
 "Tagli senza tempo e stampe resistenti, fatti per restare nel tuo guardaroba."
 
-#: .\templates\home.html:235
+#: .\templates\home.html:275
 msgid "Latest arrivals"
 msgstr "Ultimi arrivi"
 
-#: .\templates\home.html:236
+#: .\templates\home.html:276
 msgid "Freshly added — don’t miss out"
 msgstr "Appena aggiunti — da non perdere"
 
-#: .\templates\home.html:239
+#: .\templates\home.html:279
 msgid "See new"
 msgstr "Scopri le novità"
 
-#: .\templates\home.html:254 .\templates\store\product_detail.html:73
+#: .\templates\home.html:294 .\templates\store\product_detail.html:73
 msgid "Bestseller"
 msgstr "Bestseller"
 
@@ -2838,10 +2899,6 @@ msgstr "Prezzo: dal più basso"
 msgid "Price: high to low"
 msgstr "Prezzo: dal più alto"
 
-#: .\templates\merchandising\collection.html:73
-msgid "Printed on demand"
-msgstr "Stampato su ordinazione"
-
 #: .\templates\merchandising\collection.html:74 .\templates\store\cart.html:193
 #: .\templates\store\checkout.html:220 .\templates\store\product_detail.html:75
 #, python-format
@@ -3403,10 +3460,6 @@ msgstr ""
 "Hai %(window_days)s giorni dalla consegna del tuo ordine per richiedere un "
 "reso. Gli articoli devono essere non indossati, non lavati e nelle loro "
 "condizioni originali con i cartellini attaccati."
-
-#: .\templates\returns\policy.html:31
-msgid "How it works"
-msgstr "Come funziona"
 
 #: .\templates\returns\policy.html:33
 msgid "Open your order and choose “Request a return”."
