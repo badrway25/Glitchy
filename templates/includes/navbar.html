@@ -125,8 +125,10 @@
               </div>
             </div>
           {% else %}
-            <a class="btn btn-outline-primary mr-2" href="{% url 'login' %}">{% trans "Login" %}</a>
-            <a class="btn btn-primary mr-2" href="{% url 'register' %}">{% trans "Register" %}</a>
+            <span class="nav-auth mr-2">
+              <a class="btn-auth btn-auth-soft" href="{% url 'login' %}">{% trans "Login" %}</a>
+              <a class="btn-auth btn-auth-gold" href="{% url 'register' %}">{% trans "Register" %}</a>
+            </span>
           {% endif %}
 
           <!-- Wishlist -->
