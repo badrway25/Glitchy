@@ -5,7 +5,7 @@
 {% block content %}
 <section class="section-conten padding-y">
   <div class="container-fluid">
-  <div class="container" style="max-width: 1280px;">
+  <div class="container" style="max-width:var(--container-max);">
 
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-3">
@@ -605,7 +605,7 @@
 </div>
 
   {% if recently_viewed %}
-  <section class="recently-viewed container" style="max-width:1280px;">
+  <section class="recently-viewed container" style="max-width:var(--container-max);">
     <div class="lux-eyebrow mb-1">{% trans "Keep browsing" %}</div>
     <h3 class="section-title mb-3">{% trans "Recently viewed" %}</h3>
     <div class="rv-grid">

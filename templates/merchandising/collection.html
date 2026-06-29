@@ -10,7 +10,7 @@
 <!-- Hero -->
 <section class="cdx-hero {% if collection.image %}has-img{% endif %}"
          {% if collection.image %}style="background-image:linear-gradient(rgba(28,26,23,.5),rgba(28,26,23,.6)),url('{{ collection.image }}')"{% endif %}>
-  <div class="container" style="max-width:1280px;">
+  <div class="container" style="max-width:var(--container-max);">
     <nav class="cdx-crumbs" aria-label="{% trans 'Breadcrumb' %}">
       <a href="{% url 'home' %}">{% trans "Home" %}</a>
       <span>/</span><a href="{% url 'merchandising:collections' %}">{% trans "Collections" %}</a>
@@ -31,7 +31,7 @@
 </section>
 
 <section class="section-content padding-y">
-  <div class="container" style="max-width:1280px;">
+  <div class="container" style="max-width:var(--container-max);">
 
     {% if editorial %}
     <div class="cdx-editorial">{{ editorial|linebreaksbr }}</div>

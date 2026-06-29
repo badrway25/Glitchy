@@ -11,9 +11,9 @@
   --surface:#ffffff;
   --surface-2:#efe9dd;     /* sand */
   --text:#1c1a17;          /* espresso near-black */
-  --muted:#7a7368;         /* warm taupe */
+  --muted:#6b5f54;         /* warm taupe — deeper for better contrast/legibility */
   --primary:#1c1a17;       /* CTAs are architectural near-black */
-  --primary-2:#000000;
+  --primary-2:#2a2824;     /* soft espresso (was pure #000 — too hard) */
   --accent:#a6824c;        /* champagne / antique gold */
   --accent-2:#8c6a3a;
   --btn-elegant:#a6824c;   /* champagne gold — refined alt to black for inverted buttons */
@@ -24,6 +24,8 @@
   --radius:10px;
   --radius-sm:6px;
   --radius-pill:999px;
+  --container-max:1320px;  /* premium wide container (was scattered 1280px inline) */
+  --container-narrow:820px;
   --border:1px solid rgba(28,26,23,.12);
   --border-strong:1px solid rgba(28,26,23,.22);
   --shadow:0 20px 50px rgba(28,26,23,.10);
@@ -32,8 +34,11 @@
   --footer-bg:#1c1a17;
   --focus-ring:0 0 0 .18rem rgba(166,130,76,.30);
 
-  --font-display:"Plus Jakarta Sans","Inter",system-ui,-apple-system,sans-serif;
+  /* Premium editorial serif for headings (fashion-grade, full Latin accents),
+     Plus Jakarta / Inter as graceful fallbacks while the webfont loads. */
+  --font-display:"Fraunces","Plus Jakarta Sans","Inter",Georgia,serif;
   --font-ui:"Inter",system-ui,-apple-system,sans-serif;
+  --font-numeric:"Inter",system-ui,sans-serif;
   --ease:cubic-bezier(.22,.61,.36,1);
   --tr:.35s var(--ease);
 }
@@ -429,7 +434,7 @@ img{max-width:100%;}
    FOOTER — high-contrast rebuild
    ============================================================================ */
 .footer-premium{background:#17150f;color:rgba(245,241,233,.74);margin-top:4rem!important;}
-.footer-premium .container{position:relative;z-index:1;}
+.footer-premium .container{position:relative;z-index:1;max-width:var(--container-max);}
 
 /* Newsletter band */
 .footer-news-band{background:#221d15;border-top:1px solid rgba(255,255,255,.06);
@@ -1400,29 +1405,34 @@ body.has-sticky-cta .ai-assistant{bottom:78px;}
 /* ============ Premium always-visible navbar search (Phase 34) ============ */
 .premium-nav{flex-wrap:wrap;row-gap:.25rem;}
 .nav-search{flex:1 1 auto;max-width:560px;margin:0 1.5rem;position:relative;order:0;}
-.searchbar-xl{position:relative;display:block;}
+.searchbar-xl{position:relative;display:block;--sb-h:46px;}
 .searchbar-xl .icon{position:absolute;left:18px;top:50%;transform:translateY(-50%);
   color:var(--muted);pointer-events:none;font-size:.95rem;z-index:2;}
-.searchbar-xl .form-control{height:50px;width:100%;padding:0 108px 0 46px;font-size:.95rem;
+.searchbar-xl .form-control{height:var(--sb-h);width:100%;padding:0 120px 0 44px;font-size:.95rem;
   border-radius:var(--radius-pill);border:1px solid var(--border);background:var(--surface-2);
   transition:background .2s var(--ease),border-color .2s var(--ease),box-shadow .2s var(--ease);}
 .searchbar-xl .form-control::placeholder{color:var(--muted);opacity:.85;}
 .searchbar-xl .form-control:focus{background:var(--surface);border-color:var(--accent);
   box-shadow:var(--focus-ring);outline:none;}
-.searchbar-xl .search-clear{position:absolute;right:84px;top:50%;transform:translateY(-50%);
+.searchbar-xl .search-clear{position:absolute;right:98px;top:50%;transform:translateY(-50%);
   border:none;background:none;color:var(--muted);cursor:pointer;width:26px;height:26px;
   border-radius:50%;display:grid;place-items:center;z-index:3;}
 .searchbar-xl .search-clear:hover{background:var(--surface);color:var(--text);}
-.search-go{position:absolute;right:6px;top:50%;transform:translateY(-50%);height:38px;padding:0 1.15rem;
-  border:none;border-radius:var(--radius-pill);background:var(--primary);color:#fff;font-family:var(--font-ui);
-  font-weight:600;font-size:.82rem;letter-spacing:.02em;cursor:pointer;z-index:3;transition:background .2s var(--ease);}
-.search-go:hover{background:var(--accent-2);}
-.search-go:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+/* Integrated button: flush to the right edge, full height, matching pill radius —
+   one continuous border, no gap, no radius defect. */
+.search-go{position:absolute;right:0;top:0;bottom:0;padding:0 1.35rem;
+  border:1px solid var(--primary);border-radius:0 var(--radius-pill) var(--radius-pill) 0;
+  background:var(--primary);color:#fff;font-family:var(--font-ui);font-weight:600;
+  font-size:.82rem;letter-spacing:.03em;cursor:pointer;z-index:3;
+  display:inline-flex;align-items:center;
+  transition:background .2s var(--ease),border-color .2s var(--ease);}
+.search-go:hover{background:var(--accent-2);border-color:var(--accent-2);}
+.searchbar-xl:focus-within .search-go{background:var(--accent-2);border-color:var(--accent-2);}
+.search-go:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(166,130,76,.45);}
 /* mobile: full-width second row, always visible (replaces the removed trigger + overlay) */
 @media (max-width:991px){
   .nav-search{order:3;flex:0 0 100%;max-width:none;margin:.7rem 0 .15rem;}
-  .searchbar-xl .form-control{height:46px;}
-  .search-go{padding:0 .9rem;}
+  .search-go{padding:0 1.05rem;}
 }
 
 /* Desktop: let the search fill the centre, keep menu+actions to their content width */
@@ -1658,7 +1668,7 @@ body.has-sticky-cta .ai-assistant{bottom:78px;}
 /* ============ Phase 41 — root-cause polish ============ */
 
 /* Navbar/header width matches the 1280px content container */
-.section-header .container{max-width:1280px;}
+.section-header .container{max-width:var(--container-max);}
 
 /* Search: wider field, placeholder never cut (compact Search button) */
 @media (min-width:992px){
@@ -2649,4 +2659,59 @@ body.has-sticky-cta .ai-assistant{bottom:78px;}
   .js-anim .hero-x-copy > *{animation:none!important;opacity:1!important;}
   .edit-card-pic img,.lux-split-media picture img{transition:none!important;}
   .js-anim .edit-card[data-reveal]{opacity:1!important;transform:none!important;transition:none!important;}
+}
+
+/* ============================================================================
+   PHASE 59 — premium refinement: serif display headings (Fraunces), unified
+   focus states, "How it works" section, rotating tagline. Light+dark, mobile-safe.
+   ============================================================================ */
+
+/* Serif display: optical sizing + tuned tracking so Fraunces reads intentional. */
+.hero-x-title,.section-title,.faq-hero-title,.coll-hero-title,.collx-hero-title,
+.cdx-hero-title,.cat-hero-title,.dash-title,.cart-title,.pdp-title,.hiw-title{
+  font-optical-sizing:auto;letter-spacing:-.01em;}
+.hero-x-title{letter-spacing:-.015em;}
+
+/* Unified focus-visible across the button family (was inconsistent). */
+.btn-soft:focus-visible,.btn-outline-primary:focus-visible,.btn-elegant:focus-visible,
+.sortx-btn:focus-visible,.btn-icontext:focus-visible{
+  outline:none;box-shadow:var(--focus-ring);}
+/* Form fields: consistent focus ring + smooth transition (scoped to forms). */
+form .form-control:focus,form .custom-select:focus,form select:focus{
+  border-color:var(--accent)!important;box-shadow:var(--focus-ring)!important;outline:none;}
+form .form-control,form .custom-select{transition:border-color .18s var(--ease),box-shadow .18s var(--ease);}
+
+/* Rotating tagline — subtle gold italic accent under the hero sub. All lines are
+   absolutely stacked (one visible) inside a reserved-height box, so there is no
+   layout jump and no overlap. Reduced-motion shows the first line only. */
+.hero-rotator{position:relative;display:block;min-height:2.6em;margin:.1rem 0 1.2rem;
+  max-width:48ch;font-family:var(--font-ui);font-size:.92rem;font-style:italic;
+  letter-spacing:.01em;color:var(--accent);}
+.hero-rotator .rot{position:absolute;left:0;top:0;right:0;opacity:0;
+  transform:translateY(8px);transition:opacity .55s var(--ease),transform .55s var(--ease);}
+.hero-rotator .rot.is-on{opacity:1;transform:none;}
+
+/* "How Glitchy works" — 3 editorial steps. */
+.hiw{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(16px,2.4vw,32px);}
+.hiw-step{position:relative;background:var(--surface);border:var(--border);border-radius:var(--radius);
+  padding:clamp(1.4rem,2.4vw,2rem);box-shadow:var(--shadow-soft);
+  transition:transform var(--tr),box-shadow var(--tr),border-color var(--tr);}
+.hiw-step:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:rgba(166,130,76,.4);}
+.hiw-num{font-family:var(--font-display);font-weight:700;font-size:.95rem;color:var(--accent);
+  letter-spacing:.04em;}
+.hiw-ic{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;margin:.7rem 0 1rem;
+  background:linear-gradient(135deg,rgba(166,130,76,.16),rgba(166,130,76,.05));color:var(--accent-2);}
+.hiw-ic .ic,.hiw-ic i{font-size:1.15rem;}
+.hiw-title{font-family:var(--font-display);font-weight:700;font-size:1.18rem;margin:0 0 .4rem;color:var(--text);}
+.hiw-text{color:var(--muted);font-size:.92rem;line-height:1.6;margin:0;max-width:34ch;}
+.hiw-step::after{content:"";position:absolute;top:50%;right:-18px;width:18px;height:2px;
+  background:linear-gradient(90deg,rgba(166,130,76,.5),transparent);}
+.hiw-step:last-child::after{display:none;}
+:root[data-theme="dark"] .hiw-ic{background:linear-gradient(135deg,rgba(202,165,106,.22),rgba(202,165,106,.06));}
+@media (max-width:767.98px){
+  .hiw{grid-template-columns:1fr;}
+  .hiw-step::after{display:none;}
+}
+@media (prefers-reduced-motion:reduce){
+  .hero-rotator .rot{transition:none!important;}
 }
