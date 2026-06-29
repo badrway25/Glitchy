@@ -1,0 +1,25 @@
+# Glitchy — production-safe Printify sync tick (light, read-only).
+# Install: copy to /etc/systemd/system/ , then enable the .timer (NOT this service
+# directly). The tick self-skips unless PRINTIFY_SYNC_ENABLED=True in /etc/glitchy/env,
+# and is safe to run frequently: tiny stale batch, DB lock, persisted backoff on 429/5xx.
+# It NEVER creates orders and NEVER publishes products.
+[Unit]
+Description=Glitchy production-safe Printify sync tick
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=glitchy
+Group=glitchy
+WorkingDirectory=/srv/glitchy
+# Env (incl. PRINTIFY_SYNC_ENABLED, PRINTIFY_API_TOKEN, ALLOWED_HOSTS) — never in git.
+EnvironmentFile=/etc/glitchy/env
+ExecStart=/srv/glitchy/venv/bin/python manage.py printify_sync_daemon_tick --apply --live --safe-output
+# Keep a single tick short; the DB lock + backoff prevent overlap/abuse anyway.
+TimeoutStartSec=60
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true

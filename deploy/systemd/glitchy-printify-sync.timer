@@ -1,0 +1,20 @@
+# Glitchy — fire the production-safe Printify sync tick every ~30s.
+# Install:
+#   sudo cp deploy/systemd/glitchy-printify-sync.* /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now glitchy-printify-sync.timer
+# The 30s cadence is SAFE only because each tick is light + self-limiting (tiny
+# stale batch, request budget, DB lock, persisted backoff). The tick still does
+# nothing unless PRINTIFY_SYNC_ENABLED=True in /etc/glitchy/env.
+[Unit]
+Description=Glitchy Printify sync tick (every 30s)
+
+[Timer]
+OnBootSec=60
+OnUnitActiveSec=30s
+AccuracySec=5s
+Persistent=false
+Unit=glitchy-printify-sync.service
+
+[Install]
+WantedBy=timers.target
