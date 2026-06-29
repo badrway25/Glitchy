@@ -25,6 +25,17 @@ local Windows dev machine; **no real staging host exists**.
 | Security | ✅ Strong (dev) | No secrets in git, push/shipping/payments OFF. Key rotation still pending. |
 
 ## 2. What is genuinely COMPLETE
+- **Premium dynamic homepage** (Phase 58): the homepage hero is now a **wide,
+  full-bleed editorial** image (Pexels, optimized WebP+JPEG, art-directed mobile
+  crop) with a refined gradient scrim, dual CTA, trust line, subtle Ken-Burns +
+  scroll-driven parallax, and an elegant scroll cue. A new **"The Edit"** band maps
+  three premium category cards (Shirts / T-shirts / Jackets) to **real** category
+  pages, and the editorial split now uses a premium fabric shot. All imagery is
+  **fetched by Pexels photo id** via a secure management command (key read from env,
+  never printed; local assets only, no hotlink) and **documented + attributed** in
+  `docs/image-sources/PEXELS_HOME_ASSETS_2026.md`. Motion is vanilla, reduced-motion
+  safe; LCP hero is ~13 KB WebP. EN/IT/FR, light+dark, 375/390 verified. 511 tests
+  green. See `docs/PREMIUM_DYNAMIC_HOMEPAGE_PEXELS_2026.md`.
 - **Premium language switcher** (Phase 57): the navbar dropdown now shows the
   **language name only** (English / Italiano / Français — no "EN/IT/FR" codes) on a
   **flag-inspired full-width background** (green/white/red, blue/white/red, sober
