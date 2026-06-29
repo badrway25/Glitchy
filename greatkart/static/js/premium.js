@@ -16,7 +16,7 @@
   ready(function () {
     /* 1. Reveal-on-scroll: auto-tag common content blocks, then observe. */
     var sel = ".home-section, .lux-feature, .lux-strip, .pdp-card, .reviews-card, " +
-              ".summary-card, .dash-card, .p-card, .product-card";
+              ".summary-card, .dash-card, .p-card, .product-card, .edit-card";
     var nodes = Array.prototype.slice.call(document.querySelectorAll(sel));
     nodes.forEach(function (n) {
       if (!n.hasAttribute("data-reveal")) n.setAttribute("data-reveal", "");
