@@ -160,3 +160,10 @@ p49-*.png
 *.bak.*
 *.orig
 *~
+
+# Database dumps/backups (never commit data or PII)
+*.sql
+*.dump
+*.sqlite3
+*.sqlite3-journal
+glitchy_catalog_*.json
