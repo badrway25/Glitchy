@@ -1,0 +1,26 @@
+{
+  "source": "Pexels",
+  "assets": [
+    {
+      "slug": "hero-editorial",
+      "role": "Homepage hero - wide full-bleed (desktop) + portrait crop (mobile)",
+      "query": "minimalist fashion model neutral",
+      "pexels_id": 20238933,
+      "pexels_url": "https://www.pexels.com/photo/portrait-of-woman-in-black-and-white-20238933/",
+      "photographer": "Alessandra Shalbe",
+      "photographer_url": "https://www.pexels.com/@alessandra-shalbe-859114866",
+      "source_dimensions": "7952x4472",
+      "alt": "Striking black and white studio portrait of a stylish woman in a fashionable jacket.",
+      "files": [
+        "hero-editorial-2000.webp",
+        "hero-editorial-1280.webp",
+        "hero-editorial-mobile-900.webp",
+        "hero-editorial-2000.jpg",
+        "hero-editorial-1280.jpg",
+        "hero-editorial-mobile-900.jpg"
+      ],
+      "downloaded": "2026-06-29",
+      "license": "Pexels License (free to use, attribution appreciated) - https://www.pexels.com/license/"
+    }
+  ]
+}
