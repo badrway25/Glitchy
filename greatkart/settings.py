@@ -55,7 +55,19 @@ SECRET_KEY = env(
 
 DEBUG = env_bool("DJANGO_DEBUG", True)
 
-ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", ["127.0.0.1", "localhost"])
+# ALLOWED_HOSTS from the environment, so the server never needs a local
+# settings.py edit (no dirty working tree). A deploy may export either name in
+# /etc/glitchy/env: the bare ALLOWED_HOSTS (what the Glitchy production host uses)
+# takes precedence to match the existing server config; DJANGO_ALLOWED_HOSTS is the
+# canonical fallback; dev falls back to localhost. Comma-separated; the first one
+# set wins, spaces are stripped and empty values ignored. No env value is printed.
+def _allowed_hosts():
+    return (env_list("ALLOWED_HOSTS")
+            or env_list("DJANGO_ALLOWED_HOSTS")
+            or ["127.0.0.1", "localhost"])
+
+
+ALLOWED_HOSTS = _allowed_hosts()
 
 # Canonical site origin (no trailing slash). Used for absolute URLs in sitemap.xml,
 # canonical tags, hreflang alternates and og:image. Set to the real domain in prod.

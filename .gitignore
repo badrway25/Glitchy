@@ -154,3 +154,9 @@ greatkart/static/images/brand/logo-glitchy-nav-light2.png
 p48-*.png
 
 p49-*.png
+
+# Editor / deploy backups (never commit local server backups, e.g. settings.py.bak.YYYYMMDD)
+*.bak
+*.bak.*
+*.orig
+*~

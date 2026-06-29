@@ -48,6 +48,16 @@ python -c "import secrets;print(secrets.token_urlsafe(48))"   # N8N_SHARED_SECRE
 ```
 Required staging vars: `DJANGO_DEBUG=False`, `DJANGO_ALLOWED_HOSTS`,
 `CSRF_TRUSTED_ORIGINS`, `DATABASE_URL` (Postgres), `SITE_BASE_URL`,
+
+> **Allowed hosts (production):** the host list is read from the environment
+> (typically `/etc/glitchy/env`) — **no `settings.py` edit on the server**.
+> `settings.py` honours a bare `ALLOWED_HOSTS` first (the name the Glitchy host
+> exports), then `DJANGO_ALLOWED_HOSTS` (comma-separated; first one set wins;
+> spaces stripped, empties ignored; dev → localhost). So a deploy that exports
+> `ALLOWED_HOSTS=glitchy.example.com` needs no local patch and leaves the working
+> tree clean. Backups like `settings.py.bak.*` are git-ignored and must never be
+> committed.
+
 `N8N_ENABLED=True`, `N8N_WEBHOOK_BASE_URL`, `N8N_HEADER_AUTH_SECRET`,
 `N8N_SHARED_SECRET`, Stripe **test** keys + `STRIPE_WEBHOOK_SECRET`,
 `PRINTIFY_API_TOKEN`, `PRINTIFY_SHOP_ID`, **`PRINTIFY_PUSH_ENABLED=False`**.
