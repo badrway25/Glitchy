@@ -25,6 +25,21 @@ local Windows dev machine; **no real staging host exists**.
 | Security | ✅ Strong (dev) | No secrets in git, push/shipping/payments OFF. Key rotation still pending. |
 
 ## 2. What is genuinely COMPLETE
+- **Premium frontend refinement + production-safe Printify sync + DB readiness**
+  (Phase 59): a focused premium pass — **Fraunces serif** display font, softer
+  palette (no pure black), centralized **`--container-max:1320px`** (navbar/footer
+  width matched), a rebuilt **search split-pill** (flush integrated button, no radius
+  defect), unified focus states, a new **"How Glitchy works"** section (EN/IT/FR) and
+  a hero **rotating tagline** (reduced-motion safe). Backend: a **production-safe
+  Printify sync** — a light `printify_sync_daemon_tick` (DB lock, tiny stale batch,
+  request budget, persisted 429/5xx backoff; **never creates orders or publishes**;
+  OFF by default), a `printify_sync_status` monitor, and documented systemd 30s timer
+  templates. Plus a safe read-only `db_readiness_audit` (counts only, masked, no PII)
+  and a backup-first DB transfer runbook. **539 tests green.** See
+  `docs/PREMIUM_FRONTEND_SYSTEM_REFINEMENT_2026.md`,
+  `docs/PRINTIFY_PRODUCTION_SYNC_30S_2026.md`, `docs/DB_TRANSFER_TO_SERVER_2026.md`.
+  Also: **`ALLOWED_HOSTS` from env** (bare name first) so the server needs no local
+  `settings.py` edit (clean working tree on deploy).
 - **Premium dynamic homepage** (Phase 58): the homepage hero is now a **wide,
   full-bleed editorial** image (Pexels, optimized WebP+JPEG, art-directed mobile
   crop) with a refined gradient scrim, dual CTA, trust line, subtle Ken-Burns +
