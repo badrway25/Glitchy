@@ -2521,3 +2521,132 @@ body.has-sticky-cta .ai-assistant{bottom:78px;}
 :root[data-theme="dark"] .lang-switcher .lang-pill.lang-it{background:linear-gradient(95deg,rgba(79,152,102,.20),rgba(239,233,220,.16) 50%,rgba(207,90,82,.20)),var(--surface);}
 :root[data-theme="dark"] .lang-switcher .lang-pill.lang-fr{background:linear-gradient(95deg,rgba(63,114,192,.20),rgba(239,233,220,.16) 50%,rgba(207,90,82,.20)),var(--surface);}
 :root[data-theme="dark"] .lang-switcher .lang-pill.lang-en{background:linear-gradient(95deg,rgba(47,66,110,.22),rgba(239,233,220,.14) 50%,rgba(207,90,82,.18)),var(--surface);}
+
+/* ============================================================================
+   PHASE 58 - Premium dynamic homepage: wide full-bleed hero (Pexels editorial),
+   "The Edit" category cards, refined motion. Light + dark, mobile-safe,
+   reduced-motion guarded. Hero image is intentionally dark for white copy.
+   ============================================================================ */
+
+/* ---- Wide, full-bleed hero ---- */
+.hero-x{position:relative;width:100%;min-height:clamp(540px,80vh,840px);
+  display:flex;align-items:flex-end;overflow:hidden;background:#171717;
+  margin-bottom:0;}
+.hero-x-pic{position:absolute;left:0;right:0;top:-8%;height:116%;
+  will-change:transform;z-index:0;}
+.hero-x-pic img{width:100%;height:100%;display:block;}
+.hero-x-img{object-fit:cover;object-position:60% 28%;
+  transform:scale(1.06);animation:hero-kenburns 22s var(--ease) both;}
+@keyframes hero-kenburns{from{transform:scale(1.12);}to{transform:scale(1.0);}}
+.hero-x-scrim{position:absolute;inset:0;z-index:1;
+  background:
+    linear-gradient(90deg,rgba(18,16,14,.84) 0%,rgba(18,16,14,.52) 34%,rgba(18,16,14,.12) 62%,rgba(18,16,14,0) 100%),
+    linear-gradient(0deg,rgba(18,16,14,.6) 0%,rgba(18,16,14,0) 42%);}
+.hero-x-inner{position:relative;z-index:2;width:100%;max-width:1280px;padding-bottom:clamp(2.2rem,6vh,4.5rem);padding-top:clamp(2rem,6vh,3rem);}
+.hero-x-copy{max-width:600px;color:#fff;}
+.hero-x-copy .hero-kicker{margin-bottom:1rem;}
+.hero-x-title{font-family:var(--font-display);font-weight:800;line-height:1.02;
+  letter-spacing:-.02em;font-size:clamp(2.4rem,6vw,4.8rem);color:#fff;
+  margin:.7rem 0 1rem;text-shadow:0 2px 30px rgba(0,0,0,.35);}
+.hero-x-sub{font-family:var(--font-ui);color:rgba(255,255,255,.88);
+  font-size:clamp(1rem,1.4vw,1.18rem);max-width:44ch;margin:0 0 1.5rem;line-height:1.55;}
+.hero-x-cta{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:1.6rem;}
+.hero-x-copy .btn-primary{background:#fff!important;color:var(--text)!important;border-color:#fff!important;}
+.hero-x-copy .btn-primary:hover{background:var(--accent)!important;color:#fff!important;border-color:var(--accent)!important;}
+.btn-ghost-light{background:rgba(255,255,255,.06)!important;border:1px solid rgba(255,255,255,.5)!important;
+  color:#fff!important;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);}
+.btn-ghost-light:hover{background:rgba(255,255,255,.16)!important;border-color:#fff!important;color:#fff!important;}
+.hero-x-trust{display:flex;flex-wrap:wrap;gap:.5rem 1.5rem;list-style:none;padding:0;margin:0;
+  font-family:var(--font-ui);font-size:.82rem;color:rgba(255,255,255,.82);letter-spacing:.02em;}
+.hero-x-trust li{display:inline-flex;align-items:center;gap:.45rem;}
+.hero-x-trust .ic,.hero-x-trust i{color:var(--accent);}
+/* scroll cue — minimal: letterspaced label + a thin line with a gold light
+   gliding down (elegant, not a utilitarian "mouse" dot) */
+.hero-x-scroll{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);z-index:2;
+  display:flex;flex-direction:column;align-items:center;gap:.7rem;text-decoration:none;}
+.hero-x-scroll-label{font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.34em;
+  font-size:.58rem;font-weight:600;color:rgba(255,255,255,.66);padding-left:.34em;
+  transition:color var(--tr);}
+.hero-x-scroll:hover .hero-x-scroll-label{color:#fff;}
+.hero-x-scroll-line{position:relative;width:1px;height:56px;overflow:hidden;
+  background:rgba(255,255,255,.20);}
+.hero-x-scroll-line::after{content:"";position:absolute;left:0;top:0;width:100%;height:45%;
+  background:linear-gradient(180deg,transparent,var(--accent) 70%,#fff);
+  filter:drop-shadow(0 0 4px rgba(166,130,76,.6));
+  animation:hero-scroll-glide 2.2s var(--ease) infinite;}
+@keyframes hero-scroll-glide{
+  0%{transform:translateY(-110%);opacity:0;}
+  20%{opacity:1;}
+  80%{opacity:1;}
+  100%{transform:translateY(240%);opacity:0;}}
+/* hero copy entrance (gated by .js-anim, reduced-motion safe below) */
+.js-anim .hero-x-copy > *{opacity:0;animation:lux-rise .7s var(--ease) both;}
+.js-anim .hero-x-copy > *:nth-child(1){animation-delay:.10s;}
+.js-anim .hero-x-copy > *:nth-child(2){animation-delay:.20s;}
+.js-anim .hero-x-copy > *:nth-child(3){animation-delay:.30s;}
+.js-anim .hero-x-copy > *:nth-child(4){animation-delay:.40s;}
+.js-anim .hero-x-copy > *:nth-child(5){animation-delay:.50s;}
+
+@media (max-width:767.98px){
+  .hero-x{min-height:clamp(520px,86vh,760px);align-items:flex-end;}
+  .hero-x-img{object-position:50% 22%;}
+  .hero-x-scrim{background:
+    linear-gradient(0deg,rgba(18,16,14,.86) 0%,rgba(18,16,14,.36) 46%,rgba(18,16,14,.08) 78%);}
+  .hero-x-copy{max-width:100%;}
+  .hero-x-cta .btn{flex:1 1 auto;justify-content:center;}
+  /* desktop-only affordance: the centered cue would collide with the wrapping
+     full-width trust list at 375/390, so hide it on small screens */
+  .hero-x-scroll{display:none;}
+}
+
+/* ---- "The Edit" category cards ---- */
+.edit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(14px,2vw,24px);}
+.edit-card{position:relative;display:block;border-radius:var(--radius);overflow:hidden;
+  aspect-ratio:4/5;border:var(--border);box-shadow:var(--shadow-soft);text-decoration:none;
+  transition:transform var(--tr),box-shadow var(--tr),border-color var(--tr);}
+.edit-card:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:rgba(166,130,76,.45);}
+.edit-card-pic,.edit-card-pic img{position:absolute;inset:0;width:100%;height:100%;}
+.edit-card-pic img{object-fit:cover;transition:transform 1.1s var(--ease);}
+.edit-card:hover .edit-card-pic img{transform:scale(1.06);}
+.edit-card::after{content:"";position:absolute;inset:0;z-index:1;
+  background:linear-gradient(0deg,rgba(18,16,14,.8) 0%,rgba(18,16,14,.2) 48%,rgba(18,16,14,0) 74%);}
+.edit-card-body{position:absolute;left:0;right:0;bottom:0;z-index:2;
+  padding:clamp(1rem,2vw,1.5rem);display:flex;flex-direction:column;gap:.15rem;color:#fff;}
+.edit-kicker{font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.18em;
+  font-size:.66rem;font-weight:700;color:var(--accent);}
+.edit-title{font-family:var(--font-display);font-weight:800;line-height:1.04;
+  font-size:clamp(1.3rem,2.2vw,1.75rem);}
+.edit-go{font-family:var(--font-ui);font-size:.82rem;font-weight:600;margin-top:.35rem;
+  display:inline-flex;align-items:center;gap:.4rem;opacity:0;transform:translateY(6px);
+  transition:opacity var(--tr),transform var(--tr);}
+.edit-card:hover .edit-go,.edit-card:focus-visible .edit-go{opacity:1;transform:none;}
+.edit-go i{transition:transform var(--tr);}
+.edit-card:hover .edit-go i{transform:translateX(4px);}
+.edit-card:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(166,130,76,.55);}
+/* reveal-on-scroll for the cards */
+.js-anim .edit-card[data-reveal]{opacity:0;transform:translateY(26px);
+  transition:opacity .7s var(--ease),transform .7s var(--ease);}
+.js-anim .edit-card[data-reveal].is-visible{opacity:1;transform:none;}
+.js-anim .edit-card[data-reveal]:nth-child(2){transition-delay:.08s;}
+.js-anim .edit-card[data-reveal]:nth-child(3){transition-delay:.16s;}
+
+@media (max-width:767.98px){
+  .edit-grid{grid-template-columns:1fr;gap:14px;}
+  .edit-card{aspect-ratio:16/11;}
+}
+
+/* ---- Editorial split: ensure the new <picture> fills like the old <img> ---- */
+.lux-split-media picture{display:block;width:100%;height:100%;}
+.lux-split-media picture img{width:100%;height:100%;object-fit:cover;display:block;
+  transition:transform 1.1s var(--ease);}
+.lux-split:hover .lux-split-media picture img{transform:scale(1.04);}
+
+/* ---- reduced motion ---- */
+@media (prefers-reduced-motion:reduce){
+  .hero-x-img{animation:none!important;transform:none!important;}
+  .hero-x-pic{transform:none!important;}
+  .hero-x-scroll-line::after{animation:none!important;opacity:.7!important;transform:none!important;}
+  .js-anim .hero-x-copy > *{animation:none!important;opacity:1!important;}
+  .edit-card-pic img,.lux-split-media picture img{transition:none!important;}
+  .js-anim .edit-card[data-reveal]{opacity:1!important;transform:none!important;transition:none!important;}
+}

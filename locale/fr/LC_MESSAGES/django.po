@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: greatkart 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-28 20:45+0200\n"
+"POT-Creation-Date: 2026-06-29 12:29+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -263,7 +263,7 @@ msgstr "Doux"
 msgid "Gift-ready"
 msgstr "Idée cadeau"
 
-#: .\merchandising\models.py:67 .\templates\home.html:14
+#: .\merchandising\models.py:67 .\templates\home.html:43
 msgid "New season"
 msgstr "Nouvelle saison"
 
@@ -401,7 +401,7 @@ msgstr "Événement sortant"
 msgid "Outbound events (Django → n8n)"
 msgstr "Événements sortants (Django → n8n)"
 
-#: .\notifications\models.py:80 .\templates\home.html:155
+#: .\notifications\models.py:80 .\templates\home.html:253
 #: .\templates\store\_quick_view.html:27
 #: .\templates\store\product_detail.html:72 .\templates\store\store.html:198
 #: .\templates\store\store.html:239
@@ -1436,8 +1436,8 @@ msgstr "Action"
 #: .\templates\accounts\dashboard.html:151
 #: .\templates\accounts\my_orders.html:53
 #: .\templates\accounts\order_detail.html:106
-#: .\templates\accounts\transactions.html:142 .\templates\home.html:72
-#: .\templates\home.html:161 .\templates\orders\order_complete.html:286
+#: .\templates\accounts\transactions.html:142 .\templates\home.html:166
+#: .\templates\home.html:259 .\templates\orders\order_complete.html:286
 msgid "Details"
 msgstr "Détails"
 
@@ -1807,15 +1807,23 @@ msgstr "Avertissement"
 msgid "Info"
 msgstr "Info"
 
-#: .\templates\home.html:11
-msgid "Editorial fashion — premium tailoring"
-msgstr "Mode éditoriale — tailoring premium"
+#: .\templates\home.html:21
+msgid "Featured collection"
+msgstr "Collection en vedette"
 
-#: .\templates\home.html:15
+#: .\templates\home.html:37
+msgid ""
+"Editorial fashion campaign — tailored black look on a dramatic studio "
+"backdrop"
+msgstr ""
+"Campagne mode éditoriale — look noir sur mesure sur un fond de studio "
+"spectaculaire"
+
+#: .\templates\home.html:44
 msgid "Wear something worth keeping."
 msgstr "Portez quelque chose qui en vaut la peine."
 
-#: .\templates\home.html:16
+#: .\templates\home.html:45
 msgid ""
 "Considered essentials, made on demand. Premium fabrics, honest pricing, free "
 "14-day returns."
@@ -1823,116 +1831,139 @@ msgstr ""
 "Des essentiels soigneusement sélectionnés, pensés pour le confort au "
 "quotidien. Qualité premium, livraison rapide, retours simplifiés."
 
-#: .\templates\home.html:19
+#: .\templates\home.html:48
 msgid "Shop the collection"
 msgstr "Découvrir la collection"
 
-#: .\templates\home.html:22 .\templates\store\_filters.html:134
-msgid "New arrivals"
-msgstr "Nouveautés"
+#: .\templates\home.html:51
+msgid "View collections"
+msgstr "Voir les collections"
 
-#: .\templates\home.html:35
-#, python-format
-msgid "Free shipping over %(t)s"
-msgstr "Livraison gratuite dès %(t)s"
+#: .\templates\home.html:54
+msgid "Why shop with us"
+msgstr "Pourquoi acheter chez nous"
 
-#: .\templates\home.html:36
+#: .\templates\home.html:55 .\templates\home.html:72
 #, python-format
 msgid "%(d)s-day free returns"
 msgstr "Retours sous %(d)s jours"
 
-#: .\templates\home.html:37
-msgid "Ethically printed on demand"
-msgstr "Imprimé éthiquement à la demande"
+#: .\templates\home.html:56 .\templates\home.html:208
+msgid "Premium fabrics"
+msgstr "Tissus premium"
 
-#: .\templates\home.html:38 .\templates\store\cart.html:133
+#: .\templates\home.html:57 .\templates\home.html:74
+#: .\templates\store\cart.html:133
 msgid "Secure checkout"
 msgstr "Paiement sécurisé"
 
-#: .\templates\home.html:48
+#: .\templates\home.html:61
+msgid "Scroll to explore"
+msgstr "Faire défiler pour explorer"
+
+#: .\templates\home.html:62
+msgid "Scroll"
+msgstr "Défiler"
+
+#: .\templates\home.html:71
+#, python-format
+msgid "Free shipping over %(t)s"
+msgstr "Livraison gratuite dès %(t)s"
+
+#: .\templates\home.html:73
+msgid "Ethically printed on demand"
+msgstr "Imprimé éthiquement à la demande"
+
+#: .\templates\home.html:83 .\templates\merchandising\collections_index.html:30
+msgid "The edit"
+msgstr "La sélection"
+
+#: .\templates\home.html:84
+msgid "Find your look"
+msgstr "Trouvez votre look"
+
+#: .\templates\home.html:85
+msgid "Three ways into the collection"
+msgstr "Trois portes d'entrée dans la collection"
+
+#: .\templates\home.html:95
+msgid "Minimalist beige shirt on a hanger"
+msgstr "Chemise beige minimaliste sur un cintre"
+
+#: .\templates\home.html:98
+msgid "New neutrals"
+msgstr "Nouveaux neutres"
+
+#: .\templates\home.html:99
+msgid "Shirts"
+msgstr "Chemises"
+
+#: .\templates\home.html:100 .\templates\home.html:115
+#: .\templates\home.html:130 .\templates\merchandising\collection.html:103
+#: .\templates\merchandising\collections_index.html:124
+msgid "Explore"
+msgstr "Explorer"
+
+#: .\templates\home.html:110
+msgid "Model wearing a clean white everyday t-shirt"
+msgstr "Mannequin portant un t-shirt blanc épuré du quotidien"
+
+#: .\templates\home.html:113
+msgid "Everyday tees"
+msgstr "T-shirts du quotidien"
+
+#: .\templates\home.html:114
+msgid "T-shirts"
+msgstr "T-shirts"
+
+#: .\templates\home.html:125
+msgid "Moody evening look in low light"
+msgstr "Look du soir tout en ambiance, en lumière tamisée"
+
+#: .\templates\home.html:128
+msgid "After dark"
+msgstr "Après la nuit tombée"
+
+#: .\templates\home.html:129
+msgid "Jackets"
+msgstr "Vestes"
+
+#: .\templates\home.html:142
 msgid "Popular products"
 msgstr "Produits populaires"
 
-#: .\templates\home.html:49
+#: .\templates\home.html:143
 msgid "Customer favorites and trending items"
 msgstr "Les coups de cœur des clients et les articles tendance"
 
-#: .\templates\home.html:52
+#: .\templates\home.html:146
 msgid "View all"
 msgstr "Tout voir"
 
-#: .\templates\home.html:66
+#: .\templates\home.html:160
 msgid "Top seller"
 msgstr "Meilleure vente"
 
-#: .\templates\home.html:67
+#: .\templates\home.html:161
 #, python-format
 msgid "%(n)s sold"
 msgid_plural "%(n)s sold"
 msgstr[0] "%(n)s vendu"
 msgstr[1] "%(n)s vendus"
 
-#: .\templates\home.html:86
-msgid "The Glitchy promise"
-msgstr "La promesse Glitchy"
+#: .\templates\home.html:185
+msgid "Close-up of premium soft cotton fabric, naturally draped"
+msgstr "Gros plan d'un tissu de coton doux et premium, drapé naturellement"
 
-#: .\templates\home.html:87
-msgid "Designed to be worn, made to last"
-msgstr "Conçus pour être portés, faits pour durer"
-
-#: .\templates\home.html:92
-msgid "Premium fabrics"
-msgstr "Tissus premium"
-
-#: .\templates\home.html:93
-msgid "Heavyweight, soft-touch materials chosen for comfort and longevity."
-msgstr ""
-"Des matières épaisses au toucher doux, sélectionnées pour le confort et la "
-"longévité."
-
-#: .\templates\home.html:97 .\templates\merchandising\collection.html:49
-#: .\templates\merchandising\collections_index.html:133
-#: .\templates\store\product_detail.html:300 .\templates\store\store.html:112
-msgid "Made on demand"
-msgstr "Fabriqués à la demande"
-
-#: .\templates\home.html:98
-msgid "Printed only when you order — less waste, always fresh."
-msgstr ""
-"Imprimés uniquement à la commande — moins de gaspillage, toujours neufs."
-
-#: .\templates\home.html:102
-msgid "Honest pricing"
-msgstr "Prix justes"
-
-#: .\templates\home.html:103
-msgid "Fair prices with no inflated markups — what you pay reflects the piece."
-msgstr ""
-"Des prix justes sans marges gonflées — ce que vous payez reflète la pièce."
-
-#: .\templates\home.html:107
-msgid "Designed to last"
-msgstr "Conçus pour durer"
-
-#: .\templates\home.html:108
-msgid "Timeless cuts and durable prints, built to stay in your rotation."
-msgstr ""
-"Des coupes intemporelles et des imprimés durables, faits pour rester dans "
-"votre vestiaire."
-
-#: .\templates\home.html:120
-msgid "Premium fabrics, carefully finished"
-msgstr "Tissus premium, finitions soignées"
-
-#: .\templates\home.html:123
+#: .\templates\home.html:189
 msgid "Crafted, not churned"
 msgstr "Façonné, pas produit à la chaîne"
 
-#: .\templates\home.html:124
+#: .\templates\home.html:190
 msgid "Quality you can feel"
 msgstr "Une qualité qui se ressent"
 
-#: .\templates\home.html:125
+#: .\templates\home.html:191
 msgid ""
 "Considered cuts, durable fabrics and a finish made to last — pieces designed "
 "to stay in rotation, season after season."
@@ -1941,23 +1972,67 @@ msgstr ""
 "durer — des pièces conçues pour rester dans votre dressing, saison après "
 "saison."
 
-#: .\templates\home.html:126
+#: .\templates\home.html:192
 msgid "Explore the collection"
 msgstr "Explorer la collection"
 
-#: .\templates\home.html:137
+#: .\templates\home.html:202
+msgid "The Glitchy promise"
+msgstr "La promesse Glitchy"
+
+#: .\templates\home.html:203
+msgid "Designed to be worn, made to last"
+msgstr "Conçus pour être portés, faits pour durer"
+
+#: .\templates\home.html:209
+msgid "Heavyweight, soft-touch materials chosen for comfort and longevity."
+msgstr ""
+"Des matières épaisses au toucher doux, sélectionnées pour le confort et la "
+"longévité."
+
+#: .\templates\home.html:213 .\templates\merchandising\collection.html:49
+#: .\templates\merchandising\collections_index.html:133
+#: .\templates\store\product_detail.html:300 .\templates\store\store.html:112
+msgid "Made on demand"
+msgstr "Fabriqués à la demande"
+
+#: .\templates\home.html:214
+msgid "Printed only when you order — less waste, always fresh."
+msgstr ""
+"Imprimés uniquement à la commande — moins de gaspillage, toujours neufs."
+
+#: .\templates\home.html:218
+msgid "Honest pricing"
+msgstr "Prix justes"
+
+#: .\templates\home.html:219
+msgid "Fair prices with no inflated markups — what you pay reflects the piece."
+msgstr ""
+"Des prix justes sans marges gonflées — ce que vous payez reflète la pièce."
+
+#: .\templates\home.html:223
+msgid "Designed to last"
+msgstr "Conçus pour durer"
+
+#: .\templates\home.html:224
+msgid "Timeless cuts and durable prints, built to stay in your rotation."
+msgstr ""
+"Des coupes intemporelles et des imprimés durables, faits pour rester dans "
+"votre vestiaire."
+
+#: .\templates\home.html:235
 msgid "Latest arrivals"
 msgstr "Dernières nouveautés"
 
-#: .\templates\home.html:138
+#: .\templates\home.html:236
 msgid "Freshly added — don’t miss out"
 msgstr "Tout juste ajoutés — à ne pas manquer"
 
-#: .\templates\home.html:141
+#: .\templates\home.html:239
 msgid "See new"
 msgstr "Voir les nouveautés"
 
-#: .\templates\home.html:156 .\templates\store\product_detail.html:73
+#: .\templates\home.html:254 .\templates\store\product_detail.html:73
 msgid "Bestseller"
 msgstr "Meilleure vente"
 
@@ -2196,15 +2271,15 @@ msgstr "Conditions"
 msgid "Cookies"
 msgstr "Cookies"
 
-#: .\templates\includes\lang_switcher.html:9
+#: .\templates\includes\lang_switcher.html:10
 msgid "Change language"
 msgstr "Changer de langue"
 
-#: .\templates\includes\lang_switcher.html:9
+#: .\templates\includes\lang_switcher.html:10
 msgid "Language"
 msgstr "Langue"
 
-#: .\templates\includes\lang_switcher.html:14
+#: .\templates\includes\lang_switcher.html:15
 msgid "Choose language"
 msgstr "Choisir la langue"
 
@@ -2739,11 +2814,6 @@ msgstr "Refaire le quiz"
 msgid "You might also like"
 msgstr "Vous aimerez aussi"
 
-#: .\templates\merchandising\collection.html:103
-#: .\templates\merchandising\collections_index.html:124
-msgid "Explore"
-msgstr "Découvrir"
-
 #: .\templates\merchandising\collections_index.html:4
 msgid ""
 "Explore our edits — curated collections of made-on-demand fashion, grouped "
@@ -2779,10 +2849,6 @@ msgstr[1] "%(n)s collections"
 #: .\templates\merchandising\collections_index.html:104
 msgid "All collections"
 msgstr "Collections"
-
-#: .\templates\merchandising\collections_index.html:30
-msgid "The edit"
-msgstr "La sélection"
 
 #: .\templates\merchandising\collections_index.html:32
 msgid ""
@@ -3402,6 +3468,10 @@ msgstr "En stock"
 #: .\templates\store\_filters.html:133
 msgid "On sale"
 msgstr "En solde"
+
+#: .\templates\store\_filters.html:134
+msgid "New arrivals"
+msgstr "Nouveautés"
 
 #: .\templates\store\_filters.html:143 .\templates\store\store.html:153
 msgid "Show results"
@@ -4150,6 +4220,12 @@ msgstr "Articles de la liste de favoris"
 #: .\wishlist\views.py:80
 msgid "Saved for later."
 msgstr "Enregistré pour plus tard."
+
+#~ msgid "Editorial fashion — premium tailoring"
+#~ msgstr "Mode éditoriale — tailoring premium"
+
+#~ msgid "Premium fabrics, carefully finished"
+#~ msgstr "Tissus premium, finitions soignées"
 
 #~ msgid "Min"
 #~ msgstr "Min"

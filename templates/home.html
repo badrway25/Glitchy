@@ -1,34 +1,69 @@
 {% extends 'base.html' %}
 {% load static i18n uikit %}
 
+{% block extra_css %}
+  {% comment %}Preload the wide hero (LCP). WebP first; the matching <img> keeps the
+  desktop crop. Mobile uses its own portrait source via <picture>.{% endcomment %}
+  <link rel="preload" as="image" fetchpriority="high"
+        href="{% static 'images/home/pexels/hero-editorial-1280.webp' %}"
+        imagesrcset="{% static 'images/home/pexels/hero-editorial-1280.webp' %} 1280w, {% static 'images/home/pexels/hero-editorial-2000.webp' %} 2000w"
+        imagesizes="100vw" type="image/webp"
+        media="(min-width:768px)">
+  <link rel="preload" as="image" fetchpriority="high"
+        href="{% static 'images/home/pexels/hero-editorial-mobile-900.webp' %}"
+        type="image/webp" media="(max-width:767.98px)">
+{% endblock %}
+
 {% block content %}
 
-<!-- HERO -->
-<section class="section-intro padding-y-sm">
-  <div class="container" style="max-width:1280px;">
-    <div class="intro-banner-wrap hero-banner">
-      <img src="{% static 'images/banners/hero-blazer.jpg' %}" class="img-fluid hero-img"
-           alt="{% trans 'Editorial fashion — premium tailoring' %}" fetchpriority="high">
-      <div class="hero-overlay">
-        <div class="hero-copy">
-          <div class="hero-kicker">{% trans "New season" %}</div>
-          <h1 class="hero-title">{% trans "Wear something worth keeping." %}</h1>
-          <p class="hero-sub">{% trans "Considered essentials, made on demand. Premium fabrics, honest pricing, free 14-day returns." %}</p>
-          <div class="d-flex flex-wrap" style="gap:12px;margin-top:6px;">
-            <a href="{% url 'store' %}" class="btn btn-primary btn-icontext">
-              <span>{% trans "Shop the collection" %}</span> <i class="fa fa-arrow-right ml-1"></i>
-            </a>
-            <a href="{% url 'store' %}?sort=newest" class="btn btn-soft btn-icontext">
-              <span>{% trans "New arrivals" %}</span>
-            </a>
-          </div>
-        </div>
+{# ============================ HERO (wide, full-bleed) ============================ #}
+<section class="hero-x" data-hero aria-label="{% trans 'Featured collection' %}">
+  <picture class="hero-x-pic">
+    {# Mobile: dedicated portrait crop #}
+    <source media="(max-width:767.98px)" type="image/webp"
+            srcset="{% static 'images/home/pexels/hero-editorial-mobile-900.webp' %}">
+    <source media="(max-width:767.98px)" type="image/jpeg"
+            srcset="{% static 'images/home/pexels/hero-editorial-mobile-900.jpg' %}">
+    {# Desktop: wide editorial crop, responsive widths #}
+    <source type="image/webp"
+            srcset="{% static 'images/home/pexels/hero-editorial-1280.webp' %} 1280w, {% static 'images/home/pexels/hero-editorial-2000.webp' %} 2000w"
+            sizes="100vw">
+    <source type="image/jpeg"
+            srcset="{% static 'images/home/pexels/hero-editorial-1280.jpg' %} 1280w, {% static 'images/home/pexels/hero-editorial-2000.jpg' %} 2000w"
+            sizes="100vw">
+    <img class="hero-x-img" src="{% static 'images/home/pexels/hero-editorial-1280.jpg' %}"
+         width="2000" height="900" fetchpriority="high" decoding="async"
+         alt="{% trans 'Editorial fashion campaign — tailored black look on a dramatic studio backdrop' %}">
+  </picture>
+  <div class="hero-x-scrim" aria-hidden="true"></div>
+
+  <div class="container hero-x-inner">
+    <div class="hero-x-copy">
+      <span class="hero-kicker">{% trans "New season" %}</span>
+      <h1 class="hero-x-title">{% trans "Wear something worth keeping." %}</h1>
+      <p class="hero-x-sub">{% trans "Considered essentials, made on demand. Premium fabrics, honest pricing, free 14-day returns." %}</p>
+      <div class="hero-x-cta">
+        <a href="{% url 'store' %}" class="btn btn-primary btn-icontext">
+          <span>{% trans "Shop the collection" %}</span> <i class="fa fa-arrow-right ml-1"></i>
+        </a>
+        <a href="{% url 'merchandising:collections' %}" class="btn btn-ghost-light btn-icontext">
+          <span>{% trans "View collections" %}</span>
+        </a>
       </div>
+      <ul class="hero-x-trust" aria-label="{% trans 'Why shop with us' %}">
+        <li>{% icon "returns" "ic" 16 %}{% blocktrans with d=RETURN_WINDOW_DAYS %}{{ d }}-day free returns{% endblocktrans %}</li>
+        <li>{% icon "gem" "ic" 16 %}{% trans "Premium fabrics" %}</li>
+        <li>{% icon "lock" "ic" 16 %}{% trans "Secure checkout" %}</li>
+      </ul>
     </div>
   </div>
+  <a href="#the-edit" class="hero-x-scroll" aria-label="{% trans 'Scroll to explore' %}">
+    <span class="hero-x-scroll-label">{% trans "Scroll" %}</span>
+    <span class="hero-x-scroll-line" aria-hidden="true"></span>
+  </a>
 </section>
 
-<!-- TRUST STRIP -->
+{# ============================ TRUST STRIP ============================ #}
 <section class="lux-strip">
   <div class="container py-3" style="max-width:1280px;">
     <div class="d-flex flex-wrap justify-content-center text-center" style="gap:10px 38px;">
@@ -40,8 +75,69 @@
   </div>
 </section>
 
-<!-- POPULAR -->
-<section class="home-section">
+{# ============================ THE EDIT (category cards) ============================ #}
+<section class="home-section" id="the-edit">
+  <div class="container" style="max-width:1280px;">
+    <div class="text-center mb-4">
+      <div class="lux-eyebrow mb-2">{% trans "The edit" %}</div>
+      <h3 class="section-title mb-1">{% trans "Find your look" %}</h3>
+      <div class="text-muted section-sub">{% trans "Three ways into the collection" %}</div>
+    </div>
+    <div class="edit-grid">
+      {# New neutrals -> Shirts #}
+      <a class="edit-card" data-reveal
+         href="{% if home_cats.neutrals %}{{ home_cats.neutrals.get_url }}{% else %}{% url 'store' %}{% endif %}">
+        <picture class="edit-card-pic">
+          <source type="image/webp" media="(max-width:575.98px)" srcset="{% static 'images/home/pexels/edit-neutrals-440.webp' %} 1x, {% static 'images/home/pexels/edit-neutrals-760.webp' %} 2x">
+          <source type="image/jpeg" media="(max-width:575.98px)" srcset="{% static 'images/home/pexels/edit-neutrals-440.jpg' %} 1x, {% static 'images/home/pexels/edit-neutrals-760.jpg' %} 2x">
+          <source type="image/webp" srcset="{% static 'images/home/pexels/edit-neutrals-760.webp' %}">
+          <img src="{% static 'images/home/pexels/edit-neutrals-760.jpg' %}" loading="lazy" decoding="async"
+               width="760" height="950" alt="{% trans 'Minimalist beige shirt on a hanger' %}">
+        </picture>
+        <div class="edit-card-body">
+          <span class="edit-kicker">{% trans "New neutrals" %}</span>
+          <span class="edit-title">{% trans "Shirts" %}</span>
+          <span class="edit-go">{% trans "Explore" %} <i class="fa fa-arrow-right"></i></span>
+        </div>
+      </a>
+      {# Everyday tees -> T-shirts #}
+      <a class="edit-card" data-reveal
+         href="{% if home_cats.tees %}{{ home_cats.tees.get_url }}{% else %}{% url 'store' %}{% endif %}">
+        <picture class="edit-card-pic">
+          <source type="image/webp" media="(max-width:575.98px)" srcset="{% static 'images/home/pexels/edit-tees-440.webp' %} 1x, {% static 'images/home/pexels/edit-tees-760.webp' %} 2x">
+          <source type="image/jpeg" media="(max-width:575.98px)" srcset="{% static 'images/home/pexels/edit-tees-440.jpg' %} 1x, {% static 'images/home/pexels/edit-tees-760.jpg' %} 2x">
+          <source type="image/webp" srcset="{% static 'images/home/pexels/edit-tees-760.webp' %}">
+          <img src="{% static 'images/home/pexels/edit-tees-760.jpg' %}" loading="lazy" decoding="async"
+               width="760" height="950" alt="{% trans 'Model wearing a clean white everyday t-shirt' %}">
+        </picture>
+        <div class="edit-card-body">
+          <span class="edit-kicker">{% trans "Everyday tees" %}</span>
+          <span class="edit-title">{% trans "T-shirts" %}</span>
+          <span class="edit-go">{% trans "Explore" %} <i class="fa fa-arrow-right"></i></span>
+        </div>
+      </a>
+      {# After dark -> Jackets #}
+      <a class="edit-card" data-reveal
+         href="{% if home_cats.dark %}{{ home_cats.dark.get_url }}{% else %}{% url 'store' %}{% endif %}">
+        <picture class="edit-card-pic">
+          <source type="image/webp" media="(max-width:575.98px)" srcset="{% static 'images/home/pexels/edit-afterdark-440.webp' %} 1x, {% static 'images/home/pexels/edit-afterdark-760.webp' %} 2x">
+          <source type="image/jpeg" media="(max-width:575.98px)" srcset="{% static 'images/home/pexels/edit-afterdark-440.jpg' %} 1x, {% static 'images/home/pexels/edit-afterdark-760.jpg' %} 2x">
+          <source type="image/webp" srcset="{% static 'images/home/pexels/edit-afterdark-760.webp' %}">
+          <img src="{% static 'images/home/pexels/edit-afterdark-760.jpg' %}" loading="lazy" decoding="async"
+               width="760" height="950" alt="{% trans 'Moody evening look in low light' %}">
+        </picture>
+        <div class="edit-card-body">
+          <span class="edit-kicker">{% trans "After dark" %}</span>
+          <span class="edit-title">{% trans "Jackets" %}</span>
+          <span class="edit-go">{% trans "Explore" %} <i class="fa fa-arrow-right"></i></span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+{# ============================ POPULAR ============================ #}
+<section class="home-section home-section-muted">
   <div class="container" style="max-width:1280px;">
     <div class="section-head">
       <div>
@@ -58,8 +154,8 @@
         <div class="col-6 col-md-3 d-flex mb-5">
           <div class="p-card h-100">
             <a href="{{ product.get_url }}" class="p-media">
-              {% if product.cover_image %}<img src="{{ product.cover_image }}" alt="{{ product.product_name }}">
-              {% else %}<img src="{% static 'images/placeholder.png' %}" alt="{{ product.product_name }}">{% endif %}
+              {% if product.cover_image %}<img src="{{ product.cover_image }}" loading="lazy" decoding="async" alt="{{ product.product_name }}">
+              {% else %}<img src="{% static 'images/placeholder.png' %}" loading="lazy" decoding="async" alt="{{ product.product_name }}">{% endif %}
             </a>
             <div class="p-body">
               <div class="p-badges">
@@ -79,8 +175,31 @@
   </div>
 </section>
 
-<!-- WHY US -->
-<section class="home-section">
+{# ============================ EDITORIAL CRAFT BAND ============================ #}
+<section class="home-section" style="padding-top:0;">
+  <div class="container" style="max-width:1280px;">
+    <div class="lux-split">
+      <div class="lux-split-media">
+        <picture>
+          <source type="image/webp" media="(max-width:767.98px)" srcset="{% static 'images/home/pexels/editorial-fabric-700.webp' %}">
+          <source type="image/jpeg" media="(max-width:767.98px)" srcset="{% static 'images/home/pexels/editorial-fabric-700.jpg' %}">
+          <source type="image/webp" srcset="{% static 'images/home/pexels/editorial-fabric-1200.webp' %}">
+          <img src="{% static 'images/home/pexels/editorial-fabric-1200.jpg' %}" loading="lazy" decoding="async"
+               width="1200" height="900" alt="{% trans 'Close-up of premium soft cotton fabric, naturally draped' %}">
+        </picture>
+      </div>
+      <div class="lux-split-body">
+        <div class="lux-eyebrow mb-2">{% trans "Crafted, not churned" %}</div>
+        <h3 class="section-title mb-3">{% trans "Quality you can feel" %}</h3>
+        <p class="text-muted mb-4" style="max-width:42ch;">{% trans "Considered cuts, durable fabrics and a finish made to last — pieces designed to stay in rotation, season after season." %}</p>
+        <a href="{% url 'store' %}" class="btn btn-primary">{% trans "Explore the collection" %}</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# ============================ WHY US ============================ #}
+<section class="home-section" style="padding-top:0;">
   <div class="container" style="max-width:1280px;">
     <div class="text-center mb-4">
       <div class="lux-eyebrow mb-2">{% trans "The Glitchy promise" %}</div>
@@ -111,25 +230,7 @@
   </div>
 </section>
 
-<!-- EDITORIAL CRAFT BAND -->
-<section class="home-section" style="padding-top:0;">
-  <div class="container" style="max-width:1280px;">
-    <div class="lux-split">
-      <div class="lux-split-media">
-        <img src="{% static 'images/editorial/craft.jpg' %}" loading="lazy" decoding="async"
-             alt="{% trans 'Premium fabrics, carefully finished' %}">
-      </div>
-      <div class="lux-split-body">
-        <div class="lux-eyebrow mb-2">{% trans "Crafted, not churned" %}</div>
-        <h3 class="section-title mb-3">{% trans "Quality you can feel" %}</h3>
-        <p class="text-muted mb-4" style="max-width:42ch;">{% trans "Considered cuts, durable fabrics and a finish made to last — pieces designed to stay in rotation, season after season." %}</p>
-        <a href="{% url 'store' %}" class="btn btn-primary">{% trans "Explore the collection" %}</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- LATEST -->
+{# ============================ LATEST ============================ #}
 <section class="home-section home-section-muted">
   <div class="container" style="max-width:1280px;">
     <div class="section-head">
@@ -147,8 +248,8 @@
         <div class="col-6 col-md-3 d-flex">
           <div class="p-card h-100">
             <a href="{{ product.get_url }}" class="p-media">
-              {% if product.cover_image %}<img src="{{ product.cover_image }}" alt="{{ product.product_name }}">
-              {% else %}<img src="{% static 'images/placeholder.png' %}" alt="{{ product.product_name }}">{% endif %}
+              {% if product.cover_image %}<img src="{{ product.cover_image }}" loading="lazy" decoding="async" alt="{{ product.product_name }}">
+              {% else %}<img src="{% static 'images/placeholder.png' %}" loading="lazy" decoding="async" alt="{{ product.product_name }}">{% endif %}
             </a>
             <div class="p-body">
               <div class="p-badges">
@@ -168,4 +269,8 @@
   </div>
 </section>
 
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/home-motion.js' %}?v={{ ASSET_VERSION }}"></script>
 {% endblock %}

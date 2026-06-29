@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.db.models import Sum
 from store.models import Product
 from orders.models import OrderProduct
+from category.models import Category
 
 def home(request):
     # Popular = top sellers (somma quantity)
@@ -31,8 +32,19 @@ def home(request):
 
     latest_products = Product.objects.filter(is_available=True).order_by('-created_date')[:8]
 
+    # "The Edit" — three editorial entry points mapped to REAL categories.
+    # Resolved by slug so a renamed/removed category degrades gracefully to /store
+    # (the template falls back) instead of 404-ing a hard-coded link.
+    _cats = {c.slug: c for c in Category.objects.filter(slug__in=['shirts', 't-shirt', 'jackets'])}
+    home_cats = {
+        'neutrals': _cats.get('shirts'),
+        'tees': _cats.get('t-shirt'),
+        'dark': _cats.get('jackets'),
+    }
+
     context = {
         'popular_products': popular_products,
         'latest_products': latest_products,
+        'home_cats': home_cats,
     }
     return render(request, 'home.html', context)
