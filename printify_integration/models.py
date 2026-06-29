@@ -1,5 +1,90 @@
+from datetime import timedelta
+
 from django.db import models
+from django.db.models import Q
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+
+
+class PrintifySyncState(models.Model):
+    """Singleton (pk=1) coordinating the production-safe Printify sync daemon.
+
+    Holds a DB-backed advisory lock (race-safe via a single conditional UPDATE,
+    works on sqlite + Postgres and across separate systemd one-shot processes),
+    a persisted exponential-backoff window after 429/5xx, the last-tick / last-full
+    timestamps, and safe counters for monitoring. Stores NO token and NO PII.
+    """
+    SINGLETON_PK = 1
+
+    locked_at = models.DateTimeField(null=True, blank=True)
+    locked_by = models.CharField(max_length=120, blank=True, default="")
+    last_tick_at = models.DateTimeField(null=True, blank=True)
+    last_full_sync_at = models.DateTimeField(null=True, blank=True)
+    backoff_until = models.DateTimeField(null=True, blank=True)
+    backoff_level = models.IntegerField(default=0)
+    consecutive_errors = models.IntegerField(default=0)
+    last_error_at = models.DateTimeField(null=True, blank=True)
+    last_error_status = models.IntegerField(null=True, blank=True)
+    products_synced_total = models.BigIntegerField(default=0)
+    last_tick_synced = models.IntegerField(default=0)
+    last_tick_requests = models.IntegerField(default=0)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _("Printify sync state")
+        verbose_name_plural = _("Printify sync state")
+
+    def __str__(self):
+        return f"PrintifySyncState(locked={bool(self.locked_at)}, backoff={bool(self.in_backoff())})"
+
+    # -- singleton access -----------------------------------------------------
+    @classmethod
+    def load(cls):
+        obj, _created = cls.objects.get_or_create(pk=cls.SINGLETON_PK)
+        return obj
+
+    # -- DB-backed lock (race-safe conditional UPDATE) ------------------------
+    @classmethod
+    def try_acquire(cls, owner, lock_timeout_seconds, now=None):
+        """Atomically take the lock if free or its holder is stale. Returns True
+        only for the single caller that wins the UPDATE."""
+        now = now or timezone.now()
+        cls.objects.get_or_create(pk=cls.SINGLETON_PK)
+        stale_before = now - timedelta(seconds=lock_timeout_seconds)
+        won = cls.objects.filter(pk=cls.SINGLETON_PK).filter(
+            Q(locked_at__isnull=True) | Q(locked_at__lt=stale_before)
+        ).update(locked_at=now, locked_by=str(owner)[:120])
+        return won == 1
+
+    @classmethod
+    def release(cls, owner=None):
+        """Release the lock. With ``owner`` set, only release if we still hold it
+        (so a tick whose stale lock was taken over does not clear the new holder's)."""
+        qs = cls.objects.filter(pk=cls.SINGLETON_PK)
+        if owner is not None:
+            qs = qs.filter(locked_by=str(owner)[:120])
+        qs.update(locked_at=None, locked_by="")
+
+    # -- backoff --------------------------------------------------------------
+    def in_backoff(self, now=None):
+        now = now or timezone.now()
+        return bool(self.backoff_until and self.backoff_until > now)
+
+    def enter_backoff(self, base_seconds, status=None, now=None):
+        now = now or timezone.now()
+        self.backoff_level = min(self.backoff_level + 1, 8)
+        wait = int(base_seconds) * (2 ** (self.backoff_level - 1))
+        self.backoff_until = now + timedelta(seconds=wait)
+        self.consecutive_errors += 1
+        self.last_error_at = now
+        if status is not None:
+            self.last_error_status = int(status)
+        return wait
+
+    def clear_backoff(self):
+        self.backoff_level = 0
+        self.backoff_until = None
+        self.consecutive_errors = 0
 
 
 class SyncLog(models.Model):

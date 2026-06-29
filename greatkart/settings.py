@@ -307,6 +307,23 @@ PRINTIFY_DEFAULT_CATEGORY_SLUG = env("PRINTIFY_DEFAULT_CATEGORY_SLUG", "t-shirt"
 OPENAI_KEY_ROTATED = env_bool("OPENAI_KEY_ROTATED", False)
 PRINTIFY_KEY_ROTATED = env_bool("PRINTIFY_KEY_ROTATED", False)
 
+# --- Production-safe Printify sync daemon (light 30s tick) ------------------- #
+# OFF by default everywhere. Enable on the server ONLY via env (PRINTIFY_SYNC_ENABLED=True).
+# The tick is deliberately light: a tiny batch of stale products re-synced (read-only
+# GET + local upsert) per run, capped request budget, DB lock, persisted backoff on
+# 429/5xx. It NEVER creates orders and NEVER publishes products (publishing also stays
+# gated behind the separate PRINTIFY_PUSH_ENABLED). Full discovery sync is manual.
+PRINTIFY_SYNC_ENABLED = env_bool("PRINTIFY_SYNC_ENABLED", False)
+# Informational only (shown in status). The REAL cadence is the systemd .timer
+# (OnUnitActiveSec); changing this env var does not change how often the tick runs.
+PRINTIFY_SYNC_INTERVAL_SECONDS = env_int("PRINTIFY_SYNC_INTERVAL_SECONDS", 30)
+PRINTIFY_SYNC_BATCH_SIZE = env_int("PRINTIFY_SYNC_BATCH_SIZE", 2)
+PRINTIFY_SYNC_MAX_REQUESTS_PER_TICK = env_int("PRINTIFY_SYNC_MAX_REQUESTS_PER_TICK", 5)
+PRINTIFY_SYNC_BACKOFF_SECONDS = env_int("PRINTIFY_SYNC_BACKOFF_SECONDS", 60)
+PRINTIFY_SYNC_STALE_AFTER_MINUTES = env_int("PRINTIFY_SYNC_STALE_AFTER_MINUTES", 360)
+PRINTIFY_SYNC_FULL_INTERVAL_MINUTES = env_int("PRINTIFY_SYNC_FULL_INTERVAL_MINUTES", 1440)
+PRINTIFY_SYNC_LOCK_TIMEOUT_SECONDS = env_int("PRINTIFY_SYNC_LOCK_TIMEOUT_SECONDS", 120)
+
 
 # --------------------------------------------------------------------------- #
 # Stripe

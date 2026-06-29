@@ -3,8 +3,9 @@ from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from .models import (PrintifyPrintArea, PrintifyShippingEstimateCache,
-                     PrintifyShippingProfile, SyncLog)
+                     PrintifyShippingProfile, PrintifySyncState, SyncLog)
 from .services import pull_order_statuses, sync_products
+from .sync_daemon import status_snapshot
 
 
 @admin.register(PrintifyShippingProfile)
@@ -61,6 +62,32 @@ class PrintifyShippingEstimateCacheAdmin(admin.ModelAdmin):
         n, _x = PrintifyShippingEstimateCache.objects.filter(
             expires_at__lte=timezone.now()).delete()
         self.message_user(request, _("Purged %(n)d expired estimate row(s).") % {"n": n})
+
+
+@admin.register(PrintifySyncState)
+class PrintifySyncStateAdmin(admin.ModelAdmin):
+    """Read-only monitor for the production-safe sync daemon (no token, no PII)."""
+    list_display = ("monitor", "last_tick_at", "backoff_until", "consecutive_errors",
+                    "products_synced_total", "updated_at")
+    readonly_fields = [f.name for f in PrintifySyncState._meta.fields]
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    @admin.display(description=_("Sync daemon"))
+    def monitor(self, obj):
+        snap = status_snapshot()
+        on = snap["enabled"]
+        color = "#16a34a" if on else "#64748b"
+        label = "ENABLED" if on else "disabled"
+        extra = " · BACKOFF" if snap["backoff_active"] else ""
+        return format_html(
+            '<span style="background:{};color:#fff;padding:2px 8px;border-radius:999px;'
+            'font-size:11px;font-weight:600;">{}</span> &nbsp;stale: {}{}',
+            color, label, snap["stale_products"], extra)
 
 
 @admin.register(SyncLog)
