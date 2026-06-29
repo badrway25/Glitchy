@@ -25,6 +25,19 @@ local Windows dev machine; **no real staging host exists**.
 | Security | ✅ Strong (dev) | No secrets in git, push/shipping/payments OFF. Key rotation still pending. |
 
 ## 2. What is genuinely COMPLETE
+- **Ultra-premium navbar buttons + store product-card image carousel** (Phase 61):
+  the navbar `Login`/`Register` are now **equal-size** with a **premium gold
+  Register** (sober gradient, not yellow) and an elegant soft Login (light+dark,
+  mobile drawer); the global button system gained unified radius + `:disabled/
+  :active/:focus-visible/loading` states + aligned icons + subtle reduced-motion-safe
+  micro-motion. The big win: **multi-image products are now browsable directly in the
+  store card** — a scroll-snap **carousel** (discreet desktop arrows, native mobile
+  swipe, dots, keyboard) built on the already-prefetched `ProductImage` gallery
+  (**no N+1**), capped at 5 images, with **no layout shift** and a clean single-image
+  fallback. 560+ tests green. See
+  `docs/ULTRA_PREMIUM_NAVBAR_BUTTONS_PRODUCT_CARD_GALLERY_2026.md`.
+- **Post-deploy checkout-routing fix** (Phase 60): `/checkout/` (a non-route) now
+  302-redirects to the real `/cart/checkout/`; smoke + tests added.
 - **Premium frontend refinement + production-safe Printify sync + DB readiness**
   (Phase 59): a focused premium pass — **Fraunces serif** display font, softer
   palette (no pure black), centralized **`--container-max:1320px`** (navbar/footer
