@@ -33,6 +33,10 @@
             if (lbl) { var t = b.querySelector("[data-wishlist-label]"); if (t) t.textContent = lbl; }
           });
           setCount(d.count);
+          if (window.glToast) {
+            var tmsg = btn.getAttribute(d.in_wishlist ? "data-toast-on" : "data-toast-off");
+            if (tmsg) window.glToast(tmsg, "success");
+          }
         }
       })
       .catch(function(){})

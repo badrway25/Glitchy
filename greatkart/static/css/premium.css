@@ -3149,3 +3149,81 @@ form .form-control,form .custom-select{transition:border-color .18s var(--ease),
 :root[data-theme="dark"] .addr-switch input:checked + .addr-switch-track{background:var(--accent);border-color:var(--accent);}
 .addr-actions{display:flex;gap:.7rem;flex-wrap:wrap;}
 @media (max-width:575.98px){ .addr-actions{flex-direction:column;} .addr-actions .btn{width:100%;} }
+
+/* ============================================================================
+   PHASE 65 — toast feedback, empty-state coherence, reorder, store toolbar copy.
+   Light+dark, mobile, reduced-motion safe.
+   ============================================================================ */
+
+/* Toasts */
+.toast-host{position:fixed;z-index:1400;right:18px;bottom:18px;display:flex;flex-direction:column;
+  gap:10px;max-width:min(92vw,360px);pointer-events:none;}
+.toast{display:flex;align-items:center;gap:.7rem;padding:.75rem .9rem;border-radius:var(--radius);
+  background:var(--surface);border:var(--border);box-shadow:var(--shadow);color:var(--text);
+  font-family:var(--font-ui);font-size:.9rem;pointer-events:auto;opacity:0;transform:translateY(10px) scale(.98);
+  transition:opacity .26s var(--ease),transform .26s var(--ease);}
+.toast.is-in{opacity:1;transform:none;}
+.toast.is-out{opacity:0;transform:translateY(8px) scale(.98);}
+.toast-ic{flex:0 0 auto;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;
+  background:linear-gradient(135deg,rgba(166,130,76,.16),rgba(166,130,76,.05));color:var(--accent-2);}
+.toast-success .toast-ic{background:rgba(46,125,50,.14);color:#2e7d32;}
+.toast-warn .toast-ic{background:rgba(184,137,58,.16);color:var(--warning,#b8893a);}
+.toast-msg{flex:1 1 auto;}
+.toast-x{flex:0 0 auto;background:none;border:0;color:var(--muted);cursor:pointer;padding:2px 4px;line-height:1;}
+.toast-x:hover{color:var(--text);}
+@media (max-width:575.98px){ .toast-host{right:10px;left:10px;bottom:10px;max-width:none;} }
+@media (prefers-reduced-motion:reduce){ .toast{transition:none;} }
+
+/* Elevate all .dash-empty states to the luxury look (orders/billing/dashboard) */
+.dash-empty{padding:2.6rem 1.5rem;}
+.dash-empty .dash-empty-icon{width:70px;height:70px;border-radius:20px;margin:0 auto 1.1rem;
+  background:linear-gradient(135deg,rgba(166,130,76,.18),rgba(166,130,76,.04));
+  border:0;box-shadow:inset 0 0 0 1px rgba(166,130,76,.14);color:var(--accent-2);font-size:1.6rem;}
+.dash-empty h4{font-family:var(--font-display);font-weight:800;font-size:1.3rem;color:var(--text);margin-bottom:.4rem;}
+.dash-empty p{color:var(--muted);max-width:40ch;margin:0 auto 1.3rem;}
+:root[data-theme="dark"] .dash-empty .dash-empty-icon{background:linear-gradient(135deg,rgba(202,165,106,.22),rgba(202,165,106,.05));}
+
+/* Elegant order/billing row action buttons (were too subtle as plain btn-soft) */
+.oc-actions{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
+.oc-actions .btn-soft{border:var(--border-strong);background:var(--surface);color:var(--text);
+  font-family:var(--font-ui);font-weight:600;border-radius:var(--radius-sm);
+  transition:border-color var(--tr),color var(--tr),background var(--tr),transform var(--tr),box-shadow var(--tr);}
+.oc-actions .btn-soft:hover{border-color:var(--accent);color:var(--accent-2);background:var(--surface-2);
+  transform:translateY(-1px);box-shadow:var(--shadow-soft);}
+.oc-actions .oc-pdf{background:linear-gradient(135deg,rgba(166,130,76,.13),rgba(166,130,76,.04));
+  border-color:rgba(166,130,76,.32);color:var(--accent-2);}
+.oc-actions .oc-pdf:hover{background:linear-gradient(135deg,rgba(166,130,76,.22),rgba(166,130,76,.08));
+  border-color:var(--accent);color:var(--accent-2);}
+:root[data-theme="dark"] .oc-actions .oc-pdf{background:linear-gradient(135deg,rgba(202,165,106,.18),rgba(202,165,106,.05));
+  border-color:rgba(202,165,106,.35);color:var(--accent);}
+
+/* Fix: portal custom-select (pmsel) value was truncated — size to content on desktop */
+@media (min-width:576px){
+  .pf-controls .pf-select-wrap{flex:0 0 auto;}
+  .pf-controls .pmsel,.pf-controls .pmsel-btn{width:auto;}
+  .pf-controls .pmsel-btn{min-width:130px;max-width:260px;}
+}
+@media (max-width:575.98px){
+  .pf-controls .pmsel,.pf-controls .pmsel-btn{width:100%;}
+}
+
+/* Fix: pmsel dropdown menu was pinned to button width (left:0;right:0) -> options
+   truncated. Let it size to its widest option. */
+.pf-controls .pmsel-menu{right:auto;width:max-content;min-width:100%;max-width:min(300px,82vw);}
+.pmsel-opt-text{overflow:visible;text-overflow:clip;white-space:nowrap;}
+
+/* ============================================================================
+   PHASE 65 — unify the premium button family so primary / soft / outline /
+   elegant / ghost share the SAME size + treatment (only colour differs).
+   Fixes Shop / Continue shopping / Back to addresses looking smaller.
+   ============================================================================ */
+.btn-primary,.btn-soft,.btn-outline-primary,.btn-outline-dark,.btn-elegant,.btn-ghost-light{
+  text-transform:uppercase!important;letter-spacing:.06em!important;font-size:.78rem!important;
+  font-weight:600!important;padding:.72rem 1.3rem!important;line-height:1.2!important;
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:.5rem;}
+.btn-icontext{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:.5rem;}
+/* keep the small variant proportionally small + consistent */
+.btn-sm,.btn-primary.btn-sm,.btn-soft.btn-sm,.btn-outline-primary.btn-sm{
+  font-size:.7rem!important;padding:.46rem .85rem!important;letter-spacing:.05em!important;}
+/* the order-row receipt/details keep their elegant border treatment but match size */
+.oc-actions .btn-soft{padding:.46rem .85rem!important;font-size:.7rem!important;}

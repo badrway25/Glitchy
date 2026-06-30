@@ -34,6 +34,7 @@
       var prev = label ? label.textContent : null;
       btn.classList.add("is-copied");
       if (label) label.textContent = original;
+      if (window.glToast) window.glToast(btn.getAttribute("data-toast-label") || original, "success");
       setTimeout(function () {
         btn.classList.remove("is-copied");
         if (label && prev !== null) label.textContent = prev;
