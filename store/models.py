@@ -184,6 +184,29 @@ class Product(models.Model):
     def on_sale(self):
         return bool(self.compare_at_price and self.compare_at_price > self.price)
 
+    def card_variants(self):
+        """Distinct active colour + size values for the store-card swatches. Iterates the
+        already-prefetched variation_set (prefetch_related('variation_set') in the store
+        view) so it costs no extra query. Returns {} when there are no variants."""
+        colors, sizes = [], []
+        seen_c, seen_s = set(), set()
+        for v in self.variation_set.all():
+            if not v.is_active:
+                continue
+            val = (v.variation_value or "").strip()
+            if not val:
+                continue
+            low = val.lower()
+            if v.variation_category == "color" and low not in seen_c:
+                seen_c.add(low)
+                colors.append(val)
+            elif v.variation_category == "size" and low not in seen_s:
+                seen_s.add(low)
+                sizes.append(val)
+        if not colors and not sizes:
+            return {}
+        return {"colors": colors, "sizes": sizes}
+
     def averageReview(self):
         reviews = ReviewRating.objects.filter(product=self, status=True).aggregate(average=Avg('rating'))
         avg = 0

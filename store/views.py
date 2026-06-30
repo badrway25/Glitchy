@@ -28,7 +28,8 @@ def store(request, category_slug=None):
     # so options never vanish when selected.
     facets = build_facets(base)
     products_qs, active, sort = apply_filters(request, base)
-    products_qs = products_qs.prefetch_related("gallery")
+    # gallery + variation prefetched -> card carousel and colour/size swatches cost no N+1
+    products_qs = products_qs.prefetch_related("gallery", "variation_set")
     count = products_qs.count()
 
     # active collection (for a compact hero/breadcrumb)

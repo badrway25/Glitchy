@@ -177,6 +177,14 @@
       <!-- PRODUCTS GRID -->
       <main class="col-lg-9">
 
+        {# Honest trust / delivery micro-panel (no false claims) #}
+        <div class="store-trust" data-reveal>
+          <span class="store-trust-item"><i class="fa fa-pen-ruler" aria-hidden="true"></i>{% trans "Made on demand" %}</span>
+          <span class="store-trust-item"><i class="fa fa-truck" aria-hidden="true"></i>{% trans "Delivery estimate before you pay" %}</span>
+          <span class="store-trust-item"><i class="fa fa-lock" aria-hidden="true"></i>{% trans "Secure checkout" %}</span>
+          <span class="store-trust-item"><i class="fa fa-file-invoice" aria-hidden="true"></i>{% trans "Receipts in your account" %}</span>
+        </div>
+
         <div class="row" id="productGrid">
           {% for product in products %}
             <div class="col-6 col-lg-4 mb-4 d-flex product-item" data-price="{{ product.price }}"
@@ -249,6 +257,27 @@
                   <a href="{{ product.get_url }}" class="product-title d-block">
                     {{ product.product_name }}
                   </a>
+
+                  {% with cv=product.card_variants %}
+                  {% if cv %}
+                  <div class="card-variants" aria-label="{% trans 'Available options' %}">
+                    {% if cv.colors %}
+                      <span class="cv-colors">
+                        {% for c in cv.colors|slice:":4" %}
+                          <span class="cv-dot{% if c|is_light_color %} is-light{% endif %}" style="background:{{ c|color_hex }};" title="{{ c|title }}"></span>
+                        {% endfor %}
+                        {% if cv.colors|length > 4 %}<span class="cv-more">+{{ cv.colors|length|add:"-4" }}</span>{% endif %}
+                      </span>
+                    {% endif %}
+                    {% if cv.sizes %}
+                      <span class="cv-sizes">
+                        {% for s in cv.sizes|slice:":4" %}<span class="cv-size">{{ s|upper }}</span>{% endfor %}
+                        {% if cv.sizes|length > 4 %}<span class="cv-more">+{{ cv.sizes|length|add:"-4" }}</span>{% endif %}
+                      </span>
+                    {% endif %}
+                  </div>
+                  {% endif %}
+                  {% endwith %}
 
                   <div class="product-meta">
                     <div class="price">
