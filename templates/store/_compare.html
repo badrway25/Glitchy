@@ -1,0 +1,36 @@
+{% load static i18n shopfilters %}
+{% if products %}
+<div class="cmp-grid" style="--cmp-cols:{{ products|length }};">
+  {% for p in products %}
+  {% with cv=p.card_variants %}
+  <div class="cmp-col" data-cmp-col="{{ p.id }}">
+    <button type="button" class="cmp-remove" data-compare-remove data-product-id="{{ p.id }}"
+            aria-label="{% trans 'Remove from compare' %}"><i class="fa fa-times" aria-hidden="true"></i></button>
+    <a href="{{ p.get_url }}" class="cmp-media">
+      <img src="{% if p.cover_image %}{{ p.cover_image }}{% else %}{% static 'images/placeholder.png' %}{% endif %}"
+           alt="{{ p.product_name }}" loading="lazy" decoding="async"></a>
+    <a href="{{ p.get_url }}" class="cmp-name">{{ p.product_name|truncatechars:48 }}</a>
+    <div class="cmp-price">{{ CURRENCY_SYMBOL }} {{ p.price }}{% if p.on_sale %}
+      <span class="price-was">{{ CURRENCY_SYMBOL }} {{ p.compare_at_price }}</span>{% endif %}</div>
+    <dl class="cmp-rows">
+      <div class="cmp-row"><dt>{% trans "Category" %}</dt>
+        <dd>{% if p.category %}{{ p.category.category_name }}{% else %}—{% endif %}</dd></div>
+      <div class="cmp-row"><dt>{% trans "Colours" %}</dt>
+        <dd>{% if cv.colors %}{% for c in cv.colors %}<span class="cmp-dot" style="background:{{ c|color_hex }};" title="{{ c|title }}"></span>{% endfor %}{% else %}—{% endif %}</dd></div>
+      <div class="cmp-row"><dt>{% trans "Sizes" %}</dt>
+        <dd>{% if cv.sizes %}{{ cv.sizes|join:", "|upper }}{% else %}—{% endif %}</dd></div>
+    </dl>
+    <div class="cmp-actions">
+      <a href="{{ p.get_url }}" class="btn btn-soft btn-sm">{% trans "View details" %}</a>
+      {% if cv %}<button type="button" class="btn btn-primary btn-sm" data-quick-view="{{ p.id }}">{% trans "Choose options" %}</button>{% endif %}
+    </div>
+  </div>
+  {% endwith %}
+  {% endfor %}
+</div>
+{% else %}
+<div class="cmp-empty">
+  <div class="lux-empty-ic"><i class="fa fa-scale-balanced" aria-hidden="true"></i></div>
+  <p>{% trans "Add up to 3 products to compare them side by side." %}</p>
+</div>
+{% endif %}

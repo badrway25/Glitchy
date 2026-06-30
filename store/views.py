@@ -60,6 +60,7 @@ def store(request, category_slug=None):
     paginator = Paginator(products_qs, 9)
     paged_products = paginator.get_page(request.GET.get("page"))
 
+    from storefront.recently import get_recently_viewed
     context = {
         "category": category,
         "categories": all_categories,
@@ -72,9 +73,32 @@ def store(request, category_slug=None):
         "has_filters": bool(active),
         "active_collection": active_collection,
         "recommendations": recommendations,
+        "recently_viewed": get_recently_viewed(request, limit=8),
         "querystring": request.GET.urlencode(),
     }
     return render(request, "store/store.html", context)
+
+
+def compare(request):
+    """Lightweight product compare — renders up to 3 available products for the ids the
+    client holds in localStorage. No server state, no PII; ids are validated ints and
+    scoped to available products. Returns an HTML fragment for the compare drawer."""
+    raw = (request.GET.get("ids") or "").split(",")
+    ids = []
+    for r in raw:
+        r = r.strip()
+        if r.isdecimal():               # decimal 0-9 only (isdigit() accepts e.g. "²")
+            n = int(r)
+            if n not in ids:
+                ids.append(n)
+        if len(ids) >= 3:
+            break
+    products = []
+    if ids:
+        by_id = {p.id: p for p in Product.objects.filter(id__in=ids, is_available=True)
+                 .select_related("category").prefetch_related("variation_set")}
+        products = [by_id[i] for i in ids if i in by_id]
+    return render(request, "store/_compare.html", {"products": products})
 
 def product_detail(request, category_slug, product_slug):
     single_product = get_object_or_404(Product, category__slug=category_slug, slug=product_slug)
