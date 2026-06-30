@@ -87,6 +87,8 @@ def saved_items(request):
         "facets": facet_data, "active": active, "chips": chips,
         "has_query": has_filters, "has_filters": has_filters,
         "result_count": total_matched + len(saved_for_later),
+        "total_saved": len(all_pids) + len(saved_for_later),
+        "filtered_count": total_matched,
         "querystring": params.urlencode(),
     })
 

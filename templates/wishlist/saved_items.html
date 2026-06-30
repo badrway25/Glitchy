@@ -6,18 +6,36 @@
 <section class="section-content padding-y">
   <div class="container" style="max-width:var(--container-max);">
 
-    <div class="dash-top mb-4">
-      <div>
-        <h1 class="dash-title mb-1">{% trans "Saved items" %}</h1>
-        <div class="text-muted">{% trans "Your wishlist and items saved for later." %}</div>
+    <div class="lux-head" data-reveal>
+      <div class="lux-head-main">
+        <div class="lux-eyebrow">{% trans "Your collection" %}</div>
+        <h1 class="lux-title">{% trans "Saved items" %}</h1>
+        <p class="lux-sub">{% trans "Everything you've loved, ready when you are." %}</p>
       </div>
-      <a href="{% url 'store' %}" class="btn btn-soft">{% trans "Continue shopping" %}</a>
+      <div class="lux-head-actions">
+        <a href="{% url 'store' %}" class="btn btn-soft btn-icontext">
+          <i class="fa fa-shopping-bag" aria-hidden="true"></i><span>{% trans "Continue shopping" %}</span></a>
+      </div>
     </div>
 
+    {% if total_saved %}
+    <div class="lux-summary" data-reveal>
+      <div class="lux-stat"><span class="lux-stat-v" data-countup>{{ total_saved }}</span>
+        <span class="lux-stat-l">{% trans "Saved" %}</span></div>
+      {% if has_filters %}<div class="lux-stat is-accent"><span class="lux-stat-v">{{ filtered_count }}</span>
+        <span class="lux-stat-l">{% trans "Filtered" %}</span></div>{% endif %}
+      {% if facets.sale_count %}<div class="lux-stat"><span class="lux-stat-v">{{ facets.sale_count }}</span>
+        <span class="lux-stat-l">{% trans "On sale" %}</span></div>{% endif %}
+      {% if facets.multi_count %}<div class="lux-stat"><span class="lux-stat-v">{{ facets.multi_count }}</span>
+        <span class="lux-stat-l">{% trans "Multi-image" %}</span></div>{% endif %}
+    </div>
+    {% endif %}
+
     {% if not user.is_authenticated %}
-      <div class="alert alert-info mb-4" style="font-size:.9rem;">
-        {% trans "You're browsing as a guest — your saved items are kept on this device." %}
-        <a href="{% url 'login' %}">{% trans "Log in" %}</a> {% trans "to keep them on your account." %}
+      <div class="guest-note" data-reveal>
+        <span class="icon-tile"><i class="fa fa-circle-info" aria-hidden="true"></i></span>
+        <span>{% trans "You're browsing as a guest — your saved items are kept on this device." %}
+        <a href="{% url 'login' %}">{% trans "Log in" %}</a> {% trans "to keep them on your account." %}</span>
       </div>
     {% endif %}
 
@@ -130,7 +148,7 @@
     {% if result_count is not None %}<div class="portal-result-count">{% blocktrans count n=result_count %}{{ n }} saved item{% plural %}{{ n }} saved items{% endblocktrans %}</div>{% endif %}
 
     {% if wishlist_items or saved_for_later %}
-      <div class="rv-grid">
+      <div class="rv-grid" data-reveal-stagger>
         {% for it in wishlist_items %}{% include 'wishlist/_saved_card.html' with p=it.product %}{% endfor %}
         {% for it in saved_for_later %}{% include 'wishlist/_saved_card.html' with p=it.product saved=1 %}{% endfor %}
       </div>
@@ -146,18 +164,23 @@
       </nav>
       {% endif %}
     {% elif has_filters %}
-      <div class="store-empty">
-        <div class="store-empty-ic">{% icon "search" "ic" 30 %}</div>
-        <h3 class="mb-2">{% trans "No saved items match your search" %}</h3>
-        <p class="text-muted mb-4">{% trans "Try a different keyword or clear the search." %}</p>
-        <a href="{% url 'wishlist:saved' %}" class="btn btn-soft">{% trans "Clear search" %}</a>
+      <div class="lux-empty" data-reveal>
+        <div class="lux-empty-ic"><i class="fa fa-magnifying-glass" aria-hidden="true"></i></div>
+        <h3>{% trans "Nothing matches those filters" %}</h3>
+        <p>{% trans "Try a different combination, or clear the filters to see everything you've saved." %}</p>
+        <div class="lux-empty-cta">
+          <a href="{% url 'wishlist:saved' %}" class="btn btn-primary">{% trans "Clear filters" %}</a>
+          <a href="{% url 'store' %}" class="btn btn-soft">{% trans "Continue shopping" %}</a>
+        </div>
       </div>
     {% else %}
-      <div class="store-empty">
-        <div class="store-empty-ic">{% icon "heart" "ic" 30 %}</div>
-        <h3 class="mb-2">{% trans "No saved items yet" %}</h3>
-        <p class="text-muted mb-4">{% trans "Tap the heart on any product to save it here for later." %}</p>
-        <a href="{% url 'store' %}" class="btn btn-primary">{% trans "Browse products" %}</a>
+      <div class="lux-empty" data-reveal>
+        <div class="lux-empty-ic"><i class="fa fa-heart" aria-hidden="true"></i></div>
+        <h3>{% trans "Your collection is waiting" %}</h3>
+        <p>{% trans "Tap the heart on any piece you love and it'll be kept here, ready for later." %}</p>
+        <div class="lux-empty-cta">
+          <a href="{% url 'store' %}" class="btn btn-primary">{% trans "Explore the store" %}</a>
+        </div>
       </div>
     {% endif %}
 
