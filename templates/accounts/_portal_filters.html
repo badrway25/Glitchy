@@ -1,6 +1,23 @@
-{% load i18n %}
-{% comment %}Premium search + status + sort bar for orders / billing. GET form,
-server-validated (see accounts.views._filter_sort_orders).{% endcomment %}
+{% load i18n shopfilters %}
+{% comment %}Premium filter bar for orders / billing: quick chips + search + status +
+sort + collapsible advanced filters (date range, total range, receipt). GET form,
+server-validated and querystring-persistent (accounts.views._filter_sort_orders).
+{% endcomment %}
+
+{# Quick chips — preserve other params via qs_set #}
+<div class="portal-chips" role="group" aria-label="{% trans 'Quick filters' %}">
+  <a class="portal-chip {% if not status and not receipt %}is-on{% endif %}"
+     href="{{ request.path }}?{% qs_set status='' receipt='' %}">{% trans "All" %}</a>
+  <a class="portal-chip {% if status == 'New' %}is-on{% endif %}"
+     href="{{ request.path }}?{% qs_set status='New' %}">{% trans "Confirmed" %}</a>
+  <a class="portal-chip {% if status == 'Accepted' %}is-on{% endif %}"
+     href="{{ request.path }}?{% qs_set status='Accepted' %}">{% trans "Packed" %}</a>
+  <a class="portal-chip {% if status == 'Completed' %}is-on{% endif %}"
+     href="{{ request.path }}?{% qs_set status='Completed' %}">{% trans "Completed" %}</a>
+  <a class="portal-chip {% if receipt == '1' %}is-on{% endif %}"
+     href="{{ request.path }}?{% qs_set receipt='1' %}">{% trans "With receipt" %}</a>
+</div>
+
 <form method="get" class="portal-filters" role="search">
   <div class="pf-search">
     <i class="fa fa-magnifying-glass pf-search-ic" aria-hidden="true"></i>
@@ -31,4 +48,27 @@ server-validated (see accounts.views._filter_sort_orders).{% endcomment %}
       <a href="{{ request.path }}" class="btn btn-soft pf-clear">{% trans "Clear" %}</a>
     {% endif %}
   </div>
+
+  {# Advanced — collapsible (native details), mobile-friendly #}
+  <details class="pf-advanced" {% if date_from or date_to or total_min or total_max %}open{% endif %}>
+    <summary class="pf-advanced-toggle">{% trans "More filters" %}</summary>
+    <div class="pf-advanced-grid">
+      <label class="pf-field"><span>{% trans "From date" %}</span>
+        <input type="date" name="date_from" value="{{ date_from }}" class="pf-input"></label>
+      <label class="pf-field"><span>{% trans "To date" %}</span>
+        <input type="date" name="date_to" value="{{ date_to }}" class="pf-input"></label>
+      <label class="pf-field"><span>{% trans "Min total" %}</span>
+        <input type="number" name="total_min" value="{{ total_min }}" min="0" step="1" class="pf-input"
+               inputmode="decimal" placeholder="0"></label>
+      <label class="pf-field"><span>{% trans "Max total" %}</span>
+        <input type="number" name="total_max" value="{{ total_max }}" min="0" step="1" class="pf-input"
+               inputmode="decimal" placeholder="∞"></label>
+      <label class="pf-check"><input type="checkbox" name="receipt" value="1" {% if receipt == '1' %}checked{% endif %}>
+        <span>{% trans "Only with receipt" %}</span></label>
+    </div>
+  </details>
 </form>
+
+{% if result_count is not None %}
+<div class="portal-result-count">{% blocktrans count n=result_count %}{{ n }} result{% plural %}{{ n }} results{% endblocktrans %}</div>
+{% endif %}

@@ -27,6 +27,33 @@
             </div>
           </div>
 
+          {% if summary %}
+          <div class="dash-card" data-reveal>
+            <div class="dash-card-body">
+              <div class="dash-kpi dash-kpi-bill">
+                <div class="kpi-card kpi-b">
+                  <div class="kpi-top"><div class="kpi-label">{% trans "Paid orders" %}</div>
+                    <div class="kpi-icon"><i class="fa fa-check-circle"></i></div></div>
+                  <div class="kpi-value">{{ summary.paid_count }}</div>
+                  <div class="kpi-sub text-muted">€ {{ summary.paid_total|floatformat:2 }}</div>
+                </div>
+                <div class="kpi-card kpi-e">
+                  <div class="kpi-top"><div class="kpi-label">{% trans "Receipts" %}</div>
+                    <div class="kpi-icon"><i class="fa fa-file"></i></div></div>
+                  <div class="kpi-value">{{ summary.receipts_available }}</div>
+                  <div class="kpi-sub text-muted">{% trans "Available" %}</div>
+                </div>
+                <div class="kpi-card kpi-c">
+                  <div class="kpi-top"><div class="kpi-label">{% trans "Pending" %}</div>
+                    <div class="kpi-icon"><i class="fa fa-clock"></i></div></div>
+                  <div class="kpi-value">{{ summary.pending_count }}</div>
+                  <div class="kpi-sub text-muted">{% trans "Awaiting payment" %}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+
           <div class="dash-card">
             <div class="dash-card-body">
 
