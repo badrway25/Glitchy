@@ -1,52 +1,61 @@
 {% extends 'base.html' %}
 {% load i18n %}
 
+{% block title %}{% trans "Sign in" %} • {{ SITE_NAME }}{% endblock %}
 
 {% block content %}
+<section class="section-content padding-y auth-wrap">
+  <div class="container" style="max-width:var(--container-narrow);">
 
-<section class="section-conten padding-y" style="min-height:84vh">
+    {% if request.GET.command == 'verification' %}
+      <div class="auth-card auth-note" role="alert">
+        <div class="auth-note-ic"><i class="fa fa-envelope-open-text" aria-hidden="true"></i></div>
+        <p>{% blocktrans with email=request.GET.email %}Thank you for registering. We've sent a verification email to {{ email }}.{% endblocktrans %}</p>
+        <p class="text-muted">{% trans "Already verified?" %} <a href="{% url 'login' %}">{% trans "Sign in" %}</a></p>
+      </div>
+    {% else %}
 
-<!-- ============================ COMPONENT LOGIN   ================================= -->
+    <div class="auth-card">
+      <div class="auth-head">
+        <h1 class="auth-title">{% trans "Sign in" %}</h1>
+        <p class="text-muted mb-0">{% trans "Welcome back to Glitchy." %}</p>
+      </div>
 
-{% if request.GET.command == 'verification' %}
-
-<div class="container mx-auto alert alert-info text-center" role="alert" style="max-width: 1024px; margin-top:100px;">
-{% blocktrans with email=request.GET.email %}Thank you for registering with us. We have sent you a verification email to your email address [{{ email }}]{% endblocktrans %}
-<br><br>
-{% trans "Already verified?" %} <a href="{% url 'login' %}">{% trans "Login" %}</a>
-</div>
-
-{% else %}
-
-	<div class="card mx-auto p-2" style="max-width: 460px;">
-
-      <div class="card-body">
-      <h4 class="card-title mb-4">{% trans "Sign in" %}</h4>
       {% include 'includes/alerts.html' %}
-      <form action="{% url 'login' %}" method="POST">
+
+      <form action="{% url 'login' %}" method="POST" class="auth-form" novalidate>
         {% csrf_token %}
-          <div class="form-group">
-			 <input type="email" class="form-control" placeholder="{% trans 'Email Address' %}" name="email">
-          </div> <!-- form-group// -->
-          <div class="form-group">
-			<input type="password" class="form-control" placeholder="{% trans 'Password' %}" name="password">
-          </div> <!-- form-group// -->
+        <label class="auth-field">
+          <span class="auth-label">{% trans "Email" %}</span>
+          <input type="email" name="email" class="form-control" autocomplete="email" required
+                 placeholder="{% trans 'you@example.com' %}">
+        </label>
 
-          <div class="form-group">
-          	<a href="{% url 'forgotPassword' %}" class="float-right">{% trans "Forgot password?" %}</a>
+        <label class="auth-field">
+          <span class="auth-label">{% trans "Password" %}</span>
+          <span class="pw-wrap">
+            <input type="password" name="password" class="form-control" autocomplete="current-password" required
+                   placeholder="••••••••">
+            <button type="button" class="pw-toggle" data-pw-toggle
+                    data-show-label="{% trans 'Show password' %}" data-hide-label="{% trans 'Hide password' %}"
+                    aria-label="{% trans 'Show password' %}">
+              <i class="fa fa-eye" aria-hidden="true"></i>
+            </button>
+          </span>
+        </label>
 
-          </div> <!-- form-group form-check .// -->
-          <div class="form-group">
-              <button type="submit" class="btn btn-primary btn-block"> {% trans "Login" %}  </button>
-          </div> <!-- form-group// -->
+        <div class="auth-row">
+          <a href="{% url 'forgotPassword' %}" class="auth-link">{% trans "Forgot password?" %}</a>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block auth-submit">{% trans "Login" %}</button>
       </form>
-      </div> <!-- card-body.// -->
-    </div> <!-- card .// -->
 
-     <p class="text-center mt-4">{% trans "Don't have account?" %} <a href="{% url 'register' %}">{% trans "Sign up" %}</a></p>
-     <br><br>
-<!-- ============================ COMPONENT LOGIN  END.// ================================= -->
-{% endif %}
+      <p class="auth-alt">{% trans "Don't have an account?" %}
+        <a href="{% url 'register' %}">{% trans "Sign up" %}</a></p>
+    </div>
 
+    {% endif %}
+  </div>
 </section>
 {% endblock %}
