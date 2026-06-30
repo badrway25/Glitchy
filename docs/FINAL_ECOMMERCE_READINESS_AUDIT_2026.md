@@ -25,6 +25,15 @@ local Windows dev machine; **no real staging host exists**.
 | Security | ✅ Strong (dev) | No secrets in git, push/shipping/payments OFF. Key rotation still pending. |
 
 ## 2. What is genuinely COMPLETE
+- **Customer portal intelligence + wishlist facets + legacy sweep** (Phase 63): the
+  wishlist gained **real, data-driven facets** (category, colour, size, price range,
+  on-sale, multi-image, recently-saved) with quick chips, removable active chips,
+  querystring + pagination, and **quick actions** (quick view / view / remove / sale price
+  / multi-image carousel) — all ownership-scoped and **N+1-free**. The activity timeline
+  now includes wishlist saves; the sidebar shows **lazy count badges** (orders/receipts/
+  addresses); the **login/register pages were rebuilt premium** with a password toggle; and
+  a copy-order-number utility was added. 593+ tests green, no migration. See
+  `docs/CUSTOMER_PORTAL_INTELLIGENCE_WISHLIST_FACETS_2026.md`.
 - **Premium customer portal + global polish** (Phase 62): the dashboard is now genuinely
   useful — **6 real KPI cards**, **quick actions**, **smart alerts**, a **recent-activity
   timeline derived from real data**, and a premium empty state; the order & billing lists
