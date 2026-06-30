@@ -14,7 +14,7 @@
   <div class="container-fluid px-0">
     <div class="store-hero-wide">
 
-      <div class="store-header">
+      <div class="store-header" data-reveal>
 
         <div>
           <nav aria-label="breadcrumb">
@@ -277,8 +277,8 @@
             </div>
           {% empty %}
             <div class="col-12">
-              <div class="store-empty" {% if active_filters.keyword %}data-track-no-results="{{ active_filters.keyword }}"{% endif %}>
-                <div class="store-empty-ic">{% icon "search" "ic" 30 %}</div>
+              <div class="store-empty lux-empty" {% if active_filters.keyword %}data-track-no-results="{{ active_filters.keyword }}"{% endif %} data-reveal>
+                <div class="lux-empty-ic"><i class="fa fa-magnifying-glass" aria-hidden="true"></i></div>
                 {% if active_filters.keyword %}
                   <h3 class="mb-2">{% blocktrans with q=active_filters.keyword %}No results for “{{ q }}”{% endblocktrans %}</h3>
                 {% else %}
