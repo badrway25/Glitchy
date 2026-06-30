@@ -16,7 +16,9 @@ def _scope(request):
 
 
 def items(request, saved_for_later=None):
-    qs = WishlistItem.objects.filter(**_scope(request)).select_related("product", "product__category")
+    qs = (WishlistItem.objects.filter(**_scope(request))
+          .select_related("product", "product__category")
+          .prefetch_related("product__gallery"))  # cover/hover image without N+1
     if saved_for_later is not None:
         qs = qs.filter(saved_for_later=saved_for_later)
     return qs
