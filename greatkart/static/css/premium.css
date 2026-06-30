@@ -2784,9 +2784,12 @@ form .form-control,form .custom-select{transition:border-color .18s var(--ease),
 .pcard-gallery{position:absolute;inset:0;z-index:1;}
 .pcard-track{display:flex;height:100%;width:100%;overflow-x:auto;overflow-y:hidden;
   scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;
-  scrollbar-width:none;}
+  scrollbar-width:none;touch-action:pan-x pinch-zoom;}
 .pcard-track::-webkit-scrollbar{display:none;}
-.pcard-slide{flex:0 0 100%;height:100%;scroll-snap-align:center;display:block;}
+/* FIX (Phase 66): snap-align MUST be `start`, not `center`. With full-width slides +
+   `x mandatory`, center alignment pins scrollLeft to 0 (the track refuses to scroll via
+   swipe or arrow). `start` snaps each slide to the left edge and restores scrolling. */
+.pcard-slide{flex:0 0 100%;height:100%;scroll-snap-align:start;scroll-snap-stop:always;display:block;}
 .pcard-slide img{width:100%;height:100%;object-fit:cover;display:block;opacity:1!important;}
 /* don't let the generic card-hover zoom fight the carousel */
 .product-card:hover .pcard-gallery img{transform:none!important;}
@@ -3227,3 +3230,27 @@ form .form-control,form .custom-select{transition:border-color .18s var(--ease),
   font-size:.7rem!important;padding:.46rem .85rem!important;letter-spacing:.05em!important;}
 /* the order-row receipt/details keep their elegant border treatment but match size */
 .oc-actions .btn-soft{padding:.46rem .85rem!important;font-size:.7rem!important;}
+
+/* ============================================================================
+   PHASE 66 — store card colour/size swatches + trust panel.
+   ============================================================================ */
+.card-variants{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;margin:.4rem 0 .1rem;}
+.cv-colors{display:inline-flex;align-items:center;gap:5px;}
+.cv-dot{width:14px;height:14px;border-radius:50%;display:inline-block;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12);}
+.cv-dot.is-light{box-shadow:inset 0 0 0 1px rgba(0,0,0,.22);}
+.cv-sizes{display:inline-flex;align-items:center;gap:4px;}
+.cv-size{font-family:var(--font-ui);font-size:.64rem;font-weight:700;letter-spacing:.03em;color:var(--muted);
+  border:var(--border);border-radius:5px;padding:.08rem .32rem;line-height:1.3;text-transform:uppercase;}
+.cv-more{font-family:var(--font-ui);font-size:.66rem;font-weight:700;color:var(--muted);}
+:root[data-theme="dark"] .cv-dot{box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);}
+
+/* Store trust / delivery micro-panel */
+.store-trust{display:flex;flex-wrap:wrap;gap:.5rem 1.4rem;align-items:center;padding:.7rem 1.05rem;margin-bottom:1rem;
+  border:var(--border);border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow-soft);}
+.store-trust-item{display:inline-flex;align-items:center;gap:.5rem;font-family:var(--font-ui);font-size:.8rem;
+  font-weight:600;color:var(--muted);}
+.store-trust-item i{color:var(--accent-2);font-size:.92rem;}
+@media (max-width:575.98px){
+  .store-trust{gap:.45rem .9rem;padding:.6rem .8rem;}
+  .store-trust-item{font-size:.74rem;}
+}
