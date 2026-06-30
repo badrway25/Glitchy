@@ -2814,3 +2814,98 @@ form .form-control,form .custom-select{transition:border-color .18s var(--ease),
 /* touch devices: arrows always faintly present (no hover) */
 @media (hover:none){ .pcard-nav{opacity:.9;width:32px;height:32px;} }
 @media (prefers-reduced-motion:reduce){ .pcard-track{scroll-behavior:auto;} }
+
+/* ============================================================================
+   PHASE 62 — premium customer portal: dashboard alerts, quick actions, timeline,
+   and portal filter chips. Light+dark, mobile, reduced-motion safe.
+   ============================================================================ */
+
+/* 6-up KPI grid (was 4) */
+.dash-kpi.dash-kpi-6{grid-template-columns:repeat(3,1fr);}
+@media (max-width:991px){ .dash-kpi.dash-kpi-6{grid-template-columns:repeat(2,1fr);} }
+@media (max-width:480px){ .dash-kpi.dash-kpi-6{grid-template-columns:1fr;} }
+
+/* Smart alerts */
+.dash-alerts{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+.dash-alert{display:flex;align-items:center;gap:12px;padding:.85rem 1.05rem;border-radius:var(--radius);
+  border:var(--border);background:var(--surface);text-decoration:none;color:var(--text);
+  box-shadow:var(--shadow-soft);transition:transform var(--tr),box-shadow var(--tr),border-color var(--tr);}
+.dash-alert:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:rgba(166,130,76,.4);color:var(--text);}
+.dash-alert-ic{flex:0 0 auto;width:38px;height:38px;border-radius:10px;display:grid;place-items:center;
+  background:linear-gradient(135deg,rgba(166,130,76,.16),rgba(166,130,76,.05));color:var(--accent-2);}
+.dash-alert-text{flex:1 1 auto;font-size:.92rem;color:var(--text);}
+.dash-alert-text strong{font-family:var(--font-display);font-weight:800;color:var(--accent-2);}
+.dash-alert-cta{flex:0 0 auto;font-family:var(--font-ui);font-weight:600;font-size:.82rem;color:var(--accent-2);
+  display:inline-flex;align-items:center;gap:.4rem;}
+.dash-alert-cta i{transition:transform var(--tr);}
+.dash-alert:hover .dash-alert-cta i{transform:translateX(3px);}
+.dash-alert-warn .dash-alert-ic{background:linear-gradient(135deg,rgba(184,137,58,.2),rgba(184,137,58,.06));color:var(--warning);}
+.dash-alert-warn .dash-alert-cta{color:var(--warning);}
+:root[data-theme="dark"] .dash-alert-ic{background:linear-gradient(135deg,rgba(202,165,106,.22),rgba(202,165,106,.06));}
+@media (max-width:575.98px){
+  .dash-alert{flex-wrap:wrap;}
+  .dash-alert-cta{width:100%;justify-content:flex-end;}
+}
+
+/* Quick actions */
+.dash-quick{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px;}
+.dash-quick-btn{display:flex;flex-direction:column;align-items:center;gap:.5rem;padding:1rem .5rem;
+  border-radius:var(--radius);border:var(--border);background:var(--surface);text-decoration:none;
+  color:var(--text);font-family:var(--font-ui);font-weight:600;font-size:.8rem;text-align:center;
+  box-shadow:var(--shadow-soft);transition:transform var(--tr),box-shadow var(--tr),border-color var(--tr);}
+.dash-quick-btn:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:rgba(166,130,76,.45);color:var(--text);}
+.dash-quick-ic{width:40px;height:40px;border-radius:11px;display:grid;place-items:center;
+  background:linear-gradient(135deg,rgba(166,130,76,.16),rgba(166,130,76,.05));color:var(--accent-2);font-size:1.05rem;}
+:root[data-theme="dark"] .dash-quick-ic{background:linear-gradient(135deg,rgba(202,165,106,.22),rgba(202,165,106,.06));}
+@media (max-width:767.98px){ .dash-quick{grid-template-columns:repeat(3,1fr);} }
+@media (max-width:420px){ .dash-quick{grid-template-columns:repeat(2,1fr);} }
+
+/* Recent activity timeline */
+.dash-timeline{list-style:none;margin:0;padding:0;}
+.dash-tl-item{display:flex;align-items:flex-start;gap:14px;padding:.55rem 0;position:relative;}
+.dash-tl-item:not(:last-child)::before{content:"";position:absolute;left:17px;top:34px;bottom:-6px;
+  width:2px;background:linear-gradient(180deg,rgba(166,130,76,.35),rgba(166,130,76,.06));}
+.dash-tl-dot{flex:0 0 auto;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;
+  background:var(--surface-2);border:var(--border);color:var(--accent-2);font-size:.85rem;z-index:1;}
+.dash-tl-body{flex:1 1 auto;display:flex;justify-content:space-between;align-items:baseline;gap:10px;
+  text-decoration:none;color:var(--text);}
+.dash-tl-body:hover .dash-tl-title{color:var(--accent-2);}
+.dash-tl-title{font-weight:600;font-size:.92rem;}
+.dash-tl-ref{color:var(--muted);font-weight:600;font-family:var(--font-ui);}
+.dash-tl-when{flex:0 0 auto;color:var(--muted);font-size:.8rem;white-space:nowrap;}
+
+/* Portal filter chips (orders/billing/wishlist/address) */
+.portal-chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px;}
+.portal-chip{display:inline-flex;align-items:center;gap:.4rem;padding:.4rem .8rem;border-radius:var(--radius-pill);
+  border:var(--border);background:var(--surface);color:var(--text);text-decoration:none;font-family:var(--font-ui);
+  font-size:.8rem;font-weight:600;transition:background var(--tr),border-color var(--tr),color var(--tr);}
+.portal-chip:hover{border-color:var(--accent);color:var(--text);}
+.portal-chip.is-on{background:var(--primary);border-color:var(--primary);color:#fff;}
+:root[data-theme="dark"] .portal-chip.is-on{background:var(--accent);border-color:var(--accent);color:#15130f;}
+.portal-result-count{font-family:var(--font-ui);font-size:.85rem;color:var(--muted);margin-bottom:10px;}
+
+@media (prefers-reduced-motion:reduce){
+  .dash-alert:hover,.dash-quick-btn:hover{transform:none!important;}
+}
+
+/* Portal advanced filters (collapsible) */
+.pf-advanced{flex:1 1 100%;margin-top:6px;border-top:var(--border);padding-top:8px;}
+.pf-advanced-toggle{cursor:pointer;font-family:var(--font-ui);font-weight:600;font-size:.82rem;
+  color:var(--accent-2);list-style:none;display:inline-flex;align-items:center;gap:.4rem;padding:.3rem 0;}
+.pf-advanced-toggle::-webkit-details-marker{display:none;}
+.pf-advanced-toggle::before{content:"\f067";font-family:"Font Awesome 5 Free";font-weight:900;font-size:.7rem;}
+.pf-advanced[open] .pf-advanced-toggle::before{content:"\f068";}
+.pf-advanced-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:10px;align-items:end;}
+.pf-field{display:flex;flex-direction:column;gap:.3rem;font-family:var(--font-ui);font-size:.76rem;
+  color:var(--muted);font-weight:600;}
+.pf-field .pf-input{width:100%;}
+.pf-check{display:inline-flex;align-items:center;gap:.5rem;font-family:var(--font-ui);font-size:.85rem;
+  color:var(--text);font-weight:600;align-self:center;}
+.pf-check input{width:16px;height:16px;accent-color:var(--accent);}
+@media (max-width:767.98px){
+  .pf-advanced-grid{grid-template-columns:1fr 1fr;}
+  .pf-check{grid-column:1 / -1;}
+}
+
+.dash-kpi.dash-kpi-bill{grid-template-columns:repeat(3,1fr);}
+@media (max-width:575.98px){ .dash-kpi.dash-kpi-bill{grid-template-columns:1fr;} }
