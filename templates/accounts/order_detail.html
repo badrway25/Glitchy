@@ -22,7 +22,8 @@
               <div class="d-flex flex-wrap align-items-center gap-2 mb-1 ">
                 <h1 class="dash-title mb-0">{% blocktrans with n=order.order_number %}Order #{{ n }}{% endblocktrans %}</h1>
                 <button type="button" class="copy-btn" data-copy="{{ order.order_number }}"
-                        data-copied-label="{% trans 'Copied' %}" aria-label="{% trans 'Copy order number' %}">
+                        data-copied-label="{% trans 'Copied' %}" data-toast-label="{% trans 'Order number copied' %}"
+                        aria-label="{% trans 'Copy order number' %}">
                   <i class="fa fa-copy" aria-hidden="true"></i>
                   <span data-copy-label>{% trans "Copy" %}</span>
                 </button>
@@ -48,6 +49,12 @@
             </div>
 
             <div class="dash-actions">
+              <form method="post" action="{% url 'order_reorder' order.order_number %}" class="d-inline m-0">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary btn-icontext">
+                  <i class="fa fa-rotate-right" aria-hidden="true"></i><span>{% trans "Buy again" %}</span>
+                </button>
+              </form>
               <a href="{% url 'invoice_pdf' order.order_number %}?disposition=inline" target="_blank" rel="noopener" class="btn btn-soft">
                 <i class="fa fa-eye mr-2"></i>{% trans "Preview receipt" %}
               </a>

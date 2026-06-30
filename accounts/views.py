@@ -326,6 +326,50 @@ def order_detail(request, order_number):
 
 
 @login_required(login_url="login")
+@require_POST
+def order_reorder(request, order_number):
+    """Buy again — re-add a past order's items (with their original variations) to the
+    cart. SAFE: only touches the cart, never creates an order or takes payment; scoped to
+    request.user; uses the variations already chosen on the order so nothing is re-prompted.
+    Unavailable products are skipped, not faked."""
+    order = get_object_or_404(Order, user=request.user, order_number=order_number, is_ordered=True)
+    items = (OrderProduct.objects.filter(order=order)
+             .select_related("product").prefetch_related("variations"))
+
+    # Index the user's existing cart once (avoids an N+1 over CartItem in the loop).
+    from collections import defaultdict
+    cart_index = defaultdict(list)
+    for ci in CartItem.objects.filter(user=request.user).prefetch_related("variations"):
+        key = (ci.product_id, frozenset(ci.variations.values_list("id", flat=True)))
+        cart_index[key].append(ci)
+
+    added = skipped = 0
+    for op in items:
+        product = op.product
+        if not product or not getattr(product, "is_available", False):
+            skipped += 1
+            continue
+        variations = list(op.variations.all())
+        key = (product.pk, frozenset(v.pk for v in variations))
+        match = cart_index[key][0] if cart_index.get(key) else None
+        if match:
+            match.quantity += op.quantity
+            match.save(update_fields=["quantity"])
+        else:
+            ci = CartItem.objects.create(product=product, user=request.user, quantity=op.quantity)
+            if variations:
+                ci.variations.add(*variations)
+        added += 1
+    if added:
+        messages.success(request, _("Added to your cart — review and check out when you're ready."))
+    if skipped and not added:
+        messages.info(request, _("Those items are no longer available."))
+    elif skipped:
+        messages.info(request, _("Some items are no longer available and were skipped."))
+    return redirect("cart")
+
+
+@login_required(login_url="login")
 def order_help(request, order_number):
     """'Need help with this order?' — owner-only support handoff. Never exposes
     other users' orders (the queryset is scoped to request.user)."""

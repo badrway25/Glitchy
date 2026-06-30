@@ -18,6 +18,7 @@ urlpatterns = [
     path('billing/', views.billing, name='billing'),
     path('orders/<str:order_number>/', views.order_detail, name='order_detail'),
     path('orders/<str:order_number>/help/', views.order_help, name='order_help'),
+    path('orders/<str:order_number>/reorder/', views.order_reorder, name='order_reorder'),
     path('transactions/', views.transactions, name='transactions'),
 
     path("addresses/", views.address_list, name="address_list"),
