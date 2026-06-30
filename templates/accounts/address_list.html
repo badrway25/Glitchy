@@ -25,6 +25,21 @@
             </div>
           </div>
 
+          {% if addresses or has_query %}
+          <form method="get" class="portal-filters" role="search" style="margin-bottom:1.2rem;">
+            <div class="pf-search">
+              <i class="fa fa-magnifying-glass pf-search-ic" aria-hidden="true"></i>
+              <input type="text" name="q" value="{{ q }}" class="pf-input" maxlength="60"
+                     placeholder="{% trans 'Search by city, country or postal code' %}"
+                     aria-label="{% trans 'Search addresses' %}">
+            </div>
+            <div class="pf-controls">
+              <button type="submit" class="btn btn-primary pf-go">{% trans "Search" %}</button>
+              {% if has_query %}<a href="{% url 'address_list' %}" class="btn btn-soft pf-clear">{% trans "Clear" %}</a>{% endif %}
+            </div>
+          </form>
+          {% endif %}
+
           {% if addresses %}
             <div class="row g-3">
               {% for a in addresses %}

@@ -36,8 +36,33 @@ def toggle(request):
     return JsonResponse({"in_wishlist": added, "count": services.count(request)})
 
 
+WISHLIST_SORTS = {
+    "newest": "Recently added",
+    "name": "Name A–Z",
+    "price_low": "Price: low to high",
+    "price_high": "Price: high to low",
+}
+
+
+def _wishlist_sort_key(sort):
+    def price(it):
+        return float(getattr(getattr(it, "product", None), "price", 0) or 0)
+    def name(it):
+        return (getattr(getattr(it, "product", None), "product_name", "") or "").lower()
+    if sort == "name":
+        return name, False
+    if sort == "price_low":
+        return price, False
+    if sort == "price_high":
+        return price, True
+    return (lambda it: getattr(it, "created_at", None) or 0), True  # newest
+
+
 def saved_items(request):
     q = (request.GET.get("q") or "").strip()[:60]
+    sort = (request.GET.get("sort") or "newest").strip()
+    if sort not in WISHLIST_SORTS:
+        sort = "newest"
     wishlist_items = list(services.items(request, saved_for_later=False))
     saved_for_later = list(services.items(request, saved_for_later=True))
     if q:
@@ -48,11 +73,17 @@ def saved_items(request):
             return ql in name
         wishlist_items = [it for it in wishlist_items if _match(it)]
         saved_for_later = [it for it in saved_for_later if _match(it)]
+    key, rev = _wishlist_sort_key(sort)
+    wishlist_items.sort(key=key, reverse=rev)
+    saved_for_later.sort(key=key, reverse=rev)
     return render(request, "wishlist/saved_items.html", {
         "wishlist_items": wishlist_items,
         "saved_for_later": saved_for_later,
         "q": q,
-        "has_query": bool(q),
+        "has_query": bool(q or sort != "newest"),
+        "sort": sort,
+        "sort_options": WISHLIST_SORTS,
+        "result_count": len(wishlist_items) + len(saved_for_later),
     })
 
 

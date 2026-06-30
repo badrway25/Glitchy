@@ -28,10 +28,19 @@
                placeholder="{% trans 'Search your saved items' %}" aria-label="{% trans 'Search saved items' %}">
       </div>
       <div class="pf-controls">
+        <label class="pf-select-wrap">
+          <select name="sort" class="pf-select" aria-label="{% trans 'Sort saved items' %}" onchange="this.form.submit()">
+            <option value="newest" {% if sort == 'newest' %}selected{% endif %}>{% trans "Recently added" %}</option>
+            <option value="name" {% if sort == 'name' %}selected{% endif %}>{% trans "Name A–Z" %}</option>
+            <option value="price_low" {% if sort == 'price_low' %}selected{% endif %}>{% trans "Price: low to high" %}</option>
+            <option value="price_high" {% if sort == 'price_high' %}selected{% endif %}>{% trans "Price: high to low" %}</option>
+          </select>
+        </label>
         <button type="submit" class="btn btn-primary pf-go">{% trans "Search" %}</button>
         {% if has_query %}<a href="{% url 'wishlist:saved' %}" class="btn btn-soft pf-clear">{% trans "Clear" %}</a>{% endif %}
       </div>
     </form>
+    {% if result_count is not None %}<div class="portal-result-count">{% blocktrans count n=result_count %}{{ n }} saved item{% plural %}{{ n }} saved items{% endblocktrans %}</div>{% endif %}
 
     {% if wishlist_items or saved_for_later %}
       <div class="rv-grid">
