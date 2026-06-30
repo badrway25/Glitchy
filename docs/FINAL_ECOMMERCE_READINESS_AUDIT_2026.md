@@ -25,6 +25,16 @@ local Windows dev machine; **no real staging host exists**.
 | Security | ✅ Strong (dev) | No secrets in git, push/shipping/payments OFF. Key rotation still pending. |
 
 ## 2. What is genuinely COMPLETE
+- **Luxury conversion + store/portal functional depth** (Phase 65): added a real,
+  **safe "Buy again / Reorder"** (re-adds an order's items — with their original variations —
+  to the cart only; never creates an order or takes payment; ownership-scoped; N+1-free), a
+  **toast feedback system** (copy order number, wishlist add/remove on every surface),
+  **elevated empty states**, and fixed three visual inconsistencies from owner feedback
+  (subtle order-row buttons, truncated custom-select values, and a non-uniform button
+  family — now all one premium size). The `CustomerActivityEvent` model was evaluated and
+  **deliberately deferred** (the derived timeline already covers it without a risky
+  migration). 614 tests green, no migration. See
+  `docs/LUXURY_CONVERSION_STORE_PORTAL_FUNCTIONAL_DEPTH_2026.md`.
 - **Ultra-premium page detail + motion polish** (Phase 64): six pages (wishlist, login,
   register, store, dashboard, address form) were elevated with a shared **premium page
   system** (editorial `.lux-head` headers, summary stat bars, luxury empty states) and a
