@@ -5,12 +5,34 @@
 
 {% block content %}
 <section class="section-content padding-y auth-wrap">
-  <div class="container" style="max-width:var(--container-narrow);">
+  <div class="container" style="max-width:1080px;">
 
-    <div class="auth-card auth-card-wide">
+    <div class="auth-split" data-reveal>
+      <aside class="auth-side">
+        <div class="auth-side-eyebrow">{% trans "Member benefits" %}</div>
+        <div class="auth-side-brand">{% trans "Join Glitchy." %}</div>
+        <ul class="auth-benefits">
+          <li class="auth-benefit"><span class="auth-benefit-ic"><i class="fa fa-bolt" aria-hidden="true"></i></span>
+            <span><span class="auth-benefit-t">{% trans "Faster checkout" %}</span>
+              <span class="auth-benefit-d">{% trans "Saved details for a smoother order." %}</span></span></li>
+          <li class="auth-benefit"><span class="auth-benefit-ic"><i class="fa fa-map-marker-alt" aria-hidden="true"></i></span>
+            <span><span class="auth-benefit-t">{% trans "Saved addresses" %}</span>
+              <span class="auth-benefit-d">{% trans "Ship anywhere in a couple of taps." %}</span></span></li>
+          <li class="auth-benefit"><span class="auth-benefit-ic"><i class="fa fa-file-invoice" aria-hidden="true"></i></span>
+            <span><span class="auth-benefit-t">{% trans "Order receipts" %}</span>
+              <span class="auth-benefit-d">{% trans "Download a receipt for any order." %}</span></span></li>
+          <li class="auth-benefit"><span class="auth-benefit-ic"><i class="fa fa-heart" aria-hidden="true"></i></span>
+            <span><span class="auth-benefit-t">{% trans "Saved items" %}</span>
+              <span class="auth-benefit-d">{% trans "Keep the pieces you love in one place." %}</span></span></li>
+        </ul>
+        <div class="auth-side-trust"><i class="fa fa-lock" aria-hidden="true"></i>
+          {% trans "Your details stay private" %}</div>
+      </aside>
+
+    <div class="auth-card">
       <div class="auth-head">
         <h1 class="auth-title">{% trans "Create your account" %}</h1>
-        <p class="text-muted mb-0">{% trans "Join Glitchy — save items, track orders, get receipts." %}</p>
+        <p class="text-muted mb-0">{% trans "It takes less than a minute." %}</p>
       </div>
 
       {% include 'includes/alerts.html' %}
@@ -49,6 +71,7 @@
       </form>
 
       <p class="auth-alt">{% trans "Have an account?" %} <a href="{% url 'login' %}">{% trans "Log in" %}</a></p>
+    </div>
     </div>
 
   </div>

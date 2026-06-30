@@ -5,7 +5,7 @@
 
 {% block content %}
 <section class="section-content padding-y auth-wrap">
-  <div class="container" style="max-width:var(--container-narrow);">
+  <div class="container" style="max-width:1080px;">
 
     {% if request.GET.command == 'verification' %}
       <div class="auth-card auth-note" role="alert">
@@ -14,6 +14,15 @@
         <p class="text-muted">{% trans "Already verified?" %} <a href="{% url 'login' %}">{% trans "Sign in" %}</a></p>
       </div>
     {% else %}
+
+    <div class="auth-split" data-reveal>
+      <aside class="auth-side">
+        <div class="auth-side-eyebrow">{{ SITE_NAME|default:"Glitchy" }}</div>
+        <div class="auth-side-brand">{% trans "Welcome back." %}</div>
+        <p class="auth-side-lead">{% trans "Sign in to track your orders, download receipts and pick up right where you left off." %}</p>
+        <div class="auth-side-trust"><i class="fa fa-lock" aria-hidden="true"></i>
+          {% trans "Encrypted sign-in · we never share your details" %}</div>
+      </aside>
 
     <div class="auth-card">
       <div class="auth-head">
@@ -53,6 +62,7 @@
 
       <p class="auth-alt">{% trans "Don't have an account?" %}
         <a href="{% url 'register' %}">{% trans "Sign up" %}</a></p>
+    </div>
     </div>
 
     {% endif %}
