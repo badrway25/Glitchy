@@ -118,8 +118,19 @@ def dashboard(request):
         activity.append({"icon": "map-marker", "title": _("Delivery address updated"),
                          "ref": last_addr.city, "when": last_addr.updated_at,
                          "url": reverse("address_list")})
+    # Wishlist saves — real WishlistItem.created_at timestamps (no invented events).
+    try:
+        from wishlist.models import WishlistItem
+        for wi in (WishlistItem.objects.filter(user=user).select_related("product")
+                   .order_by("-created_at")[:3]):
+            pname = getattr(wi.product, "product_name", "") if wi.product_id else ""
+            activity.append({"icon": "heart", "title": _("Saved to wishlist"),
+                             "ref": (pname or "")[:32], "when": wi.created_at,
+                             "url": reverse("wishlist:saved")})
+    except Exception:
+        pass
     activity.sort(key=lambda a: a["when"] or timezone.now(), reverse=True)
-    activity = activity[:6]
+    activity = activity[:7]
 
     # Smart, actionable alerts (only when genuinely useful).
     alerts = []

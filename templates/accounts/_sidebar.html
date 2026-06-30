@@ -17,11 +17,13 @@
     <a class="acc-link {% if request.resolver_match.url_name == 'my_orders' or request.resolver_match.url_name == 'order_detail' %}active{% endif %}"
        href="{% url 'my_orders' %}">
       <i class="fa fa-box"></i> {% trans "My orders" %}
+      {% if PORTAL_ORDERS_COUNT %}<span class="acc-badge">{{ PORTAL_ORDERS_COUNT }}</span>{% endif %}
     </a>
 
     <a class="acc-link {% if request.resolver_match.url_name == 'billing' %}active{% endif %}"
        href="{% url 'billing' %}">
       <i class="fa fa-file-invoice"></i> {% trans "Billing & receipts" %}
+      {% if PORTAL_RECEIPTS_COUNT %}<span class="acc-badge">{{ PORTAL_RECEIPTS_COUNT }}</span>{% endif %}
     </a>
 
     <a class="acc-link {% if request.resolver_match.url_name == 'saved' %}active{% endif %}"
@@ -33,6 +35,7 @@
     <a class="acc-link {% if request.resolver_match.url_name == 'address_list' or request.resolver_match.url_name == 'address_create' or request.resolver_match.url_name == 'address_edit' %}active{% endif %}"
        href="{% url 'address_list' %}">
       <i class="fa fa-map-marker-alt"></i> {% trans "My addresses" %}
+      {% if PORTAL_ADDRESSES_COUNT %}<span class="acc-badge">{{ PORTAL_ADDRESSES_COUNT }}</span>{% endif %}
     </a>
 
     <a class="acc-link {% if request.resolver_match.url_name == 'transactions' %}active{% endif %}"

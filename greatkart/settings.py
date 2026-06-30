@@ -143,6 +143,7 @@ TEMPLATES = [
                 "greatkart.context_processors.site_globals",
                 "storefront.context_processors.announcement",
                 "wishlist.context_processors.wishlist_globals",
+                "accounts.context_processors.portal_counts",
                 "greatkart.context_processors.seo_globals",
             ],
         },
