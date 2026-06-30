@@ -296,9 +296,22 @@
                     {% endif %}
                   </div>
 
-                  <div class="product-actions">
-					<a href="{{ product.get_url }}" class="btn btn-primary">{% trans "View" %}</a>
-					<a href="{{ product.get_url }}#reviews" class="btn btn-soft">{% trans "Reviews" %}</a>
+                  <div class="product-actions pa-stack">
+                    {% if product.card_variants %}
+                      <button type="button" class="btn btn-primary pa-cta" data-quick-view="{{ product.id }}">{% trans "Choose options" %}</button>
+                    {% else %}
+                      <button type="button" class="btn btn-primary pa-cta" data-quick-add="{{ product.id }}"
+                              data-added-label="{% trans 'Added to cart' %}"
+                              data-unavailable-label="{% trans 'No longer available' %}"
+                              data-product-url="{{ product.get_url }}">{% trans "Add to cart" %}</button>
+                    {% endif %}
+                    <div class="pa-row">
+                      <a href="{{ product.get_url }}" class="btn btn-soft">{% trans "View" %}</a>
+                      <button type="button" class="btn btn-soft cmp-toggle" data-compare-toggle data-product-id="{{ product.id }}"
+                              data-added-label="{% trans 'Added to compare' %}" data-removed-label="{% trans 'Removed from compare' %}"
+                              data-full-label="{% trans 'You can compare up to 3 items' %}"
+                              aria-pressed="false" aria-label="{% trans 'Add to compare' %}">{% trans "Compare" %}</button>
+                    </div>
 				</div>
 
                 </div>
@@ -397,10 +410,53 @@
         </nav>
         {% endif %}
 
+        {% if recently_viewed %}
+        <section class="rv-rail-wrap" aria-label="{% trans 'Recently viewed' %}">
+          <div class="rv-rail-head">
+            <div class="lux-eyebrow">{% trans "Keep browsing" %}</div>
+            <h3 class="rv-rail-title">{% trans "Recently viewed" %}</h3>
+          </div>
+          <div class="rv-rail" data-rv-rail>
+            {% for p in recently_viewed %}
+            <a class="rv-card" href="{{ p.get_url }}">
+              <span class="rv-card-media"><img src="{% if p.cover_image %}{{ p.cover_image }}{% else %}{% static 'images/placeholder.png' %}{% endif %}"
+                    alt="{{ p.product_name }}" loading="lazy" decoding="async"></span>
+              <span class="rv-card-name">{{ p.product_name|truncatechars:34 }}</span>
+              <span class="rv-card-price">{{ CURRENCY_SYMBOL }} {{ p.price }}</span>
+            </a>
+            {% endfor %}
+          </div>
+        </section>
+        {% endif %}
+
       </main>
     </div>
   </div>
 </section>
+
+{# Compare floating bar + drawer (localStorage ids only, no PII) #}
+<div class="cmp-bar" id="cmpBar" hidden>
+  <span class="cmp-bar-text"><i class="fa fa-scale-balanced" aria-hidden="true"></i>
+    <strong data-compare-count>0</strong> {% trans "to compare" %}</span>
+  <button type="button" class="btn btn-primary btn-sm" data-compare-open>{% trans "Compare" %}</button>
+  <button type="button" class="cmp-bar-clear" data-compare-clear aria-label="{% trans 'Clear compare' %}">
+    <i class="fa fa-times" aria-hidden="true"></i></button>
+</div>
+<div class="cmp-drawer" id="cmpDrawer" role="dialog" aria-modal="true"
+     aria-label="{% trans 'Compare products' %}" aria-hidden="true">
+  <div class="cmp-drawer-backdrop" data-compare-close></div>
+  <div class="cmp-drawer-panel">
+    <div class="cmp-drawer-head">
+      <h3>{% trans "Compare" %}</h3>
+      <div class="cmp-drawer-actions">
+        <button type="button" class="btn btn-soft btn-sm" data-compare-clear>{% trans "Clear all" %}</button>
+        <button type="button" class="cmp-drawer-x" data-compare-close aria-label="{% trans 'Close' %}">
+          <i class="fa fa-times" aria-hidden="true"></i></button>
+      </div>
+    </div>
+    <div class="cmp-drawer-body" data-compare-body></div>
+  </div>
+</div>
 
 
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: greatkart 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-30 12:30+0200\n"
+"POT-Creation-Date: 2026-06-30 17:53+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -260,11 +260,11 @@ msgid "Please choose a colour and size before adding this item to your cart."
 msgstr ""
 "Choisissez une couleur et une taille avant d'ajouter cet article au panier."
 
-#: .\carts\views.py:260
+#: .\carts\views.py:291
 msgid "Too many requests. Please wait a moment."
 msgstr "Trop de requêtes. Veuillez patienter un instant."
 
-#: .\carts\views.py:271 .\templates\includes\shipping_estimator.html:16
+#: .\carts\views.py:302 .\templates\includes\shipping_estimator.html:16
 msgid "Please choose a delivery country."
 msgstr "Veuillez choisir un pays de livraison."
 
@@ -716,7 +716,7 @@ msgstr "Resynchronisation d'un seul produit"
 msgid "Running"
 msgstr "En cours d'exécution"
 
-#: .\printify_integration\models.py:110 .\templates\base.html:101
+#: .\printify_integration\models.py:110 .\templates\base.html:102
 msgid "Success"
 msgstr "Succès"
 
@@ -724,7 +724,7 @@ msgstr "Succès"
 msgid "Partial"
 msgstr "Partiel"
 
-#: .\printify_integration\models.py:112 .\templates\base.html:102
+#: .\printify_integration\models.py:112 .\templates\base.html:103
 msgid "Error"
 msgstr "Erreur"
 
@@ -1135,7 +1135,12 @@ msgstr "Clé OpenAI non configurée — aucune traduction effectuée."
 msgid "Translations written: %(w)d, failed: %(f)d."
 msgstr "Traductions écrites : %(w)d, échouées : %(f)d."
 
-#: .\store\test_phase66_gallery.py:119 .\templates\home.html:253
+#: .\store\test_phase66_gallery.py:119 .\store\test_phase66_gallery.py:123
+#: .\templates\store\store.html:263
+msgid "Available options"
+msgstr "Options disponibles"
+
+#: .\store\test_phase66_gallery.py:120 .\templates\home.html:253
 #: .\templates\merchandising\collection.html:49
 #: .\templates\merchandising\collections_index.html:133
 #: .\templates\store\product_detail.html:301 .\templates\store\store.html:112
@@ -1143,43 +1148,43 @@ msgstr "Traductions écrites : %(w)d, échouées : %(f)d."
 msgid "Made on demand"
 msgstr "Fabriqués à la demande"
 
-#: .\store\test_phase66_gallery.py:121 .\templates\home.html:62
+#: .\store\test_phase66_gallery.py:122 .\templates\home.html:62
 #: .\templates\home.html:79 .\templates\store\cart.html:133
 #: .\templates\store\store.html:184
 msgid "Secure checkout"
 msgstr "Paiement sécurisé"
 
-#: .\store\views.py:250
+#: .\store\views.py:274
 msgid "Shipping & delivery"
 msgstr "Adresse de livraison"
 
-#: .\store\views.py:250 .\templates\includes\footer.html:78
+#: .\store\views.py:274 .\templates\includes\footer.html:78
 #: .\templates\returns\policy.html:3 .\templates\returns\policy.html:11
 #: .\templates\returns\policy.html:15
 msgid "Returns & refunds"
 msgstr "Retours et remboursements"
 
-#: .\store\views.py:251
+#: .\store\views.py:275
 msgid "Payments & security"
 msgstr "Paiement reçu"
 
-#: .\store\views.py:251
+#: .\store\views.py:275
 msgid "Orders & tracking"
 msgstr "Livraison / suivi"
 
-#: .\store\views.py:252
+#: .\store\views.py:276
 msgid "Account & wishlist"
 msgstr "Compte et favoris"
 
-#: .\store\views.py:252
+#: .\store\views.py:276
 msgid "Sizing & products"
 msgstr "Resynchronisation d'un seul produit"
 
-#: .\store\views.py:253
+#: .\store\views.py:277
 msgid "Coupons & offers"
 msgstr "Coupons"
 
-#: .\store\views.py:253
+#: .\store\views.py:277
 msgid "Support & assistant"
 msgstr "Panier"
 
@@ -1544,6 +1549,7 @@ msgstr "Ajoutez une adresse pour accélérer votre prochaine commande."
 #: .\templates\store\cart.html:212 .\templates\store\product_detail.html:224
 #: .\templates\store\product_detail.html:228
 #: .\templates\store\product_detail.html:639 .\templates\store\store.html:146
+#: .\templates\store\store.html:452
 msgid "Close"
 msgstr "Fermer"
 
@@ -1599,7 +1605,7 @@ msgid "Try a different search or clear the filters."
 msgstr "Essayez une autre recherche ou effacez les filtres."
 
 #: .\templates\accounts\billing.html:99 .\templates\accounts\my_orders.html:67
-#: .\templates\store\store.html:328 .\templates\wishlist\saved_items.html:172
+#: .\templates\store\store.html:340 .\templates\wishlist\saved_items.html:172
 msgid "Clear filters"
 msgstr "Effacer la recherche"
 
@@ -1946,7 +1952,7 @@ msgid "Send to support"
 msgstr "Envoyer au support"
 
 #: .\templates\accounts\order_detail.html:125 .\templates\store\faq.html:53
-#: .\templates\store\store.html:330
+#: .\templates\store\store.html:342
 msgid "Ask the assistant"
 msgstr "Demander à l'assistant"
 
@@ -2176,11 +2182,11 @@ msgstr "À traiter"
 msgid "Could not load this product. Please try again."
 msgstr "Impossible de charger le produit. Veuillez réessayer."
 
-#: .\templates\base.html:103
+#: .\templates\base.html:104
 msgid "Warning"
 msgstr "Avertissement"
 
-#: .\templates\base.html:104
+#: .\templates\base.html:105
 msgid "Info"
 msgstr "Info"
 
@@ -2742,7 +2748,7 @@ msgstr "Nouvelle saison"
 msgid "Categories"
 msgstr "Catégories"
 
-#: .\templates\includes\navbar.html:68 .\templates\store\store.html:333
+#: .\templates\includes\navbar.html:68 .\templates\store\store.html:345
 msgid "Browse categories"
 msgstr "Parcourir les catégories"
 
@@ -3152,6 +3158,7 @@ msgid "Price range"
 msgstr "Fourchette de prix"
 
 #: .\templates\merchandising\collection.html:46
+#: .\templates\store\_compare.html:18
 msgid "Colours"
 msgstr "Couleurs"
 
@@ -3675,7 +3682,7 @@ msgstr ""
 "contactez l'assistance en indiquant votre numéro de commande."
 
 #: .\templates\orders\order_complete.html:253
-#: .\templates\store\product_detail.html:374 .\templates\store\store.html:344
+#: .\templates\store\product_detail.html:374 .\templates\store\store.html:356
 msgid "Recommended for you"
 msgstr "Recommandé pour vous"
 
@@ -3687,7 +3694,7 @@ msgstr "D'après votre achat"
 msgid "Browse all"
 msgstr "Tout parcourir"
 
-#: .\templates\orders\order_complete.html:285 .\templates\store\store.html:300
+#: .\templates\orders\order_complete.html:285 .\templates\store\store.html:308
 #: .\templates\wishlist\_saved_card.html:48
 msgid "View"
 msgstr "Voir"
@@ -3817,6 +3824,32 @@ msgstr "Articles"
 msgid "Note from our team:"
 msgstr "Note de notre équipe :"
 
+#: .\templates\store\_compare.html:8
+msgid "Remove from compare"
+msgstr "Retirer du comparateur"
+
+#: .\templates\store\_compare.html:16 .\templates\store\_filters.html:19
+#: .\templates\wishlist\saved_items.html:95
+msgid "Category"
+msgstr "Catégories"
+
+#: .\templates\store\_compare.html:20 .\templates\store\product_detail.html:290
+msgid "Sizes"
+msgstr "Tailles"
+
+#: .\templates\store\_compare.html:24
+msgid "View details"
+msgstr "Voir les détails"
+
+#: .\templates\store\_compare.html:25 .\templates\store\product_detail.html:223
+#: .\templates\store\product_detail.html:232 .\templates\store\store.html:301
+msgid "Choose options"
+msgstr "Choisir les options"
+
+#: .\templates\store\_compare.html:34
+msgid "Add up to 3 products to compare them side by side."
+msgstr "Ajoutez jusqu'à 3 produits pour les comparer côte à côte."
+
 #: .\templates\store\_filters.html:12
 msgid "Refine your look"
 msgstr "Affinez votre style"
@@ -3824,10 +3857,6 @@ msgstr "Affinez votre style"
 #: .\templates\store\_filters.html:13
 msgid "Narrow the edit to find your pieces faster."
 msgstr "Affinez la sélection pour trouver vos pièces plus vite."
-
-#: .\templates\store\_filters.html:19 .\templates\wishlist\saved_items.html:95
-msgid "Category"
-msgstr "Catégories"
 
 #: .\templates\store\_filters.html:44
 msgid "Minimum price"
@@ -3877,7 +3906,7 @@ msgid "Show results"
 msgstr "Voir les résultats"
 
 #: .\templates\store\_filters.html:144 .\templates\store\store.html:127
-#: .\templates\wishlist\saved_items.html:66
+#: .\templates\store\store.html:451 .\templates\wishlist\saved_items.html:66
 msgid "Clear all"
 msgstr "Effacer"
 
@@ -3911,7 +3940,7 @@ msgstr "Sélectionner une taille"
 msgid "Out of stock"
 msgstr "Rupture de stock"
 
-#: .\templates\store\_quick_view.html:65
+#: .\templates\store\_quick_view.html:65 .\templates\store\store.html:306
 msgid "Add to cart"
 msgstr "Ajouter au panier"
 
@@ -4224,11 +4253,6 @@ msgstr "Choisissez une couleur avant d'ajouter cet article au panier."
 msgid "Choose a size before adding this item to your cart."
 msgstr "Choisissez une taille avant d'ajouter cet article au panier."
 
-#: .\templates\store\product_detail.html:223
-#: .\templates\store\product_detail.html:232
-msgid "Choose options"
-msgstr "Choisir les options"
-
 #: .\templates\store\product_detail.html:241
 #: .\templates\store\product_detail.html:245
 msgid "Save"
@@ -4286,10 +4310,6 @@ msgstr "Entretien"
 #: .\templates\store\product_detail.html:289
 msgid "Machine wash cold, do not tumble dry."
 msgstr "Lavage en machine à froid, ne pas sécher au sèche-linge."
-
-#: .\templates\store\product_detail.html:290
-msgid "Sizes"
-msgstr "Tailles"
 
 #: .\templates\store\product_detail.html:291
 msgid "One size"
@@ -4391,11 +4411,12 @@ msgstr "Répartition des notes"
 msgid "Verified purchase"
 msgstr "Achat vérifié"
 
-#: .\templates\store\product_detail.html:610
+#: .\templates\store\product_detail.html:610 .\templates\store\store.html:415
 msgid "Keep browsing"
 msgstr "Continuez à explorer"
 
-#: .\templates\store\product_detail.html:611
+#: .\templates\store\product_detail.html:611 .\templates\store\store.html:413
+#: .\templates\store\store.html:416
 msgid "Recently viewed"
 msgstr "Vus récemment"
 
@@ -4526,38 +4547,71 @@ msgstr "Image suivante"
 msgid "Quick view"
 msgstr "Aperçu"
 
-#: .\templates\store\store.html:263
-msgid "Available options"
-msgstr "Options disponibles"
+#: .\templates\store\store.html:304
+msgid "Added to cart"
+msgstr "Ajouté au panier"
 
-#: .\templates\store\store.html:301
-msgid "Reviews"
-msgstr "Avis"
+#: .\templates\store\store.html:305
+msgid "No longer available"
+msgstr "Plus disponible"
 
-#: .\templates\store\store.html:313
+#: .\templates\store\store.html:310
+msgid "Added to compare"
+msgstr "Ajouté au comparateur"
+
+#: .\templates\store\store.html:310
+msgid "Removed from compare"
+msgstr "Retiré du comparateur"
+
+#: .\templates\store\store.html:311
+msgid "You can compare up to 3 items"
+msgstr "Vous pouvez comparer jusqu'à 3 articles"
+
+#: .\templates\store\store.html:312
+msgid "Add to compare"
+msgstr "Ajouter au comparateur"
+
+#: .\templates\store\store.html:312 .\templates\store\store.html:440
+#: .\templates\store\store.html:449
+msgid "Compare"
+msgstr "Comparer"
+
+#: .\templates\store\store.html:325
 #, python-format
 msgid "No results for “%(q)s”"
 msgstr "Aucun résultat pour « %(q)s »"
 
-#: .\templates\store\store.html:315
+#: .\templates\store\store.html:327
 msgid "No products match these filters"
 msgstr "Aucun produit disponible."
 
-#: .\templates\store\store.html:318
+#: .\templates\store\store.html:330
 msgid "Try removing a filter to see more."
 msgstr "Essayez de retirer un filtre pour voir plus."
 
-#: .\templates\store\store.html:325
+#: .\templates\store\store.html:337
 msgid "There are no products in this view right now."
 msgstr "Il n'y a aucun produit dans cette vue pour le moment."
 
-#: .\templates\store\store.html:329
+#: .\templates\store\store.html:341
 msgid "Browse collections"
 msgstr "Pas encore de collections"
 
-#: .\templates\store\store.html:343
+#: .\templates\store\store.html:355
 msgid "You might like"
 msgstr "Vous aimerez aussi"
+
+#: .\templates\store\store.html:439
+msgid "to compare"
+msgstr "à comparer"
+
+#: .\templates\store\store.html:441
+msgid "Clear compare"
+msgstr "Vider le comparateur"
+
+#: .\templates\store\store.html:445
+msgid "Compare products"
+msgstr "Comparer les produits"
 
 #: .\templates\wishlist\_saved_card.html:6
 msgid "Saved for later"
@@ -4689,6 +4743,9 @@ msgstr "Articles de la liste de favoris"
 #: .\wishlist\views.py:117
 msgid "Saved for later."
 msgstr "Enregistré pour plus tard."
+
+#~ msgid "Reviews"
+#~ msgstr "Avis"
 
 #~ msgid "Account overview"
 #~ msgstr "Aperçu du compte"
