@@ -36,54 +36,58 @@ def toggle(request):
     return JsonResponse({"in_wishlist": added, "count": services.count(request)})
 
 
-WISHLIST_SORTS = {
-    "newest": "Recently added",
-    "name": "Name A–Z",
-    "price_low": "Price: low to high",
-    "price_high": "Price: high to low",
-}
-
-
-def _wishlist_sort_key(sort):
-    def price(it):
-        return float(getattr(getattr(it, "product", None), "price", 0) or 0)
-    def name(it):
-        return (getattr(getattr(it, "product", None), "product_name", "") or "").lower()
-    if sort == "name":
-        return name, False
-    if sort == "price_low":
-        return price, False
-    if sort == "price_high":
-        return price, True
-    return (lambda it: getattr(it, "created_at", None) or 0), True  # newest
+def _name_of(it):
+    return (getattr(getattr(it, "product", None), "product_name", "") or "").lower()
 
 
 def saved_items(request):
+    from django.core.paginator import Paginator
+    from . import facets
+
     q = (request.GET.get("q") or "").strip()[:60]
-    sort = (request.GET.get("sort") or "newest").strip()
-    if sort not in WISHLIST_SORTS:
-        sort = "newest"
-    wishlist_items = list(services.items(request, saved_for_later=False))
+    active = facets.parse(request)
+    sort = active["sort"]
+
+    base_items = list(services.items(request, saved_for_later=False))
     saved_for_later = list(services.items(request, saved_for_later=True))
+
+    # Facet options from ALL saved products (so options stay visible while filtering).
+    all_pids = [it.product_id for it in base_items]
+    facet_data = facets.build_facets(all_pids)
+
+    # Product-level facets (category/color/size/price/sale/multi) — DB-side, ownership-safe.
+    matched = facets.matching_product_ids(all_pids, active)
+    items = [it for it in base_items if it.product_id in matched]
+
     if q:
         ql = q.lower()
+        items = [it for it in items if ql in _name_of(it)]
+        saved_for_later = [it for it in saved_for_later if ql in _name_of(it)]
+    if active.get("recent"):
+        cutoff = facets.recent_cutoff()
+        items = [it for it in items if getattr(it, "created_at", None) and it.created_at >= cutoff]
 
-        def _match(it):
-            name = (getattr(getattr(it, "product", None), "product_name", "") or "").lower()
-            return ql in name
-        wishlist_items = [it for it in wishlist_items if _match(it)]
-        saved_for_later = [it for it in saved_for_later if _match(it)]
-    key, rev = _wishlist_sort_key(sort)
-    wishlist_items.sort(key=key, reverse=rev)
-    saved_for_later.sort(key=key, reverse=rev)
+    items = facets.sort_items(items, sort)
+    saved_for_later = facets.sort_items(saved_for_later, sort)
+
+    chips = facets.active_chips(active)
+    has_filters = bool(q or chips or sort != "newest")
+    total_matched = len(items)
+
+    paginator = Paginator(items, 12)
+    page = paginator.get_page(request.GET.get("page"))
+    params = request.GET.copy()
+    params.pop("page", None)
+
     return render(request, "wishlist/saved_items.html", {
-        "wishlist_items": wishlist_items,
+        "wishlist_items": page,
         "saved_for_later": saved_for_later,
         "q": q,
-        "has_query": bool(q or sort != "newest"),
-        "sort": sort,
-        "sort_options": WISHLIST_SORTS,
-        "result_count": len(wishlist_items) + len(saved_for_later),
+        "sort": sort, "sort_options": facets.WISHLIST_SORTS,
+        "facets": facet_data, "active": active, "chips": chips,
+        "has_query": has_filters, "has_filters": has_filters,
+        "result_count": total_matched + len(saved_for_later),
+        "querystring": params.urlencode(),
     })
 
 

@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static i18n uikit %}
+{% load static i18n uikit shopfilters %}
 {% block title %}{% trans "Saved items" %} • {{ SITE_NAME }}{% endblock %}
 
 {% block content %}
@@ -21,7 +21,35 @@
       </div>
     {% endif %}
 
-    <form method="get" class="portal-filters" role="search" style="margin-bottom:1.4rem;">
+    {# Quick toggle chips (boolean facets) — preserve other params via qs_set/qs_remove #}
+    <div class="portal-chips" role="group" aria-label="{% trans 'Quick filters' %}">
+      {% if facets.sale_count %}
+        <a class="portal-chip {% if active.sale %}is-on{% endif %}"
+           href="{{ request.path }}?{% if active.sale %}{% qs_remove 'sale' %}{% else %}{% qs_set sale='1' %}{% endif %}">
+           {% trans "On sale" %} <span class="chip-n">{{ facets.sale_count }}</span></a>
+      {% endif %}
+      {% if facets.multi_count %}
+        <a class="portal-chip {% if active.multi %}is-on{% endif %}"
+           href="{{ request.path }}?{% if active.multi %}{% qs_remove 'multi' %}{% else %}{% qs_set multi='1' %}{% endif %}">
+           {% trans "Multi-image" %} <span class="chip-n">{{ facets.multi_count }}</span></a>
+      {% endif %}
+      <a class="portal-chip {% if active.recent %}is-on{% endif %}"
+         href="{{ request.path }}?{% if active.recent %}{% qs_remove 'recent' %}{% else %}{% qs_set recent='1' %}{% endif %}">
+         {% trans "Recently saved" %}</a>
+    </div>
+
+    {# Active filter chips (removable) #}
+    {% if chips %}
+    <div class="portal-active-chips">
+      {% for c in chips %}
+        <a class="active-chip" href="{{ request.path }}?{% qs_remove c.param c.value %}">
+          {{ c.label }} <i class="fa fa-times" aria-hidden="true"></i></a>
+      {% endfor %}
+      <a class="active-chip-clear" href="{% url 'wishlist:saved' %}">{% trans "Clear all" %}</a>
+    </div>
+    {% endif %}
+
+    <form method="get" class="portal-filters" role="search" style="margin-bottom:1rem;">
       <div class="pf-search">
         <i class="fa fa-magnifying-glass pf-search-ic" aria-hidden="true"></i>
         <input type="text" name="q" value="{{ q }}" class="pf-input" maxlength="60"
@@ -37,8 +65,67 @@
           </select>
         </label>
         <button type="submit" class="btn btn-primary pf-go">{% trans "Search" %}</button>
-        {% if has_query %}<a href="{% url 'wishlist:saved' %}" class="btn btn-soft pf-clear">{% trans "Clear" %}</a>{% endif %}
+        {% if has_filters %}<a href="{% url 'wishlist:saved' %}" class="btn btn-soft pf-clear">{% trans "Clear" %}</a>{% endif %}
       </div>
+
+      {% if facets.categories or facets.colors or facets.sizes or facets.price.hi %}
+      <details class="pf-advanced wf-facets" {% if active.category or active.color or active.size or active.min_price or active.max_price %}open{% endif %}>
+        <summary class="pf-advanced-toggle">{% trans "Filters" %}</summary>
+        <div class="wf-facet-grid">
+          {% if facets.categories %}
+          <div class="wf-facet">
+            <span class="wf-facet-h">{% trans "Category" %}</span>
+            <label class="pf-select-wrap">
+              <select name="category" class="pf-select">
+                <option value="">{% trans "All categories" %}</option>
+                {% for c in facets.categories %}
+                  <option value="{{ c.slug }}" {% if active.category == c.slug %}selected{% endif %}>{{ c.name }} ({{ c.count }})</option>
+                {% endfor %}
+              </select>
+            </label>
+          </div>
+          {% endif %}
+
+          {% if facets.colors %}
+          <div class="wf-facet">
+            <span class="wf-facet-h">{% trans "Colour" %}</span>
+            <div class="wf-chips">
+              {% for c in facets.colors %}
+                <label class="wf-chip"><input type="checkbox" name="color" value="{{ c.value }}" {% if c.value in active.color %}checked{% endif %}>
+                  <span>{{ c.value|title }} <small>{{ c.count }}</small></span></label>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+
+          {% if facets.sizes %}
+          <div class="wf-facet">
+            <span class="wf-facet-h">{% trans "Size" %}</span>
+            <div class="wf-chips">
+              {% for s in facets.sizes %}
+                <label class="wf-chip"><input type="checkbox" name="size" value="{{ s.value }}" {% if s.value in active.size %}checked{% endif %}>
+                  <span>{{ s.value|upper }} <small>{{ s.count }}</small></span></label>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+
+          {% if facets.price.hi %}
+          <div class="wf-facet">
+            <span class="wf-facet-h">{% trans "Price" %} ({{ CURRENCY_SYMBOL }})</span>
+            <div class="wf-price">
+              <input type="number" name="min_price" value="{{ active.min_price }}" min="0" class="pf-input"
+                     inputmode="numeric" placeholder="{{ facets.price.lo }}" aria-label="{% trans 'Min price' %}">
+              <span>—</span>
+              <input type="number" name="max_price" value="{{ active.max_price }}" min="0" class="pf-input"
+                     inputmode="numeric" placeholder="{{ facets.price.hi }}" aria-label="{% trans 'Max price' %}">
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm">{% trans "Apply filters" %}</button>
+      </details>
+      {% endif %}
     </form>
     {% if result_count is not None %}<div class="portal-result-count">{% blocktrans count n=result_count %}{{ n }} saved item{% plural %}{{ n }} saved items{% endblocktrans %}</div>{% endif %}
 
@@ -47,7 +134,18 @@
         {% for it in wishlist_items %}{% include 'wishlist/_saved_card.html' with p=it.product %}{% endfor %}
         {% for it in saved_for_later %}{% include 'wishlist/_saved_card.html' with p=it.product saved=1 %}{% endfor %}
       </div>
-    {% elif has_query %}
+      {% if wishlist_items.paginator.num_pages > 1 %}
+      <nav class="wf-pagination" aria-label="{% trans 'Wishlist pages' %}">
+        {% if wishlist_items.has_previous %}
+          <a class="btn btn-soft btn-sm" href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ wishlist_items.previous_page_number }}">{% trans "Previous" %}</a>
+        {% endif %}
+        <span class="wf-page-label">{% blocktrans with cur=wishlist_items.number total=wishlist_items.paginator.num_pages %}Page {{ cur }} of {{ total }}{% endblocktrans %}</span>
+        {% if wishlist_items.has_next %}
+          <a class="btn btn-soft btn-sm" href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ wishlist_items.next_page_number }}">{% trans "Next" %}</a>
+        {% endif %}
+      </nav>
+      {% endif %}
+    {% elif has_filters %}
       <div class="store-empty">
         <div class="store-empty-ic">{% icon "search" "ic" 30 %}</div>
         <h3 class="mb-2">{% trans "No saved items match your search" %}</h3>

@@ -1,19 +1,56 @@
 {% load static i18n uikit %}
-<div class="ymal-card saved-card">
-  <a href="{{ p.get_url }}" class="p-media d-block" style="aspect-ratio:1/1;">
-    <img src="{% if p.cover_image %}{{ p.cover_image }}{% else %}{% static 'images/placeholder.png' %}{% endif %}"
-         alt="{{ p.product_name }}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;">
-  </a>
-  {% if saved %}<span class="saved-tag">{% trans "Saved for later" %}</span>{% endif %}
+{% with gimgs=p.gallery.all %}
+<div class="ymal-card saved-card{% if gimgs|length > 1 %} has-gallery{% endif %}">
+  <div class="saved-media">
+    {% if p.on_sale %}<span class="saved-sale">{% trans "Sale" %}</span>{% endif %}
+    {% if saved %}<span class="saved-tag">{% trans "Saved for later" %}</span>{% endif %}
+
+    {% if gimgs|length > 1 %}
+      {# Multi-image gallery (reuses the Phase 61 product-card carousel) #}
+      <div class="pcard-gallery" data-card-gallery>
+        <div class="pcard-track" tabindex="0" role="group"
+             aria-label="{% blocktrans with n=p.product_name %}{{ n }} — product images{% endblocktrans %}">
+          {% for img in gimgs|slice:":5" %}
+            <a class="pcard-slide" href="{{ p.get_url }}" tabindex="-1">
+              <img src="{{ img.display_url }}" width="600" height="600" decoding="async"
+                   loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+                   alt="{% if forloop.first %}{{ p.product_name }}{% else %}{{ p.product_name }} — {{ forloop.counter }}{% endif %}">
+            </a>
+          {% endfor %}
+        </div>
+        <button type="button" class="pcard-nav pcard-prev" data-card-prev tabindex="-1"
+                aria-label="{% trans 'Previous image' %}"><i class="fa fa-angle-left" aria-hidden="true"></i></button>
+        <button type="button" class="pcard-nav pcard-next" data-card-next tabindex="-1"
+                aria-label="{% trans 'Next image' %}"><i class="fa fa-angle-right" aria-hidden="true"></i></button>
+        <div class="pcard-dots" data-card-dots aria-hidden="true">
+          {% for img in gimgs|slice:":5" %}<span class="pcard-dot{% if forloop.first %} is-on{% endif %}"></span>{% endfor %}
+        </div>
+      </div>
+    {% else %}
+      <a href="{{ p.get_url }}" class="d-block" style="width:100%;height:100%;">
+        {# use the already-prefetched gallery (gimgs) — avoids cover_image()'s extra query #}
+        <img src="{% if p.images %}{{ p.images.url }}{% elif gimgs %}{{ gimgs.0.display_url }}{% else %}{% static 'images/placeholder.png' %}{% endif %}"
+             alt="{{ p.product_name }}" loading="lazy" decoding="async"
+             style="width:100%;height:100%;object-fit:cover;">
+      </a>
+    {% endif %}
+  </div>
+
   <div class="p-3">
     <a href="{{ p.get_url }}" class="product-title d-block mb-1" style="font-size:.92rem;">{{ p.product_name|truncatechars:42 }}</a>
-    <div class="price mb-2" style="font-size:1rem;">{{ CURRENCY_SYMBOL }} {{ p.price }}</div>
-    <div class="d-flex" style="gap:.5rem;">
-      <a href="{{ p.get_url }}" class="btn btn-primary btn-sm" style="flex:1;">{% trans "View" %}</a>
-      <button type="button" class="btn btn-soft btn-sm wish-btn is-active" data-wishlist-toggle
+    <div class="price mb-2" style="font-size:1rem;">
+      {{ CURRENCY_SYMBOL }} {{ p.price }}
+      {% if p.on_sale %}<span class="price-was">{{ CURRENCY_SYMBOL }} {{ p.compare_at_price }}</span>{% endif %}
+    </div>
+    <div class="saved-actions">
+      <button type="button" class="btn btn-soft btn-sm saved-qv" data-quick-view="{{ p.id }}"
+              aria-label="{% trans 'Quick view' %}: {{ p.product_name }}">{% icon "bag" "ic" 14 %}<span>{% trans "Quick view" %}</span></button>
+      <a href="{{ p.get_url }}" class="btn btn-primary btn-sm saved-view">{% trans "View" %}</a>
+      <button type="button" class="btn btn-soft btn-sm wish-btn is-active saved-remove" data-wishlist-toggle
               data-product-id="{{ p.id }}" title="{% trans 'Remove' %}" aria-label="{% trans 'Remove' %}">
-        {% icon "close" "ic" 15 %}
+        {% icon "close" "ic" 14 %}
       </button>
     </div>
   </div>
 </div>
+{% endwith %}
