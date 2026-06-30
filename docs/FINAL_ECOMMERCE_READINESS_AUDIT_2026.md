@@ -25,6 +25,13 @@ local Windows dev machine; **no real staging host exists**.
 | Security | ✅ Strong (dev) | No secrets in git, push/shipping/payments OFF. Key rotation still pending. |
 
 ## 2. What is genuinely COMPLETE
+- **Store product-card gallery FIX + premium card features** (Phase 66): the carousel was
+  unscrollable (`scroll-snap-align:center` on full-width slides + `x mandatory` pins
+  `scrollLeft` to 0); fixed to `start` — arrow click now advances `0→308→616→924`, mobile
+  swipe holds, dots update, no accidental PDP navigation (verified empirically, with a CSS
+  regression-guard test). Added **colour/size swatches** on cards (real `Variation` data,
+  prefetched → no N+1) and an honest **trust/delivery micro-panel**. 625 tests green, no
+  migration. See `docs/STORE_GALLERY_INTERACTION_PREMIUM_FEATURES_2026.md`.
 - **Luxury conversion + store/portal functional depth** (Phase 65): added a real,
   **safe "Buy again / Reorder"** (re-adds an order's items — with their original variations —
   to the cart only; never creates an order or takes payment; ownership-scoped; N+1-free), a
