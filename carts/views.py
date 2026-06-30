@@ -170,6 +170,39 @@ def add_cart(request, product_id):
     return redirect('cart')
 
 
+@require_POST
+def quick_add(request, product_id):
+    """AJAX quick add for SIMPLE products (no required colour/size). For products that
+    offer variations it returns needs_options:true so the UI opens Quick View instead —
+    a wrong variation is never added. Never creates an order or takes payment."""
+    from django.db.models import Sum
+    product = get_object_or_404(Product, id=product_id)
+    if not product.is_available or product.stock <= 0:
+        return JsonResponse({"ok": False, "reason": "unavailable"}, status=409)
+    if _missing_required_variations(product, []):
+        return JsonResponse({"ok": False, "needs_options": True})
+
+    def _add(scope):
+        # find an existing line for this product with NO variations, else create one
+        for ci in CartItem.objects.filter(product=product, **scope).prefetch_related("variations"):
+            if ci.variations.count() == 0:
+                ci.quantity += 1
+                ci.save(update_fields=["quantity"])
+                return
+        CartItem.objects.create(product=product, quantity=1, **scope)
+
+    if request.user.is_authenticated:
+        _add({"user": request.user})
+        count = CartItem.objects.filter(user=request.user).aggregate(n=Sum("quantity"))["n"] or 0
+    else:
+        if not request.session.session_key:
+            request.session.save()              # _cart_id can return None on a fresh session
+        cart, _created = Cart.objects.get_or_create(cart_id=request.session.session_key)
+        _add({"cart": cart})
+        count = CartItem.objects.filter(cart=cart).aggregate(n=Sum("quantity"))["n"] or 0
+    return JsonResponse({"ok": True, "count": int(count), "name": product.product_name})
+
+
 def remove_cart(request, product_id, cart_item_id):
     product = get_object_or_404(Product, id=product_id)
 
