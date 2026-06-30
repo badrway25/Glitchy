@@ -25,6 +25,14 @@ local Windows dev machine; **no real staging host exists**.
 | Security | ✅ Strong (dev) | No secrets in git, push/shipping/payments OFF. Key rotation still pending. |
 
 ## 2. What is genuinely COMPLETE
+- **Premium customer portal + global polish** (Phase 62): the dashboard is now genuinely
+  useful — **6 real KPI cards**, **quick actions**, **smart alerts**, a **recent-activity
+  timeline derived from real data**, and a premium empty state; the order & billing lists
+  gained **date-range / total-range / receipt** filters, **quick chips**, **result
+  counts**, a collapsible advanced panel, and a billing **summary** — all
+  querystring-persistent, pagination-preserving, mobile-friendly, **ownership-scoped**,
+  and **N+1-free**. Wishlist sort + address search added. EN/IT/FR, light+dark, 573 tests
+  green. No migration. See `docs/CUSTOMER_PORTAL_PREMIUM_UX_GLOBAL_POLISH_2026.md`.
 - **Ultra-premium navbar buttons + store product-card image carousel** (Phase 61):
   the navbar `Login`/`Register` are now **equal-size** with a **premium gold
   Register** (sober gradient, not yellow) and an elegant soft Login (light+dark,
