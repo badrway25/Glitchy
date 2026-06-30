@@ -21,21 +21,17 @@
         <div class="acc-layout">
 
           <!-- Header row -->
-          <div class="dash-top">
-            <div>
-              <h1 class="dash-title">{% trans "Account overview" %}</h1>
-              <div class="text-muted">{% trans "Track your orders, payments and deliveries." %}</div>
+          <div class="lux-head" data-reveal>
+            <div class="lux-head-main">
+              <div class="lux-eyebrow">{% trans "Account" %}</div>
+              <h1 class="lux-title">{% blocktrans with name=request.user.first_name|default:request.user.email %}Hi, {{ name }}{% endblocktrans %}</h1>
+              <p class="lux-sub">{% trans "Track your orders, payments and deliveries — all in one place." %}</p>
             </div>
-            <div class="dash-actions">
+            <div class="lux-head-actions">
               <a href="{% url 'store' %}" class="btn btn-soft btn-icontext">
-				<i class="fa fa-shopping-bag" aria-hidden="true"></i>
-				<span>{% trans "Shop" %}</span>
-				</a>
+                <i class="fa fa-shopping-bag" aria-hidden="true"></i><span>{% trans "Shop" %}</span></a>
               <a href="{% url 'my_orders' %}" class="btn btn-primary btn-icontext">
-				<span>{% trans "View all orders" %}</span>
-				<i class="fa fa-arrow-right" aria-hidden="true"></i>
-				</a>
-
+                <span>{% trans "View all orders" %}</span><i class="fa fa-arrow-right" aria-hidden="true"></i></a>
             </div>
           </div>
 
@@ -53,7 +49,7 @@
           {% endif %}
 
           <!-- Quick actions -->
-          <div class="dash-quick" data-reveal>
+          <div class="dash-quick" data-reveal-stagger>
             <a class="dash-quick-btn" href="{% url 'my_orders' %}">
               <span class="dash-quick-ic"><i class="fa fa-box" aria-hidden="true"></i></span>
               <span>{% trans "View orders" %}</span></a>
@@ -81,11 +77,11 @@
                 </div>
               </div>
 
-              <div class="dash-kpi dash-kpi-6">
+              <div class="dash-kpi dash-kpi-6" data-reveal-stagger>
                 <div class="kpi-card kpi-a">
                   <div class="kpi-top"><div class="kpi-label">{% trans "Total orders" %}</div>
                     <div class="kpi-icon"><i class="fa fa-shopping-bag"></i></div></div>
-                  <div class="kpi-value">{{ total_orders }}</div>
+                  <div class="kpi-value" data-countup>{{ total_orders }}</div>
                   <div class="kpi-sub text-muted">{% trans "All time" %}</div>
                 </div>
                 <div class="kpi-card kpi-b">
@@ -97,25 +93,25 @@
                 <div class="kpi-card kpi-c">
                   <div class="kpi-top"><div class="kpi-label">{% trans "In progress" %}</div>
                     <div class="kpi-icon"><i class="fa fa-clock"></i></div></div>
-                  <div class="kpi-value">{{ pending_count }}</div>
+                  <div class="kpi-value" data-countup>{{ pending_count }}</div>
                   <div class="kpi-sub text-muted">{% trans "New / Accepted" %}</div>
                 </div>
                 <div class="kpi-card kpi-e">
                   <div class="kpi-top"><div class="kpi-label">{% trans "Receipts" %}</div>
                     <div class="kpi-icon"><i class="fa fa-file"></i></div></div>
-                  <div class="kpi-value">{{ receipts_available }}</div>
+                  <div class="kpi-value" data-countup>{{ receipts_available }}</div>
                   <div class="kpi-sub text-muted">{% trans "Available" %}</div>
                 </div>
                 <div class="kpi-card kpi-f">
                   <div class="kpi-top"><div class="kpi-label">{% trans "Addresses" %}</div>
                     <div class="kpi-icon"><i class="fa fa-map-marker"></i></div></div>
-                  <div class="kpi-value">{{ addresses_count }}</div>
+                  <div class="kpi-value" data-countup>{{ addresses_count }}</div>
                   <div class="kpi-sub text-muted">{% trans "Saved" %}</div>
                 </div>
                 <div class="kpi-card kpi-g">
                   <div class="kpi-top"><div class="kpi-label">{% trans "Saved items" %}</div>
                     <div class="kpi-icon"><i class="fa fa-heart"></i></div></div>
-                  <div class="kpi-value">{{ wishlist_count }}</div>
+                  <div class="kpi-value" data-countup>{{ wishlist_count }}</div>
                   <div class="kpi-sub text-muted">{% trans "Wishlist" %}</div>
                 </div>
               </div>

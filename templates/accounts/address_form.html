@@ -2,20 +2,6 @@
 {% load static i18n %}
 {% block title %}{% if mode == 'edit' %}{% trans "Edit address" %}{% else %}{% trans "Add address" %}{% endif %} • {{ SITE_NAME }}{% endblock %}
 
-{% block extra_css %}
-<style>
-  .address-form .form-group { margin-bottom: 1rem; }
-  .address-form input:not([type=checkbox]), .address-form select, .address-form textarea {
-    width: 100%; padding: .6rem .8rem; border: 1px solid var(--border, #e2e8f0);
-    border-radius: 10px; font-size: .95rem; background: var(--surface, #fff);
-    color: var(--text, #0f172a);
-  }
-  .address-form label { font-weight: 600; font-size: .85rem; margin-bottom: .3rem; display:block; }
-  .address-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1rem; }
-  @media (max-width: 600px){ .address-grid { grid-template-columns: 1fr; } }
-</style>
-{% endblock %}
-
 {% block content %}
 <section class="section-content padding-y">
   <div class="container" style="max-width:var(--container-max);">
@@ -27,55 +13,78 @@
 
       <main class="col-lg-9">
         <div class="acc-layout">
-          <div class="dash-top">
-            <div>
-              <h1 class="dash-title mb-0">
-                {% if mode == 'edit' %}{% trans "Edit address" %}{% else %}{% trans "Add a new address" %}{% endif %}
-              </h1>
-              <div class="text-muted">{% trans "These details will be used for delivery and billing." %}</div>
+
+          <div class="lux-head" data-reveal>
+            <div class="lux-head-main">
+              <div class="lux-eyebrow">{% if mode == 'edit' %}{% trans "Edit address" %}{% else %}{% trans "New address" %}{% endif %}</div>
+              <h1 class="lux-title">{% if mode == 'edit' %}{% trans "Edit address" %}{% else %}{% trans "Add a new address" %}{% endif %}</h1>
+              <p class="lux-sub">{% trans "These details are used for delivery and billing on your orders." %}</p>
             </div>
-            <div class="dash-actions">
-              <a href="{% url 'address_list' %}" class="btn btn-soft">
-                <i class="fa fa-arrow-left mr-2"></i>{% trans "Back to addresses" %}
-              </a>
-            </div>
-          </div>
-
-          <div class="dash-card">
-            <div class="dash-card-body">
-              <form method="post" class="address-form">
-                {% csrf_token %}
-                {% if form.non_field_errors %}
-                  <div class="alert alert-danger">{{ form.non_field_errors }}</div>
-                {% endif %}
-                <div class="address-grid">
-                  {% for field in form %}
-                    {% if field.name != 'is_default' %}
-                    <div class="form-group">
-                      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                      {{ field }}
-                      {% if field.errors %}<div class="text-danger small mt-1">{{ field.errors.0 }}</div>{% endif %}
-                    </div>
-                    {% endif %}
-                  {% endfor %}
-                </div>
-
-                {% if form.is_default %}
-                <div class="custom-control custom-checkbox mt-2 mb-3">
-                  {{ form.is_default }}
-                  <label class="custom-control-label" for="{{ form.is_default.id_for_label }}">
-                    {% trans "Set as my default address" %}
-                  </label>
-                </div>
-                {% endif %}
-
-                <button type="submit" class="btn btn-primary">
-                  <i class="fa fa-save mr-2"></i>{% trans "Save address" %}
-                </button>
-                <a href="{% url 'address_list' %}" class="btn btn-soft">{% trans "Cancel" %}</a>
-              </form>
+            <div class="lux-head-actions">
+              <a href="{% url 'address_list' %}" class="btn btn-soft btn-icontext">
+                <i class="fa fa-arrow-left" aria-hidden="true"></i><span>{% trans "Back to addresses" %}</span></a>
             </div>
           </div>
+
+          {% if form.non_field_errors %}
+            <div class="auth-errsum" role="alert" data-reveal>{{ form.non_field_errors }}</div>
+          {% endif %}
+
+          <form method="post" class="addr-form" novalidate>
+            {% csrf_token %}
+
+            <div class="dash-card addr-section" data-reveal>
+              <div class="addr-section-h">
+                <span class="icon-tile"><i class="fa fa-user" aria-hidden="true"></i></span>
+                <div><div class="addr-section-t">{% trans "Contact" %}</div>
+                  <div class="addr-section-d">{% trans "Who should we address the parcel to?" %}</div></div>
+              </div>
+              <div class="addr-grid">
+                {% with f=form.first_name %}<label class="addr-field"><span class="addr-label">{% trans "First name" %}</span>{{ f }}{% if f.errors %}<small class="auth-err">{{ f.errors.0 }}</small>{% endif %}</label>{% endwith %}
+                {% with f=form.last_name %}<label class="addr-field"><span class="addr-label">{% trans "Last name" %}</span>{{ f }}{% if f.errors %}<small class="auth-err">{{ f.errors.0 }}</small>{% endif %}</label>{% endwith %}
+                {% with f=form.email %}<label class="addr-field"><span class="addr-label">{% trans "Email" %}</span>{{ f }}{% if f.errors %}<small class="auth-err">{{ f.errors.0 }}</small>{% endif %}</label>{% endwith %}
+                {% with f=form.phone %}<label class="addr-field"><span class="addr-label">{% trans "Phone" %}</span>{{ f }}{% if f.errors %}<small class="auth-err">{{ f.errors.0 }}</small>{% endif %}</label>{% endwith %}
+              </div>
+            </div>
+
+            <div class="dash-card addr-section" data-reveal>
+              <div class="addr-section-h">
+                <span class="icon-tile"><i class="fa fa-map-marker-alt" aria-hidden="true"></i></span>
+                <div><div class="addr-section-t">{% trans "Shipping address" %}</div>
+                  <div class="addr-section-d">{% trans "Where should we deliver your order?" %}</div></div>
+              </div>
+              <div class="addr-grid">
+                {% with f=form.address_line_1 %}<label class="addr-field addr-col-2"><span class="addr-label">{% trans "Address line 1" %}</span>{{ f }}{% if f.errors %}<small class="auth-err">{{ f.errors.0 }}</small>{% endif %}</label>{% endwith %}
+                {% with f=form.address_line_2 %}<label class="addr-field addr-col-2"><span class="addr-label">{% trans "Address line 2" %} <em class="addr-opt">{% trans "(optional)" %}</em></span>{{ f }}{% if f.errors %}<small class="auth-err">{{ f.errors.0 }}</small>{% endif %}</label>{% endwith %}
+                {% with f=form.city %}<label class="addr-field"><span class="addr-label">{% trans "City" %}</span>{{ f }}{% if f.errors %}<small class="auth-err">{{ f.errors.0 }}</small>{% endif %}</label>{% endwith %}
+                {% with f=form.state %}<label class="addr-field"><span class="addr-label">{% trans "State / Province" %}</span>{{ f }}{% if f.errors %}<small class="auth-err">{{ f.errors.0 }}</small>{% endif %}</label>{% endwith %}
+                {% with f=form.postal_code %}<label class="addr-field"><span class="addr-label">{% trans "Postal code" %}</span>{{ f }}{% if f.errors %}<small class="auth-err">{{ f.errors.0 }}</small>{% endif %}</label>{% endwith %}
+                {% with f=form.country %}<label class="addr-field"><span class="addr-label">{% trans "Country" %}</span>{{ f }}{% if f.errors %}<small class="auth-err">{{ f.errors.0 }}</small>{% endif %}</label>{% endwith %}
+              </div>
+            </div>
+
+            {% if form.is_default %}
+            <div class="dash-card addr-section" data-reveal>
+              <div class="addr-section-h">
+                <span class="icon-tile"><i class="fa fa-star" aria-hidden="true"></i></span>
+                <div><div class="addr-section-t">{% trans "Delivery preferences" %}</div>
+                  <div class="addr-section-d">{% trans "Make this the address we use by default." %}</div></div>
+              </div>
+              <label class="addr-switch">
+                {{ form.is_default }}
+                <span class="addr-switch-track" aria-hidden="true"></span>
+                <span class="addr-switch-label">{% trans "Set as my default address" %}</span>
+              </label>
+            </div>
+            {% endif %}
+
+            <div class="addr-actions" data-reveal>
+              <button type="submit" class="btn btn-primary btn-icontext">
+                <i class="fa fa-save" aria-hidden="true"></i><span>{% trans "Save address" %}</span></button>
+              <a href="{% url 'address_list' %}" class="btn btn-soft">{% trans "Cancel" %}</a>
+            </div>
+          </form>
+
         </div>
       </main>
 
