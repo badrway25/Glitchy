@@ -25,6 +25,14 @@ local Windows dev machine; **no real staging host exists**.
 | Security | ✅ Strong (dev) | No secrets in git, push/shipping/payments OFF. Key rotation still pending. |
 
 ## 2. What is genuinely COMPLETE
+- **Premium store: recently viewed, compare, safe quick-add** (Phase 67): recently-viewed
+  rail on the store (session-based, no PII, one query); lightweight compare (localStorage
+  ids only, max 3, drawer/mobile sheet, real data, decimal-validated ids); safe quick-add
+  AJAX (`/cart/quick-add/`) that adds simple products and opens Quick View for variant
+  products — POST+CSRF, scoped, never creates an order. Fixed owner-reported button design
+  (missing FA6 icon → text "Compare", 2-row layout) and a QA-data artifact that made one card
+  look broken/smaller. 639 tests green, no migration. See
+  `docs/PREMIUM_STORE_RECENTLY_VIEWED_COMPARE_QUICK_ADD_2026.md`.
 - **Store product-card gallery FIX + premium card features** (Phase 66): the carousel was
   unscrollable (`scroll-snap-align:center` on full-width slides + `x mandatory` pins
   `scrollLeft` to 0); fixed to `start` — arrow click now advances `0→308→616→924`, mobile
