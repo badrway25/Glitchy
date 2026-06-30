@@ -25,7 +25,9 @@ from django.core.paginator import Paginator
 
 from orders.models import Order, OrderProduct  # <-- aggiungi
 
-from django.db.models import Sum,Q
+from django.db.models import Sum, Q
+from django.urls import reverse
+from django.utils import timezone
 
 @login_required(login_url='login')
 def transactions(request):
@@ -73,6 +75,14 @@ def transactions(request):
     return render(request, "accounts/transactions.html", context)
 
 
+def _wishlist_count(user):
+    try:
+        from wishlist.models import WishlistItem
+        return WishlistItem.objects.filter(user=user).count()
+    except Exception:
+        return 0
+
+
 @login_required(login_url='login')
 def dashboard(request):
     user = request.user
@@ -81,12 +91,50 @@ def dashboard(request):
 
     total_orders = orders_qs.count()
     total_spent = orders_qs.aggregate(total=Sum("order_total"))["total"] or 0
-
     pending_count = orders_qs.filter(status__in=["New", "Accepted"]).count()
     completed_count = orders_qs.filter(status="Completed").count()
     cancelled_count = orders_qs.filter(status="Cancelled").count()
+    receipts_available = orders_qs.filter(payment__isnull=False).count()
 
-    recent_orders = orders_qs[:5]
+    addresses_count = Address.objects.filter(user=user).count()
+    has_default_address = Address.objects.filter(user=user, is_default=True).exists()
+    wishlist_count = _wishlist_count(user)
+
+    # 5 most recent — payment fetched in one query (no N+1 in the table).
+    recent_orders = list(orders_qs.select_related("payment")[:5])
+
+    # "Recent activity" — derived from REAL data only (no fake events).
+    activity = []
+    for o in recent_orders:
+        activity.append({"icon": "shopping-bag", "title": _("Order placed"),
+                         "ref": "#" + o.order_number, "when": o.created_at,
+                         "url": reverse("order_detail", args=[o.order_number])})
+        if o.payment_id:
+            activity.append({"icon": "file", "title": _("Receipt available"),
+                             "ref": "#" + o.order_number, "when": o.created_at,
+                             "url": reverse("billing")})
+    last_addr = Address.objects.filter(user=user).order_by("-updated_at").first()
+    if last_addr:
+        activity.append({"icon": "map-marker", "title": _("Delivery address updated"),
+                         "ref": last_addr.city, "when": last_addr.updated_at,
+                         "url": reverse("address_list")})
+    activity.sort(key=lambda a: a["when"] or timezone.now(), reverse=True)
+    activity = activity[:6]
+
+    # Smart, actionable alerts (only when genuinely useful).
+    alerts = []
+    if receipts_available:
+        alerts.append({"tone": "info", "icon": "file", "count": receipts_available,
+                       "text": _("receipt(s) ready to download"),
+                       "url": reverse("billing"), "cta": _("Open billing")})
+    if addresses_count == 0:
+        alerts.append({"tone": "warn", "icon": "map-marker", "count": 0,
+                       "text": _("Add a delivery address to speed up checkout."),
+                       "url": reverse("address_create"), "cta": _("Add address")})
+    if wishlist_count:
+        alerts.append({"tone": "soft", "icon": "heart", "count": wishlist_count,
+                       "text": _("item(s) saved for later"),
+                       "url": reverse("wishlist:saved"), "cta": _("View saved")})
 
     context = {
         "orders": recent_orders,
@@ -95,6 +143,12 @@ def dashboard(request):
         "pending_count": pending_count,
         "completed_count": completed_count,
         "cancelled_count": cancelled_count,
+        "receipts_available": receipts_available,
+        "addresses_count": addresses_count,
+        "has_default_address": has_default_address,
+        "wishlist_count": wishlist_count,
+        "activity": activity,
+        "alerts": alerts,
     }
     return render(request, "accounts/dashboard.html", context)
 
@@ -112,14 +166,33 @@ ORDER_SORT_OPTIONS = {
 }
 
 
-def _filter_sort_orders(request, base_qs):
-    """Shared search + status + sort for the orders / billing lists.
+def _parse_date(s):
+    from datetime import datetime
+    try:
+        return datetime.strptime((s or "").strip(), "%Y-%m-%d").date()
+    except (ValueError, TypeError):
+        return None
 
-    Search matches the order number or any purchased product name. Status is
-    validated against the model choices; sort against a whitelist."""
+
+def _parse_amount(s):
+    import math
+    try:
+        v = float(str(s).strip())
+        return v if math.isfinite(v) and v >= 0 else None
+    except (ValueError, TypeError):
+        return None
+
+
+def _filter_sort_orders(request, base_qs):
+    """Shared search + status + date range + total range + receipt + sort for the
+    orders / billing lists. Every input is validated/whitelisted (no field injection).
+    Search matches the order number or any purchased product name."""
     q = (request.GET.get("q") or "").strip()[:60]
     status = (request.GET.get("status") or "").strip()
     sort = (request.GET.get("sort") or "recent").strip()
+    df, dt = _parse_date(request.GET.get("date_from")), _parse_date(request.GET.get("date_to"))
+    tmin, tmax = _parse_amount(request.GET.get("total_min")), _parse_amount(request.GET.get("total_max"))
+    receipt = (request.GET.get("receipt") or "").strip() == "1"
 
     qs = base_qs
     if status in ORDER_STATUS_OPTIONS:
@@ -129,10 +202,30 @@ def _filter_sort_orders(request, base_qs):
             Q(order_number__icontains=q) |
             Q(orderproduct__product__product_name__icontains=q)
         ).distinct()
+    if df:
+        qs = qs.filter(created_at__date__gte=df)
+    if dt:
+        qs = qs.filter(created_at__date__lte=dt)
+    if tmin is not None:
+        qs = qs.filter(order_total__gte=tmin)
+    if tmax is not None:
+        qs = qs.filter(order_total__lte=tmax)
+    if receipt:
+        qs = qs.filter(payment__isnull=False)
     ordering = ORDER_SORT_OPTIONS.get(sort, ORDER_SORT_OPTIONS["recent"])[1]
     qs = qs.order_by(ordering)
-    return qs, {"q": q, "status": status if status in ORDER_STATUS_OPTIONS else "",
-                "sort": sort if sort in ORDER_SORT_OPTIONS else "recent"}
+
+    active = {
+        "q": q,
+        "status": status if status in ORDER_STATUS_OPTIONS else "",
+        "sort": sort if sort in ORDER_SORT_OPTIONS else "recent",
+        "date_from": df.isoformat() if df else "",
+        "date_to": dt.isoformat() if dt else "",
+        "total_min": (request.GET.get("total_min") or "").strip() if tmin is not None else "",
+        "total_max": (request.GET.get("total_max") or "").strip() if tmax is not None else "",
+        "receipt": "1" if receipt else "",
+    }
+    return qs, active
 
 
 @login_required(login_url='login')
@@ -150,13 +243,20 @@ def my_orders(request):
 
     context = {
         "orders": orders,
-        "q": active["q"], "status": active["status"], "sort": active["sort"],
         "status_options": ORDER_STATUS_OPTIONS,
         "sort_options": {k: v[0] for k, v in ORDER_SORT_OPTIONS.items()},
-        "has_filters": bool(active["q"] or active["status"] or active["sort"] != "recent"),
+        "has_filters": _has_active_filters(active),
+        "result_count": paginator.count,
         "querystring": params.urlencode(),
+        **active,
     }
     return render(request, "accounts/my_orders.html", context)
+
+
+def _has_active_filters(active):
+    return bool(active["q"] or active["status"] or active["date_from"] or active["date_to"]
+                or active["total_min"] or active["total_max"] or active["receipt"]
+                or active["sort"] != "recent")
 
 
 @login_required(login_url="login")
@@ -173,13 +273,25 @@ def billing(request):
     params = request.GET.copy()
     params.pop("page", None)
 
+    # Honest billing summary over ALL the user's orders (not just this page).
+    paid_qs = base.filter(payment__isnull=False)
+    paid_count = paid_qs.count()
+    summary = {
+        "paid_count": paid_count,
+        "paid_total": paid_qs.aggregate(t=Sum("order_total"))["t"] or 0,
+        "receipts_available": paid_count,   # a receipt exists for every paid order
+        "pending_count": base.filter(payment__isnull=True).count(),
+    }
+
     context = {
         "receipts": receipts,
-        "q": active["q"], "status": active["status"], "sort": active["sort"],
         "status_options": ORDER_STATUS_OPTIONS,
         "sort_options": {k: v[0] for k, v in ORDER_SORT_OPTIONS.items()},
-        "has_filters": bool(active["q"] or active["status"] or active["sort"] != "recent"),
+        "has_filters": _has_active_filters(active),
+        "result_count": paginator.count,
+        "summary": summary,
         "querystring": params.urlencode(),
+        **active,
     }
     return render(request, "accounts/billing.html", context)
 
@@ -248,8 +360,18 @@ def order_help(request, order_number):
 
 @login_required(login_url="login")
 def address_list(request):
-    addresses = Address.objects.filter(user=request.user).order_by("-is_default", "-updated_at")
-    return render(request, "accounts/address_list.html", {"addresses": addresses})
+    q = (request.GET.get("q") or "").strip()[:60]
+    addresses = Address.objects.filter(user=request.user)
+    if q:
+        addresses = addresses.filter(
+            Q(city__icontains=q) | Q(country__icontains=q) | Q(postal_code__icontains=q) |
+            Q(first_name__icontains=q) | Q(last_name__icontains=q)
+        )
+    addresses = addresses.order_by("-is_default", "-updated_at")
+    return render(request, "accounts/address_list.html", {
+        "addresses": addresses, "q": q, "has_query": bool(q),
+        "result_count": addresses.count(),
+    })
 
 @login_required(login_url="login")
 def address_create(request):

@@ -39,6 +39,38 @@
             </div>
           </div>
 
+          <!-- Smart alerts -->
+          {% if alerts %}
+          <div class="dash-alerts" data-reveal>
+            {% for a in alerts %}
+              <a class="dash-alert dash-alert-{{ a.tone }}" href="{{ a.url }}">
+                <span class="dash-alert-ic"><i class="fa fa-{{ a.icon }}" aria-hidden="true"></i></span>
+                <span class="dash-alert-text">{% if a.count %}<strong>{{ a.count }}</strong> {% endif %}{{ a.text }}</span>
+                <span class="dash-alert-cta">{{ a.cta }} <i class="fa fa-arrow-right" aria-hidden="true"></i></span>
+              </a>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          <!-- Quick actions -->
+          <div class="dash-quick" data-reveal>
+            <a class="dash-quick-btn" href="{% url 'my_orders' %}">
+              <span class="dash-quick-ic"><i class="fa fa-box" aria-hidden="true"></i></span>
+              <span>{% trans "View orders" %}</span></a>
+            <a class="dash-quick-btn" href="{% url 'billing' %}">
+              <span class="dash-quick-ic"><i class="fa fa-file" aria-hidden="true"></i></span>
+              <span>{% trans "Receipts" %}</span></a>
+            <a class="dash-quick-btn" href="{% url 'address_list' %}">
+              <span class="dash-quick-ic"><i class="fa fa-map-marker" aria-hidden="true"></i></span>
+              <span>{% trans "Addresses" %}</span></a>
+            <a class="dash-quick-btn" href="{% url 'wishlist:saved' %}">
+              <span class="dash-quick-ic"><i class="fa fa-heart" aria-hidden="true"></i></span>
+              <span>{% trans "Saved items" %}</span></a>
+            <a class="dash-quick-btn" href="{% url 'store' %}">
+              <span class="dash-quick-ic"><i class="fa fa-shopping-bag" aria-hidden="true"></i></span>
+              <span>{% trans "Continue shopping" %}</span></a>
+          </div>
+
           <!-- KPI cards -->
           <div class="dash-card">
             <div class="dash-card-body">
@@ -49,45 +81,69 @@
                 </div>
               </div>
 
-              <div class="dash-kpi">
+              <div class="dash-kpi dash-kpi-6">
                 <div class="kpi-card kpi-a">
-                  <div class="kpi-top">
-                    <div class="kpi-label">{% trans "Total orders" %}</div>
-                    <div class="kpi-icon"><i class="fa fa-shopping-bag"></i></div>
-                  </div>
+                  <div class="kpi-top"><div class="kpi-label">{% trans "Total orders" %}</div>
+                    <div class="kpi-icon"><i class="fa fa-shopping-bag"></i></div></div>
                   <div class="kpi-value">{{ total_orders }}</div>
                   <div class="kpi-sub text-muted">{% trans "All time" %}</div>
                 </div>
-
                 <div class="kpi-card kpi-b">
-                  <div class="kpi-top">
-                    <div class="kpi-label">{% trans "Spent" %}</div>
-                    <div class="kpi-icon"><i class="fa fa-credit-card"></i></div>
-                  </div>
+                  <div class="kpi-top"><div class="kpi-label">{% trans "Spent" %}</div>
+                    <div class="kpi-icon"><i class="fa fa-credit-card"></i></div></div>
                   <div class="kpi-value">€ {{ total_spent|floatformat:2 }}</div>
                   <div class="kpi-sub text-muted">{% trans "All time" %}</div>
                 </div>
-
                 <div class="kpi-card kpi-c">
-                  <div class="kpi-top">
-                    <div class="kpi-label">{% trans "In progress" %}</div>
-                    <div class="kpi-icon"><i class="fa fa-clock"></i></div>
-                  </div>
+                  <div class="kpi-top"><div class="kpi-label">{% trans "In progress" %}</div>
+                    <div class="kpi-icon"><i class="fa fa-clock"></i></div></div>
                   <div class="kpi-value">{{ pending_count }}</div>
                   <div class="kpi-sub text-muted">{% trans "New / Accepted" %}</div>
                 </div>
-
-                <div class="kpi-card kpi-d">
-                  <div class="kpi-top">
-                    <div class="kpi-label">{% trans "Completed" %}</div>
-                    <div class="kpi-icon"><i class="fa fa-check-circle"></i></div>
-                  </div>
-                  <div class="kpi-value">{{ completed_count }}</div>
-                  <div class="kpi-sub text-muted">{% trans "Delivered" %}</div>
+                <div class="kpi-card kpi-e">
+                  <div class="kpi-top"><div class="kpi-label">{% trans "Receipts" %}</div>
+                    <div class="kpi-icon"><i class="fa fa-file"></i></div></div>
+                  <div class="kpi-value">{{ receipts_available }}</div>
+                  <div class="kpi-sub text-muted">{% trans "Available" %}</div>
+                </div>
+                <div class="kpi-card kpi-f">
+                  <div class="kpi-top"><div class="kpi-label">{% trans "Addresses" %}</div>
+                    <div class="kpi-icon"><i class="fa fa-map-marker"></i></div></div>
+                  <div class="kpi-value">{{ addresses_count }}</div>
+                  <div class="kpi-sub text-muted">{% trans "Saved" %}</div>
+                </div>
+                <div class="kpi-card kpi-g">
+                  <div class="kpi-top"><div class="kpi-label">{% trans "Saved items" %}</div>
+                    <div class="kpi-icon"><i class="fa fa-heart"></i></div></div>
+                  <div class="kpi-value">{{ wishlist_count }}</div>
+                  <div class="kpi-sub text-muted">{% trans "Wishlist" %}</div>
                 </div>
               </div>
             </div>
           </div>
+
+          <!-- Recent activity -->
+          {% if activity %}
+          <div class="dash-card" data-reveal>
+            <div class="dash-card-head">
+              <div><div class="dash-card-title">{% trans "Recent activity" %}</div>
+                <div class="text-muted dash-small">{% trans "Your latest account events" %}</div></div>
+            </div>
+            <div class="dash-card-body">
+              <ul class="dash-timeline">
+                {% for ev in activity %}
+                  <li class="dash-tl-item">
+                    <span class="dash-tl-dot"><i class="fa fa-{{ ev.icon }}" aria-hidden="true"></i></span>
+                    <a class="dash-tl-body" href="{{ ev.url }}">
+                      <span class="dash-tl-title">{{ ev.title }} <span class="dash-tl-ref">{{ ev.ref }}</span></span>
+                      <span class="dash-tl-when">{{ ev.when|date:"M d, Y" }}</span>
+                    </a>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+          {% endif %}
 
           <!-- Orders table -->
           <div class="dash-card">
