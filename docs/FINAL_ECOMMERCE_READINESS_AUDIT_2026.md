@@ -25,6 +25,14 @@ local Windows dev machine; **no real staging host exists**.
 | Security | ✅ Strong (dev) | No secrets in git, push/shipping/payments OFF. Key rotation still pending. |
 
 ## 2. What is genuinely COMPLETE
+- **Ultra-premium page detail + motion polish** (Phase 64): six pages (wishlist, login,
+  register, store, dashboard, address form) were elevated with a shared **premium page
+  system** (editorial `.lux-head` headers, summary stat bars, luxury empty states) and a
+  **refined motion layer** (staggered card reveal + KPI count-up, `prefers-reduced-motion`
+  safe, no CLS). Login/register became a **split brand-panel layout** (register with four
+  real benefit cards); the address form is now **grouped sections** with an elegant default
+  switch; the wishlist gained an editorial header + summary bar. 604 tests green, no
+  migration. See `docs/ULTRA_PREMIUM_PAGE_DETAIL_MOTION_POLISH_2026.md`.
 - **Customer portal intelligence + wishlist facets + legacy sweep** (Phase 63): the
   wishlist gained **real, data-driven facets** (category, colour, size, price range,
   on-sale, multi-image, recently-saved) with quick chips, removable active chips,
