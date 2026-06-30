@@ -237,6 +237,7 @@
               <div class="pdp-actions">
                 <button type="button" class="btn btn-soft wish-btn wish-btn-pdp {% if single_product.id in WISHLIST_IDS %}is-active{% endif %}"
                         data-wishlist-toggle data-product-id="{{ single_product.id }}"
+                        data-toast-on="{% trans 'Saved to wishlist' %}" data-toast-off="{% trans 'Removed from wishlist' %}"
                         data-label-on="{% trans 'Saved' %}" data-label-off="{% trans 'Save' %}"
                         aria-pressed="{% if single_product.id in WISHLIST_IDS %}true{% else %}false{% endif %}"
                         title="{% trans 'Save to wishlist' %}">

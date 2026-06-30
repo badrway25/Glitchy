@@ -6,7 +6,9 @@
     {% if p.on_sale %}<span class="badge-corner badge-out" style="position:absolute;top:10px;left:10px;">{% trans "Sale" %}</span>{% endif %}
   </a>
   <button type="button" class="wish-btn {% if p.id in WISHLIST_IDS %}is-active{% endif %}"
-          data-wishlist-toggle data-product-id="{{ p.id }}" aria-label="{% trans 'Save to wishlist' %}"><i class="fa fa-heart"></i></button>
+          data-wishlist-toggle data-product-id="{{ p.id }}"
+          data-toast-on="{% trans 'Saved to wishlist' %}" data-toast-off="{% trans 'Removed from wishlist' %}"
+          aria-label="{% trans 'Save to wishlist' %}"><i class="fa fa-heart"></i></button>
   <div class="p-3">
     <a href="{{ p.get_url }}" class="product-title d-block mb-1" style="font-size:.9rem;">{{ p.product_name|truncatechars:42 }}</a>
     {% if p.countReview %}

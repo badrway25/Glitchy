@@ -202,6 +202,7 @@
 
   <button type="button" class="wish-btn {% if product.id in WISHLIST_IDS %}is-active{% endif %}"
           data-wishlist-toggle data-product-id="{{ product.id }}"
+          data-toast-on="{% trans 'Saved to wishlist' %}" data-toast-off="{% trans 'Removed from wishlist' %}"
           aria-pressed="{% if product.id in WISHLIST_IDS %}true{% else %}false{% endif %}"
           aria-label="{% trans 'Save to wishlist' %}" title="{% trans 'Save to wishlist' %}">
     <i class="fa fa-heart"></i>

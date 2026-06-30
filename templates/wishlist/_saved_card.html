@@ -47,7 +47,9 @@
               aria-label="{% trans 'Quick view' %}: {{ p.product_name }}">{% icon "bag" "ic" 14 %}<span>{% trans "Quick view" %}</span></button>
       <a href="{{ p.get_url }}" class="btn btn-primary btn-sm saved-view">{% trans "View" %}</a>
       <button type="button" class="btn btn-soft btn-sm wish-btn is-active saved-remove" data-wishlist-toggle
-              data-product-id="{{ p.id }}" title="{% trans 'Remove' %}" aria-label="{% trans 'Remove' %}">
+              data-product-id="{{ p.id }}" data-toast-off="{% trans 'Removed from saved items' %}"
+              data-toast-on="{% trans 'Saved to your items' %}"
+              title="{% trans 'Remove' %}" aria-label="{% trans 'Remove' %}">
         {% icon "close" "ic" 14 %}
       </button>
     </div>
