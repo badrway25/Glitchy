@@ -25,6 +25,14 @@ local Windows dev machine; **no real staging host exists**.
 | Security | ✅ Strong (dev) | No secrets in git, push/shipping/payments OFF. Key rotation still pending. |
 
 ## 2. What is genuinely COMPLETE
+- **Premium Admin + Printify Control Center** (Phase 68-admin): Django **Unfold** admin
+  ("Glitchy Commerce Studio") with a real KPI dashboard, thumbnail/filter-rich product admin,
+  a `catalog_health_check` command, and premium order badges. Security core: a
+  `PrintifyAccountConfig` model that stores the API token **Fernet-encrypted, write-only**
+  (never rendered/logged — masked last-4 + fingerprint only), superadmin-gated, with
+  admin-controlled sync (test-connection / dry-run) and **all dangerous flags default OFF**.
+  New migration (`0005`), new deps (django-unfold, cryptography), new env `PRINTIFY_CONFIG_KEY`.
+  655 tests green. See `docs/PREMIUM_ADMIN_PRINTIFY_CONTROL_CENTER_2026.md`.
 - **Premium store: recently viewed, compare, safe quick-add** (Phase 67): recently-viewed
   rail on the store (session-based, no PII, one query); lightweight compare (localStorage
   ids only, max 3, drawer/mobile sheet, real data, decimal-validated ids); safe quick-add
