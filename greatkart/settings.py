@@ -120,6 +120,16 @@ INSTALLED_APPS = [
 # Unfold premium admin — "Glitchy Commerce Studio" control center.
 # Brand: espresso ink + champagne gold (matches the storefront tokens).
 # --------------------------------------------------------------------------- #
+def _gl_admin_css(request):
+    from django.templatetags.static import static
+    return static("glitchy_admin/premium.css")
+
+
+def _gl_admin_js(request):
+    from django.templatetags.static import static
+    return static("glitchy_admin/motion.js")
+
+
 UNFOLD = {
     "SITE_TITLE": "Glitchy Commerce Studio",
     "SITE_HEADER": "Glitchy Commerce Studio",
@@ -127,6 +137,8 @@ UNFOLD = {
     "SITE_URL": "/",
     "SHOW_HISTORY": True,
     "SHOW_VIEW_ON_SITE": True,
+    "STYLES": [_gl_admin_css],
+    "SCRIPTS": [_gl_admin_js],
     "ENVIRONMENT": "greatkart.admin_ext.environment_callback",
     "DASHBOARD_CALLBACK": "greatkart.admin_ext.dashboard_callback",
     "COLORS": {
