@@ -34,6 +34,26 @@ class PrintifyAccountConfigForm(forms.ModelForm):
                   "sync_interval_seconds", "sync_mode", "allow_product_publish",
                   "allow_order_creation")
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # A custom ModelForm's fields get Django's bare vTextField widgets, which Unfold does
+        # NOT style -> the inputs render ~invisible. Give each widget Unfold's own input class
+        # so they look native to the premium admin. (Import lazily: unfold.widgets touches
+        # settings at import time.)
+        from unfold.widgets import (INPUT_CLASSES, SELECT_CLASSES, CHECKBOX_CLASSES)
+        text = " ".join(INPUT_CLASSES)
+        select = " ".join(SELECT_CLASSES)
+        checkbox = " ".join(CHECKBOX_CLASSES)
+        for field in self.fields.values():
+            w = field.widget
+            if isinstance(w, forms.CheckboxInput):
+                w.attrs["class"] = (w.attrs.get("class", "") + " " + checkbox).strip()
+            elif isinstance(w, forms.Select):
+                w.attrs["class"] = (w.attrs.get("class", "") + " " + select).strip()
+            elif isinstance(w, (forms.TextInput, forms.NumberInput, forms.PasswordInput,
+                                forms.EmailInput, forms.URLInput, forms.Textarea)):
+                w.attrs["class"] = (w.attrs.get("class", "") + " " + text).strip()
+
     def clean_new_token(self):
         token = (self.cleaned_data.get("new_token") or "").strip()
         if token and not printify_secrets.has_key():
@@ -62,6 +82,7 @@ class PrintifyAccountConfigAdmin(admin.ModelAdmin):
     actions = ["action_test_connection", "action_sync_dry_run", "action_sync_apply_safe"]
     readonly_fields = ("token_state_detail", "connection_state_detail", "token_set_at",
                        "token_updated_by", "created_at", "updated_at")
+    # Full layout (editing an existing account) — includes the read-only status/meta blocks.
     fieldsets = (
         (_("Account"), {"fields": ("name", "is_active", "shop_id")}),
         (_("API token (write-only)"), {"fields": ("new_token", "token_state_detail",
@@ -71,6 +92,17 @@ class PrintifyAccountConfigAdmin(admin.ModelAdmin):
         (_("Connection status (read-only)"), {"fields": ("connection_state_detail",)}),
         (_("Meta"), {"fields": ("created_at", "updated_at")}),
     )
+    # Slim layout when CREATING — auto/read-only fields (token status, connection, created/
+    # updated) are empty on add, so they're hidden until the account exists.
+    add_fieldsets = (
+        (_("Account"), {"fields": ("name", "is_active", "shop_id")}),
+        (_("API token (write-only)"), {"fields": ("new_token",)}),
+        (_("Sync governance"), {"fields": ("sync_enabled", "sync_interval_seconds", "sync_mode",
+                                           "allow_product_publish", "allow_order_creation")}),
+    )
+
+    def get_fieldsets(self, request, obj=None):
+        return self.add_fieldsets if obj is None else self.fieldsets
 
     # -- permissions: only superusers touch the token + dangerous switches ----
     def get_readonly_fields(self, request, obj=None):
