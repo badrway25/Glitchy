@@ -1,13 +1,81 @@
 from django.contrib import admin
+from django.db.models import Count, Q
+from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
+
+try:                                        # premium admin styling
+    from unfold.admin import ModelAdmin as BaseModelAdmin
+    from unfold.admin import TabularInline as BaseTabularInline
+except Exception:                           # graceful fallback if Unfold is absent
+    from django.contrib.admin import ModelAdmin as BaseModelAdmin
+    from django.contrib.admin import TabularInline as BaseTabularInline
 
 from .models import (GeneralFAQ, Product, ProductDescriptionTranslation, ProductFAQ,
                      ProductImage, ReviewRating, Variation)
 
 
-class ProductImageInline(admin.TabularInline):
+# --- Catalog-health filters (drive the dashboard quick links) ---------------
+class MissingImageFilter(admin.SimpleListFilter):
+    title = _("image")
+    parameter_name = "missing_image"
+
+    def lookups(self, request, model_admin):
+        return [("1", _("Missing image"))]
+
+    def queryset(self, request, queryset):
+        if self.value() == "1":
+            return queryset.annotate(_g=Count("gallery")).filter(
+                _g=0).filter(Q(images="") | Q(images__isnull=True))
+        return queryset
+
+
+class MissingPriceFilter(admin.SimpleListFilter):
+    title = _("price")
+    parameter_name = "missing_price"
+
+    def lookups(self, request, model_admin):
+        return [("1", _("Missing / zero price"))]
+
+    def queryset(self, request, queryset):
+        if self.value() == "1":
+            return queryset.filter(Q(price__isnull=True) | Q(price__lte=0))
+        return queryset
+
+
+class PrintifyFilter(admin.SimpleListFilter):
+    title = _("Printify")
+    parameter_name = "printify"
+
+    def lookups(self, request, model_admin):
+        return [("1", _("Printify products")), ("0", _("Local only"))]
+
+    def queryset(self, request, queryset):
+        if self.value() == "1":
+            return queryset.exclude(printify_product_id__isnull=True).exclude(printify_product_id="")
+        if self.value() == "0":
+            return queryset.filter(Q(printify_product_id__isnull=True) | Q(printify_product_id=""))
+        return queryset
+
+
+class StaleSyncFilter(admin.SimpleListFilter):
+    title = _("sync freshness")
+    parameter_name = "stale_sync"
+
+    def lookups(self, request, model_admin):
+        return [("1", _("Stale Printify sync"))]
+
+    def queryset(self, request, queryset):
+        if self.value() == "1":
+            from django.conf import settings
+            cutoff = timezone.now() - timezone.timedelta(
+                minutes=getattr(settings, "PRINTIFY_SYNC_STALE_AFTER_MINUTES", 360))
+            return queryset.filter(printify_product_id__isnull=False, printify_synced_at__lt=cutoff)
+        return queryset
+
+
+class ProductImageInline(BaseTabularInline):
     model = ProductImage
     extra = 0
 
@@ -31,23 +99,107 @@ class DescriptionTranslationInline(admin.TabularInline):
 
 
 @admin.register(Product)
-class ProductAdmin(admin.ModelAdmin):
-    list_display = ("product_name", "price", "base_cost", "margin_hint", "quality_score",
-                    "stock", "category", "sync_badge", "is_available", "is_bestseller")
+class ProductAdmin(BaseModelAdmin):
+    list_display = ("thumb", "product_name", "price", "margin_hint", "quality_score",
+                    "img_count", "variant_count", "stock", "category", "sync_badge",
+                    "is_available", "is_bestseller")
+    list_display_links = ("thumb", "product_name")
     list_filter = ("category", "is_available", "is_bestseller", "is_featured",
-                   "printify_sync_status", "printify_visible")
+                   "printify_sync_status", "printify_visible",
+                   PrintifyFilter, MissingImageFilter, MissingPriceFilter, StaleSyncFilter)
     list_editable = ("is_available", "is_bestseller")
+    list_select_related = ("category",)
     search_fields = ("product_name", "sku", "printify_product_id")
     prepopulated_fields = {"slug": ("product_name",)}
-    readonly_fields = ("printify_synced_at", "printify_sync_error", "printify_panel")
+    readonly_fields = ("printify_synced_at", "printify_sync_error", "printify_panel", "big_preview")
     inlines = [ProductImageInline, VariationInline, DescriptionTranslationInline]
-    actions = ["resync_from_printify", "audit_data_quality", "translate_missing_descriptions"]
+    actions = ["resync_from_printify", "audit_data_quality", "translate_missing_descriptions",
+               "bulk_activate", "bulk_deactivate", "bulk_mark_stale"]
+
+    def get_queryset(self, request):
+        # annotate counts once -> no N+1 for img_count / variant_count in the list
+        return (super().get_queryset(request)
+                .annotate(_img_n=Count("gallery", distinct=True),
+                          _var_n=Count("variation", distinct=True)))
+
+    @admin.display(description="")
+    def thumb(self, obj):
+        src = ""
+        first = obj.gallery.first() if hasattr(obj, "gallery") else None
+        if first and getattr(first, "image", None):
+            try:
+                src = first.image.url
+            except Exception:
+                src = ""
+        if not src and obj.images:
+            try:
+                src = obj.images.url
+            except Exception:
+                src = ""
+        if not src:
+            return mark_safe('<div style="width:44px;height:44px;border-radius:8px;'
+                             'background:rgba(120,120,120,.15);display:flex;align-items:center;'
+                             'justify-content:center;font-size:10px;opacity:.6;">&mdash;</div>')
+        return format_html('<img src="{}" style="width:44px;height:44px;object-fit:cover;'
+                           'border-radius:8px;" loading="lazy">', src)
+
+    @admin.display(description=_("Full preview"))
+    def big_preview(self, obj):
+        imgs = list(obj.gallery.all()[:6]) if hasattr(obj, "gallery") else []
+        srcs = []
+        for im in imgs:
+            try:
+                srcs.append(im.image.url)
+            except Exception:
+                pass
+        if not srcs and obj.images:
+            try:
+                srcs = [obj.images.url]
+            except Exception:
+                srcs = []
+        if not srcs:
+            return _("No images")
+        from django.utils.html import escape
+        inner = "".join(
+            '<img src="%s" style="width:110px;height:110px;object-fit:cover;border-radius:10px;">' % escape(s)
+            for s in srcs)
+        return mark_safe("<div style='display:flex;gap:8px;flex-wrap:wrap;'>%s</div>" % inner)
+
+    @admin.display(description=_("Imgs"), ordering="_img_n")
+    def img_count(self, obj):
+        n = getattr(obj, "_img_n", None)
+        n = n if n is not None else (obj.gallery.count() if hasattr(obj, "gallery") else 0)
+        color = "#dc2626" if not n else "inherit"
+        return format_html('<span style="color:{}">{}</span>', color, n)
+
+    @admin.display(description=_("Vars"), ordering="_var_n")
+    def variant_count(self, obj):
+        n = getattr(obj, "_var_n", None)
+        n = n if n is not None else obj.variation_set.count()
+        return n
+
+    @admin.action(description=_("Activate selected"))
+    def bulk_activate(self, request, queryset):
+        n = queryset.update(is_available=True)
+        self.message_user(request, _("Activated %(n)d product(s).") % {"n": n})
+
+    @admin.action(description=_("Deactivate selected"))
+    def bulk_deactivate(self, request, queryset):
+        n = queryset.update(is_available=False)
+        self.message_user(request, _("Deactivated %(n)d product(s).") % {"n": n})
+
+    @admin.action(description=_("Mark Printify sync stale (selected)"))
+    def bulk_mark_stale(self, request, queryset):
+        old = timezone.now() - timezone.timedelta(days=3650)
+        n = queryset.exclude(printify_product_id__isnull=True).exclude(
+            printify_product_id="").update(printify_synced_at=old)
+        self.message_user(request, _("Marked %(n)d Printify product(s) as stale.") % {"n": n})
     fieldsets = (
         (None, {"fields": ("product_name", "slug", "category", "description")}),
         (_("Pricing & stock"), {"fields": ("price", "compare_at_price", "base_cost",
                                            "stock", "is_available")}),
         (_("Premium content"), {"fields": ("composition", "fit_notes", "care_instructions")}),
-        (_("Merchandising"), {"fields": ("is_bestseller", "is_featured", "images")}),
+        (_("Merchandising"), {"fields": ("is_bestseller", "is_featured", "images", "big_preview")}),
         (_("Printify"), {"fields": ("printify_panel", "printify_product_id",
                                     "printify_blueprint_id", "printify_provider_id", "sku",
                                     "printify_blueprint_title", "printify_provider_name",
