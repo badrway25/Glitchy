@@ -25,6 +25,11 @@ local Windows dev machine; **no real staging host exists**.
 | Security | ✅ Strong (dev) | No secrets in git, push/shipping/payments OFF. Key rotation still pending. |
 
 ## 2. What is genuinely COMPLETE
+- **Ultra-premium admin login** (Phase 70): a split-panel luxury sign-in — espresso/gold brand
+  hero with the **animated Glitchy monogram** (cream "G" + tricolore glitch strokes that
+  oscillate left↔right, matching the site logo, reduced-motion safe), trust notes and an
+  environment badge, beside an elevated form card with refined focus/error states. No token/PII
+  in the HTML (test-asserted). No migration/dependency. See `docs/ADMIN_PREMIUM_LOGIN_2026.md`.
 - **Ultra-premium admin visual analytics + motion** (Phase 69): the Unfold admin dashboard is
   now a luxury "Commerce Studio" decision panel — a champagne/espresso design system, sober
   motion (reveal, count-up, ring/bar draw, `prefers-reduced-motion` safe, no CLS), and **real
