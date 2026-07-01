@@ -6,8 +6,25 @@ from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
+try:
+    from unfold.admin import ModelAdmin as BaseModelAdmin
+    from unfold.admin import TabularInline as BaseTabularInline
+except Exception:
+    from django.contrib.admin import ModelAdmin as BaseModelAdmin
+    from django.contrib.admin import TabularInline as BaseTabularInline
+
 from .models import Order, OrderProduct, Payment
 from .services import push_order_to_printify
+
+
+def _pill(text, color, *, solid=False):
+    """A refined status/label pill — soft tinted by default, matching the premium palette."""
+    if solid:
+        style = ("background:%s;color:#fff;" % color)
+    else:
+        style = ("background:%s1f;color:%s;box-shadow:inset 0 0 0 1px %s3d;" % (color, color, color))
+    return format_html('<span style="{}padding:2px 10px;border-radius:999px;font-size:11px;'
+                       'font-weight:600;white-space:nowrap;">{}</span>', mark_safe(style), text)
 
 # Net-margin expression reused for annotation/filtering/aggregation.
 NET_MARGIN_EXPR = (
@@ -90,7 +107,7 @@ class MarginBandFilter(admin.SimpleListFilter):
         return queryset
 
 
-class OrderProductInline(admin.TabularInline):
+class OrderProductInline(BaseTabularInline):
     model = OrderProduct
     readonly_fields = ("payment", "user", "product", "quantity", "product_price",
                        "production_cost", "ordered")
@@ -98,11 +115,11 @@ class OrderProductInline(admin.TabularInline):
 
 
 @admin.register(Order)
-class OrderAdmin(admin.ModelAdmin):
+class OrderAdmin(BaseModelAdmin):
     change_list_template = "admin/orders/order_changelist.html"
-    list_display = ("order_number", "masked_email", "actor", "status", "is_ordered",
+    list_display = ("order_number", "actor", "status_badge", "is_ordered",
                     "total_display", "margin_display", "margin_pct_display",
-                    "refunded_display", "printify_status", "created_at")
+                    "refunded_display", "printify_badge", "created_at")
     list_filter = ("status", "is_ordered", "is_guest", MarginBandFilter, "created_at")
     search_fields = ("order_number", "first_name", "last_name", "email", "phone",
                      "printify_order_id")
@@ -141,18 +158,32 @@ class OrderAdmin(admin.ModelAdmin):
             return mask_email(obj.user.email)
         return mask_name(obj.first_name, obj.last_name) or "—"
 
+    @admin.display(description=_("Status"), ordering="status")
+    def status_badge(self, obj):
+        colors = {"New": "#64748b", "Accepted": "#2563eb", "In production": "#a6824c",
+                  "Completed": "#16a34a", "Cancelled": "#dc2626"}
+        label = obj.get_status_display() if hasattr(obj, "get_status_display") else obj.status
+        return _pill(label, colors.get(obj.status, "#64748b"))
+
+    @admin.display(description=_("Printify"))
+    def printify_badge(self, obj):
+        s = obj.printify_status or "—"
+        if s in ("—", "", None):
+            return "—"
+        colors = {"error": "#dc2626", "fulfilled": "#16a34a", "in_production": "#a6824c",
+                  "on-hold": "#d97706"}
+        return _pill(s, colors.get(s, "#64748b"))
+
     @admin.display(description=_("Total"))
     def total_display(self, obj):
-        return f"{obj.currency} {obj.order_total:.2f}"
+        return format_html('<span style="font-variant-numeric:tabular-nums;">{}</span>',
+                           f"{obj.currency} {obj.order_total:.2f}")
 
     @admin.display(description=_("Net margin"))
     def margin_display(self, obj):
         m = obj.margins()
         colors = {"good": "#16a34a", "low": "#d97706", "negative": "#dc2626"}
-        return format_html(
-            '<span style="background:{};color:#fff;padding:2px 8px;border-radius:999px;'
-            'font-weight:600;font-size:11px;">{}</span>',
-            colors.get(m.band, "#64748b"), f"{m.currency} {m.net_margin:.2f}")
+        return _pill(f"{m.currency} {m.net_margin:.2f}", colors.get(m.band, "#64748b"))
 
     @admin.display(description=_("Margin %"))
     def margin_pct_display(self, obj):
@@ -212,7 +243,7 @@ class OrderAdmin(admin.ModelAdmin):
 
 
 @admin.register(Payment)
-class PaymentAdmin(admin.ModelAdmin):
+class PaymentAdmin(BaseModelAdmin):
     list_display = ("payment_id", "user", "email", "payment_method", "amount_paid",
                     "status", "created_at")
     search_fields = ("payment_id", "email")

@@ -2,35 +2,36 @@
 {% load i18n %}
 
 {% block content_title %}
-  <h1>{% trans "Orders" %}</h1>
+  <h1 style="font-size:1.4rem;font-weight:800;margin:0 0 .25rem;">{% trans "Orders" %}</h1>
 {% endblock %}
 
 {% block result_list %}
   {% if kpis %}
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:0 0 18px;">
-    <div style="background:#0f172a;color:#fff;border-radius:12px;padding:14px 16px;">
-      <div style="font-size:11px;opacity:.7;text-transform:uppercase;letter-spacing:.5px;">{% trans "Total sales" %}</div>
-      <div style="font-size:22px;font-weight:700;margin-top:4px;">{{ kpis.currency }} {{ kpis.sales }}</div>
+  {# Cohesive premium KPI cards — uniform surface + subtle border; only the value carries a semantic colour. #}
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.75rem;margin:0 0 1.5rem;">
+    <div style="border:1px solid rgba(120,120,120,.22);border-radius:14px;padding:1rem 1.1rem;background:rgba(166,130,76,.05);">
+      <div style="font-size:.7rem;opacity:.6;text-transform:uppercase;letter-spacing:.06em;font-weight:600;">{% trans "Total sales" %}</div>
+      <div style="font-size:1.5rem;font-weight:800;margin-top:.35rem;line-height:1;">{{ kpis.currency }} {{ kpis.sales }}</div>
     </div>
-    <div style="background:#1e293b;color:#fff;border-radius:12px;padding:14px 16px;">
-      <div style="font-size:11px;opacity:.7;text-transform:uppercase;letter-spacing:.5px;">{% trans "Printify costs" %}</div>
-      <div style="font-size:22px;font-weight:700;margin-top:4px;">{{ kpis.currency }} {{ kpis.printify_costs }}</div>
+    <div style="border:1px solid rgba(120,120,120,.22);border-radius:14px;padding:1rem 1.1rem;">
+      <div style="font-size:.7rem;opacity:.6;text-transform:uppercase;letter-spacing:.06em;font-weight:600;">{% trans "Printify costs" %}</div>
+      <div style="font-size:1.5rem;font-weight:800;margin-top:.35rem;line-height:1;opacity:.85;">{{ kpis.currency }} {{ kpis.printify_costs }}</div>
     </div>
-    <div style="background:{% if kpis.net_margin >= 0 %}#166534{% else %}#991b1b{% endif %};color:#fff;border-radius:12px;padding:14px 16px;">
-      <div style="font-size:11px;opacity:.7;text-transform:uppercase;letter-spacing:.5px;">{% trans "Net margin" %}</div>
-      <div style="font-size:22px;font-weight:700;margin-top:4px;">{{ kpis.currency }} {{ kpis.net_margin }}</div>
+    <div style="border:1px solid rgba(120,120,120,.22);border-radius:14px;padding:1rem 1.1rem;">
+      <div style="font-size:.7rem;opacity:.6;text-transform:uppercase;letter-spacing:.06em;font-weight:600;">{% trans "Net margin" %}</div>
+      <div style="font-size:1.5rem;font-weight:800;margin-top:.35rem;line-height:1;color:{% if kpis.net_margin >= 0 %}#16a34a{% else %}#dc2626{% endif %};">{{ kpis.currency }} {{ kpis.net_margin }}</div>
     </div>
-    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;">
-      <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.5px;">{% trans "Refunded" %}</div>
-      <div style="font-size:22px;font-weight:700;margin-top:4px;color:#dc2626;">{{ kpis.refunded_orders }}</div>
+    <div style="border:1px solid rgba(120,120,120,.22);border-radius:14px;padding:1rem 1.1rem;">
+      <div style="font-size:.7rem;opacity:.6;text-transform:uppercase;letter-spacing:.06em;font-weight:600;">{% trans "Refunded" %}</div>
+      <div style="font-size:1.5rem;font-weight:800;margin-top:.35rem;line-height:1;color:{% if kpis.refunded_orders %}#dc2626{% else %}inherit{% endif %};">{{ kpis.refunded_orders }}</div>
     </div>
-    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;">
-      <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.5px;">{% trans "In error" %}</div>
-      <div style="font-size:22px;font-weight:700;margin-top:4px;color:#d97706;">{{ kpis.error_orders }}</div>
+    <div style="border:1px solid rgba(120,120,120,.22);border-radius:14px;padding:1rem 1.1rem;">
+      <div style="font-size:.7rem;opacity:.6;text-transform:uppercase;letter-spacing:.06em;font-weight:600;">{% trans "In error" %}</div>
+      <div style="font-size:1.5rem;font-weight:800;margin-top:.35rem;line-height:1;color:{% if kpis.error_orders %}#d97706{% else %}inherit{% endif %};">{{ kpis.error_orders }}</div>
     </div>
-    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;">
-      <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.5px;">{% trans "To fulfil" %}</div>
-      <div style="font-size:22px;font-weight:700;margin-top:4px;color:#2563eb;">{{ kpis.to_complete }}</div>
+    <div style="border:1px solid rgba(120,120,120,.22);border-radius:14px;padding:1rem 1.1rem;">
+      <div style="font-size:.7rem;opacity:.6;text-transform:uppercase;letter-spacing:.06em;font-weight:600;">{% trans "To fulfil" %}</div>
+      <div style="font-size:1.5rem;font-weight:800;margin-top:.35rem;line-height:1;color:{% if kpis.to_complete %}#a6824c{% else %}inherit{% endif %};">{{ kpis.to_complete }}</div>
     </div>
   </div>
   {% endif %}
