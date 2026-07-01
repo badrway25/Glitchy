@@ -417,3 +417,131 @@ def pull_order_statuses(limit=20, client=None) -> SyncLog:
         log.finished_at = timezone.now()
         log.save()
     return log
+
+
+# --------------------------------------------------------------------------- #
+# Admin-driven Printify: use the ADMIN CONFIG credentials (not env), discover
+# shops, and import the catalogue into the LOCAL DB only. Never publishes a
+# product and never creates an order. No token is ever logged or returned.
+# --------------------------------------------------------------------------- #
+def _safe_printify_error(exc) -> str:
+    """Map a PrintifyError to a short, non-sensitive message (no payload/token)."""
+    status = getattr(exc, "status", None)
+    return {
+        401: "Invalid or expired token (401).",
+        403: "Token is missing the required scopes (403).",
+        404: "Not found — check the shop ID (404).",
+        429: "Rate limited by Printify (429). Try again shortly.",
+    }.get(status, "Could not reach Printify (network/timeout).")
+
+
+def client_for_config(config):
+    """Build a PrintifyClient from an admin PrintifyAccountConfig (decrypted token +
+    numeric shop id). Server-side only — the token is never returned or logged."""
+    from .printify_client import PrintifyClient
+    return PrintifyClient(token=config.get_token() or "", shop_id=str(config.shop_id or ""))
+
+
+def discover_shops(config) -> dict:
+    """List the Printify shops for the config's token (read-only GET /v1/shops.json).
+    Returns safe data only: id, title, sales_channel. Never the token."""
+    from .printify_client import PrintifyError
+    if not config.get_token():
+        return {"ok": False, "error": "No token set — save a token first.", "shops": []}
+    try:
+        shops = client_for_config(config).get_shops() or []
+        return {"ok": True, "error": "", "shops": [
+            {"id": str(s.get("id", "")), "title": str(s.get("title", ""))[:80],
+             "sales_channel": str(s.get("sales_channel", ""))[:40]}
+            for s in shops if s.get("id")]}
+    except PrintifyError as exc:
+        return {"ok": False, "error": _safe_printify_error(exc), "shops": []}
+    except Exception:
+        return {"ok": False, "error": "Could not reach Printify (network/timeout).", "shops": []}
+
+
+def import_catalog_from_config(config, *, apply=True, limit=50, max_pages=20) -> tuple:
+    """Import/update the local catalogue from the config's Printify shop.
+
+    apply=False -> DRY RUN (reads + simulates mapping, writes nothing).
+    Uses the admin config credentials, requires a NUMERIC shop id, updates only local
+    Product/Gallery/Variation, never publishes to Printify, never creates an order. Products
+    missing a price/image/category are imported HIDDEN (is_available=False) and flagged
+    to-review. Returns (report_dict, SyncLog). No token is logged.
+    """
+    from django.conf import settings as dj_settings
+    from .printify_client import PrintifyError
+
+    log = SyncLog.objects.create(kind=SyncLog.KIND_PRODUCTS)
+    report = {"shop_id": str(config.shop_id or ""), "apply": bool(apply), "created": 0,
+              "updated": 0, "skipped": 0, "errors": 0, "hidden": 0, "missing_price": 0,
+              "missing_image": 0, "pages": 0, "to_review": [], "samples": [], "error": ""}
+
+    def _finish(status, msg):
+        log.status = status
+        log.created_count = report["created"]; log.updated_count = report["updated"]
+        log.error_count = report["errors"]
+        log.message = ("DRY-RUN: " if not apply else "") + msg
+        log.finished_at = timezone.now(); log.save()
+        return report, log
+
+    if not config.get_token():
+        report["error"] = "No token set — save a token first."
+        return _finish(SyncLog.STATUS_ERROR, report["error"])
+    if not str(config.shop_id or "").isdigit():
+        report["error"] = "Shop ID must be numeric — use Discover shops to select the right shop."
+        return _finish(SyncLog.STATUS_ERROR, report["error"])
+
+    settings_map = getattr(dj_settings, "PRINTIFY_BLUEPRINT_CATEGORY_MAP", {}) or {}
+    fallback_category = _resolve_fallback_category()
+    client = client_for_config(config)
+    try:
+        for page in range(1, max_pages + 1):
+            payload = client.list_products(limit=limit, page=page)
+            data = (payload or {}).get("data") or []
+            if not data:
+                break
+            report["pages"] += 1
+            for p in data:
+                pid = str(p.get("id") or ""); title = (p.get("title") or "").strip()
+                if not pid or not title:
+                    report["skipped"] += 1
+                    continue
+                price, _cost = _enabled_variant_info(p)
+                has_img = bool(p.get("images"))
+                if not price:
+                    report["missing_price"] += 1
+                if not has_img:
+                    report["missing_image"] += 1
+                if len(report["samples"]) < 8:
+                    report["samples"].append({"title": title[:48], "price": round(price or 0),
+                                              "has_image": has_img})
+                exists = Product.objects.filter(printify_product_id=pid).exists()
+                if not apply:
+                    report["updated" if exists else "created"] += 1
+                    continue
+                try:
+                    obj, is_new = _upsert_product(p, fallback_category, settings_map, False)
+                    if obj is None:
+                        report["skipped"] += 1
+                        continue
+                    missing = (obj.price or 0) <= 0 or not has_img or obj.category_id is None
+                    if missing and obj.is_available:
+                        obj.is_available = False
+                        obj.save(update_fields=["is_available"])
+                        report["hidden"] += 1
+                    if missing:
+                        report["to_review"].append(obj.slug)
+                    report["created" if is_new else "updated"] += 1
+                except Exception as exc:
+                    report["errors"] += 1
+                    logger.warning("Import error for %s: %s", p.get("id"), exc)
+        status = SyncLog.STATUS_OK if report["errors"] == 0 else SyncLog.STATUS_PARTIAL
+        return _finish(status, "created=%d updated=%d hidden=%d skipped=%d errors=%d" % (
+            report["created"], report["updated"], report["hidden"], report["skipped"], report["errors"]))
+    except PrintifyError as exc:
+        report["error"] = _safe_printify_error(exc)
+        return _finish(SyncLog.STATUS_ERROR, report["error"])
+    except Exception:
+        report["error"] = "Could not reach Printify (network/timeout)."
+        return _finish(SyncLog.STATUS_ERROR, report["error"])
