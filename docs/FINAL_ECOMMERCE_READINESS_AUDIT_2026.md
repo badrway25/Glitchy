@@ -15,7 +15,7 @@ local Windows dev machine; **no real staging host exists**.
 | Premium design | ✅ Mostly | Consistent token system, premium components. Some legacy CSS duplication remains (theme.css has 3 cart blocks). |
 | Responsive | ✅ Done | 375/390/1280/1440 verified, 0 overflow across the matrix. |
 | Dark mode | ✅ Done | Systemic dark-mode pass; readable text/buttons/bands. (This audit's filter fix closes the last yellow-tint gap.) |
-| Printify integration | ⚠️ Partial | Real READ data cached in DB for 2 products; **shipping is fallback**, push OFF, **variants stale** (live 18 vs site 12), no real orders. |
+| Printify integration | ⚠️ Partial | **Admin-driven import now works** (Discover shops → Use this shop → Sync, local catalogue only, Phase 72). Still: **shipping is fallback**, push OFF, no real orders; the background daemon still reads the env token (follow-up). |
 | Translations EN/IT/FR | ✅ Done | All customer-facing strings localized; FR `.po` corruption (made-on-demand) fixed. OpenAI translation cached for 1 product. |
 | Cart | ✅ Done | Premium remove modal, transparent surfaces, qty stepper, coupon, free-ship, empty state. |
 | Checkout | ⚠️ Partial | Works (guest + Stripe TEST), dark-aware. No step indicator / inline per-field errors / webhook tested on a public URL. |
@@ -25,6 +25,16 @@ local Windows dev machine; **no real staging host exists**.
 | Security | ✅ Strong (dev) | No secrets in git, push/shipping/payments OFF. Key rotation still pending. |
 
 ## 2. What is genuinely COMPLETE
+- **Printify admin connection + shop discovery + catalog import** (Phase 72): the admin is now
+  operational end-to-end. Root cause of "credentials entered but nothing imported": sync used
+  the *env* token (not the admin config), the actions were changelist-only (no change-form
+  buttons), and `shop_id` was a free text field holding a shop *name* (`Fabricon`) instead of
+  the numeric id. Fix: `shop_id` is button-driven — **Discover shops** (`GET /shops.json`) →
+  **Use this shop** saves the numeric id (+ title/channel) → **Test connection** / **Dry-run**
+  / **Sync products now** import via the config credentials into the local catalogue only.
+  Missing-data products import hidden (to review). Publishing + order creation stay OFF; no
+  publish/order endpoint is ever called; token never leaks. Migration `0006`. See
+  `docs/PRINTIFY_ADMIN_CONNECTION_SHOP_DISCOVERY_CATALOG_IMPORT_2026.md`.
 - **Admin forms premium polish** (Phase 71): fixed the flagged PrintifyAccountConfig add form
   — its custom ModelForm's inputs rendered as bare ~invisible `vTextField` because Unfold only
   styles its own widgets; now every widget gets Unfold's input classes. Added a form CSS
