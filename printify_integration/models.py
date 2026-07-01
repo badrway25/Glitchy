@@ -6,6 +6,100 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 
+class PrintifyAccountConfig(models.Model):
+    """Admin-managed Printify account + sync governance.
+
+    Security: the API token is NEVER stored in plaintext. `set_token()` encrypts it with
+    Fernet (key from env) and records only a one-way fingerprint + last-4 for display.
+    `get_token()` decrypts server-side at call time (sync / test connection) and its result is
+    never rendered or logged. All dangerous switches default OFF.
+    """
+
+    SYNC_MODE_DRY = "dry_run"
+    SYNC_MODE_READ = "read_only"
+    SYNC_MODE_APPLY = "apply_catalog"
+    SYNC_MODES = [
+        (SYNC_MODE_DRY, _("Dry run — read only, no DB writes")),
+        (SYNC_MODE_READ, _("Read-only catalog — cache reads, no writes")),
+        (SYNC_MODE_APPLY, _("Apply catalog (safe) — update local catalog only")),
+    ]
+
+    name = models.CharField(max_length=80, default="Primary")
+    is_active = models.BooleanField(default=False, help_text=_("Use this account for sync / test connection."))
+    shop_id = models.CharField(max_length=40, blank=True, default="")
+
+    # --- secret: never exposed. All fields non-editable in forms/admin. ---
+    token_ciphertext = models.TextField(blank=True, default="", editable=False)
+    token_fingerprint = models.CharField(max_length=16, blank=True, default="", editable=False)
+    token_last_four = models.CharField(max_length=4, blank=True, default="", editable=False)
+    token_set_at = models.DateTimeField(null=True, blank=True, editable=False)
+    token_updated_by = models.CharField(max_length=150, blank=True, default="", editable=False)
+
+    # --- connection status (safe, no secret / no PII) ---
+    last_connection_check_at = models.DateTimeField(null=True, blank=True, editable=False)
+    last_connection_status = models.CharField(max_length=20, blank=True, default="", editable=False)
+    last_connection_error_safe = models.CharField(max_length=200, blank=True, default="", editable=False)
+    last_connection_shop_name = models.CharField(max_length=120, blank=True, default="", editable=False)
+    last_connection_product_count = models.PositiveIntegerField(null=True, blank=True, editable=False)
+
+    # --- sync governance (safe defaults) ---
+    sync_enabled = models.BooleanField(default=False)
+    sync_interval_seconds = models.PositiveIntegerField(default=1800)
+    sync_mode = models.CharField(max_length=20, choices=SYNC_MODES, default=SYNC_MODE_DRY)
+    allow_product_publish = models.BooleanField(default=False, help_text=_("Superuser only. Keep OFF."))
+    allow_order_creation = models.BooleanField(default=False, help_text=_("Superuser only. Keep OFF."))
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _("Printify account")
+        verbose_name_plural = _("Printify accounts")
+        ordering = ["-is_active", "name"]
+
+    def __str__(self):
+        flag = "★ " if self.is_active else ""
+        return f"{flag}{self.name}"
+
+    # -- token handling (server-side only) -----------------------------------
+    def has_token(self) -> bool:
+        return bool(self.token_ciphertext)
+
+    def set_token(self, plaintext, by=""):
+        """Encrypt + store a new token. Raises secrets.SecretKeyMissing if no key is set."""
+        from .secrets import encrypt_token, fingerprint
+        plaintext = (plaintext or "").strip()
+        if not plaintext:
+            return
+        self.token_ciphertext = encrypt_token(plaintext)
+        self.token_fingerprint = fingerprint(plaintext)
+        self.token_last_four = plaintext[-4:]
+        self.token_set_at = timezone.now()
+        self.token_updated_by = (by or "")[:150]
+
+    def clear_token(self):
+        self.token_ciphertext = ""
+        self.token_fingerprint = ""
+        self.token_last_four = ""
+        self.token_set_at = None
+
+    def get_token(self):
+        """Decrypt the token for a Printify call. NEVER render or log the result."""
+        from .secrets import decrypt_token
+        return decrypt_token(self.token_ciphertext)
+
+    def token_display(self):
+        """Safe masked representation for the admin — never the real token."""
+        if not self.token_last_four:
+            return "—"
+        return "•••• " + self.token_last_four
+
+    @classmethod
+    def active(cls):
+        """The active account, if any (used by the sync daemon / test connection)."""
+        return cls.objects.filter(is_active=True).order_by("-updated_at").first()
+
+
 class PrintifySyncState(models.Model):
     """Singleton (pk=1) coordinating the production-safe Printify sync daemon.
 
