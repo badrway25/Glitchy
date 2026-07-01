@@ -86,6 +86,10 @@ SITE_BASE_URL = env("SITE_BASE_URL", "http://127.0.0.1:8000")
 # Applications
 # --------------------------------------------------------------------------- #
 INSTALLED_APPS = [
+    # Unfold premium admin — MUST come before django.contrib.admin.
+    "unfold",
+    "unfold.contrib.filters",
+    "unfold.contrib.forms",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -111,6 +115,55 @@ INSTALLED_APPS = [
     # Third party
     "stripe",
 ]
+
+# --------------------------------------------------------------------------- #
+# Unfold premium admin — "Glitchy Commerce Studio" control center.
+# Brand: espresso ink + champagne gold (matches the storefront tokens).
+# --------------------------------------------------------------------------- #
+UNFOLD = {
+    "SITE_TITLE": "Glitchy Commerce Studio",
+    "SITE_HEADER": "Glitchy Commerce Studio",
+    "SITE_SUBHEADER": "Print-on-demand operations",
+    "SITE_URL": "/",
+    "SHOW_HISTORY": True,
+    "SHOW_VIEW_ON_SITE": True,
+    "ENVIRONMENT": "greatkart.admin_ext.environment_callback",
+    "DASHBOARD_CALLBACK": "greatkart.admin_ext.dashboard_callback",
+    "COLORS": {
+        "primary": {
+            "50": "250 247 240", "100": "243 236 222", "200": "230 214 184",
+            "300": "214 187 140", "400": "194 156 96", "500": "166 130 76",
+            "600": "140 108 62", "700": "112 86 50", "800": "84 65 40",
+            "900": "60 47 30", "950": "34 26 17",
+        },
+    },
+    "SIDEBAR": {
+        "show_search": True,
+        "show_all_applications": True,
+        "navigation": [
+            {
+                "title": "Commerce",
+                "separator": True,
+                "items": [
+                    {"title": "Products", "icon": "inventory_2", "link": "/admin/store/product/"},
+                    {"title": "Categories", "icon": "category", "link": "/admin/category/category/"},
+                    {"title": "Orders", "icon": "receipt_long", "link": "/admin/orders/order/"},
+                    {"title": "Customers", "icon": "group", "link": "/admin/accounts/account/"},
+                ],
+            },
+            {
+                "title": "Printify control",
+                "separator": True,
+                "items": [
+                    {"title": "Printify accounts", "icon": "vpn_key", "link": "/admin/printify_integration/printifyaccountconfig/"},
+                    {"title": "Sync monitor", "icon": "sync", "link": "/admin/printify_integration/printifysyncstate/"},
+                    {"title": "Sync logs", "icon": "history", "link": "/admin/printify_integration/synclog/"},
+                    {"title": "Shipping profiles", "icon": "local_shipping", "link": "/admin/printify_integration/printifyshippingprofile/"},
+                ],
+            },
+        ],
+    },
+}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -292,6 +345,10 @@ ADMIN_NOTIFY_EMAIL = env("ADMIN_NOTIFY_EMAIL", EMAIL_HOST_USER or "")
 # --------------------------------------------------------------------------- #
 PRINTIFY_API_TOKEN = env("PRINTIFY_API_TOKEN", "")
 PRINTIFY_SHOP_ID = env("PRINTIFY_SHOP_ID", "")
+# Fernet key (from env only, never in the repo) that encrypts an admin-entered Printify token
+# at rest. Generate once: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+# If unset, the admin refuses to save a token (fail-closed); env PRINTIFY_API_TOKEN still works.
+PRINTIFY_CONFIG_KEY = env("PRINTIFY_CONFIG_KEY", "")
 # Safety switch: when False, orders are NOT pushed to the real Printify shop
 # (used for integration dry-runs so no real Printify order is created).
 PRINTIFY_PUSH_ENABLED = env_bool("PRINTIFY_PUSH_ENABLED", True)
