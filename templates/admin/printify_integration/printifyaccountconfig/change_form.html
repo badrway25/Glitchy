@@ -1,0 +1,52 @@
+{% extends "admin/change_form.html" %}
+{% load i18n %}
+
+{% block content %}
+{{ block.super }}
+
+{% if original and gl_is_superadmin %}
+<div class="gl-card gl-printify-ops" style="margin-top:1.5rem;max-width:960px;">
+  <div class="gl-eyebrow" style="margin-top:0;">{% trans "Printify operations" %}</div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:.55rem;align-items:center;margin-bottom:.4rem;">
+    {% if gl_token_present %}
+      <form method="post" action="{% url 'admin:printify_integration_printifyaccountconfig_discover' original.pk %}">
+        {% csrf_token %}<button type="submit" class="gl-action">{% trans "Discover shops" %}</button></form>
+      <form method="post" action="{% url 'admin:printify_integration_printifyaccountconfig_test' original.pk %}">
+        {% csrf_token %}<button type="submit" class="gl-action">{% trans "Test connection" %}</button></form>
+      {% if gl_has_shop %}
+        <form method="post" action="{% url 'admin:printify_integration_printifyaccountconfig_dryrun' original.pk %}">
+          {% csrf_token %}<button type="submit" class="gl-action">{% trans "Dry-run catalog sync" %}</button></form>
+        <form method="post" action="{% url 'admin:printify_integration_printifyaccountconfig_sync' original.pk %}">
+          {% csrf_token %}<button type="submit" class="gl-action"
+            style="border-color:var(--gl-gold);background:color-mix(in srgb,var(--gl-gold) 18%,transparent);">
+            {% trans "Sync products now" %}</button></form>
+      {% endif %}
+    {% else %}
+      <div style="opacity:.75;font-size:.88rem;">
+        {% trans "Save an API token first, then Discover shops, Test connection and Sync will appear here." %}</div>
+    {% endif %}
+  </div>
+
+  {% if gl_token_present and not gl_has_shop %}
+    <p style="font-size:.82rem;color:var(--gl-muted);margin:.2rem 0 0;">
+      {% trans "No shop selected yet — click Discover shops, then Use this shop. A shop ID must be numeric; a shop name (e.g. Fabricon) is not valid." %}</p>
+  {% endif %}
+
+  {% if gl_shops %}
+  <div class="gl-eyebrow">{% trans "Available Printify shops" %}</div>
+  <div style="display:flex;flex-direction:column;gap:.5rem;">
+    {% for s in gl_shops %}
+    <div class="gl-issue" style="justify-content:space-between;">
+      <span><code>{{ s.id }}</code> &nbsp; <strong>{{ s.title }}</strong>
+        {% if s.sales_channel %}<span style="opacity:.6;">· {{ s.sales_channel }}</span>{% endif %}
+        {% if s.suggested %} <span class="gl-badge sev-info">{% trans "suggested" %}</span>{% endif %}</span>
+      <form method="post" action="{% url 'admin:printify_integration_printifyaccountconfig_use_shop' original.pk s.id %}">
+        {% csrf_token %}<button type="submit" class="gl-action" style="padding:.35rem .85rem;">{% trans "Use this shop" %}</button></form>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

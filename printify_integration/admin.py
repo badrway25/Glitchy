@@ -30,7 +30,9 @@ class PrintifyAccountConfigForm(forms.ModelForm):
 
     class Meta:
         model = PrintifyAccountConfig
-        fields = ("name", "is_active", "shop_id", "new_token", "sync_enabled",
+        # shop_id is intentionally NOT here — it is chosen via "Discover shops" -> "Use this
+        # shop" (numeric id only), never typed by hand.
+        fields = ("name", "is_active", "new_token", "sync_enabled",
                   "sync_interval_seconds", "sync_mode", "allow_product_publish",
                   "allow_order_creation")
 
@@ -79,23 +81,26 @@ class PrintifyAccountConfigAdmin(admin.ModelAdmin):
                     "sync_mode", "connection_state", "updated_at")
     list_filter = ("is_active", "sync_enabled", "sync_mode")
     search_fields = ("name", "shop_id")
-    actions = ["action_test_connection", "action_sync_dry_run", "action_sync_apply_safe"]
-    readonly_fields = ("token_state_detail", "connection_state_detail", "token_set_at",
-                       "token_updated_by", "created_at", "updated_at")
-    # Full layout (editing an existing account) — includes the read-only status/meta blocks.
+    change_form_template = "admin/printify_integration/printifyaccountconfig/change_form.html"
+    readonly_fields = ("token_state_detail", "connection_state_detail", "printify_ops_panel",
+                       "token_set_at", "token_updated_by", "created_at", "updated_at")
+    # Full layout (editing an existing account) — includes the operations panel + status blocks.
     fieldsets = (
-        (_("Account"), {"fields": ("name", "is_active", "shop_id")}),
+        (_("Account"), {"fields": ("name", "is_active")}),
         (_("API token (write-only)"), {"fields": ("new_token", "token_state_detail",
                                                   "token_set_at", "token_updated_by")}),
+        (_("Printify shop & operations"), {"fields": ("printify_ops_panel",)}),
         (_("Sync governance"), {"fields": ("sync_enabled", "sync_interval_seconds", "sync_mode",
                                            "allow_product_publish", "allow_order_creation")}),
         (_("Connection status (read-only)"), {"fields": ("connection_state_detail",)}),
         (_("Meta"), {"fields": ("created_at", "updated_at")}),
     )
-    # Slim layout when CREATING — auto/read-only fields (token status, connection, created/
-    # updated) are empty on add, so they're hidden until the account exists.
+    # Slim layout when CREATING — no shop_id (chosen after save via Discover shops), no
+    # auto/read-only fields (empty on add).
     add_fieldsets = (
-        (_("Account"), {"fields": ("name", "is_active", "shop_id")}),
+        (_("Account"), {"fields": ("name", "is_active"),
+                        "description": _("Enter a name and API token, then Save. After saving, "
+                                         "use 'Discover shops' to select your Printify shop.")}),
         (_("API token (write-only)"), {"fields": ("new_token",)}),
         (_("Sync governance"), {"fields": ("sync_enabled", "sync_interval_seconds", "sync_mode",
                                            "allow_product_publish", "allow_order_creation")}),
@@ -117,6 +122,146 @@ class PrintifyAccountConfigAdmin(admin.ModelAdmin):
             # non-superusers cannot enter a token at all
             form.base_fields.pop("new_token", None)
         return form
+
+    # -- Printify operations: status panel (buttons live in the change_form template) --------
+    @admin.display(description=_("Printify shop & operations"))
+    def printify_ops_panel(self, obj):
+        from django.utils.safestring import mark_safe
+        if obj is None or not obj.pk:
+            return _("Save the account first, then use 'Discover shops'.")
+        rows = []
+        if obj.has_valid_shop():
+            rows.append("<div style='font-weight:700;margin-bottom:.2rem;'>%s</div>" % _("Selected shop"))
+            rows.append("<div>ID: <code>%s</code></div>" % obj.shop_id)
+            if obj.shop_title:
+                rows.append("<div>%s: <strong>%s</strong></div>" % (_("Title"), obj.shop_title))
+            if obj.shop_sales_channel:
+                rows.append("<div>%s: %s</div>" % (_("Sales channel"), obj.shop_sales_channel))
+        elif obj.shop_id:
+            rows.append("<div style='color:#b3554e;font-weight:600;'>%s</div>" % (
+                _("“%s” looks like a shop name, not a numeric Printify shop ID. "
+                  "Use Discover shops to select the correct shop.") % obj.shop_id))
+        else:
+            rows.append("<div style='color:#8a8177;'>%s</div>" % _("No shop selected yet."))
+        last = SyncLog.objects.filter(kind=SyncLog.KIND_PRODUCTS).order_by("-started_at").first()
+        if last:
+            rows.append("<div style='margin-top:.5rem;opacity:.75;font-size:.85em;'>%s: %s</div>"
+                        % (_("Latest sync"), (last.message or "—")[:200]))
+        rows.append("<div style='margin-top:.5rem;opacity:.7;font-size:.82em;'>%s</div>"
+                    % _("Publishing and order creation stay OFF; sync updates the local catalogue only."))
+        return mark_safe("<div style='line-height:1.6;'>%s</div>" % "".join(rows))
+
+    # -- custom admin URLs (all state-changing ops are POST + superadmin-gated) --------------
+    def get_urls(self):
+        from django.urls import path
+        base = "printify_integration_printifyaccountconfig"
+        custom = [
+            path("<int:pk>/discover-shops/", self.admin_site.admin_view(self._discover_view),
+                 name="%s_discover" % base),
+            path("<int:pk>/use-shop/<str:shop_id>/", self.admin_site.admin_view(self._use_shop_view),
+                 name="%s_use_shop" % base),
+            path("<int:pk>/test-connection/", self.admin_site.admin_view(self._test_view),
+                 name="%s_test" % base),
+            path("<int:pk>/sync-now/", self.admin_site.admin_view(self._sync_view),
+                 name="%s_sync" % base),
+            path("<int:pk>/dry-run/", self.admin_site.admin_view(self._dryrun_view),
+                 name="%s_dryrun" % base),
+        ]
+        return custom + super().get_urls()
+
+    def _guard(self, request, pk):
+        from django.http import HttpResponseForbidden
+        if request.method != "POST":
+            return None, self._redirect(pk)
+        if not _is_superadmin(request.user):
+            return None, HttpResponseForbidden("Superuser only.")
+        cfg = PrintifyAccountConfig.objects.filter(pk=pk).first()
+        if not cfg:
+            return None, self._redirect(pk)
+        return cfg, None
+
+    def _redirect(self, pk):
+        from django.shortcuts import redirect
+        return redirect("admin:printify_integration_printifyaccountconfig_change", pk)
+
+    def _discover_view(self, request, pk):
+        cfg, err = self._guard(request, pk)
+        if err:
+            return err
+        from .services import discover_shops
+        res = discover_shops(cfg)
+        if res["ok"]:
+            request.session["printify_shops_%s" % pk] = res["shops"]
+            self.message_user(request, _("Found %(n)d shop(s). Pick one below with 'Use this shop'.")
+                              % {"n": len(res["shops"])})
+        else:
+            self.message_user(request, _("Discover shops failed: %(e)s") % {"e": res["error"]}, level="error")
+        return self._redirect(pk)
+
+    def _use_shop_view(self, request, pk, shop_id):
+        cfg, err = self._guard(request, pk)
+        if err:
+            return err
+        if not str(shop_id).isdigit():
+            self.message_user(request, _("Invalid shop ID (must be numeric)."), level="error")
+            return self._redirect(pk)
+        shops = request.session.get("printify_shops_%s" % pk, [])
+        shop = next((s for s in shops if str(s.get("id")) == str(shop_id)), {})
+        cfg.set_shop(shop_id, shop.get("title", ""), shop.get("sales_channel", ""))
+        cfg.save(update_fields=["shop_id", "shop_title", "shop_sales_channel", "shop_selected_at"])
+        request.session.pop("printify_shops_%s" % pk, None)
+        self.message_user(request, _("Shop selected successfully. You can now test connection or sync products."))
+        return self._redirect(pk)
+
+    def _test_view(self, request, pk):
+        cfg, err = self._guard(request, pk)
+        if err:
+            return err
+        self._test_one(request, cfg)
+        return self._redirect(pk)
+
+    def _sync_view(self, request, pk):
+        cfg, err = self._guard(request, pk)
+        if err:
+            return err
+        from .services import import_catalog_from_config
+        report, _log = import_catalog_from_config(cfg, apply=True)
+        if report.get("error"):
+            self.message_user(request, _("Sync failed: %(e)s") % {"e": report["error"]}, level="error")
+        else:
+            self.message_user(request, _("Sync done: %(c)d created, %(u)d updated, %(h)d hidden "
+                              "(to review), %(e)d errors.") % {"c": report["created"], "u": report["updated"],
+                              "h": report["hidden"], "e": report["errors"]})
+        return self._redirect(pk)
+
+    def _dryrun_view(self, request, pk):
+        cfg, err = self._guard(request, pk)
+        if err:
+            return err
+        from .services import import_catalog_from_config
+        report, _log = import_catalog_from_config(cfg, apply=False)
+        if report.get("error"):
+            self.message_user(request, _("Dry-run failed: %(e)s") % {"e": report["error"]}, level="error")
+        else:
+            self.message_user(request, _("Dry-run: would create %(c)d, update %(u)d "
+                              "(missing price %(mp)d, missing image %(mi)d).") % {"c": report["created"],
+                              "u": report["updated"], "mp": report["missing_price"], "mi": report["missing_image"]})
+        return self._redirect(pk)
+
+    def change_view(self, request, object_id, form_url="", extra_context=None):
+        extra_context = extra_context or {}
+        cfg = PrintifyAccountConfig.objects.filter(pk=object_id).first()
+        if cfg:
+            extra_context["gl_token_present"] = cfg.has_token()
+            extra_context["gl_has_shop"] = cfg.has_valid_shop()
+            extra_context["gl_is_superadmin"] = _is_superadmin(request.user)
+            shops = list(request.session.get("printify_shops_%s" % object_id, []))
+            hint = (cfg.shop_id or "").strip().lower()
+            for s in shops:
+                s["suggested"] = bool(hint and not hint.isdigit()
+                                      and s.get("title", "").strip().lower() == hint)
+            extra_context["gl_shops"] = shops
+        return super().change_view(request, object_id, form_url, extra_context)
 
     def save_model(self, request, obj, form, change):
         token = form.cleaned_data.get("new_token") if _is_superadmin(request.user) else ""
