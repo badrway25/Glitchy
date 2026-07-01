@@ -25,6 +25,14 @@ local Windows dev machine; **no real staging host exists**.
 | Security | ✅ Strong (dev) | No secrets in git, push/shipping/payments OFF. Key rotation still pending. |
 
 ## 2. What is genuinely COMPLETE
+- **Ultra-premium admin visual analytics + motion** (Phase 69): the Unfold admin dashboard is
+  now a luxury "Commerce Studio" decision panel — a champagne/espresso design system, sober
+  motion (reveal, count-up, ring/bar draw, `prefers-reduced-motion` safe, no CLS), and **real
+  CSS/SVG charts with NO CDN**: a catalog **health-score ring**, product-status **donuts**,
+  **Printify sync-health** (safe defaults badges, never the token), a 7-day orders
+  **sparkline**, category-readiness bars and wishlist demand. Fully server-computed (renders
+  without JS), aggregate (no N+1), no token/PII. 665 tests green, no migration. See
+  `docs/ADMIN_ULTRA_PREMIUM_VISUAL_ANALYTICS_MOTION_2026.md`.
 - **Premium Admin + Printify Control Center** (Phase 68-admin): Django **Unfold** admin
   ("Glitchy Commerce Studio") with a real KPI dashboard, thumbnail/filter-rich product admin,
   a `catalog_health_check` command, and premium order badges. Security core: a
