@@ -4,45 +4,196 @@
 {% block title %}{{ site_title|default:_('Django site admin') }}{% endblock %}
 
 {% block content %}
-<div class="gl-admin-dash" style="max-width:1200px;">
+<div class="gl-dash" style="max-width:1240px;">
 
-  <div style="margin-bottom:1.5rem;">
-    <h1 style="font-size:1.4rem;font-weight:800;margin:0 0 .25rem;">{% trans "Commerce control center" %}</h1>
-    <p style="opacity:.7;margin:0;font-size:.9rem;">{% trans "Catalog health, Printify operations and orders at a glance." %}</p>
+  <div class="gl-dash-head" data-gl-reveal>
+    <h1 class="gl-dash-title">{% trans "Commerce control center" %}</h1>
+    <p class="gl-dash-sub">{% trans "Catalog health, Printify operations and orders — at a glance." %}</p>
   </div>
 
-  {% if gl_catalog_kpis %}
-  <h2 style="font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;opacity:.6;margin:0 0 .6rem;">{% trans "Catalog" %}</h2>
-  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.75rem;margin-bottom:1.75rem;">
-    {% for k in gl_catalog_kpis %}
-      <a href="{{ k.url }}" style="display:block;text-decoration:none;border:1px solid rgba(120,120,120,.22);border-radius:12px;padding:.9rem 1rem;background:rgba(166,130,76,.04);">
-        <div style="font-size:1.6rem;font-weight:800;line-height:1;color:{% if k.tone == 'danger' and k.value %}#dc2626{% elif k.tone == 'warning' and k.value %}#d97706{% else %}inherit{% endif %};">{{ k.value }}</div>
-        <div style="font-size:.78rem;opacity:.7;margin-top:.3rem;">{{ k.label }}</div>
-      </a>
-    {% endfor %}
-  </div>
-  {% endif %}
+  {# ================= row 1: health ring + product status donuts ================= #}
+  <div class="gl-grid gl-grid-2">
 
-  {% if gl_commerce_kpis %}
-  <h2 style="font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;opacity:.6;margin:0 0 .6rem;">{% trans "Commerce" %}</h2>
-  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.75rem;margin-bottom:1.75rem;">
-    {% for k in gl_commerce_kpis %}
-      <a href="{{ k.url|default:'#' }}" style="display:block;text-decoration:none;border:1px solid rgba(120,120,120,.22);border-radius:12px;padding:.9rem 1rem;">
-        <div style="font-size:1.6rem;font-weight:800;line-height:1;">{{ k.value }}</div>
-        <div style="font-size:.78rem;opacity:.7;margin-top:.3rem;">{{ k.label }}</div>
-      </a>
-    {% endfor %}
-  </div>
-  {% endif %}
+    {% if gl_health %}
+    <div class="gl-card gl-card-accent" data-gl-reveal>
+      <div class="gl-eyebrow" style="margin-top:0;">{% trans "Catalog health" %}</div>
+      <div class="gl-ring-wrap">
+        <div class="gl-ring {{ gl_health.tone }}" role="img"
+             aria-label="{% blocktrans with s=gl_health.score %}Catalog health score {{ s }} out of 100{% endblocktrans %}">
+          <svg viewBox="0 0 116 116" aria-hidden="true">
+            <circle class="trk" cx="58" cy="58" r="52"></circle>
+            <circle class="arc" cx="58" cy="58" r="52"
+                    stroke-dasharray="{{ gl_health.ring_circ }}"
+                    stroke-dashoffset="{{ gl_health.ring_offset }}"
+                    data-gl-ring="{{ gl_health.ring_circ }}" data-gl-ring-to="{{ gl_health.ring_offset }}"></circle>
+          </svg>
+          <div class="gl-ring-num"><b data-gl-count="{{ gl_health.score }}">{{ gl_health.score }}</b><span>{% trans "score" %}</span></div>
+        </div>
+        <div class="gl-bars" style="flex:1;">
+          {% for d in gl_health.dimensions %}
+          <div class="gl-bar-row">
+            <span class="gl-bar-lab">{{ d.label }}</span>
+            <span class="gl-bar-val">{{ d.ok_pct }}%{% if d.bad %} · {{ d.bad }} {% trans "to fix" %}{% endif %}</span>
+            <div class="gl-bar-track">
+              <div class="gl-bar-fill {% if d.ok_pct >= 90 %}is-good{% elif d.ok_pct >= 70 %}is-warn{% else %}is-bad{% endif %}"
+                   style="width:{{ d.ok_pct }}%" data-gl-bar="{{ d.ok_pct }}"></div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
 
-  {% if gl_quick_actions %}
-  <h2 style="font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;opacity:.6;margin:0 0 .6rem;">{% trans "Quick actions" %}</h2>
-  <div style="display:flex;flex-wrap:wrap;gap:.6rem;">
-    {% for a in gl_quick_actions %}
-      <a href="{{ a.url }}" style="text-decoration:none;border:1px solid rgba(166,130,76,.4);border-radius:999px;padding:.5rem 1rem;font-size:.85rem;font-weight:600;background:rgba(166,130,76,.08);">{{ a.label }}</a>
-    {% endfor %}
+    {% if gl_status and gl_status.total %}
+    <div class="gl-card" data-gl-reveal>
+      <div class="gl-eyebrow" style="margin-top:0;">{% trans "Product status" %}</div>
+      <div style="display:flex;gap:1.8rem;flex-wrap:wrap;">
+        <div class="gl-donut-wrap">
+          <div class="gl-donut" style="--gl-donut:{{ gl_status.availability_conic }};"
+               role="img" aria-label="{% trans 'Active vs hidden products' %}"></div>
+          <div class="gl-legend">
+            {% for s in gl_status.availability %}
+            <a href="{{ s.url }}"><span class="gl-dot" style="background:{{ s.color }};"></span>{{ s.label }} <span class="n">{{ s.value }}</span></a>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="gl-donut-wrap">
+          <div class="gl-donut" style="--gl-donut:{{ gl_status.source_conic }};"
+               role="img" aria-label="{% trans 'Printify vs manual products' %}"></div>
+          <div class="gl-legend">
+            {% for s in gl_status.source %}
+            <a href="{{ s.url }}"><span class="gl-dot" style="background:{{ s.color }};"></span>{{ s.label }} <span class="n">{{ s.value }}</span></a>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
   </div>
-  {% endif %}
+
+  {# ================= row 2: sync health + orders snapshot ================= #}
+  <div class="gl-grid gl-grid-2" style="margin-top:.85rem;">
+
+    {% if gl_sync %}
+    <div class="gl-card" data-gl-reveal>
+      <div class="gl-eyebrow" style="margin-top:0;">{% trans "Printify sync health" %}</div>
+      {% if gl_sync.configured or gl_sync.token_present %}
+      <div class="gl-kv"><span class="k">{% trans "Connection" %}</span>
+        <span class="v"><span class="gl-pulse {% if gl_sync.connection == 'connected' %}{% elif gl_sync.connection == 'failed' %}bad{% else %}off{% endif %}"></span>
+        {{ gl_sync.connection }}</span></div>
+      <div class="gl-kv"><span class="k">{% trans "Token" %}</span><span class="v">{% if gl_sync.token_present %}{% trans "set" %}{% else %}{% trans "none" %}{% endif %}</span></div>
+      <div class="gl-kv"><span class="k">{% trans "Sync" %}</span><span class="v"><span class="gl-pulse {% if gl_sync.enabled %}{% if gl_sync.backoff %}warn{% endif %}{% else %}off{% endif %}"></span>{% if gl_sync.enabled %}{% trans "enabled" %}{% else %}{% trans "disabled" %}{% endif %} · {{ gl_sync.mode }}</span></div>
+      <div class="gl-kv"><span class="k">{% trans "Stale products" %}</span><span class="v">{{ gl_sync.stale_products }}</span></div>
+      <div class="gl-kv"><span class="k">{% trans "Sync errors" %}</span><span class="v">{{ gl_sync.sync_errors }}</span></div>
+      <div class="gl-kv"><span class="k">{% trans "Safe defaults" %}</span>
+        <span class="v">
+          <span class="gl-badge {% if gl_sync.publish_off %}is-ok{% else %}sev-crit{% endif %}">{% trans "publish" %} {% if gl_sync.publish_off %}off{% else %}ON{% endif %}</span>
+          <span class="gl-badge {% if gl_sync.orders_off %}is-ok{% else %}sev-crit{% endif %}">{% trans "orders" %} {% if gl_sync.orders_off %}off{% else %}ON{% endif %}</span>
+        </span></div>
+      {% else %}
+      <div class="gl-empty">
+        <div class="ic">⚙</div>
+        <div class="t">{% trans "No Printify account configured" %}</div>
+        <div class="m">{% trans "Add an account and a token to enable safe sync." %}</div>
+        <p style="margin-top:.7rem;"><a class="gl-action" href="{% url 'admin:printify_integration_printifyaccountconfig_changelist' %}">{% trans "Printify accounts" %}</a></p>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {% if gl_orders and gl_orders.available %}
+    <div class="gl-card" data-gl-reveal>
+      <div class="gl-eyebrow" style="margin-top:0;">{% trans "Orders — last 30 days" %}</div>
+      <div style="display:flex;gap:2rem;align-items:flex-end;flex-wrap:wrap;">
+        <div>
+          <div class="gl-kpi-val is-gold">{{ gl_orders.count_30d }}</div>
+          <div class="gl-kpi-lab">{% trans "orders (30d)" %} · {{ gl_orders.count_7d }} {% trans "in 7d" %}</div>
+          <div class="gl-kpi-val" style="font-size:1.05rem;margin-top:.6rem;">{{ gl_orders.currency }} {{ gl_orders.amount_30d }}</div>
+          <div class="gl-kpi-lab">{% trans "gross (30d)" %}</div>
+        </div>
+        <div style="flex:1;min-width:180px;">
+          <div class="gl-spark" role="img" aria-label="{% trans 'Orders per day, last 7 days' %}">
+            {% for d in gl_orders.days %}
+            <div class="gl-spark-col">
+              <div class="gl-spark-bar" style="height:{{ d.h_pct }}%" data-gl-bar-h="{{ d.h_pct }}" title="{{ d.label }}: {{ d.count }}"></div>
+              <span class="gl-spark-lab">{{ d.label|slice:":1" }}</span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  {# ================= row 3: catalog issues + category readiness ================= #}
+  <div class="gl-grid gl-grid-2" style="margin-top:.85rem;">
+
+    {% if gl_health %}
+    <div class="gl-card" data-gl-reveal>
+      <div class="gl-eyebrow" style="margin-top:0;">{% trans "Issues to fix" %}</div>
+      {% if gl_health.issues %}
+      <div class="gl-issues">
+        {% for i in gl_health.issues %}
+        <a class="gl-issue" href="{{ i.url }}">
+          <span><span class="gl-badge {{ i.sev }}">{{ i.count }}</span> &nbsp;{{ i.label }}</span>
+          <span class="fix">{% trans "Fix now" %} →</span>
+        </a>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="gl-empty"><div class="ic">✓</div><div class="t">{% trans "No catalog issues" %}</div>
+        <div class="m">{% trans "Every product has an image, price and category." %}</div></div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {% if gl_categories %}
+    <div class="gl-card" data-gl-reveal>
+      <div class="gl-eyebrow" style="margin-top:0;">{% trans "Category readiness" %}</div>
+      <div class="gl-bars">
+        {% for c in gl_categories %}
+        <div class="gl-bar-row">
+          <a class="gl-bar-lab" href="{{ c.url }}" style="text-decoration:none;color:inherit;">{{ c.name }} <span class="gl-bar-val">· {{ c.count }}</span></a>
+          <span class="gl-bar-val">{{ c.ready_pct }}%</span>
+          <div class="gl-bar-track">
+            <div class="gl-bar-fill {% if c.ready_pct >= 90 %}is-good{% elif c.ready_pct >= 70 %}is-warn{% else %}is-bad{% endif %}"
+                 style="width:{{ c.ready_pct }}%" data-gl-bar="{{ c.ready_pct }}"></div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  {# ================= row 4: wishlist + quick actions ================= #}
+  <div class="gl-grid gl-grid-2" style="margin-top:.85rem;">
+    {% if gl_wishlist and gl_wishlist.available %}
+    <div class="gl-card" data-gl-reveal>
+      <div class="gl-eyebrow" style="margin-top:0;">{% trans "Demand signals — wishlist" %}</div>
+      <div class="gl-kpi-val is-gold">{{ gl_wishlist.total }}</div>
+      <div class="gl-kpi-lab">{% trans "saved items" %}</div>
+      {% if gl_wishlist.top %}
+      <div class="gl-bars" style="margin-top:.8rem;">
+        {% for t in gl_wishlist.top %}
+        <a class="gl-kv" href="{{ t.url }}" style="text-decoration:none;color:inherit;"><span class="k">{{ t.name }}</span><span class="v">{{ t.count }}</span></a>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="gl-card" data-gl-reveal>
+      <div class="gl-eyebrow" style="margin-top:0;">{% trans "Quick actions" %}</div>
+      <div class="gl-actions">
+        {% for a in gl_quick_actions %}
+        <a class="gl-action" href="{{ a.url }}">{{ a.label }}</a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
 
 </div>
 {% endblock %}
