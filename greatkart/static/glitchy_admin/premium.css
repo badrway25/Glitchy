@@ -172,3 +172,84 @@ a.gl-card:hover { transform: translateY(-3px); border-color: var(--gl-line-stron
 @media (max-width: 600px) {
   .gl-ring-wrap, .gl-donut-wrap { flex-direction: column; align-items: flex-start; }
 }
+
+/* ============================================================================
+   Ultra-premium admin LOGIN (Phase: premium login). Split-panel brand hero +
+   form card. Loads via UNFOLD STYLES (skeleton). Reduced-motion safe.
+   ============================================================================ */
+.gl-login { min-height: 100vh; display: grid; grid-template-columns: 1.05fr .95fr; background: var(--gl-surface); }
+html.dark .gl-login { background: #1b1813; }
+
+/* ---- hero (left) ---- */
+.gl-login-hero { position: relative; overflow: hidden; display: flex; align-items: center;
+  padding: 3rem 3.4rem; color: #f3ead9;
+  background:
+    radial-gradient(120% 90% at 10% 0%, #4a4033 0%, transparent 55%),
+    radial-gradient(130% 120% at 100% 100%, rgba(166,130,76,.55) 0%, transparent 50%),
+    linear-gradient(140deg, #2b2721 0%, #201d17 60%, #171410 100%); }
+.gl-login-hero-inner { position: relative; z-index: 2; max-width: 460px; }
+.gl-login-hero-glow { position: absolute; inset: -30% -20% auto auto; width: 520px; height: 520px;
+  background: radial-gradient(circle, rgba(214,189,130,.30), transparent 62%); filter: blur(8px);
+  animation: gl-float 12s var(--gl-ease) infinite alternate; z-index: 1; }
+
+.gl-login-brand { display: flex; align-items: center; gap: .95rem; margin-bottom: 2.4rem; }
+.gl-login-brand-name { font-size: 1.5rem; font-weight: 800; letter-spacing: .02em; line-height: 1; color: #fbf4e6; }
+.gl-login-brand-studio { font-size: .74rem; text-transform: uppercase; letter-spacing: .22em; color: #d8bd82; margin-top: .25rem; }
+
+/* Glitchy "G" monogram — cream G + tricolore glitch strokes oscillating left↔right */
+.gl-logo-g { display: inline-flex; width: 72px; height: 60px; border-radius: 16px; align-items: center; justify-content: center;
+  background: linear-gradient(150deg, rgba(255,255,255,.07), rgba(255,255,255,.015));
+  box-shadow: inset 0 0 0 1px rgba(216,189,130,.24), 0 12px 30px -14px rgba(0,0,0,.7); overflow: hidden; }
+.gl-g-body { filter: drop-shadow(0 2px 5px rgba(0,0,0,.45)); }
+.gl-g-tri .gls { transform-box: fill-box; }
+.gls1 { animation: gl-glitch-a 3.2s var(--gl-ease) infinite; }
+.gls2 { animation: gl-glitch-b 3.2s var(--gl-ease) infinite .25s; }
+.gls3 { animation: gl-glitch-a 3.2s var(--gl-ease) infinite .5s; }
+/* the tricolore fragments drift right then left (glitch), staggered per stroke */
+@keyframes gl-glitch-a { 0%,100% { transform: translateX(0); } 35% { transform: translateX(6px); } 70% { transform: translateX(-3px); } }
+@keyframes gl-glitch-b { 0%,100% { transform: translateX(0); } 35% { transform: translateX(-4px); } 70% { transform: translateX(7px); } }
+@keyframes gl-float { from { transform: translate(0,0); } to { transform: translate(-24px, 20px); } }
+
+.gl-login-hero-title { font-size: 1.9rem; font-weight: 800; line-height: 1.15; letter-spacing: -.01em; margin: 0 0 .8rem; color: #fbf4e6; }
+.gl-login-hero-sub { font-size: .95rem; line-height: 1.55; color: #d7cbb6; margin: 0 0 2rem; }
+.gl-login-trust { list-style: none; margin: 0 0 2rem; padding: 0; display: flex; flex-direction: column; gap: .7rem; }
+.gl-login-trust li { font-size: .88rem; color: #e7ddc9; display: flex; align-items: center; gap: .6rem; }
+.gl-tick { display: inline-flex; width: 20px; height: 20px; border-radius: 50%; align-items: center; justify-content: center;
+  background: rgba(63,125,99,.28); color: #8fd3ac; font-size: .7rem; box-shadow: inset 0 0 0 1px rgba(143,211,172,.35); }
+.gl-login-env { display: inline-block; padding: .3rem .8rem; border-radius: 999px; font-size: .68rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .1em; background: rgba(216,189,130,.16); color: #e6cf92;
+  box-shadow: inset 0 0 0 1px rgba(216,189,130,.35); }
+.gl-login-env.gl-env-danger { background: rgba(179,85,78,.18); color: #e6a49e; box-shadow: inset 0 0 0 1px rgba(230,164,158,.4); }
+.gl-login-env.gl-env-info { background: rgba(78,120,160,.18); color: #a9c6e0; box-shadow: inset 0 0 0 1px rgba(169,198,224,.4); }
+
+/* ---- form (right) ---- */
+.gl-login-main { display: flex; align-items: center; justify-content: center; padding: 2.5rem 1.5rem;
+  background: var(--gl-surface-2); }
+html.dark .gl-login-main { background: #221f1a; }
+.gl-login-card { width: 100%; max-width: 400px; background: var(--gl-surface); border: 1px solid var(--gl-line);
+  border-radius: var(--gl-radius); box-shadow: var(--gl-shadow); padding: 2.3rem 2.1rem; }
+.gl-login-card-head { margin-bottom: 1.6rem; }
+.gl-login-card-head h2 { font-size: 1.5rem; font-weight: 800; margin: 0 0 .3rem; color: var(--gl-text); }
+.gl-login-card-head p { font-size: .88rem; color: var(--gl-muted); margin: 0; }
+.gl-login-form { display: flex; flex-direction: column; gap: 1rem; }
+.gl-login-actions { display: flex; flex-direction: column; gap: .8rem; margin-top: .6rem; }
+.gl-login-reset { text-align: center; font-size: .82rem; color: var(--gl-gold); text-decoration: none; }
+.gl-login-reset:hover { text-decoration: underline; }
+.gl-login-secure { display: flex; align-items: center; justify-content: center; gap: .4rem; margin: 1.4rem 0 0;
+  font-size: .76rem; color: var(--gl-muted); }
+.gl-login-error { border-radius: var(--gl-radius-sm); padding: .7rem .9rem; margin-bottom: 1.1rem; font-size: .85rem;
+  background: color-mix(in srgb, var(--gl-ruby) 12%, transparent); color: var(--gl-ruby);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gl-ruby) 30%, transparent); }
+
+@media (max-width: 900px) {
+  .gl-login { grid-template-columns: 1fr; }
+  .gl-login-hero { display: none; }
+  .gl-login-main { min-height: 100vh; }
+}
+@media (max-width: 900px) and (min-height: 640px) {
+  .gl-login-hero { display: flex; min-height: 40vh; padding: 2rem; }
+  .gl-login { grid-template-rows: auto 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gl-login-hero-glow, .gl-g-tri rect { animation: none !important; }
+}

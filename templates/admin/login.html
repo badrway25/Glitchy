@@ -1,0 +1,88 @@
+{% extends "unfold/layouts/unauthenticated.html" %}
+{% load i18n static unfold %}
+
+{% block title %}{% trans "Sign in" %} | {{ site_title }}{% endblock %}
+
+{% block extrastyle %}{{ block.super }}{{ form.media }}{% endblock %}
+
+{% block base %}
+<div class="gl-login">
+
+  {# ---- brand hero ---- #}
+  <aside class="gl-login-hero" aria-hidden="false">
+    <div class="gl-login-hero-inner">
+      <div class="gl-login-brand">
+        {% comment %}Glitchy monogram: cream "G" + 3 tricolore glitch strokes on the left, oscillating left-right (matches the site logo). Reduced-motion safe.{% endcomment %}
+        <span class="gl-logo-g" role="img" aria-label="Glitchy">
+          <svg viewBox="0 0 150 116" width="96" height="74">
+            <path class="gl-g-body" d="M104 38 A36 36 0 1 0 110 62 L78 62"
+                  fill="none" stroke="#f4ecdb" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+            <g class="gl-g-tri">
+              <rect class="gls gls1" x="4"  y="42" width="34" height="8" rx="2" fill="#1a8a4b"/>
+              <rect class="gls gls2" x="0"  y="55" width="40" height="8" rx="2" fill="#efe7d6"/>
+              <rect class="gls gls3" x="6"  y="68" width="30" height="8" rx="2" fill="#c8322f"/>
+            </g>
+          </svg>
+        </span>
+        <div>
+          <div class="gl-login-brand-name">Glitchy</div>
+          <div class="gl-login-brand-studio">Commerce Studio</div>
+        </div>
+      </div>
+
+      <h1 class="gl-login-hero-title">{% trans "Print-on-demand, run like a maison." %}</h1>
+      <p class="gl-login-hero-sub">{% trans "Catalog health, Printify operations and orders — one refined control center." %}</p>
+
+      <ul class="gl-login-trust">
+        <li><span class="gl-tick">✓</span> {% trans "Secure, encrypted credential vault" %}</li>
+        <li><span class="gl-tick">✓</span> {% trans "Safe defaults — no accidental publishing or orders" %}</li>
+        <li><span class="gl-tick">✓</span> {% trans "Live catalog & sync health at a glance" %}</li>
+      </ul>
+
+      {% if environment %}
+      <span class="gl-login-env gl-env-{{ environment.1|default:'info' }}">{{ environment.0|default:environment }}</span>
+      {% endif %}
+    </div>
+    <div class="gl-login-hero-glow" aria-hidden="true"></div>
+  </aside>
+
+  {# ---- form card ---- #}
+  <main class="gl-login-main">
+    <div class="gl-login-card">
+      <div class="gl-login-card-head">
+        <h2>{% trans "Sign in" %}</h2>
+        <p>{% trans "Welcome back — enter your studio credentials." %}</p>
+      </div>
+
+      {% include "unfold/helpers/messages.html" %}
+
+      {% if form.errors or form.non_field_errors %}
+      <div class="gl-login-error" role="alert">
+        {% if form.non_field_errors %}{{ form.non_field_errors|join:" " }}{% else %}{% trans "Please check your username and password and try again." %}{% endif %}
+      </div>
+      {% endif %}
+
+      <form action="{{ app_path }}" method="post" id="login-form" class="gl-login-form">
+        {% csrf_token %}
+        {% include "unfold/helpers/field.html" with field=form.username %}
+        {% include "unfold/helpers/field.html" with field=form.password %}
+
+        <div class="gl-login-actions">
+          {% component "unfold/components/button.html" with submit=1 variant="primary" class="w-full" %}
+            {% trans "Sign in" %} <span class="material-symbols-outlined text-sm">arrow_forward</span>
+          {% endcomponent %}
+
+          {% url 'admin_password_reset' as password_reset_url %}
+          {% url 'admin:admin_password_reset' as unfold_password_reset_url %}
+          {% if password_reset_url or unfold_password_reset_url %}
+          <a class="gl-login-reset" href="{{ password_reset_url|default:unfold_password_reset_url }}">{% trans "Forgot your password?" %}</a>
+          {% endif %}
+        </div>
+
+        <p class="gl-login-secure"><span class="material-symbols-outlined text-sm">lock</span> {% trans "Secure access · staff only" %}</p>
+      </form>
+    </div>
+  </main>
+
+</div>
+{% endblock %}
