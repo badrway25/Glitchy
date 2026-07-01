@@ -1,0 +1,111 @@
+/* Glitchy admin — premium FORM polish + safety-net (Admin Forms Premium Polish phase).
+   Two jobs:
+   1) SAFETY NET: any admin input that did NOT receive Unfold's classes (e.g. a custom
+      ModelForm using Django's bare .vTextField) still renders visible + premium, so a form is
+      never "invisible" again.
+   2) POLISH: fieldsets, help text, readonly rows, error state, and a solid sticky save bar
+      that no longer overlaps the last fields.
+   Scoped to admin form pages, dark-aware, reduced-motion safe. Never fights Unfold's own
+   already-styled widgets (the safety net only targets inputs Unfold missed). */
+
+/* ---- 1) safety net: only inputs WITHOUT Unfold's utility classes ---- */
+#content form .vTextField:not([class*="border"]),
+#content form input[type="text"]:not([class*="border"]):not([class*="px-"]),
+#content form input[type="number"]:not([class*="border"]):not([class*="px-"]),
+#content form input[type="url"]:not([class*="border"]):not([class*="px-"]),
+#content form input[type="email"]:not([class*="border"]):not([class*="px-"]),
+#content form input[type="password"]:not([class*="border"]):not([class*="px-"]),
+#content form textarea:not([class*="border"]):not([class*="px-"]),
+#content form select:not([class*="border"]):not([class*="px-"]) {
+  width: 100%;
+  max-width: 42rem;
+  min-height: 38px;
+  padding: .5rem .75rem;
+  border-radius: 10px;
+  border: 1px solid var(--gl-line, rgba(120,110,95,.3));
+  background: var(--gl-surface, #fff);
+  color: var(--gl-text, #2b2721);
+  font-size: .9rem;
+  line-height: 1.4;
+  transition: border-color .18s ease, box-shadow .18s ease;
+}
+#content form .vTextField:not([class*="border"]):focus,
+#content form input:not([class*="border"]):not([class*="px-"]):focus,
+#content form textarea:not([class*="border"]):not([class*="px-"]):focus,
+#content form select:not([class*="border"]):not([class*="px-"]):focus {
+  outline: none;
+  border-color: var(--gl-gold, #a6824c);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--gl-gold, #a6824c) 22%, transparent);
+}
+html.dark #content form .vTextField:not([class*="border"]),
+html.dark #content form input:not([class*="border"]):not([class*="px-"]),
+html.dark #content form textarea:not([class*="border"]):not([class*="px-"]),
+html.dark #content form select:not([class*="border"]):not([class*="px-"]) {
+  background: #221f1a; color: #efe8dc; border-color: rgba(210,195,170,.22);
+}
+
+/* ---- 2) polish ---- */
+/* help text: give it breathing room + a muted tone */
+#content form .help, #content form .helptext, #content form small.help {
+  margin-top: .35rem; font-size: .78rem; line-height: 1.45; opacity: .8;
+}
+
+/* checkbox rows: (a) breathing room between the box and its label; (b) move the help text
+   INLINE beside the label as a small grey span (Unfold structure:
+   input + .flex.flex-col( <label> + <div.ml-2.-mt-1>(help) )). */
+#content form .flex.flex-row:has(> input[type="checkbox"]) { align-items: center; column-gap: .65rem; }
+#content form .flex.flex-row:has(> input[type="checkbox"]) > .flex.flex-col {
+  flex-direction: row;
+  align-items: baseline;
+  flex-wrap: wrap;
+  column-gap: .6rem;
+}
+#content form .flex.flex-row:has(> input[type="checkbox"]) > .flex.flex-col > label { margin: 0; }
+/* the help wrapper (.ml-2.-mt-1) + inner text: neutralise offsets, make it a small grey span */
+#content form .flex.flex-row:has(> input[type="checkbox"]) > .flex.flex-col > div {
+  margin: 0 !important;
+}
+#content form .flex.flex-row:has(> input[type="checkbox"]) > .flex.flex-col .text-xs {
+  margin: 0 !important;
+  font-size: .76rem;
+  color: var(--gl-muted, #8a8177);
+  opacity: .92;
+}
+/* required marker */
+#content form label.required::after { content: " *"; color: var(--gl-ruby, #b3554e); font-weight: 700; }
+/* readonly value rows: subtle chip so they read as "not editable" */
+#content form .readonly { color: var(--gl-text, #2b2721); }
+html.dark #content form .readonly { color: #d9cfbe; }
+
+/* field-level error state */
+#content form .errors input, #content form .errorlist + * input,
+#content form input[aria-invalid="true"], #content form select[aria-invalid="true"] {
+  border-color: var(--gl-ruby, #b3554e) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--gl-ruby, #b3554e) 18%, transparent) !important;
+}
+#content form .errorlist { list-style: none; margin: .3rem 0 0; padding: 0;
+  color: var(--gl-ruby, #b3554e); font-size: .8rem; font-weight: 600; }
+
+/* sticky save bar: solid backing + soft top divider so it never blends into the fields it
+   scrolls over, and give the CHANGE/ADD form room so the last fieldset is never hidden behind
+   it. Scope to *_form (change/add) — never the changelist search form, or its sibling Filters
+   button would stretch to the padded height. */
+#content form[id$="_form"] { padding-bottom: 5.5rem; }
+[class*="lg:sticky"][class*="bottom-0"] {
+  background: var(--gl-surface, #fff);
+  box-shadow: 0 -1px 0 var(--gl-line, rgba(120,110,95,.18)), 0 -12px 24px -18px rgba(43,39,33,.35);
+  backdrop-filter: saturate(1.05);
+}
+html.dark [class*="lg:sticky"][class*="bottom-0"] {
+  background: #1f1c17; box-shadow: 0 -1px 0 rgba(210,195,170,.14), 0 -12px 24px -18px rgba(0,0,0,.6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #content form input, #content form textarea, #content form select { transition: none !important; }
+}
+@media (max-width: 600px) {
+  #content form .vTextField:not([class*="border"]),
+  #content form input:not([class*="border"]):not([class*="px-"]),
+  #content form textarea:not([class*="border"]):not([class*="px-"]),
+  #content form select:not([class*="border"]):not([class*="px-"]) { max-width: 100%; }
+}
