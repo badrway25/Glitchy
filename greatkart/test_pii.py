@@ -45,10 +45,12 @@ class PiiHelperTests(TestCase):
 
 class AdminColumnTests(TestCase):
     def test_admin_lists_do_not_render_raw_email(self):
-        # OrderAdmin list_display uses masked_email, not raw email.
+        # OrderAdmin list_display uses a masking column (actor / masked_email), never raw PII.
         from orders.admin import OrderAdmin
-        self.assertIn("masked_email", OrderAdmin.list_display)
-        self.assertNotIn("email", OrderAdmin.list_display)
+        self.assertTrue({"masked_email", "actor"} & set(OrderAdmin.list_display),
+                        "OrderAdmin must show a masked customer column")
+        for raw in ("email", "first_name", "last_name", "phone"):
+            self.assertNotIn(raw, OrderAdmin.list_display)
 
     def test_masked_email_column_factory(self):
         from greatkart.admin_pii import masked_email_column
