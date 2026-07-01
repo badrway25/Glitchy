@@ -35,6 +35,11 @@ class PrintifyAccountConfig(models.Model):
     token_set_at = models.DateTimeField(null=True, blank=True, editable=False)
     token_updated_by = models.CharField(max_length=150, blank=True, default="", editable=False)
 
+    # --- selected shop (chosen via 'Discover shops' -> 'Use this shop'; never typed) ---
+    shop_title = models.CharField(max_length=120, blank=True, default="", editable=False)
+    shop_sales_channel = models.CharField(max_length=60, blank=True, default="", editable=False)
+    shop_selected_at = models.DateTimeField(null=True, blank=True, editable=False)
+
     # --- connection status (safe, no secret / no PII) ---
     last_connection_check_at = models.DateTimeField(null=True, blank=True, editable=False)
     last_connection_status = models.CharField(max_length=20, blank=True, default="", editable=False)
@@ -93,6 +98,17 @@ class PrintifyAccountConfig(models.Model):
         if not self.token_last_four:
             return "—"
         return "•••• " + self.token_last_four
+
+    def has_valid_shop(self) -> bool:
+        """A shop is usable for sync only when a NUMERIC id has been selected."""
+        return str(self.shop_id or "").isdigit()
+
+    def set_shop(self, shop_id, title="", sales_channel=""):
+        """Store the selected shop (numeric id + safe metadata). Used by 'Use this shop'."""
+        self.shop_id = str(shop_id).strip()
+        self.shop_title = (title or "")[:120]
+        self.shop_sales_channel = (sales_channel or "")[:60]
+        self.shop_selected_at = timezone.now()
 
     @classmethod
     def active(cls):
