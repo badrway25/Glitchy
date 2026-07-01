@@ -25,6 +25,13 @@ local Windows dev machine; **no real staging host exists**.
 | Security | ✅ Strong (dev) | No secrets in git, push/shipping/payments OFF. Key rotation still pending. |
 
 ## 2. What is genuinely COMPLETE
+- **Admin forms premium polish** (Phase 71): fixed the flagged PrintifyAccountConfig add form
+  — its custom ModelForm's inputs rendered as bare ~invisible `vTextField` because Unfold only
+  styles its own widgets; now every widget gets Unfold's input classes. Added a form CSS
+  safety-net (any bare admin input stays visible), a slim add form (auto/readonly fields hidden
+  on create), inline-grey checkbox help, a fixed oversized changelist Filters button, disabled
+  the broken Order add page (was a 500), and hid the unused `Category.cat_image` field. Token
+  never leaks (tested). No migration/dependency. See `docs/ADMIN_FORMS_PREMIUM_POLISH_2026.md`.
 - **Ultra-premium admin login** (Phase 70): a split-panel luxury sign-in — espresso/gold brand
   hero with the **animated Glitchy monogram** (cream "G" + tricolore glitch strokes that
   oscillate left↔right, matching the site logo, reduced-motion safe), trust notes and an
