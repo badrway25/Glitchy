@@ -117,6 +117,12 @@ class OrderProductInline(BaseTabularInline):
 @admin.register(Order)
 class OrderAdmin(BaseModelAdmin):
     change_list_template = "admin/orders/order_changelist.html"
+
+    # Orders are created by the checkout flow, never hand-added in the admin. Disabling add
+    # also removes the broken /add/ page (created_at is a non-editable field in the fieldsets).
+    def has_add_permission(self, request):
+        return False
+
     list_display = ("order_number", "actor", "status_badge", "is_ordered",
                     "total_display", "margin_display", "margin_pct_display",
                     "refunded_display", "printify_badge", "created_at")
