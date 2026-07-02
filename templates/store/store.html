@@ -192,8 +192,8 @@
 
               <div class="card product-card h-100">
 
-                {% with gimgs=product.gallery.all %}
-                <div class="media-skeleton{% if gimgs|length > 1 %} has-gallery is-loaded{% endif %}">
+                {% with cardimgs=product.card_image_urls %}
+                <div class="media-skeleton{% if cardimgs|length > 1 %} has-gallery is-loaded{% endif %}">
   <div class="badge-stack">
     {% if not product.is_available or product.stock <= 0 %}
       <span class="badge-corner badge-out">{% trans "Sold out" %}</span>
@@ -216,14 +216,16 @@
     <i class="fa fa-heart"></i>
   </button>
 
-  {% if gimgs|length > 1 %}
-  {# Multi-image card carousel: scroll/swipe without leaving the store (max 5) #}
+  {% if cardimgs|length > 1 %}
+  {# Multi-image card carousel: scroll/swipe without leaving the store (max 5). URLs come from
+     card_image_urls (main + gallery, local file or remote Printify src) so synced products
+     always show every image directly in the card. #}
   <div class="pcard-gallery" data-card-gallery>
     <div class="pcard-track" tabindex="0" role="group"
          aria-label="{% blocktrans with n=product.product_name %}{{ n }} — product images{% endblocktrans %}">
-      {% for img in gimgs|slice:":5" %}
+      {% for u in cardimgs %}
         <a class="pcard-slide" href="{{ product.get_url }}" tabindex="-1">
-          <img src="{{ img.display_url }}" width="600" height="450" decoding="async"
+          <img src="{{ u }}" width="600" height="450" decoding="async"
                loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
                alt="{% if forloop.first %}{{ product.product_name }}{% else %}{{ product.product_name }} — {{ forloop.counter }}{% endif %}">
         </a>
@@ -234,13 +236,13 @@
     <button type="button" class="pcard-nav pcard-next" data-card-next tabindex="-1"
             aria-label="{% trans 'Next image' %}"><i class="fa fa-angle-right" aria-hidden="true"></i></button>
     <div class="pcard-dots" data-card-dots aria-hidden="true">
-      {% for img in gimgs|slice:":5" %}<span class="pcard-dot{% if forloop.first %} is-on{% endif %}"></span>{% endfor %}
+      {% for u in cardimgs %}<span class="pcard-dot{% if forloop.first %} is-on{% endif %}"></span>{% endfor %}
     </div>
   </div>
   {% else %}
-  {# single image / fallback — unchanged behaviour #}
+  {# single image / fallback #}
   <a href="{{ product.get_url }}">
-    <img data-skeleton src="{% if product.cover_image %}{{ product.cover_image }}{% else %}{% static 'images/placeholder.png' %}{% endif %}" alt="{{ product.product_name }}">
+    <img data-skeleton src="{% if cardimgs %}{{ cardimgs.0 }}{% else %}{% static 'images/placeholder.png' %}{% endif %}" alt="{{ product.product_name }}">
     {% with hover=product.hover_image %}{% if hover %}<img class="p-img-2" src="{{ hover }}" alt="" loading="lazy" aria-hidden="true">{% endif %}{% endwith %}
   </a>
   {% endif %}

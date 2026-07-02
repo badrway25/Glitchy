@@ -166,6 +166,11 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
 
 /* ---- 9. Product detail ---- */
 .pdp-card{background:var(--surface);border:var(--border);border-radius:var(--radius);box-shadow:var(--shadow-soft);}
+/* theme.css sets .pdp-card{overflow:hidden} (for the radius) but it clips the Color/Size variant
+   dropdowns. The card body has 28px padding so the media never touches the edge — free the card
+   and round the media itself instead. */
+.pdp-card{overflow:visible!important;}
+.pdp-media{border-radius:var(--radius);overflow:hidden;}
 .pdp-title{font-size:clamp(1.6rem,3vw,2.3rem);}
 .pdp-price{font-family:var(--font-display)!important;font-weight:800;color:var(--text);font-size:1.7rem;}
 .pdp-badges .badge{text-transform:uppercase;letter-spacing:.08em;font-size:.62rem;font-weight:600;}
@@ -1968,28 +1973,35 @@ body.has-sticky-cta .ai-assistant{bottom:78px;}
 
 /* ============ Phase 45 — Colour/size variant dropdowns styled like .sortx ============ */
 .custom-select-btn{
-  height:46px!important;border:1px solid var(--border)!important;background:var(--surface)!important;
+  height:46px!important;border:1px solid var(--accent)!important;
+  background:color-mix(in srgb,var(--accent) 12%,var(--surface))!important;
   color:var(--text)!important;border-radius:var(--radius-pill)!important;
   display:inline-flex!important;align-items:center;justify-content:space-between;gap:.5rem;width:100%;
   padding:0 1.05rem!important;font-family:var(--font-ui);font-weight:600;font-size:.9rem;
   transition:border-color .2s var(--ease),background .2s var(--ease)!important;}
-.custom-select-btn:hover{border-color:var(--accent)!important;background:var(--surface-2)!important;}
+.custom-select-btn:hover{border-color:var(--accent-2)!important;
+  background:color-mix(in srgb,var(--accent) 24%,var(--surface))!important;
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent)!important;}
+.custom-select-dd.is-open .custom-select-btn{border-color:var(--accent)!important;}
 .custom-select-btn:focus,.custom-select-btn:focus-visible{outline:2px solid var(--accent)!important;
   outline-offset:2px;box-shadow:none!important;border-color:var(--accent)!important;}
 .csdd-caret{font-size:.6rem;color:var(--muted);transition:transform .2s var(--ease);flex:0 0 auto;}
 .custom-select-dd.is-open .csdd-caret{transform:rotate(180deg);}
 /* Menu: vanilla-controlled visibility (always display:block, shown via .is-open) */
+/* --border is a full shorthand, so `1px solid var(--border)` is invalid (no border); --shadow-lg
+   was undefined (no shadow). Both made the open menu a borderless/shadowless "invisible box". */
 .custom-select-dd .dropdown-menu{display:block!important;position:absolute;top:calc(100% + 8px);left:0;right:0;
-  min-width:100%;border:1px solid var(--border)!important;border-radius:var(--radius)!important;
-  background:var(--surface)!important;box-shadow:var(--shadow-lg)!important;padding:.4rem!important;margin:0!important;
-  z-index:1400;opacity:0;visibility:hidden;transform:translateY(-6px);
+  min-width:100%;border:var(--border-strong)!important;border-radius:var(--radius)!important;
+  background:var(--surface)!important;box-shadow:var(--shadow)!important;padding:.4rem!important;margin:0!important;
+  z-index:1400;opacity:0;visibility:hidden;transform:translateY(-6px);max-height:min(60vh,320px);overflow:auto;
   transition:opacity .18s var(--ease),transform .18s var(--ease),visibility .18s;}
 .custom-select-dd.is-open .dropdown-menu{opacity:1;visibility:visible;transform:translateY(0);}
 .custom-select-dd .dropdown-item{border-radius:var(--radius-sm)!important;padding:.55rem .7rem!important;
   font-size:.88rem;color:var(--text)!important;background:transparent!important;transition:background .15s var(--ease);}
 .custom-select-dd .dropdown-item:hover,.custom-select-dd .dropdown-item:focus{
-  background:var(--surface-2)!important;color:var(--primary)!important;}
-.custom-select-dd .dropdown-item.is-active{background:var(--surface-2)!important;color:var(--accent-2)!important;font-weight:600;}
+  background:color-mix(in srgb,var(--accent) 12%,var(--surface))!important;color:var(--accent-2)!important;outline:none;}
+.custom-select-dd .dropdown-item.is-active{background:color-mix(in srgb,var(--accent) 16%,var(--surface))!important;
+  color:var(--accent-2)!important;font-weight:700;}
 /* Dark mode: warm brand surface (override theme.css's cool blue-dark) */
 :root[data-theme="dark"] .custom-select-btn{background:var(--surface)!important;color:var(--text)!important;
   border-color:var(--border)!important;}
@@ -2387,9 +2399,12 @@ body.has-sticky-cta .ai-assistant{bottom:78px;}
   background:var(--accent);color:#fff;font-size:.66rem;font-weight:800;}
 .lxf-chev{color:var(--muted);display:inline-flex;transition:transform .25s ease;}
 .lxf-section.is-collapsed .lxf-chev{transform:rotate(-90deg);}
-.lxf-body{display:grid;grid-template-rows:1fr;transition:grid-template-rows .28s ease;}
+/* grid 1fr->0fr collapse. overflow:hidden on the grid CONTAINER clips the child's residual
+   padding-bottom when the track is 0fr — without it a ~1rem sliver stayed visible when collapsed. */
+.lxf-body{display:grid;grid-template-rows:1fr;overflow:hidden;transition:grid-template-rows .28s ease;}
 .lxf-section.is-collapsed .lxf-body{grid-template-rows:0fr;}
 .lxf-body > *{overflow:hidden;min-height:0;padding-bottom:1rem;}
+.lxf-section.is-collapsed .lxf-body > *{padding-bottom:0;}
 
 .lxf-cats{display:flex;flex-direction:column;gap:.15rem;}
 .lxf-cats .cat-item{display:block;padding:.5rem .7rem;border-radius:9px;color:var(--text);text-decoration:none;
@@ -2801,6 +2816,8 @@ form .form-control,form .custom-select{transition:border-color .18s var(--ease),
 .pcard-prev{left:8px;}
 .pcard-next{right:8px;}
 .product-card:hover .pcard-nav,.pcard-gallery:focus-within .pcard-nav{opacity:1;}
+/* touch devices have no hover -> arrows would never appear; keep them visible there */
+@media (hover:none){.pcard-nav{opacity:.92;}}
 .pcard-nav:hover{background:#fff;color:var(--accent-2);}
 .pcard-nav:focus-visible{opacity:1;outline:none;box-shadow:0 0 0 3px rgba(166,130,76,.5);}
 .pcard-nav[hidden]{display:none;}

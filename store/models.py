@@ -165,21 +165,50 @@ class Product(models.Model):
         return self.data_quality()["score"]
 
     def cover_image(self):
-        """Best available image: explicit cover, else first gallery image."""
+        """Best available image: explicit cover, else first gallery image (local file OR the
+        remote Printify src, so synced products never fall back to the placeholder)."""
         if self.images:
-            return self.images.url
-        first = self.gallery.first()
-        if first and first.image:
-            return first.image.url
+            try:
+                return self.images.url
+            except Exception:
+                pass
+        for g in self.gallery.all():
+            u = g.display_url()
+            if u:
+                return u
         return ""
 
     def hover_image(self):
         """Second distinct image for the card hover effect (empty if only one)."""
         cover = self.cover_image()
         for g in self.gallery.all():
-            if g.image and g.image.url and g.image.url != cover:
-                return g.image.url
+            u = g.display_url()
+            if u and u != cover:
+                return u
         return ""
+
+    def card_image_urls(self, limit=5):
+        """De-duplicated, resolvable image URLs for the store-card carousel: main image first,
+        then gallery images (local file, else the remote Printify src). Uses the already-
+        prefetched gallery (no N+1). Guarantees synced Printify products show every image in the
+        card without opening the detail. Empty list -> the card shows a placeholder."""
+        urls, seen = [], set()
+
+        def add(u):
+            if u and u not in seen:
+                seen.add(u)
+                urls.append(u)
+
+        if self.images:
+            try:
+                add(self.images.url)
+            except Exception:
+                pass
+        for g in self.gallery.all():
+            add(g.display_url())
+            if len(urls) >= limit:
+                break
+        return urls[:limit]
 
     def on_sale(self):
         return bool(self.compare_at_price and self.compare_at_price > self.price)
