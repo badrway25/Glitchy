@@ -472,7 +472,8 @@ def import_catalog_from_config(config, *, apply=True, limit=50, max_pages=20) ->
     from django.conf import settings as dj_settings
     from .printify_client import PrintifyError
 
-    log = SyncLog.objects.create(kind=SyncLog.KIND_PRODUCTS)
+    log = SyncLog.objects.create(kind=SyncLog.KIND_PRODUCTS, shop_id=str(config.shop_id or ""),
+                                 dry_run=not apply)
     report = {"shop_id": str(config.shop_id or ""), "apply": bool(apply), "created": 0,
               "updated": 0, "skipped": 0, "errors": 0, "hidden": 0, "missing_price": 0,
               "missing_image": 0, "pages": 0, "to_review": [], "samples": [], "error": ""}
@@ -480,7 +481,12 @@ def import_catalog_from_config(config, *, apply=True, limit=50, max_pages=20) ->
     def _finish(status, msg):
         log.status = status
         log.created_count = report["created"]; log.updated_count = report["updated"]
-        log.error_count = report["errors"]
+        log.error_count = report["errors"]; log.skipped_count = report["skipped"]
+        log.hidden_count = report["hidden"]; log.missing_price_count = report["missing_price"]
+        log.missing_image_count = report["missing_image"]
+        # persist safe drill-down: to-review products (slug + reason) + a few samples, no PII
+        log.detail = {"to_review": report["to_review"][:100], "samples": report["samples"][:8],
+                      "pages": report["pages"], "error": report["error"]}
         log.message = ("DRY-RUN: " if not apply else "") + msg
         log.finished_at = timezone.now(); log.save()
         return report, log
@@ -525,13 +531,25 @@ def import_catalog_from_config(config, *, apply=True, limit=50, max_pages=20) ->
                     if obj is None:
                         report["skipped"] += 1
                         continue
-                    missing = (obj.price or 0) <= 0 or not has_img or obj.category_id is None
-                    if missing and obj.is_available:
+                    reasons = []
+                    if (obj.price or 0) <= 0:
+                        reasons.append("no price")
+                    if not has_img:
+                        reasons.append("no image")
+                    if obj.category_id is None:
+                        reasons.append("no category")
+                    # Only HIDE products that genuinely cannot be sold (no price). Incomplete-
+                    # but-sellable products stay VISIBLE and are flagged for review, so a
+                    # connected shop's catalogue actually appears in the store instead of
+                    # silently vanishing (the previous over-aggressive policy hid all of them).
+                    unsellable = (obj.price or 0) <= 0
+                    if unsellable and obj.is_available:
                         obj.is_available = False
                         obj.save(update_fields=["is_available"])
                         report["hidden"] += 1
-                    if missing:
-                        report["to_review"].append(obj.slug)
+                    if reasons:
+                        report["to_review"].append({"slug": obj.slug, "id": obj.id,
+                                                    "reasons": reasons, "hidden": unsellable})
                     report["created" if is_new else "updated"] += 1
                 except Exception as exc:
                     report["errors"] += 1

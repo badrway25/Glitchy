@@ -141,8 +141,8 @@ class PrintifySyncState(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = _("Printify sync state")
-        verbose_name_plural = _("Printify sync state")
+        verbose_name = _("Printify Sync Monitor")
+        verbose_name_plural = _("Printify Sync Monitor")
 
     def __str__(self):
         return f"PrintifySyncState(locked={bool(self.locked_at)}, backoff={bool(self.in_backoff())})"
@@ -227,9 +227,23 @@ class SyncLog(models.Model):
     created_count = models.PositiveIntegerField(default=0)
     updated_count = models.PositiveIntegerField(default=0)
     error_count = models.PositiveIntegerField(default=0)
+    # richer, owner-facing counts so a report says exactly what happened + why
+    skipped_count = models.PositiveIntegerField(default=0)
+    hidden_count = models.PositiveIntegerField(default=0)
+    missing_price_count = models.PositiveIntegerField(default=0)
+    missing_image_count = models.PositiveIntegerField(default=0)
+    shop_id = models.CharField(max_length=40, blank=True, default="")
+    dry_run = models.BooleanField(default=False)
+    detail = models.JSONField(default=dict, blank=True)  # to_review slugs + reasons + samples (safe)
     message = models.TextField(blank=True, default="")
     started_at = models.DateTimeField(auto_now_add=True)
     finished_at = models.DateTimeField(blank=True, null=True)
+
+    @property
+    def duration_seconds(self):
+        if self.finished_at and self.started_at:
+            return round((self.finished_at - self.started_at).total_seconds(), 1)
+        return None
 
     class Meta:
         ordering = ["-started_at"]
