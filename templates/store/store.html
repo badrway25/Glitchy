@@ -217,9 +217,9 @@
   </button>
 
   {% if cardimgs|length > 1 %}
-  {# Multi-image card carousel: scroll/swipe without leaving the store (max 5). URLs come from
-     card_image_urls (main + gallery, local file or remote Printify src) so synced products
-     always show every image directly in the card. #}
+  {% comment %}Multi-image card carousel (transform-based, max 5). URLs come from
+  card_image_urls (gallery first — distinct mockups — then main image fallback) so synced
+  products show every image in the card.{% endcomment %}
   <div class="pcard-gallery" data-card-gallery>
     <div class="pcard-track" tabindex="0" role="group"
          aria-label="{% blocktrans with n=product.product_name %}{{ n }} — product images{% endblocktrans %}">

@@ -188,10 +188,13 @@ class Product(models.Model):
         return ""
 
     def card_image_urls(self, limit=5):
-        """De-duplicated, resolvable image URLs for the store-card carousel: main image first,
-        then gallery images (local file, else the remote Printify src). Uses the already-
-        prefetched gallery (no N+1). Guarantees synced Printify products show every image in the
-        card without opening the detail. Empty list -> the card shows a placeholder."""
+        """De-duplicated, resolvable image URLs for the store-card carousel.
+
+        The GALLERY comes first (its images are the distinct product mockups); the main image is
+        only appended as a fallback when the gallery is empty. This matters because the import
+        copies the main image INTO the gallery, so prepending it made the first two slides an
+        identical photo — clicking "next" appeared to do nothing. Resolves each to its local file
+        or the remote Printify src, de-duplicated by URL, uses the prefetched gallery (no N+1)."""
         urls, seen = [], set()
 
         def add(u):
@@ -199,15 +202,15 @@ class Product(models.Model):
                 seen.add(u)
                 urls.append(u)
 
-        if self.images:
-            try:
-                add(self.images.url)
-            except Exception:
-                pass
         for g in self.gallery.all():
             add(g.display_url())
             if len(urls) >= limit:
                 break
+        if not urls and self.images:          # no gallery -> fall back to the single main image
+            try:
+                add(self.images.url)
+            except Exception:
+                pass
         return urls[:limit]
 
     def on_sale(self):
