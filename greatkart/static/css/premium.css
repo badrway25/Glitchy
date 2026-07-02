@@ -2403,8 +2403,9 @@ body.has-sticky-cta .ai-assistant{bottom:78px;}
    padding-bottom when the track is 0fr — without it a ~1rem sliver stayed visible when collapsed. */
 .lxf-body{display:grid;grid-template-rows:1fr;overflow:hidden;transition:grid-template-rows .28s ease;}
 .lxf-section.is-collapsed .lxf-body{grid-template-rows:0fr;}
-.lxf-body > *{overflow:hidden;min-height:0;padding-bottom:1rem;}
-.lxf-section.is-collapsed .lxf-body > *{padding-bottom:0;}
+/* expanded: breathing room from the header (top) + bottom; collapsed: zero (clipped anyway) */
+.lxf-body > *{overflow:hidden;min-height:0;padding:.9rem .1rem 1rem;}
+.lxf-section.is-collapsed .lxf-body > *{padding-top:0;padding-bottom:0;}
 
 .lxf-cats{display:flex;flex-direction:column;gap:.15rem;}
 .lxf-cats .cat-item{display:block;padding:.5rem .7rem;border-radius:9px;color:var(--text);text-decoration:none;
@@ -2430,7 +2431,10 @@ body.has-sticky-cta .ai-assistant{bottom:78px;}
 .lxf-dot{flex:0 0 auto;width:20px;height:20px;border-radius:50%;box-shadow:0 0 0 1px rgba(28,26,23,.12) inset;
   transition:box-shadow .15s ease,transform .12s ease;}
 .lxf-swatch.is-light .lxf-dot{box-shadow:0 0 0 1px rgba(28,26,23,.30) inset;}
-.lxf-swatch:has(input:checked) .lxf-dot{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--accent);transform:scale(1.04);}
+.lxf-swatch:has(input:checked){background:color-mix(in srgb,var(--accent) 12%,transparent);}
+.lxf-swatch:has(input:checked) .lxf-dot{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--accent);transform:scale(1.06);}
+/* clear checkmark on the selected swatch */
+.lxf-swatch:has(input:checked)::after{content:"\2713";margin-left:auto;color:var(--accent-2);font-weight:800;font-size:.9rem;}
 .lxf-sw-name{font-size:.88rem;color:var(--text);}
 .lxf-sw-name em{color:var(--muted);font-style:normal;font-size:.78rem;margin-left:.15rem;}
 .lxf-swatch:has(input:checked) .lxf-sw-name{font-weight:700;}
@@ -2796,16 +2800,18 @@ form .form-control,form .custom-select{transition:border-color .18s var(--ease),
 }
 
 /* ---- Phase 61 — product card image carousel ---- */
-.pcard-gallery{position:absolute;inset:0;z-index:1;}
-.pcard-track{display:flex;height:100%;width:100%;overflow-x:auto;overflow-y:hidden;
-  scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;
-  scrollbar-width:none;touch-action:pan-x pinch-zoom;}
-.pcard-track::-webkit-scrollbar{display:none;}
+.pcard-gallery{position:absolute;inset:0;z-index:1;overflow:hidden;}
+.pcard-track{display:flex;height:100%;width:100%;transform:translateX(0);will-change:transform;
+  transition:transform .42s cubic-bezier(.4,0,.2,1);touch-action:pan-y;}
+@media (prefers-reduced-motion:reduce){.pcard-track{transition:none;}}
 /* FIX (Phase 66): snap-align MUST be `start`, not `center`. With full-width slides +
    `x mandatory`, center alignment pins scrollLeft to 0 (the track refuses to scroll via
    swipe or arrow). `start` snaps each slide to the left edge and restores scrolling. */
-.pcard-slide{flex:0 0 100%;height:100%;scroll-snap-align:start;scroll-snap-stop:always;display:block;}
-.pcard-slide img{width:100%;height:100%;object-fit:cover;display:block;opacity:1!important;}
+.pcard-slide{flex:0 0 100%;height:100%;display:block;}
+/* theme.css sets .media-skeleton img{position:absolute} (aspect-fill) which made ALL carousel
+   slides stack at the same spot -> the track moved but the visible image never changed. Force
+   the slide image to flow in the flex track so prev/next actually change the picture. */
+.pcard-slide img{position:static!important;inset:auto!important;width:100%;height:100%;object-fit:cover;display:block;opacity:1!important;}
 /* don't let the generic card-hover zoom fight the carousel */
 .product-card:hover .pcard-gallery img{transform:none!important;}
 /* discreet arrows — reveal on hover/focus (desktop) */
