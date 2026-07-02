@@ -25,6 +25,15 @@ local Windows dev machine; **no real staging host exists**.
 | Security | ✅ Strong (dev) | No secrets in git, push/shipping/payments OFF. Key rotation still pending. |
 
 ## 2. What is genuinely COMPLETE
+- **Store card carousel functional fix + premium filters** (Phase 75): root-caused (via
+  screenshot diff) why the card "next" never changed the image — `.media-skeleton img` is
+  `position:absolute`, so all carousel slides stacked; plus the main image (a content-duplicate
+  of a gallery image) was prepended, making slides 0–1 identical. Fixed: slide img forced
+  `position:static`, transform-based carousel (translateX + swipe + idempotent init), gallery-
+  first `card_image_urls`. Refined the "Refine your look" filters: price focus ring now wraps
+  the € + input, collapsed groups have real top-spacing when re-opened, colour selection is
+  clearly premium (row wash + gold ring + ✓). No migration. See
+  `docs/STORE_CAROUSEL_AND_FILTER_SYSTEM_FINAL_FIX_2026.md`.
 - **Store visual interaction fixes + Glitchy favicon** (Phase 74): regenerated the stale
   favicon from the brand mark (multi-size ico + png + apple-touch, site + admin); fixed the
   store card carousel to show every photo in-card via `card_image_urls` (main + gallery, local
