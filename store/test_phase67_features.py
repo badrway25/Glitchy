@@ -108,13 +108,16 @@ class Phase67StoreFeatureTests(TestCase):
         self.assertIn(self.simple, list(ctx["recently_viewed"]))
 
     # -- regressions + i18n ---------------------------------------------------
-    def test_gallery_snap_fix_still_present(self):
+    def test_gallery_carousel_transform_fix_still_present(self):
+        # Phase 75: transform-based carousel; the guarantee is the slide image is static (flows
+        # in the track) so prev/next change the visible image.
         import pathlib
         from django.conf import settings
-        css = (pathlib.Path(settings.BASE_DIR) / "greatkart" / "static" / "css" / "premium.css").read_text(encoding="utf-8")
-        import re
-        rule = re.search(r"\.pcard-slide\s*\{[^}]*\}", css).group(0).replace(" ", "")
-        self.assertIn("scroll-snap-align:start", rule)
+        base = pathlib.Path(settings.BASE_DIR) / "greatkart" / "static"
+        css = (base / "css" / "premium.css").read_text(encoding="utf-8").replace(" ", "")
+        js = (base / "js" / "product-card-gallery.js").read_text(encoding="utf-8")
+        self.assertIn(".pcard-slideimg{position:static!important", css)
+        self.assertIn("translateX", js)
 
     def test_i18n(self):
         from django.utils import translation

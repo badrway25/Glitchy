@@ -42,16 +42,14 @@ class Phase66GalleryFixTests(TestCase):
         self.addCleanup(translation.deactivate_all)
 
     # -- THE FIX: CSS regression guard ---------------------------------------
-    def test_pcard_slide_uses_start_snap_not_center(self):
-        css = CSS.read_text(encoding="utf-8")
-        # the .pcard-slide rule must use scroll-snap-align:start (the fix), never center
-        import re
-        m = re.search(r"\.pcard-slide\s*\{[^}]*\}", css)
-        self.assertIsNotNone(m, ".pcard-slide rule not found")
-        rule = m.group(0)
-        self.assertIn("scroll-snap-align:start", rule.replace(" ", ""))
-        self.assertNotIn("scroll-snap-align:center", rule.replace(" ", ""),
-                         "regression: center alignment pins the track to scrollLeft 0")
+    def test_pcard_carousel_is_transform_based_with_static_images(self):
+        # Phase 75 replaced the scroll-snap carousel with a transform-based one. The critical
+        # guarantee is that the slide IMAGE flows in the track (static), not position:absolute
+        # (which stacked every slide so the visible image never changed).
+        css = CSS.read_text(encoding="utf-8").replace(" ", "")
+        self.assertIn(".pcard-slideimg{position:static!important", css)
+        self.assertNotIn("scroll-snap-align:center", css,
+                         "regression: center alignment pinned the track to scrollLeft 0")
 
     # -- gallery markup -------------------------------------------------------
     def test_multi_image_renders_scrollable_track(self):
