@@ -145,8 +145,28 @@ class PrintifyAccountConfigAdmin(admin.ModelAdmin):
             rows.append("<div style='color:#8a8177;'>%s</div>" % _("No shop selected yet."))
         last = SyncLog.objects.filter(kind=SyncLog.KIND_PRODUCTS).order_by("-started_at").first()
         if last:
-            rows.append("<div style='margin-top:.5rem;opacity:.75;font-size:.85em;'>%s: %s</div>"
-                        % (_("Latest sync"), (last.message or "—")[:200]))
+            pill = ("display:inline-block;padding:.1rem .5rem;border-radius:999px;"
+                    "border:1px solid var(--gl-line,#e7e0d4);margin:.15rem .3rem .15rem 0;font-size:.8em;")
+            rows.append("<div style='margin-top:.7rem;font-weight:600;'>%s%s</div>" % (
+                _("Latest sync report"), (" · DRY-RUN" if last.dry_run else "")))
+            rows.append(
+                "<div style='margin-top:.3rem;'>"
+                "<span style='%s'>%s created</span><span style='%s'>%s updated</span>"
+                "<span style='%s'>%s hidden</span><span style='%s'>%s skipped</span>"
+                "<span style='%s'>%s errors</span></div>" % (
+                    pill, last.created_count, pill, last.updated_count, pill, last.hidden_count,
+                    pill, last.skipped_count, pill, last.error_count))
+            if last.missing_price_count or last.missing_image_count:
+                rows.append("<div style='opacity:.75;font-size:.82em;margin-top:.2rem;'>%s</div>" % (
+                    _("Needs review — missing price: %(p)d, missing image: %(i)d")
+                    % {"p": last.missing_price_count, "i": last.missing_image_count}))
+            # next-action links: hidden products + full sync log
+            rows.append(
+                "<div style='margin-top:.45rem;font-size:.85em;'>"
+                "<a href='/admin/store/product/?is_available__exact=0' style='color:var(--gl-gold,#a6824c);'>%s</a>"
+                " &nbsp;·&nbsp; <a href='/admin/store/product/' style='color:var(--gl-gold,#a6824c);'>%s</a>"
+                " &nbsp;·&nbsp; <a href='/admin/printify_integration/synclog/%s/change/' style='color:var(--gl-gold,#a6824c);'>%s</a></div>"
+                % (_("View hidden products"), _("All products"), last.pk, _("Full report")))
         rows.append("<div style='margin-top:.5rem;opacity:.7;font-size:.82em;'>%s</div>"
                     % _("Publishing and order creation stay OFF; sync updates the local catalogue only."))
         return mark_safe("<div style='line-height:1.6;'>%s</div>" % "".join(rows))
@@ -228,10 +248,15 @@ class PrintifyAccountConfigAdmin(admin.ModelAdmin):
         report, _log = import_catalog_from_config(cfg, apply=True)
         if report.get("error"):
             self.message_user(request, _("Sync failed: %(e)s") % {"e": report["error"]}, level="error")
+        elif report["created"] == 0 and report["updated"] == 0:
+            self.message_user(request, _("Sync finished but imported 0 products (%(s)d skipped for "
+                              "missing id/title). The shop may be empty or all products are drafts.")
+                              % {"s": report["skipped"]}, level="warning")
         else:
             self.message_user(request, _("Sync done: %(c)d created, %(u)d updated, %(h)d hidden "
-                              "(to review), %(e)d errors.") % {"c": report["created"], "u": report["updated"],
-                              "h": report["hidden"], "e": report["errors"]})
+                              "(no price — can't be sold), %(r)d need review. See the report below.")
+                              % {"c": report["created"], "u": report["updated"], "h": report["hidden"],
+                                 "r": len(report["to_review"])})
         return self._redirect(pk)
 
     def _dryrun_view(self, request, pk):
@@ -425,16 +450,53 @@ class PrintifyShippingEstimateCacheAdmin(admin.ModelAdmin):
 
 @admin.register(PrintifySyncState)
 class PrintifySyncStateAdmin(admin.ModelAdmin):
-    """Read-only monitor for the production-safe sync daemon (no token, no PII)."""
+    """Read-only 'Sync Monitor' for the production-safe sync daemon (no token, no PII).
+
+    This is a technical health page — it is deliberately not editable (the lock/backoff are
+    managed by the daemon). It answers 'is the background sync healthy?'; the per-import result
+    lives on the Printify account page."""
     list_display = ("monitor", "last_tick_at", "backoff_until", "consecutive_errors",
                     "products_synced_total", "updated_at")
-    readonly_fields = [f.name for f in PrintifySyncState._meta.fields]
+    readonly_fields = ["monitor_explain"] + [f.name for f in PrintifySyncState._meta.fields]
+    fieldsets = (
+        (_("What is this?"), {"fields": ("monitor_explain",)}),
+        (_("Health"), {"fields": ("last_tick_at", "last_full_sync_at", "backoff_until",
+                                  "backoff_level", "consecutive_errors", "last_error_at",
+                                  "last_error_status", "products_synced_total",
+                                  "last_tick_synced", "last_tick_requests", "updated_at")}),
+        (_("Lock (technical)"), {"fields": ("locked_at", "locked_by"), "classes": ("collapse",)}),
+    )
 
     def has_add_permission(self, request):
         return False
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+    def has_change_permission(self, request, obj=None):
+        return False        # readonly — the daemon owns this state, not the UI
+
+    @admin.display(description=_("About the Sync Monitor"))
+    def monitor_explain(self, obj):
+        from django.utils.safestring import mark_safe
+        recent = SyncLog.objects.filter(kind=SyncLog.KIND_PRODUCTS).order_by("-started_at")[:8]
+        rows = ["<div style='max-width:640px;line-height:1.6;'>",
+                "<p style='margin:.2rem 0;'>%s</p>" % _(
+                    "This page tracks the state of the background/manual Printify sync: when it "
+                    "last ran, whether it is in a rate-limit backoff, and how many errors it hit. "
+                    "It is read-only — the daemon manages the lock and backoff."),
+                "<div style='margin:.5rem 0;font-size:.85em;'>"
+                "<a href='/admin/printify_integration/printifyaccountconfig/' style='color:var(--gl-gold,#a6824c);'>%s</a>"
+                " &nbsp;·&nbsp; <a href='/admin/store/product/?is_available__exact=0' style='color:var(--gl-gold,#a6824c);'>%s</a>"
+                "</div>" % (_("Back to Printify account (run sync)"), _("Products needing review"))]
+        if recent:
+            rows.append("<div style='font-weight:600;margin-top:.4rem;'>%s</div><ul style='margin:.2rem 0 0 1rem;font-size:.85em;'>" % _("Recent product syncs"))
+            for lg in recent:
+                rows.append("<li>%s — %s</li>" % (lg.started_at.strftime("%Y-%m-%d %H:%M"),
+                                                  (lg.message or "—")[:120]))
+            rows.append("</ul>")
+        rows.append("</div>")
+        return mark_safe("".join(rows))
 
     @admin.display(description=_("Sync daemon"))
     def monitor(self, obj):
@@ -451,11 +513,55 @@ class PrintifySyncStateAdmin(admin.ModelAdmin):
 
 @admin.register(SyncLog)
 class SyncLogAdmin(admin.ModelAdmin):
-    list_display = ("kind", "status_badge", "created_count", "updated_count",
-                    "error_count", "duration_display", "started_at")
-    list_filter = ("kind", "status")
-    readonly_fields = [f.name for f in SyncLog._meta.fields]
+    list_display = ("kind", "status_badge", "created_count", "updated_count", "hidden_count",
+                    "skipped_count", "error_count", "duration_display", "started_at")
+    list_filter = ("kind", "status", "dry_run")
+    readonly_fields = ["report_detail"] + [f.name for f in SyncLog._meta.fields]
+    fieldsets = (
+        (_("Report"), {"fields": ("report_detail",)}),
+        (_("Counts"), {"fields": ("kind", "status", "dry_run", "shop_id", "created_count",
+                                  "updated_count", "hidden_count", "skipped_count",
+                                  "missing_price_count", "missing_image_count", "error_count")}),
+        (_("Timing"), {"fields": ("started_at", "finished_at", "message")}),
+        (_("Raw detail"), {"fields": ("detail",), "classes": ("collapse",)}),
+    )
     actions = ["run_product_sync", "run_order_pull"]
+
+    @admin.display(description=_("Sync report"))
+    def report_detail(self, obj):
+        from django.utils.safestring import mark_safe
+        det = obj.detail or {}
+        rows = ["<div style='max-width:680px;line-height:1.6;'>"]
+        rows.append("<p style='margin:.2rem 0;'>%s: <strong>%s</strong> · shop <code>%s</code>%s</p>" % (
+            _("Operation"), obj.get_kind_display(), obj.shop_id or "—",
+            " · DRY-RUN" if obj.dry_run else ""))
+        rows.append("<p style='margin:.2rem 0;'>%s</p>" % (obj.message or "—"))
+        to_review = det.get("to_review") or []
+        if to_review:
+            rows.append("<div style='font-weight:600;margin-top:.4rem;'>%s (%d)</div>" % (
+                _("Products needing review"), len(to_review)))
+            rows.append("<ul style='margin:.2rem 0 0 1rem;font-size:.86em;'>")
+            for it in to_review[:60]:
+                if isinstance(it, dict):
+                    slug = it.get("slug", ""); pid = it.get("id")
+                    why = ", ".join(it.get("reasons", [])) or "review"
+                    hid = " · hidden" if it.get("hidden") else ""
+                    link = ("/admin/store/product/%s/change/" % pid) if pid else "#"
+                    rows.append("<li><a href='%s' style='color:var(--gl-gold,#a6824c);'>%s</a> — %s%s</li>"
+                                % (link, slug, why, hid))
+                else:
+                    rows.append("<li>%s</li>" % it)
+            rows.append("</ul>")
+        samples = det.get("samples") or []
+        if samples:
+            rows.append("<div style='font-weight:600;margin-top:.4rem;'>%s</div><ul style='margin:.2rem 0 0 1rem;font-size:.86em;'>" % _("Sample products"))
+            for s in samples[:8]:
+                rows.append("<li>%s — price %s — %s</li>" % (
+                    s.get("title", "?"), s.get("price", "?"),
+                    _("has image") if s.get("has_image") else _("no image")))
+            rows.append("</ul>")
+        rows.append("</div>")
+        return mark_safe("".join(rows))
 
     @admin.display(description=_("Status"))
     def status_badge(self, obj):
