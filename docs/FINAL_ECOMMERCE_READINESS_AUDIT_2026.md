@@ -25,6 +25,16 @@ local Windows dev machine; **no real staging host exists**.
 | Security | ✅ Strong (dev) | No secrets in git, push/shipping/payments OFF. Key rotation still pending. |
 
 ## 2. What is genuinely COMPLETE
+- **Store visual interaction fixes + Glitchy favicon** (Phase 74): regenerated the stale
+  favicon from the brand mark (multi-size ico + png + apple-touch, site + admin); fixed the
+  store card carousel to show every photo in-card via `card_image_urls` (main + gallery, local
+  or remote Printify src, de-duplicated, no N+1) + kept arrows visible on touch; fixed the
+  "Refine your look" filters to collapse fully (residual padding-bottom clipped — no sliver);
+  made the PDP Color/Size controls premium (gold accent by default, and the variant dropdown
+  now renders as a real bordered+shadowed box that isn't clipped — the `1px solid var(--border)`
+  double-shorthand and undefined `--shadow-lg` bugs are fixed); and wired discreet per-visitor
+  shipping-country detection (CDN `CF-IPCountry`, session-cached, valid per-country rates). No
+  migration. See `docs/STORE_VISUAL_INTERACTION_FIXES_2026.md`.
 - **Printify sync UX + Glitchy branding + premium loader** (Phase 73): root-caused "connected
   but no products" — our own previous over-aggressive policy hid every product missing
   price/image/category, and the storefront filters hidden ones, so the owner saw created>0 but
