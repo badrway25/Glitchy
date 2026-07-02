@@ -26,7 +26,13 @@
   {"@context":"https://schema.org","@type":"Organization","name":"{{ SITE_NAME }}","url":"{{ SITE_URL }}","description":"{{ SITE_TAGLINE }}"}
   </script>
 
-  <link href="{% static 'images/favicon.ico' %}" rel="shortcut icon" type="image/x-icon">
+  {% comment %}Glitchy favicon — regenerated from the brand mark. Hashed static filenames
+  (manifest storage) bust the browser cache automatically when the asset changes.{% endcomment %}
+  <link href="{% static 'images/favicon.ico' %}" rel="icon" sizes="any" type="image/x-icon">
+  <link href="{% static 'images/favicon-32.png' %}" rel="icon" sizes="32x32" type="image/png">
+  <link href="{% static 'images/favicon-16.png' %}" rel="icon" sizes="16x16" type="image/png">
+  <link href="{% static 'images/apple-touch-icon.png' %}" rel="apple-touch-icon" sizes="180x180">
+  <meta name="theme-color" content="#221a11">
 
   <!-- Fonts (modern) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
