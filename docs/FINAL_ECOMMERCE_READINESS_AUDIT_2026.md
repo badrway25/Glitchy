@@ -25,6 +25,16 @@ local Windows dev machine; **no real staging host exists**.
 | Security | ✅ Strong (dev) | No secrets in git, push/shipping/payments OFF. Key rotation still pending. |
 
 ## 2. What is genuinely COMPLETE
+- **Printify sync UX + Glitchy branding + premium loader** (Phase 73): root-caused "connected
+  but no products" — our own previous over-aggressive policy hid every product missing
+  price/image/category, and the storefront filters hidden ones, so the owner saw created>0 but
+  0 visible with only a transient message. Fix: only **unsellable** (no-price) products hide;
+  incomplete-but-sellable ones import **visible + flagged**; a **persistent report** (SyncLog
+  richer counts + JSON detail) shows created/updated/hidden/skipped + per-product reasons +
+  links to the hidden set. `PrintifySyncState` → readonly **"Sync Monitor"** (explained). Admin
+  now shows the **Glitchy logo + favicon** (not the settings icon). Premium **loader overlay**
+  (stepped, reduced-motion safe) on every Printify operation. Migration `0007`; no publish/order,
+  token never leaks. See `docs/PRINTIFY_SYNC_UX_BRANDING_LOADER_2026.md`.
 - **Printify admin connection + shop discovery + catalog import** (Phase 72): the admin is now
   operational end-to-end. Root cause of "credentials entered but nothing imported": sync used
   the *env* token (not the admin config), the actions were changelist-only (no change-form
