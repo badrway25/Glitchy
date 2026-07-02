@@ -135,15 +135,51 @@ def _gl_admin_js(request):
     return static("glitchy_admin/motion.js")
 
 
+def _gl_ops_js(request):
+    from django.templatetags.static import static
+    return static("glitchy_admin/ops-modal.js")
+
+
+def _gl_ops_css(request):
+    from django.templatetags.static import static
+    return static("glitchy_admin/ops-modal.css")
+
+
+# Brand assets (deferred static() so resolution happens at request time, not import time).
+def _gl_logo_dark(request):        # dark ink — shown on LIGHT admin background
+    from django.templatetags.static import static
+    return static("images/brand/logo-glitchy-nav.png")
+
+
+def _gl_logo_light(request):       # light ink — shown on DARK admin background
+    from django.templatetags.static import static
+    return static("images/brand/logo-glitchy-nav-light.png")
+
+
+def _gl_mark(request):
+    from django.templatetags.static import static
+    return static("images/brand/logo-glitchy-mark.png")
+
+
+def _gl_favicon(request):
+    from django.templatetags.static import static
+    return static("images/favicon.ico")
+
+
 UNFOLD = {
     "SITE_TITLE": "Glitchy Commerce Studio",
     "SITE_HEADER": "Glitchy Commerce Studio",
     "SITE_SUBHEADER": "Print-on-demand operations",
     "SITE_URL": "/",
+    # Glitchy branding — replaces Unfold's default material-symbols "settings" mark.
+    "SITE_LOGO": {"light": _gl_logo_dark, "dark": _gl_logo_light},   # horizontal nav logo
+    "SITE_ICON": {"light": _gl_mark, "dark": _gl_mark},              # square monogram mark
+    "SITE_SYMBOL": "storefront",                                     # valid Material Symbol fallback only
+    "SITE_FAVICONS": [{"rel": "icon", "sizes": "any", "type": "image/x-icon", "href": _gl_favicon}],
     "SHOW_HISTORY": True,
     "SHOW_VIEW_ON_SITE": True,
-    "STYLES": [_gl_admin_css, _gl_admin_forms_css],
-    "SCRIPTS": [_gl_admin_js],
+    "STYLES": [_gl_admin_css, _gl_admin_forms_css, _gl_ops_css],
+    "SCRIPTS": [_gl_admin_js, _gl_ops_js],
     "ENVIRONMENT": "greatkart.admin_ext.environment_callback",
     "DASHBOARD_CALLBACK": "greatkart.admin_ext.dashboard_callback",
     "COLORS": {
