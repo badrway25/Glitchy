@@ -1,0 +1,51 @@
+/* Glitchy admin — premium operation loader/overlay for Printify actions.
+   Reuses the .gl-* design tokens (premium.css). Reduced-motion safe. No CDN. */
+#gl-ops-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  display: none; align-items: center; justify-content: center;
+  background: color-mix(in srgb, var(--gl-ink, #221a12) 55%, transparent);
+  backdrop-filter: blur(4px);
+}
+#gl-ops-overlay.gl-on { display: flex; }
+
+.gl-ops-card {
+  width: min(92vw, 380px);
+  background: var(--gl-surface, #fffdf9);
+  color: var(--gl-text, #2a2419);
+  border: 1px solid var(--gl-line, #e7e0d4);
+  border-radius: var(--gl-radius, 16px);
+  box-shadow: var(--gl-shadow, 0 24px 60px rgba(40,30,15,.28));
+  padding: 1.6rem 1.5rem;
+  text-align: center;
+}
+html.dark .gl-ops-card { background: #1c1913; color: #efe7d6; border-color: #34302a; }
+
+.gl-ops-spinner {
+  width: 46px; height: 46px; margin: 0 auto .9rem;
+  border-radius: 50%;
+  border: 3px solid color-mix(in srgb, var(--gl-gold, #a6824c) 25%, transparent);
+  border-top-color: var(--gl-gold, #a6824c);
+  animation: gl-ops-spin .9s linear infinite;
+}
+@keyframes gl-ops-spin { to { transform: rotate(360deg); } }
+
+.gl-ops-title { font-weight: 700; font-size: 1.02rem; margin: 0 0 .25rem; }
+.gl-ops-step { font-size: .86rem; color: var(--gl-muted, #8a8177); min-height: 1.2em; }
+.gl-ops-steps { margin: .8rem 0 0; padding: 0; list-style: none; text-align: left; }
+.gl-ops-steps li {
+  font-size: .82rem; color: var(--gl-muted, #8a8177);
+  padding: .12rem 0 .12rem 1.4rem; position: relative; opacity: .5;
+  transition: opacity .25s var(--gl-ease, ease);
+}
+.gl-ops-steps li::before {
+  content: "○"; position: absolute; left: 0; color: var(--gl-line, #cbc3b4);
+}
+.gl-ops-steps li.gl-done { opacity: 1; }
+.gl-ops-steps li.gl-done::before { content: "✓"; color: var(--gl-gold, #a6824c); }
+.gl-ops-steps li.gl-active { opacity: 1; color: var(--gl-text, #2a2419); }
+.gl-ops-steps li.gl-active::before { content: "◆"; color: var(--gl-gold, #a6824c); }
+
+@media (prefers-reduced-motion: reduce) {
+  .gl-ops-spinner { animation: none; }
+  .gl-ops-steps li { transition: none; }
+}
