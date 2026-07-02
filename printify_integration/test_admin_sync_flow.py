@@ -117,15 +117,37 @@ class PrintifyAdminFlowTests(TestCase):
         self.assertIn("not a numeric Printify shop ID", html)
 
     # -- catalog import ------------------------------------------------------
-    def test_sync_creates_and_hides_products(self):
+    def test_sync_creates_hides_unsellable_and_keeps_incomplete_visible(self):
+        # New policy: only UNSELLABLE (no price) products are hidden. Incomplete-but-sellable
+        # (e.g. missing image but priced) stay VISIBLE and are flagged for review, so a
+        # connected shop's catalogue actually appears instead of silently vanishing.
         cfg = self._cfg(shop_id="12345")
         self.client.force_login(self.su)
-        pages = [[_product("p1", "Good Tee"), _product("p2", "No Image Tee", with_image=False)]]
+        pages = [[
+            _product("p1", "Good Tee"),                                   # complete -> visible
+            _product("p2", "No Image Tee", with_image=False),            # priced, no image -> visible + flagged
+            _product("p3", "No Price Tee", price_cents=0),               # no price -> hidden
+        ]]
         with patch("printify_integration.services.client_for_config", return_value=_mock_client(pages)):
             self.client.post(self._u("sync", cfg.id))
-        self.assertTrue(Product.objects.filter(printify_product_id="p1").exists())
-        no_img = Product.objects.get(printify_product_id="p2")
-        self.assertFalse(no_img.is_available)              # missing image -> hidden / to review
+        self.assertTrue(Product.objects.get(printify_product_id="p1").is_available)
+        self.assertTrue(Product.objects.get(printify_product_id="p2").is_available)   # NOT hidden anymore
+        self.assertFalse(Product.objects.get(printify_product_id="p3").is_available)  # unsellable -> hidden
+
+    def test_sync_persists_report_counts_and_reasons(self):
+        from printify_integration.models import SyncLog
+        cfg = self._cfg(shop_id="12345")
+        self.client.force_login(self.su)
+        pages = [[_product("q1", "Good Tee"), _product("q2", "No Price", price_cents=0)]]
+        with patch("printify_integration.services.client_for_config", return_value=_mock_client(pages)):
+            self.client.post(self._u("sync", cfg.id))
+        log = SyncLog.objects.filter(kind=SyncLog.KIND_PRODUCTS).order_by("-started_at").first()
+        self.assertEqual(log.created_count, 2)
+        self.assertEqual(log.hidden_count, 1)              # the no-price product
+        self.assertEqual(log.shop_id, "12345")
+        self.assertFalse(log.dry_run)
+        review = log.detail.get("to_review", [])
+        self.assertTrue(any("no price" in (it.get("reasons") or []) for it in review))
 
     def test_dry_run_writes_nothing(self):
         cfg = self._cfg(shop_id="12345")
