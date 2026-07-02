@@ -75,29 +75,44 @@ def _from_api(ip: str) -> str | None:
     return None
 
 
+AUTO_KEY = "ship_country_auto"      # cached best-effort detection (once per visitor, discreet)
+
+
 def detect_country(request) -> str:
-    """Return a best-effort ISO-3166 alpha-2 country code (never empty)."""
+    """Return a best-effort ISO-3166 alpha-2 country code (never empty).
+
+    Detection is discreet and server-side: an explicit choice wins, then the CDN/proxy country
+    header (e.g. Cloudflare CF-IPCountry — no external call, no PII), then an optional cached
+    IP lookup. The auto-detected value is cached in the session so the (possible) lookup runs
+    at most once per visitor and the country stays stable while they browse."""
     default = getattr(settings, "SHIPPING_DEFAULT_COUNTRY", "IT")
 
-    # 1. Manual session override (set via the country switcher).
+    # 1. Manual override (country switcher) — always wins.
     manual = (request.session.get(SESSION_KEY) or "").strip().upper()
     if manual and len(manual) == 2:
         return manual
 
-    # 2. CDN / proxy headers.
+    # 2. CDN / proxy headers (fresh every request — cheap, reflects the real visitor).
     header_country = _from_headers(request)
     if header_country:
+        request.session[AUTO_KEY] = header_country
         return header_country
 
-    # 3 & 4. IP-based lookups (only for routable public IPs).
+    # 3. Cached auto-detection from a previous request (avoids repeat IP lookups).
+    cached = (request.session.get(AUTO_KEY) or "").strip().upper()
+    if cached and len(cached) == 2:
+        return cached
+
+    # 4. IP-based lookups (only for routable public IPs); cache the result.
     ip = get_client_ip(request)
     if _is_public_ip(ip):
         for resolver in (_from_geoip2, _from_api):
             code = resolver(ip)
             if code:
+                request.session[AUTO_KEY] = code
                 return code
 
-    # 5. Fallback.
+    # 5. Fallback (not cached, so detection can still succeed on a later request).
     return default
 
 
