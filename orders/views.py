@@ -21,7 +21,16 @@ import json
 
 
 import stripe
-stripe.api_key = settings.STRIPE_SECRET_KEY
+stripe.api_key = settings.STRIPE_SECRET_KEY   # import-time default; refreshed per request below
+
+
+def _use_stripe():
+    """Refresh the Stripe key per request from the admin config (DB-preferred) or env, so a key
+    entered in the Payment Control Center takes effect without a redeploy. Backward-compatible:
+    with no DB config it returns the same env key as before."""
+    from payments import config as pconf
+    stripe.api_key = pconf.stripe_secret_key() or ""
+    return stripe
 
 
 def _resolve_pending_order(request, order_number):
@@ -60,6 +69,7 @@ def stripe_return(request):
 
     # retrieve PI from Stripe
     try:
+        _use_stripe()
         intent = stripe.PaymentIntent.retrieve(payment_intent_id)
     except Exception:
         messages.error(request, "We couldn't verify the payment with Stripe. Please try again.")
@@ -115,6 +125,7 @@ def stripe_create_intent(request):
         return JsonResponse({"error": "Invalid order total"}, status=400)
 
     try:
+        _use_stripe()
         intent = stripe.PaymentIntent.create(
             amount=amount_cents,
             currency=settings.STRIPE_CURRENCY,
@@ -128,9 +139,10 @@ def stripe_create_intent(request):
     except Exception:
         return JsonResponse({"error": "Stripe intent creation failed"}, status=500)
 
+    from payments import config as pconf
     return JsonResponse({
         "clientSecret": intent.client_secret,
-        "publishableKey": settings.STRIPE_PUBLIC_KEY,
+        "publishableKey": pconf.stripe_publishable_key(),
     })
 
 
@@ -156,6 +168,7 @@ def stripe_confirm(request):
 
     # verify with Stripe
     try:
+        _use_stripe()
         intent = stripe.PaymentIntent.retrieve(payment_intent_id)
     except Exception:
         messages.error(request, "We couldn't verify the payment with Stripe.")
@@ -198,12 +211,16 @@ def stripe_webhook(request):
     """
     payload = request.body
     sig_header = request.META.get("HTTP_STRIPE_SIGNATURE", "")
-    secret = settings.STRIPE_WEBHOOK_SECRET
+    from payments import config as pconf
+    from payments.models import PaymentEvent
+    _use_stripe()
+    secret = pconf.stripe_webhook_secret()
 
     try:
         event = stripe.Webhook.construct_event(payload, sig_header, secret)
     except Exception:
         # Invalid signature / payload — reject (no secret logged).
+        PaymentEvent.log("stripe", PaymentEvent.KIND_WEBHOOK, ok=False, reason_safe="signature/payload rejected")
         return HttpResponse(status=400)
 
     etype = _ev_get(event, "type")

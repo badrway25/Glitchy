@@ -104,6 +104,7 @@ INSTALLED_APPS = [
     "carts",
     "orders",
     "printify_integration",
+    "payments",
     "shipping",
     "returns",
     "notifications",
@@ -166,10 +167,13 @@ def _gl_favicon(request):
     return static("images/favicon.ico")
 
 
+# gettext_lazy for admin i18n — lazy, safe at settings import (no premature translation).
+from django.utils.translation import gettext_lazy as _  # noqa: E402 (harvested by makemessages)
+
 UNFOLD = {
-    "SITE_TITLE": "Glitchy Commerce Studio",
-    "SITE_HEADER": "Glitchy Commerce Studio",
-    "SITE_SUBHEADER": "Print-on-demand operations",
+    "SITE_TITLE": _("Glitchy Commerce Studio"),
+    "SITE_HEADER": _("Glitchy Commerce Studio"),
+    "SITE_SUBHEADER": _("Print-on-demand operations"),
     "SITE_URL": "/",
     # Glitchy branding — replaces Unfold's default material-symbols "settings" mark.
     "SITE_LOGO": {"light": _gl_logo_dark, "dark": _gl_logo_light},   # horizontal nav logo
@@ -195,23 +199,31 @@ UNFOLD = {
         "show_all_applications": True,
         "navigation": [
             {
-                "title": "Commerce",
+                "title": _("Commerce"),
                 "separator": True,
                 "items": [
-                    {"title": "Products", "icon": "inventory_2", "link": "/admin/store/product/"},
-                    {"title": "Categories", "icon": "category", "link": "/admin/category/category/"},
-                    {"title": "Orders", "icon": "receipt_long", "link": "/admin/orders/order/"},
-                    {"title": "Customers", "icon": "group", "link": "/admin/accounts/account/"},
+                    {"title": _("Products"), "icon": "inventory_2", "link": "/admin/store/product/"},
+                    {"title": _("Categories"), "icon": "category", "link": "/admin/category/category/"},
+                    {"title": _("Orders"), "icon": "receipt_long", "link": "/admin/orders/order/"},
+                    {"title": _("Customers"), "icon": "group", "link": "/admin/accounts/account/"},
                 ],
             },
             {
-                "title": "Printify control",
+                "title": _("Printify control"),
                 "separator": True,
                 "items": [
-                    {"title": "Printify accounts", "icon": "vpn_key", "link": "/admin/printify_integration/printifyaccountconfig/"},
-                    {"title": "Sync monitor", "icon": "sync", "link": "/admin/printify_integration/printifysyncstate/"},
-                    {"title": "Sync logs", "icon": "history", "link": "/admin/printify_integration/synclog/"},
-                    {"title": "Shipping profiles", "icon": "local_shipping", "link": "/admin/printify_integration/printifyshippingprofile/"},
+                    {"title": _("Printify accounts"), "icon": "vpn_key", "link": "/admin/printify_integration/printifyaccountconfig/"},
+                    {"title": _("Sync monitor"), "icon": "sync", "link": "/admin/printify_integration/printifysyncstate/"},
+                    {"title": _("Sync logs"), "icon": "history", "link": "/admin/printify_integration/synclog/"},
+                    {"title": _("Shipping profiles"), "icon": "local_shipping", "link": "/admin/printify_integration/printifyshippingprofile/"},
+                ],
+            },
+            {
+                "title": _("Payment control"),
+                "separator": True,
+                "items": [
+                    {"title": _("Payment providers"), "icon": "payments", "link": "/admin/payments/paymentproviderconfig/"},
+                    {"title": _("Payment monitor"), "icon": "monitoring", "link": "/admin/payments/paymentevent/"},
                 ],
             },
         ],
@@ -402,6 +414,8 @@ PRINTIFY_SHOP_ID = env("PRINTIFY_SHOP_ID", "")
 # at rest. Generate once: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
 # If unset, the admin refuses to save a token (fail-closed); env PRINTIFY_API_TOKEN still works.
 PRINTIFY_CONFIG_KEY = env("PRINTIFY_CONFIG_KEY", "")
+# Separate Fernet key for admin-entered PAYMENT secrets (Stripe/PayPal). Own blast radius.
+PAYMENT_CONFIG_KEY = env("PAYMENT_CONFIG_KEY", "")
 # Safety switch: when False, orders are NOT pushed to the real Printify shop
 # (used for integration dry-runs so no real Printify order is created).
 PRINTIFY_PUSH_ENABLED = env_bool("PRINTIFY_PUSH_ENABLED", True)

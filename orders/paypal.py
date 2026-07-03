@@ -15,17 +15,18 @@ logger = logging.getLogger("orders.paypal")
 
 
 def paypal_available():
-    """True only when PayPal is explicitly enabled AND both credentials are present."""
-    return bool(getattr(settings, "PAYPAL_ENABLED", False)
-                and getattr(settings, "PAYPAL_CLIENT_ID", "")
-                and getattr(settings, "PAYPAL_SECRET", ""))
+    """True only when PayPal is enabled AND both credentials are present (admin config or env).
+    Credentials resolve DB-first (payments.config) then fall back to env — see the resolver."""
+    from payments import config as pc
+    return pc.paypal_available()
 
 
 def _access_token():
     import requests
-    base = getattr(settings, "PAYPAL_API_BASE", "https://api-m.sandbox.paypal.com")
+    from payments import config as pc
+    base = pc.paypal_api_base()
     resp = requests.post(f"{base}/v1/oauth2/token",
-                         auth=(settings.PAYPAL_CLIENT_ID, settings.PAYPAL_SECRET),
+                         auth=(pc.paypal_client_id(), pc.paypal_secret()),
                          data={"grant_type": "client_credentials"},
                          headers={"Accept": "application/json"}, timeout=15)
     resp.raise_for_status()
@@ -41,7 +42,8 @@ def verify_capture(capture_id, expected_amount, expected_currency):
         return False, "missing_capture"
     try:
         import requests
-        base = settings.PAYPAL_API_BASE
+        from payments import config as pc
+        base = pc.paypal_api_base()
         token = _access_token()
         resp = requests.get(f"{base}/v2/payments/captures/{capture_id}",
                             headers={"Authorization": f"Bearer {token}",
