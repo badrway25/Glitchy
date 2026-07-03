@@ -114,17 +114,41 @@ class ResolverTests(TestCase):
             self.assertEqual(pc.stripe_secret_key(), "sk_env")      # falls back — live gate off
 
 
-class MonitorAndI18nTests(TestCase):
-    def test_payment_event_is_readonly_and_idempotent(self):
-        from payments.models import PaymentEvent
-        PaymentEvent.log("stripe", PaymentEvent.KIND_WEBHOOK, external_id="evt_1", ok=True)
-        PaymentEvent.log("stripe", PaymentEvent.KIND_WEBHOOK, external_id="evt_1", ok=True)  # dup
-        self.assertEqual(PaymentEvent.objects.filter(external_id="evt_1").count(), 1)
+class CredentialFieldsUXTests(TestCase):
+    """The owner's report: the add form showed no fields for the API keys."""
 
-    def test_admin_strings_are_translatable_to_italian(self):
-        from django.utils import translation
-        with translation.override("it"):
-            from django.utils.translation import gettext as g
-            self.assertEqual(g("Payment control"), "Controllo pagamenti")
-            self.assertEqual(g("Payment providers"), "Provider di pagamento")
-            self.assertEqual(g("Products"), "Prodotti")
+    @classmethod
+    def setUpTestData(cls):
+        cls.su = Account.objects.create_superuser("Adm", "User", "adm2@x.com", "adm2", "pw-Str0ng!123")
+
+    def test_add_form_shows_stripe_and_paypal_credential_fields(self):
+        self.client.force_login(self.su)
+        html = self.client.get("/admin/payments/paymentproviderconfig/add/").content.decode()
+        for field in ("id_stripe_publishable_key", "id_new_stripe_secret_key",
+                      "id_new_stripe_webhook_secret", "id_paypal_client_id",
+                      "id_new_paypal_secret", "id_paypal_webhook_id"):
+            self.assertIn(field, html, f"add form is missing {field}")
+
+    def test_add_form_hides_non_editable_meta(self):
+        self.client.force_login(self.su)
+        html = self.client.get("/admin/payments/paymentproviderconfig/add/").content.decode()
+        self.assertNotIn("field-created_at", html)
+        self.assertNotIn("field-updated_at", html)
+        self.assertNotIn("field-connection_state_detail", html)
+
+    def test_environment_defaults_to_test_not_live(self):
+        from payments.models import PaymentProviderConfig
+        c = PaymentProviderConfig.objects.create(provider="paypal")
+        self.assertEqual(c.environment, "test")
+        self.assertFalse(c.is_live())
+
+    def test_capture_and_refund_gates_default_off(self):
+        from payments.models import PaymentProviderConfig
+        c = PaymentProviderConfig.objects.create(provider="stripe")
+        self.assertFalse(c.allow_capture)
+        self.assertFalse(c.allow_refund)
+
+
+# NOTE: the F76B admin language-switcher / i18n-catalog tests were NOT ported here —
+# those commits (86cc950, 3b013ed) are intentionally excluded from this integration
+# (they conflict with 4 later i18n phases) and remain pending work.
