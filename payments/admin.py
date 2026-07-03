@@ -33,22 +33,30 @@ _SECRET_FIELDS = {
 class PaymentProviderConfigForm(forms.ModelForm):
     new_stripe_secret_key = forms.CharField(
         required=False, label=_("Set / replace Stripe secret key"),
-        widget=forms.PasswordInput(render_value=False, attrs={"autocomplete": "new-password"}),
+        widget=forms.PasswordInput(render_value=False,
+                                   attrs={"autocomplete": "new-password", "placeholder": "sk_test_… / sk_live_…"}),
         help_text=_("Write-only. Leave blank to keep the current key. Encrypted at rest, never shown again."))
     new_stripe_webhook_secret = forms.CharField(
         required=False, label=_("Set / replace Stripe webhook signing secret"),
-        widget=forms.PasswordInput(render_value=False, attrs={"autocomplete": "new-password"}),
+        widget=forms.PasswordInput(render_value=False,
+                                   attrs={"autocomplete": "new-password", "placeholder": "whsec_…"}),
         help_text=_("Write-only. Used to verify webhook signatures."))
     new_paypal_secret = forms.CharField(
         required=False, label=_("Set / replace PayPal client secret"),
-        widget=forms.PasswordInput(render_value=False, attrs={"autocomplete": "new-password"}),
+        widget=forms.PasswordInput(render_value=False,
+                                   attrs={"autocomplete": "new-password", "placeholder": "PayPal client secret"}),
         help_text=_("Write-only. Encrypted at rest, never shown again."))
 
     class Meta:
         model = PaymentProviderConfig
         fields = ("provider", "display_name", "is_enabled", "environment", "currency",
-                  "stripe_publishable_key", "paypal_client_id", "paypal_api_base",
-                  "allow_checkout", "allow_live_mode")
+                  "stripe_publishable_key", "paypal_client_id", "paypal_webhook_id", "paypal_api_base",
+                  "allow_checkout", "allow_capture", "allow_refund", "allow_live_mode")
+        widgets = {
+            "stripe_publishable_key": forms.TextInput(attrs={"placeholder": "pk_test_… / pk_live_…"}),
+            "paypal_client_id": forms.TextInput(attrs={"placeholder": "PayPal client id (sandbox / live)"}),
+            "paypal_api_base": forms.TextInput(attrs={"placeholder": "auto (sandbox) — or https://api-m.paypal.com"}),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -92,43 +100,50 @@ class PaymentProviderConfigAdmin(BaseModelAdmin):
     change_form_template = "admin/payments/paymentproviderconfig/change_form.html"
     list_display = ("provider", "provider_badge", "is_enabled", "environment", "connection_badge", "updated_at")
     list_filter = ("provider", "is_enabled", "environment")
-    readonly_fields = ("secret_state_detail", "payment_ops_panel", "connection_state_detail",
-                       "created_at", "updated_at")
+    readonly_fields = ("stripe_secret_state", "paypal_secret_state", "payment_ops_panel",
+                       "connection_state_detail", "created_at", "updated_at")
 
-    add_fieldsets = (
-        (_("Provider"), {"fields": ("provider", "display_name", "is_enabled", "environment", "currency"),
-                         "description": _("Pick a provider and Save, then add credentials + test the connection.")}),
-    )
-    stripe_fieldsets = (
+    # ONE layout for add AND change: the credential fields are visible immediately (the owner
+    # can enter keys without saving first). Both provider sections are rendered; payment-admin.js
+    # shows only the one matching the selected provider (no-JS shows both — accessible fallback).
+    _STRIPE_HELP = _("Stripe Dashboard → Developers → API keys (Publishable + Secret). Webhook "
+                     "signing secret: Developers → Webhooks → your endpoint. Test keys start "
+                     "sk_test_/pk_test_, live keys sk_live_/pk_live_. Live checkout stays OFF "
+                     "until a superuser enables it below.")
+    _PAYPAL_HELP = _("PayPal Developer Dashboard → Apps & Credentials (Sandbox or Live) → your "
+                     "app → Client ID + Secret. Webhook ID: your app → Webhooks. Sandbox is the "
+                     "default; Live checkout stays OFF until a superuser enables it below.")
+    fieldsets = (
         (_("Provider"), {"fields": ("provider", "display_name", "is_enabled", "environment", "currency")}),
-        (_("Stripe keys"), {"fields": ("stripe_publishable_key", "new_stripe_secret_key",
-                                       "new_stripe_webhook_secret", "secret_state_detail")}),
+        (_("Stripe credentials"), {"classes": ("gl-prov", "gl-prov-stripe"),
+                                   "description": _STRIPE_HELP,
+                                   "fields": ("stripe_publishable_key", "new_stripe_secret_key",
+                                              "new_stripe_webhook_secret", "stripe_secret_state")}),
+        (_("PayPal credentials"), {"classes": ("gl-prov", "gl-prov-paypal"),
+                                   "description": _PAYPAL_HELP,
+                                   "fields": ("paypal_client_id", "paypal_webhook_id", "paypal_api_base",
+                                              "new_paypal_secret", "paypal_secret_state")}),
         (_("Payment operations"), {"fields": ("payment_ops_panel",)}),
-        (_("Safety gates"), {"fields": ("allow_checkout", "allow_live_mode")}),
+        (_("Safety gates"), {"fields": ("allow_checkout", "allow_capture", "allow_refund", "allow_live_mode")}),
         (_("Connection status"), {"fields": ("connection_state_detail",)}),
         (_("Meta"), {"fields": ("created_at", "updated_at")}),
     )
-    paypal_fieldsets = (
-        (_("Provider"), {"fields": ("provider", "display_name", "is_enabled", "environment", "currency")}),
-        (_("PayPal credentials"), {"fields": ("paypal_client_id", "paypal_api_base",
-                                              "new_paypal_secret", "secret_state_detail")}),
-        (_("Payment operations"), {"fields": ("payment_ops_panel",)}),
-        (_("Safety gates"), {"fields": ("allow_checkout", "allow_live_mode")}),
-        (_("Connection status"), {"fields": ("connection_state_detail",)}),
-        (_("Meta"), {"fields": ("created_at", "updated_at")}),
-    )
+
+    # readonly, non-editable rows that only make sense once the object exists — hidden on ADD so
+    # the creation form stays focused on the fields the owner actually fills in.
+    _ADD_HIDDEN = frozenset({"created_at", "updated_at", "connection_state_detail",
+                             "stripe_secret_state", "paypal_secret_state", "payment_ops_panel"})
 
     def get_fieldsets(self, request, obj=None):
-        if obj is None:
-            fs = self.add_fieldsets
-        else:
-            fs = self.paypal_fieldsets if obj.provider == PaymentProviderConfig.PAYPAL else self.stripe_fieldsets
-        if _is_superadmin(request.user):
-            return fs
-        # non-superadmins never see the write-only secret fields
+        fs = self.fieldsets
+        is_add = obj is None
+        drop = set() if _is_superadmin(request.user) else set(_SECRET_FIELDS)
         cleaned = []
         for title, opts in fs:
-            fields = tuple(f for f in opts["fields"] if f not in _SECRET_FIELDS)
+            fields = tuple(f for f in opts["fields"]
+                           if f not in drop and not (is_add and f in self._ADD_HIDDEN))
+            if not fields:                      # skip sections that became empty (e.g. Meta on add)
+                continue
             cleaned.append((title, {**opts, "fields": fields}))
         return tuple(cleaned)
 
@@ -178,20 +193,25 @@ class PaymentProviderConfigAdmin(BaseModelAdmin):
         return mark_safe('<span style="background:%s;color:#fff;padding:2px 8px;border-radius:999px;'
                          'font-size:11px;font-weight:600;">%s</span>' % (colors.get(s, "#64748b"), label))
 
-    @admin.display(description=_("Secret status"))
-    def secret_state_detail(self, obj):
+    def _secret_state(self, obj, slots):
         if obj is None or not obj.pk:
-            return _("Save first, then add credentials.")
+            return _("Not saved yet — enter the credentials above and Save.")
         rows = []
-        slots = [("stripe_secret_key", _("Stripe secret key")),
-                 ("stripe_webhook_secret", _("Webhook secret"))] if obj.provider == PaymentProviderConfig.STRIPE \
-            else [("paypal_secret", _("PayPal secret"))]
         for name, label in slots:
             rows.append("<div>%s: <code>%s</code></div>" % (label, obj.secret_display(name)))
         if obj.secret_updated_by:
             rows.append("<div style='opacity:.7;font-size:.85em;'>%s: %s</div>"
                         % (_("Updated by"), obj.secret_updated_by))
         return mark_safe("<div style='line-height:1.6;'>%s</div>" % "".join(rows))
+
+    @admin.display(description=_("Stripe secret status"))
+    def stripe_secret_state(self, obj):
+        return self._secret_state(obj, [("stripe_secret_key", _("Secret key")),
+                                        ("stripe_webhook_secret", _("Webhook secret"))])
+
+    @admin.display(description=_("PayPal secret status"))
+    def paypal_secret_state(self, obj):
+        return self._secret_state(obj, [("paypal_secret", _("Client secret"))])
 
     @admin.display(description=_("Connection status (read-only)"))
     def connection_state_detail(self, obj):
@@ -210,15 +230,31 @@ class PaymentProviderConfigAdmin(BaseModelAdmin):
     @admin.display(description=_("Payment operations"))
     def payment_ops_panel(self, obj):
         if obj is None or not obj.pk:
-            return _("Save first, then Test connection.")
+            return mark_safe("<div style='opacity:.85;'>%s</div>" %
+                             _("Enter the credentials above and Save — then Test connection appears here."))
         from payments import config as pc
-        src = pc.stripe_source() if obj.provider == PaymentProviderConfig.STRIPE else pc.paypal_source()
-        ready = obj.is_ready_for_checkout()
-        rows = ["<div>%s: <strong>%s</strong></div>" % (_("Active credential source"), src.upper()),
-                "<div>%s: <strong>%s</strong></div>" % (_("Ready for checkout"), _("yes") if ready else _("no")),
-                "<div style='margin-top:.5rem;opacity:.7;font-size:.82em;'>%s</div>"
-                % _("Test connection is read-only — it never creates a payment, capture or refund.")]
-        return mark_safe("<div style='line-height:1.6;'>%s</div>" % "".join(rows))
+        yes = "<span style='color:#16a34a;font-weight:700;'>%s</span>" % _("set")
+        no = "<span style='color:#b3554e;font-weight:700;'>%s</span>" % _("not set")
+        rows = []
+        if obj.provider == PaymentProviderConfig.STRIPE:
+            src = pc.stripe_source()
+            rows += ["<div>%s: %s</div>" % (_("Publishable key"), yes if obj.stripe_publishable_key else no),
+                     "<div>%s: %s</div>" % (_("Secret key"), yes if obj.has_secret("stripe_secret_key") else no),
+                     "<div>%s: %s</div>" % (_("Webhook secret"), yes if obj.has_secret("stripe_webhook_secret") else no)]
+        else:
+            src = pc.paypal_source()
+            rows += ["<div>%s: %s</div>" % (_("Client id"), yes if obj.paypal_client_id else no),
+                     "<div>%s: %s</div>" % (_("Client secret"), yes if obj.has_secret("paypal_secret") else no),
+                     "<div>%s: %s</div>" % (_("Webhook id"), yes if obj.paypal_webhook_id else no)]
+        rows.append("<div style='margin-top:.4rem;'>%s: <strong>%s</strong> · %s: <strong>%s</strong></div>" % (
+            _("Active source"), src.upper(), _("Ready for checkout"),
+            _("yes") if obj.is_ready_for_checkout() else _("no")))
+        if obj.is_live() and not obj.allow_live_mode:
+            rows.append("<div style='margin-top:.4rem;color:#b45309;font-weight:600;'>%s</div>"
+                        % _("Live mode is disabled until explicitly allowed by a superuser."))
+        rows.append("<div style='margin-top:.5rem;opacity:.7;font-size:.82em;'>%s</div>"
+                    % _("Test connection is read-only — it never creates a payment, capture or refund."))
+        return mark_safe("<div style='line-height:1.7;'>%s</div>" % "".join(rows))
 
     # -- custom admin URLs (Test connection — POST, superadmin, read-only) ----
     def get_urls(self):

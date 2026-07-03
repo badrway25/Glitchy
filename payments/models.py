@@ -41,6 +41,8 @@ class PaymentProviderConfig(models.Model):
     # --- public / publishable (NOT secret — already exposed to the browser) ---
     stripe_publishable_key = models.CharField(max_length=255, blank=True, default="")
     paypal_client_id = models.CharField(max_length=255, blank=True, default="")
+    paypal_webhook_id = models.CharField(max_length=120, blank=True, default="",
+                                         help_text=_("PayPal webhook id (not a secret)."))
     paypal_api_base = models.CharField(max_length=120, blank=True, default="",
                                        help_text=_("Leave blank to derive from the environment."))
 
@@ -62,8 +64,10 @@ class PaymentProviderConfig(models.Model):
 
     secret_updated_by = models.CharField(max_length=150, blank=True, default="", editable=False)
 
-    # --- safety gates (superadmin only) ---
+    # --- safety gates (superadmin only) — all OFF by default ---
     allow_checkout = models.BooleanField(default=False, help_text=_("Superuser only. Keep OFF until tested."))
+    allow_capture = models.BooleanField(default=False, help_text=_("Superuser only. Keep OFF by default."))
+    allow_refund = models.BooleanField(default=False, help_text=_("Superuser only. Keep OFF by default."))
     allow_live_mode = models.BooleanField(default=False, help_text=_("Superuser only. Required to use live keys."))
 
     # --- connection status (safe, no secret) ---
