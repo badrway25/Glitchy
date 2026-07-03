@@ -242,12 +242,41 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
 .lux-strip{background:var(--primary);color:#f5f1e9;}
 .lux-strip .lux-item{font-family:var(--font-ui);letter-spacing:.04em;}
 .lux-strip .lux-item i{color:var(--accent);}
+/* Equal-height flex cards (parent col is d-flex, .lux-feature is w-100) so the four trust
+   cards line up per row at every breakpoint regardless of text length. */
 .lux-feature{background:var(--surface);border:var(--border);border-radius:var(--radius);box-shadow:none;
+  display:flex;flex-direction:column;min-height:100%;
   transition:transform var(--tr),box-shadow var(--tr);}
 .lux-feature:hover{transform:translateY(-3px);box-shadow:var(--shadow-soft);}
 .lux-feature .lux-ic{width:46px;height:46px;display:grid;place-items:center;border-radius:var(--radius-pill);
   background:var(--surface-2);color:var(--accent-2);font-size:1.1rem;}
-.lux-feature h4{font-family:var(--font-display);font-weight:500;font-size:1.05rem;}
+.lux-feature h4{font-family:var(--font-display);font-weight:500;font-size:1.05rem;line-height:1.25;}
+.lux-feature p{font-size:.9rem;line-height:1.5;margin-bottom:0;color:var(--muted);}
+/* JS adds .lux-clamp (clamp copy to 2 lines) + .lux-overflow (reveal the discreet read-more)
+   only when the text actually overflows — no-JS keeps the full text visible. */
+.lux-feature.lux-clamp p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.lux-more{margin-top:auto;padding-top:.65rem;align-self:flex-start;background:none;border:0;cursor:pointer;
+  color:var(--accent-2);font:inherit;font-size:.82rem;font-weight:600;display:none;align-items:center;gap:.32rem;}
+.lux-feature.lux-overflow .lux-more{display:inline-flex;}
+.lux-more:hover{color:var(--accent);}
+.lux-more:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px;}
+/* Card detail dialog (native <dialog> — free focus trap, ESC, backdrop). Reduced-motion safe. */
+dialog.lux-dialog{border:0;border-radius:var(--radius);padding:0;max-width:min(92vw,440px);width:100%;
+  position:relative;background:var(--surface);color:var(--text);box-shadow:var(--shadow);}
+dialog.lux-dialog::backdrop{background:rgba(28,26,23,.5);backdrop-filter:blur(3px);}
+.lux-dialog-in{padding:1.7rem 1.5rem 1.5rem;}
+.lux-dialog .lux-ic{width:46px;height:46px;display:grid;place-items:center;border-radius:var(--radius-pill);
+  background:var(--surface-2);color:var(--accent-2);margin-bottom:.9rem;}
+.lux-dialog h3{font-family:var(--font-display);font-weight:600;font-size:1.2rem;margin:0 0 .5rem;}
+.lux-dialog p{font-size:.94rem;line-height:1.6;color:var(--muted);margin:0;}
+.lux-dialog-x{position:absolute;top:.7rem;right:.7rem;width:34px;height:34px;border-radius:50%;border:0;
+  background:var(--surface-2);color:var(--text);cursor:pointer;display:grid;place-items:center;font-size:1rem;}
+.lux-dialog-x:hover{background:var(--accent);color:#fff;}
+.lux-dialog-x:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+@media (prefers-reduced-motion:no-preference){
+  dialog.lux-dialog[open]{animation:lux-dlg .22s var(--ease);}
+  @keyframes lux-dlg{from{opacity:0;transform:translateY(8px) scale(.98);}to{opacity:1;transform:none;}}
+}
 .lux-quote{font-family:var(--font-display);font-weight:600;font-size:clamp(1.3rem,3vw,1.95rem);
   line-height:1.32;letter-spacing:-.02em;color:var(--text);}
 .lux-eyebrow{font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.28em;font-size:.7rem;
