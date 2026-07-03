@@ -25,6 +25,18 @@ local Windows dev machine; **no real staging host exists**.
 | Security | ✅ Strong (dev) | No secrets in git, push/shipping/payments OFF. Key rotation still pending. |
 
 ## 2. What is genuinely COMPLETE
+- **Premium home cards + secure Payment Control Center + admin i18n** (Phase 76): balanced the
+  home trust cards (equal-height flex + line-clamp + an accessible native-`<dialog>` "Read more"
+  modal). Added a `payments` app mirroring the Printify secure-config pattern:
+  `PaymentProviderConfig` (Stripe + PayPal) with **Fernet-encrypted, write-only, masked** server
+  secrets (`PAYMENT_CONFIG_KEY`), safe defaults (disabled/test/checkout-off/live-off,
+  superadmin-gated), read-only **Test connection** (no charge/capture/refund), a
+  DB-preferred/ENV-fallback credential resolver wired into Stripe + PayPal checkout
+  (backward-compatible), and a `PaymentEvent` audit log. Wrapped the admin sidebar + labels in
+  `gettext_lazy` and translated the admin chrome to it/fr (gettext-verified). Migration
+  `payments/0001`; new env `PAYMENT_CONFIG_KEY`; deploy needs migrate. Admin live language-toggle
+  + Arabic/RTL deferred (documented). See
+  `docs/PREMIUM_HOME_PAYMENT_CONTROL_CENTER_ADMIN_I18N_2026.md`.
 - **Store card carousel functional fix + premium filters** (Phase 75): root-caused (via
   screenshot diff) why the card "next" never changed the image — `.media-skeleton img` is
   `position:absolute`, so all carousel slides stacked; plus the main image (a content-duplicate
