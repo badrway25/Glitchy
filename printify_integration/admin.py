@@ -503,7 +503,7 @@ class PrintifySyncStateAdmin(admin.ModelAdmin):
         snap = status_snapshot()
         on = snap["enabled"]
         color = "#16a34a" if on else "#64748b"
-        label = "ENABLED" if on else "disabled"
+        label = _("ENABLED") if on else _("disabled")
         extra = " · BACKOFF" if snap["backoff_active"] else ""
         return format_html(
             '<span style="background:{};color:#fff;padding:2px 8px;border-radius:999px;'

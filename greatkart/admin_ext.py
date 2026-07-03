@@ -11,6 +11,7 @@ from django.conf import settings
 from django.db.models import Count, Q, Sum
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 
 # --- brand chart palette (kept in sync with the admin CSS) ------------------
@@ -27,10 +28,10 @@ def environment_callback(request):
     if not env:
         env = "local" if getattr(settings, "DEBUG", False) else "production"
     return {
-        "local": ["Local", "warning"],
-        "staging": ["Staging", "info"],
-        "production": ["Production", "danger"],
-    }.get(env, ["Local", "warning"])
+        "local": [_("Local"), "warning"],
+        "staging": [_("Staging"), "info"],
+        "production": [_("Production"), "danger"],
+    }.get(env, [_("Local"), "warning"])
 
 
 def _safe_url(viewname, *args):
