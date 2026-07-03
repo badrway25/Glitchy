@@ -90,12 +90,20 @@ html.dark #content form .readonly { color: #d9cfbe; }
    scrolls over, and give the CHANGE/ADD form room so the last fieldset is never hidden behind
    it. Scope to *_form (change/add) — never the changelist search form, or its sibling Filters
    button would stretch to the padded height. */
-#content form[id$="_form"] { padding-bottom: 5.5rem; }
+#content form[id$="_form"] { padding-bottom: 7rem; }
 [class*="lg:sticky"][class*="bottom-0"] {
   background: var(--gl-surface, #fff);
   box-shadow: 0 -1px 0 var(--gl-line, rgba(120,110,95,.18)), 0 -12px 24px -18px rgba(43,39,33,.35);
   backdrop-filter: saturate(1.05);
 }
+
+/* Breathing room between a field label and its input. The two-column admin rows (label left,
+   input right) otherwise sit flush — cramped for long labels like "Set / replace Stripe webhook
+   signing secret". `gap` gives horizontal space on desktop (flex-row) and vertical space when the
+   row stacks on mobile (flex-col). */
+#content form .field-line { gap: 1.5rem; }
+#content form .field-line > label,
+#content form .field-line > div:first-child { padding-right: .5rem; }
 html.dark [class*="lg:sticky"][class*="bottom-0"] {
   background: #1f1c17; box-shadow: 0 -1px 0 rgba(210,195,170,.14), 0 -12px 24px -18px rgba(0,0,0,.6);
 }
@@ -109,3 +117,19 @@ html.dark [class*="lg:sticky"][class*="bottom-0"] {
   #content form textarea:not([class*="border"]):not([class*="px-"]),
   #content form select:not([class*="border"]):not([class*="px-"]) { max-width: 100%; }
 }
+
+/* Admin language switcher (injected into the header by lang-switch.js). Pushed to the far end of
+   the header; compact, premium, dark/light aware. RTL-safe via logical margin. */
+.gl-lang {
+  margin-inline-start: auto; display: inline-flex; align-items: center; gap: .35rem;
+  padding: .28rem .5rem; border: 1px solid var(--gl-line, rgba(120,110,95,.28));
+  border-radius: 999px; background: color-mix(in srgb, var(--gl-surface, #fff) 88%, transparent);
+}
+.gl-lang-ic { font-size: .9rem; opacity: .6; line-height: 1; }
+.gl-lang-sel {
+  border: 0 !important; background: transparent !important; box-shadow: none !important;
+  font-size: .8rem; font-weight: 700; letter-spacing: .04em; padding: 0 .15rem !important;
+  cursor: pointer; color: inherit; min-width: 3.2rem;
+}
+.gl-lang-sel:focus-visible { outline: 2px solid var(--gl-gold, #b08d57); outline-offset: 2px; }
+html.dark .gl-lang { border-color: rgba(210,195,170,.22); background: rgba(255,255,255,.04); }

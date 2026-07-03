@@ -1,5 +1,5 @@
 {% extends "admin/change_form.html" %}
-{% load i18n %}
+{% load i18n static %}
 
 {% block content %}
 {{ block.super }}
@@ -9,15 +9,17 @@
   <div class="gl-eyebrow" style="margin-top:0;">{% trans "Payment operations" %}</div>
   <div style="display:flex;flex-wrap:wrap;gap:.55rem;align-items:center;">
     {% if gl_has_secret %}
-      <form method="post" action="{% url 'admin:payments_paymentproviderconfig_test' original.pk %}">
+      <form method="post" action="{% url 'admin:payments_paymentproviderconfig_test' original.pk %}" data-gl-op="paytest">
         {% csrf_token %}<button type="submit" class="gl-action">{% trans "Test connection" %}</button></form>
     {% else %}
       <div style="opacity:.75;font-size:.88rem;">
-        {% trans "Add the provider secret first, then Test connection will appear here." %}</div>
+        {% trans "Add the provider secret above and Save — then Test connection appears here." %}</div>
     {% endif %}
+    <a class="gl-action" href="/admin/payments/paymentevent/?provider={{ original.provider }}">{% trans "View logs" %}</a>
   </div>
   <p style="font-size:.82rem;color:var(--gl-muted);margin:.5rem 0 0;">
-    {% trans "Test connection is read-only — it never creates a payment, capture or refund. Checkout and live mode stay OFF until you enable them below." %}</p>
+    {% trans "Test connection is read-only — it never creates a payment, capture or refund. Checkout, capture, refund and live mode stay OFF until you enable them below." %}</p>
 </div>
 {% endif %}
+<script src="{% static 'glitchy_admin/payment-admin.js' %}?v={{ ASSET_VERSION }}" defer></script>
 {% endblock %}

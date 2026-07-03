@@ -11,11 +11,12 @@
     dryrun: ["Connecting to Printify", "Reading products", "Simulating mapping", "Building report"],
     sync: ["Connecting to Printify", "Reading products", "Mapping catalog", "Updating local database", "Building report"],
     use: ["Selecting shop", "Saving"],
+    paytest: ["Connecting to the payment provider", "Checking credentials (read-only)", "Building report"],
     default: ["Working with Printify", "Please wait"]
   };
   var TITLES = {
     discover: "Discovering shops…", test: "Testing connection…", dryrun: "Dry-run in progress…",
-    sync: "Syncing products…", use: "Selecting shop…", default: "Working…"
+    sync: "Syncing products…", use: "Selecting shop…", paytest: "Testing connection…", default: "Working…"
   };
 
   function reduced() {
@@ -85,13 +86,15 @@
   }
 
   function wire() {
-    var scope = document.querySelector(".gl-printify-ops");
-    if (!scope) return;
-    var forms = scope.querySelectorAll("form[method='post'], form[method='POST']");
-    Array.prototype.forEach.call(forms, function (form) {
-      form.addEventListener("submit", function () {
-        // let the form submit normally; just show the loader over the round-trip
-        try { run(form); } catch (e) { /* fail open: never block the submit */ }
+    var scopes = document.querySelectorAll(".gl-printify-ops, .gl-payment-ops");
+    if (!scopes.length) return;
+    Array.prototype.forEach.call(scopes, function (scope) {
+      var forms = scope.querySelectorAll("form[method='post'], form[method='POST']");
+      Array.prototype.forEach.call(forms, function (form) {
+        form.addEventListener("submit", function () {
+          // let the form submit normally; just show the loader over the round-trip
+          try { run(form); } catch (e) { /* fail open: never block the submit */ }
+        });
       });
     });
   }
