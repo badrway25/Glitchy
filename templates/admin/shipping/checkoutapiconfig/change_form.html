@@ -2,6 +2,17 @@
 {% load i18n %}
 
 {% block content %}
+{% if gl_secretbox_ready is not None and not gl_secretbox_ready %}
+{% comment %}Encryption-key readiness card — shown BEFORE the admin types anything, so the
+save error never comes as a surprise. Never prints any key value.{% endcomment %}
+<div class="gl-card" style="max-width:960px;margin:0 0 1.25rem;padding:1rem 1.25rem;border:1px solid rgba(214,158,46,.5);border-radius:14px;background:rgba(214,158,46,.08);">
+  <div style="font-weight:700;color:#8a5a12;margin-bottom:.25rem;">
+    ⚠ {% trans "Encryption key missing" %}</div>
+  <div style="font-size:.9rem;line-height:1.6;">
+    {% trans "Secret API keys are stored encrypted and cannot be saved right now. Ask the server administrator to configure PAYMENT_CONFIG_KEY in the server environment (see docs/GLITCHY_CHECKOUT_PHONE_PREFIX_AND_CONFIG_KEY_FIX_2026.md). Non-secret settings on this page can still be saved. The browser key below is public by design and does not need encryption." %}
+  </div>
+</div>
+{% endif %}
 {{ block.super }}
 
 {% if original and gl_is_superadmin %}

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: greatkart 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-04 12:20+0200\n"
+"POT-Creation-Date: 2026-07-04 18:05+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -457,7 +457,7 @@ msgstr "Destinataire"
 
 #: .\notifications\admin.py:21 .\orders\admin.py:167
 #: .\printify_integration\admin.py:566 .\returns\admin.py:40
-#: .\shipping\admin.py:74 .\templates\accounts\dashboard.html:162
+#: .\shipping\admin.py:75 .\templates\accounts\dashboard.html:162
 #: .\templates\accounts\transactions.html:100
 #: .\templates\orders\order_complete.html:186
 msgid "Status"
@@ -814,12 +814,12 @@ msgid "Safety gates"
 msgstr ""
 
 #: .\payments\admin.py:108 .\payments\admin.py:117
-#: .\printify_integration\admin.py:318 .\shipping\admin.py:81
+#: .\printify_integration\admin.py:318 .\shipping\admin.py:82
 msgid "Connection status"
 msgstr ""
 
 #: .\payments\admin.py:109 .\payments\admin.py:118
-#: .\printify_integration\admin.py:96 .\shipping\admin.py:82
+#: .\printify_integration\admin.py:96 .\shipping\admin.py:83
 msgid "Meta"
 msgstr ""
 
@@ -836,11 +836,11 @@ msgid "TEST"
 msgstr ""
 
 #: .\payments\admin.py:173 .\printify_integration\admin.py:311
-#: .\shipping\admin.py:116 .\templates\admin\index.html:82
+#: .\shipping\admin.py:117 .\templates\admin\index.html:82
 msgid "Connection"
 msgstr ""
 
-#: .\payments\admin.py:177 .\shipping\admin.py:121
+#: .\payments\admin.py:177 .\shipping\admin.py:122
 msgid "not tested"
 msgstr ""
 
@@ -864,16 +864,16 @@ msgstr ""
 msgid "PayPal secret"
 msgstr ""
 
-#: .\payments\admin.py:193 .\shipping\admin.py:130
+#: .\payments\admin.py:193 .\shipping\admin.py:131
 msgid "Updated by"
 msgstr ""
 
 #: .\payments\admin.py:196 .\printify_integration\admin.py:95
-#: .\shipping\admin.py:133
+#: .\shipping\admin.py:134
 msgid "Connection status (read-only)"
 msgstr ""
 
-#: .\payments\admin.py:199 .\shipping\admin.py:136
+#: .\payments\admin.py:199 .\shipping\admin.py:137
 msgid "Never tested. Use 'Test connection'."
 msgstr ""
 
@@ -902,12 +902,12 @@ msgid ""
 "Test connection is read-only — it never creates a payment, capture or refund."
 msgstr ""
 
-#: .\payments\admin.py:244 .\shipping\admin.py:162
+#: .\payments\admin.py:244 .\shipping\admin.py:163
 #, python-format
 msgid "Connection OK — %(d)s"
 msgstr ""
 
-#: .\payments\admin.py:246 .\shipping\admin.py:164
+#: .\payments\admin.py:246 .\shipping\admin.py:165
 #, python-format
 msgid "Connection failed — %(e)s"
 msgstr ""
@@ -963,7 +963,7 @@ msgstr "Fournisseur de paiement"
 #: .\payments\models.py:148
 #: .\templates\admin\payments\paymentproviderconfig\change_form.html:13
 #: .\templates\admin\printify_integration\printifyaccountconfig\change_form.html:16
-#: .\templates\admin\shipping\checkoutapiconfig\change_form.html:13
+#: .\templates\admin\shipping\checkoutapiconfig\change_form.html:25
 msgid "Test connection"
 msgstr "Tester la connexion"
 
@@ -1698,14 +1698,16 @@ msgstr ""
 
 #: .\shipping\admin.py:62
 msgid ""
-"PAYMENT_CONFIG_KEY is not configured on the server — cannot encrypt the key."
-msgstr ""
+"Encryption key missing — the key was NOT saved (it is never stored in plain "
+"text). Ask the server administrator to configure PAYMENT_CONFIG_KEY, then "
+"try again."
+msgstr "Clé de chiffrement manquante — la clé n'a PAS été enregistrée (elle n'est jamais stockée en clair). Demandez à l'administrateur du serveur de configurer PAYMENT_CONFIG_KEY, puis réessayez."
 
-#: .\shipping\admin.py:75
+#: .\shipping\admin.py:76
 msgid "Google keys"
 msgstr ""
 
-#: .\shipping\admin.py:76
+#: .\shipping\admin.py:77
 msgid ""
 "Browser key: Google Cloud console → Credentials → API key restricted by HTTP "
 "referrer, Places API enabled (public by design). Server key: a SEPARATE key "
@@ -1713,15 +1715,15 @@ msgid ""
 "is stored encrypted."
 msgstr ""
 
-#: .\shipping\admin.py:123
+#: .\shipping\admin.py:124
 msgid "Server key status"
 msgstr "Statut actuel"
 
-#: .\shipping\admin.py:126
+#: .\shipping\admin.py:127
 msgid "Save first, then add the server key."
 msgstr ""
 
-#: .\shipping\admin.py:127
+#: .\shipping\admin.py:128
 msgid "Address Validation key"
 msgstr "Adresse ligne 1"
 
@@ -3241,15 +3243,29 @@ msgstr ""
 msgid "Use this shop"
 msgstr ""
 
-#: .\templates\admin\shipping\checkoutapiconfig\change_form.html:9
+#: .\templates\admin\shipping\checkoutapiconfig\change_form.html:11
+msgid "Encryption key missing"
+msgstr "Clé de chiffrement manquante"
+
+#: .\templates\admin\shipping\checkoutapiconfig\change_form.html:13
+msgid ""
+"Secret API keys are stored encrypted and cannot be saved right now. Ask the "
+"server administrator to configure PAYMENT_CONFIG_KEY in the server "
+"environment (see docs/"
+"GLITCHY_CHECKOUT_PHONE_PREFIX_AND_CONFIG_KEY_FIX_2026.md). Non-secret "
+"settings on this page can still be saved. The browser key below is public by "
+"design and does not need encryption."
+msgstr ""
+
+#: .\templates\admin\shipping\checkoutapiconfig\change_form.html:21
 msgid "API operations"
 msgstr "Opérations de paiement"
 
-#: .\templates\admin\shipping\checkoutapiconfig\change_form.html:16
+#: .\templates\admin\shipping\checkoutapiconfig\change_form.html:28
 msgid "Add the server key first, then Test connection will appear here."
 msgstr ""
 
-#: .\templates\admin\shipping\checkoutapiconfig\change_form.html:20
+#: .\templates\admin\shipping\checkoutapiconfig\change_form.html:32
 msgid ""
 "Test connection is read-only — it validates a fixed dummy address, never a "
 "customer's. Autocomplete and validation stay OFF until enabled above; "

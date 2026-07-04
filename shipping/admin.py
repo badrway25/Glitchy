@@ -59,7 +59,8 @@ class CheckoutApiConfigForm(forms.ModelForm):
         val = (self.cleaned_data.get("new_server_key") or "").strip()
         if val and not secretbox.has_key():
             raise forms.ValidationError(
-                _("PAYMENT_CONFIG_KEY is not configured on the server — cannot encrypt the key."))
+                _("Encryption key missing — the key was NOT saved (it is never stored in plain "
+                  "text). Ask the server administrator to configure PAYMENT_CONFIG_KEY, then try again."))
         return val
 
 
@@ -169,4 +170,11 @@ class CheckoutApiConfigAdmin(BaseModelAdmin):
         cfg = CheckoutApiConfig.objects.filter(pk=object_id).first()
         extra_context["gl_is_superadmin"] = _is_superadmin(request.user)
         extra_context["gl_has_key"] = bool(cfg and cfg.has_server_key())
+        extra_context["gl_secretbox_ready"] = secretbox.has_key()
         return super().change_view(request, object_id, form_url, extra_context)
+
+    def add_view(self, request, form_url="", extra_context=None):
+        extra_context = extra_context or {}
+        extra_context["gl_is_superadmin"] = _is_superadmin(request.user)
+        extra_context["gl_secretbox_ready"] = secretbox.has_key()
+        return super().add_view(request, form_url, extra_context)
