@@ -78,25 +78,63 @@ def validate_address(data, cfg=None):
     return "ok", ""
 
 
+def _diagnose_403():
+    """Premium diagnostic for a Google 403 — the terse 'Key rejected' hid the real causes."""
+    return _("Google rejected this key (403). Common causes: the Address Validation API is not "
+             "enabled on the project, billing is disabled, the key is restricted to the wrong "
+             "application type, this server's IP is not in the key's allowed IPs, or a "
+             "referrer-restricted BROWSER key was pasted into the server-key field (a browser "
+             "key cannot be tested from the server — use the client-side test instead).")
+
+
 def test_connection(cfg):
-    """Admin 'Test connection' — READ-ONLY: validates a fixed dummy address. Safe report."""
+    """Admin 'Test connection' for the SERVER key only — READ-ONLY dummy-address check.
+
+    The browser key is deliberately NEVER tested server-side: a referrer-restricted key
+    always 403s outside a browser, which reads as a false negative. The admin page offers a
+    client-side test for it instead. Errors are mapped to actionable, key-free messages."""
+    from payments import secrets as secretbox
+    from payments.secrets import SecretKeyMissing
     if not cfg.has_server_key():
         cfg.record_connection("failed", _("No server key set."))
         return {"ok": False, "detail": "", "error": _("No server key set.")}
+    # decrypt() is fail-soft (returns "" without the encryption key) — check explicitly so a
+    # missing PAYMENT_CONFIG_KEY yields a precise message instead of a bogus Google call.
+    server_key = cfg.get_server_key()
+    if not server_key:
+        cfg.record_connection("failed", _("Encryption key missing."))
+        return {"ok": False, "detail": "",
+                "error": _("PAYMENT_CONFIG_KEY is not configured on the server — the stored key "
+                           "cannot be decrypted. Configure it, then save the server key again.")}
     try:
         import requests
         resp = requests.post(
             "https://addressvalidation.googleapis.com/v1:validateAddress",
-            params={"key": cfg.get_server_key()},
+            params={"key": server_key},
             json={"address": {"regionCode": "IT", "postalCode": "20100",
                               "locality": "Milano", "addressLines": ["Via Roma 1"]}},
             timeout=8)
         if resp.status_code in (401, 403):
-            cfg.record_connection("failed", _("Key rejected (%d).") % resp.status_code)
-            return {"ok": False, "detail": "", "error": _("Key rejected (%d).") % resp.status_code}
+            err = _diagnose_403()
+            cfg.record_connection("failed", _("Key rejected (%d) — see diagnostics.") % resp.status_code)
+            return {"ok": False, "detail": "", "error": err}
+        if resp.status_code == 400:
+            cfg.record_connection("failed", _("Invalid key or malformed request (400)."))
+            return {"ok": False, "detail": "",
+                    "error": _("Google answered 400 — the key looks malformed or truncated. "
+                               "Re-copy it from the Google console.")}
+        if resp.status_code == 429:
+            cfg.record_connection("failed", _("Quota exceeded (429)."))
+            return {"ok": False, "detail": "",
+                    "error": _("Quota exceeded (429) — check the project's quotas and billing.")}
         resp.raise_for_status()
         cfg.record_connection("connected", _("Address Validation API reachable."))
         return {"ok": True, "detail": _("Address Validation API reachable."), "error": ""}
+    except SecretKeyMissing:
+        cfg.record_connection("failed", _("Encryption key missing."))
+        return {"ok": False, "detail": "",
+                "error": _("PAYMENT_CONFIG_KEY is not configured on the server — the stored key "
+                           "cannot be decrypted. Configure it, then save the server key again.")}
     except Exception:
         cfg.record_connection("failed", _("Could not reach Google (network/timeout)."))
         return {"ok": False, "detail": "", "error": _("Could not reach Google (network/timeout).")}

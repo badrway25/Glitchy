@@ -19,16 +19,71 @@ save error never comes as a surprise. Never prints any key value.{% endcomment %
 <div class="gl-card gl-payment-ops" style="margin-top:1.5rem;max-width:960px;">
   <div class="gl-eyebrow" style="margin-top:0;">{% trans "API operations" %}</div>
   <div style="display:flex;flex-wrap:wrap;gap:.55rem;align-items:center;">
+    {% comment %}BROWSER key: tested in THIS browser (a referrer-restricted key always 403s from
+    the server — that false negative was the reported bug). Loads Maps JS with the SAVED key
+    (public by design) and runs one prediction. Key never logged.{% endcomment %}
+    <button type="button" class="gl-action" id="glBrowserKeyTest"
+            data-msg-nokey="{% trans 'Save a browser key first, then test it here.' %}"
+            data-msg-loading="{% trans 'Loading Google Maps JS in this browser…' %}"
+            data-msg-ok="{% trans 'Browser key works — live suggestions received in this browser.' %}"
+            data-msg-fail="{% trans 'Google rejected this key in the browser. Check: Maps JavaScript API + Places API enabled, billing enabled, and THIS domain present in the HTTP referrers of the key.' %}"
+            data-msg-status="{% trans 'Places responded with status:' %}">
+      {% trans "Test browser key in this browser" %}</button>
     {% if gl_has_key %}
-      <form method="post" action="{% url 'admin:shipping_checkoutapiconfig_test' original.pk %}">
-        {% csrf_token %}<button type="submit" class="gl-action">{% trans "Test connection" %}</button></form>
+      <form method="post" action="{% url 'admin:shipping_checkoutapiconfig_test' original.pk %}" style="margin:0;">
+        {% csrf_token %}<button type="submit" class="gl-action">{% trans "Test server key (server-side)" %}</button></form>
     {% else %}
       <div style="opacity:.75;font-size:.88rem;">
-        {% trans "Add the server key first, then Test connection will appear here." %}</div>
+        {% trans "Add the server key to unlock the server-side test." %}</div>
     {% endif %}
   </div>
-  <p style="font-size:.82rem;color:var(--gl-muted);margin:.5rem 0 0;">
-    {% trans "Test connection is read-only — it validates a fixed dummy address, never a customer's. Autocomplete and validation stay OFF until enabled above; checkout always works without them." %}</p>
+  <div id="glBrowserKeyResult" role="status" hidden
+       style="margin-top:.7rem;padding:.7rem .9rem;border-radius:10px;font-size:.86rem;font-weight:600;"></div>
+  <p style="font-size:.82rem;color:var(--gl-muted);margin:.6rem 0 0;">
+    {% trans "Both tests are read-only. The browser-key test runs entirely in this browser (the referrer check needs a real page); the server-key test validates a fixed dummy address — never a customer's. Checkout always keeps working without Google." %}</p>
 </div>
+
+<script>
+(function () {
+  "use strict";
+  var btn = document.getElementById("glBrowserKeyTest");
+  var box = document.getElementById("glBrowserKeyResult");
+  if (!btn || !box) return;
+  function show(ok, msg) {
+    box.hidden = false;
+    box.style.background = ok ? "rgba(22,163,74,.12)" : "rgba(220,38,38,.10)";
+    box.style.color = ok ? "#15803d" : "#b91c1c";
+    box.textContent = msg;
+  }
+  window.gm_authFailure = function () { show(false, btn.getAttribute("data-msg-fail")); };
+  window.__glKeyTest = function () {
+    try {
+      var svc = new google.maps.places.AutocompleteService();
+      svc.getPlacePredictions({ input: "Via Roma", types: ["address"] }, function (preds, status) {
+        if (status === google.maps.places.PlacesServiceStatus.OK && preds && preds.length) {
+          show(true, btn.getAttribute("data-msg-ok"));
+        } else {
+          show(false, btn.getAttribute("data-msg-status") + " " + status + ". " +
+                      btn.getAttribute("data-msg-fail"));
+        }
+      });
+    } catch (e) { show(false, btn.getAttribute("data-msg-fail")); }
+  };
+  btn.addEventListener("click", function () {
+    var keyInput = document.getElementById("id_maps_browser_key");
+    var key = (keyInput && keyInput.value || "").trim();
+    if (!key) { show(false, btn.getAttribute("data-msg-nokey")); return; }
+    show(true, btn.getAttribute("data-msg-loading"));
+    box.style.background = "rgba(120,110,95,.10)"; box.style.color = "inherit";
+    if (window.google && google.maps && google.maps.places) { window.__glKeyTest(); return; }
+    var sc = document.createElement("script");
+    sc.async = true; sc.defer = true;
+    sc.src = "https://maps.googleapis.com/maps/api/js?key=" + encodeURIComponent(key) +
+             "&libraries=places&callback=__glKeyTest&loading=async";
+    sc.onerror = function () { show(false, btn.getAttribute("data-msg-fail")); };
+    document.head.appendChild(sc);
+  });
+})();
+</script>
 {% endif %}
 {% endblock %}
