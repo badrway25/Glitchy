@@ -20,7 +20,7 @@
     return h;
   }
 
-  var ICONS = { success: "fa-circle-check", info: "fa-circle-info", warn: "fa-triangle-exclamation" };
+  var ICONS = { success: "fa-check-circle", info: "fa-info-circle", warn: "fa-exclamation-triangle" };
 
   function show(message, tone) {
     if (!message) return;

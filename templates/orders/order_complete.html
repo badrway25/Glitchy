@@ -13,7 +13,7 @@
     <div class="oc-hero">
       <div class="oc-icon {% if order.status == 'Cancelled' %}is-danger{% else %}is-success{% endif %}">
         {% if order.status == 'Cancelled' %}
-          <i class="fas fa-xmark"></i>
+          <i class="fas fa-times"></i>
         {% else %}
           <i class="fas fa-check"></i>
         {% endif %}
@@ -44,7 +44,7 @@
             <i class="fa fa-fingerprint"></i> {% blocktrans with t=transID %}Transaction {{ t }}{% endblocktrans %}
           </span>
           <span class="meta-chip">
-            <i class="fa fa-circle-check"></i> {{ payment.status }}
+            <i class="fa fa-check-circle"></i> {{ payment.status }}
           </span>
         </div>
       </div>

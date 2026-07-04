@@ -33,7 +33,7 @@
 
     {% if not user.is_authenticated %}
       <div class="guest-note" data-reveal>
-        <span class="icon-tile"><i class="fa fa-circle-info" aria-hidden="true"></i></span>
+        <span class="icon-tile"><i class="fa fa-info-circle" aria-hidden="true"></i></span>
         <span>{% trans "You're browsing as a guest — your saved items are kept on this device." %}
         <a href="{% url 'login' %}">{% trans "Log in" %}</a> {% trans "to keep them on your account." %}</span>
       </div>
@@ -69,7 +69,7 @@
 
     <form method="get" class="portal-filters" role="search" style="margin-bottom:1rem;">
       <div class="pf-search">
-        <i class="fa fa-magnifying-glass pf-search-ic" aria-hidden="true"></i>
+        <i class="fa fa-search pf-search-ic" aria-hidden="true"></i>
         <input type="text" name="q" value="{{ q }}" class="pf-input" maxlength="60"
                placeholder="{% trans 'Search your saved items' %}" aria-label="{% trans 'Search saved items' %}">
       </div>
@@ -165,7 +165,7 @@
       {% endif %}
     {% elif has_filters %}
       <div class="lux-empty" data-reveal>
-        <div class="lux-empty-ic"><i class="fa fa-magnifying-glass" aria-hidden="true"></i></div>
+        <div class="lux-empty-ic"><i class="fa fa-search" aria-hidden="true"></i></div>
         <h3>{% trans "Nothing matches those filters" %}</h3>
         <p>{% trans "Try a different combination, or clear the filters to see everything you've saved." %}</p>
         <div class="lux-empty-cta">

@@ -25,7 +25,7 @@
                 <i class="fa fa-file-invoice" aria-hidden="true"></i><span>{% trans "Receipts" %}</span>
               </a>
               <a href="{% url 'store' %}" class="btn btn-soft btn-icontext">
-                <i class="fa fa-bag-shopping" aria-hidden="true"></i><span>{% trans "Shop" %}</span>
+                <i class="fa fa-shopping-bag" aria-hidden="true"></i><span>{% trans "Shop" %}</span>
               </a>
             </div>
           </div>
@@ -61,7 +61,7 @@
                 {% include 'accounts/_portal_pagination.html' with page_obj=orders querystring=querystring %}
               {% elif has_filters %}
                 <div class="dash-empty">
-                  <div class="dash-empty-icon"><i class="fa fa-magnifying-glass"></i></div>
+                  <div class="dash-empty-icon"><i class="fa fa-search"></i></div>
                   <h4>{% trans "No orders match your filters" %}</h4>
                   <p class="text-muted mb-3">{% trans "Try a different search or clear the filters." %}</p>
                   <a href="{% url 'my_orders' %}" class="btn btn-soft">{% trans "Clear filters" %}</a>
