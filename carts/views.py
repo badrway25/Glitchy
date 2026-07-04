@@ -33,6 +33,19 @@ def _missing_required_variations(product, matched):
     return missing
 
 
+def _is_ajax(request):
+    return request.headers.get("x-requested-with") == "XMLHttpRequest"
+
+
+def _cart_qty(request):
+    from django.db.models import Sum
+    if request.user.is_authenticated:
+        n = CartItem.objects.filter(user=request.user).aggregate(n=Sum("quantity"))["n"]
+    else:
+        n = CartItem.objects.filter(cart__cart_id=_cart_id(request)).aggregate(n=Sum("quantity"))["n"]
+    return int(n or 0)
+
+
 def add_cart(request, product_id):
     current_user = request.user
     product = get_object_or_404(Product, id=product_id)
@@ -57,6 +70,8 @@ def add_cart(request, product_id):
                     pass
 
         if request.method == 'POST' and _missing_required_variations(product, product_variation):
+            if _is_ajax(request):
+                return JsonResponse({"ok": False, "needs_options": True}, status=400)
             messages.error(request, _("Please choose a colour and size before adding this item to your cart."))
             return redirect(product.get_url())
 
@@ -97,8 +112,10 @@ def add_cart(request, product_id):
                 cart_item.variations.clear()
                 cart_item.variations.add(*product_variation)
             cart_item.save()
-            messages.success(request, f"Added {product.product_name} to cart.")
 
+        if _is_ajax(request):
+            return JsonResponse({"ok": True, "count": _cart_qty(request), "name": product.product_name})
+        messages.success(request, _("Added %(name)s to your bag.") % {"name": product.product_name})
         return redirect('cart')
 
     # =========================
@@ -120,6 +137,8 @@ def add_cart(request, product_id):
                 pass
 
     if request.method == 'POST' and _missing_required_variations(product, product_variation):
+        if _is_ajax(request):
+            return JsonResponse({"ok": False, "needs_options": True}, status=400)
         messages.error(request, _("Please choose a colour and size before adding this item to your cart."))
         return redirect(product.get_url())
 
@@ -165,8 +184,10 @@ def add_cart(request, product_id):
             cart_item.variations.clear()
             cart_item.variations.add(*product_variation)
         cart_item.save()
-        messages.success(request, "Added to cart.")
 
+    if _is_ajax(request):
+        return JsonResponse({"ok": True, "count": _cart_qty(request), "name": product.product_name})
+    messages.success(request, _("Added %(name)s to your bag.") % {"name": product.product_name})
     return redirect('cart')
 
 

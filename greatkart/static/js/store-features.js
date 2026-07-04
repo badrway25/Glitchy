@@ -136,3 +136,47 @@
   function ready(fn) { if (document.readyState !== "loading") fn(); else document.addEventListener("DOMContentLoaded", fn); }
   ready(updateCmpUI);
 })();
+
+/* PDP add-to-cart — AJAX + toast instead of yanking the shopper to /cart.
+   Respects variant-guard (defaultPrevented), updates the navbar badge, disables the
+   CTA while in flight. No-JS / fetch-failure: falls back to the normal POST redirect. */
+(function () {
+  "use strict";
+  var form = document.getElementById("pdpForm");
+  if (!form || !window.fetch) return;
+  form.setAttribute("data-no-loader", "");          // fast AJAX — no G-loader flash
+
+  function cartButtons() {
+    return document.querySelectorAll('button[form="pdpForm"], #pdpForm button[type="submit"]');
+  }
+  function setBusy(b) {
+    cartButtons().forEach(function (btn) { btn.disabled = b; btn.classList.toggle("is-busy", b); });
+  }
+  function updateCount(n) {
+    document.querySelectorAll("[data-cart-count]").forEach(function (el) {
+      el.textContent = n;
+      el.classList.remove("badge-pop"); void el.offsetWidth; el.classList.add("badge-pop");
+    });
+  }
+
+  form.addEventListener("submit", function (e) {
+    if (e.defaultPrevented) return;                 // variant-guard already blocked it
+    e.preventDefault();
+    setBusy(true);
+    fetch(form.action, {
+      method: "POST", credentials: "same-origin",
+      headers: { "X-Requested-With": "XMLHttpRequest" },
+      body: new FormData(form)
+    }).then(function (r) { return r.json().then(function (d) { return { s: r.status, d: d }; }); })
+      .then(function (res) {
+        setBusy(false);
+        if (res.d && res.d.ok) {
+          updateCount(res.d.count);
+          if (window.glToast) window.glToast(form.getAttribute("data-added-msg") || "Added to your bag", "success");
+        } else if (window.glToast) {
+          window.glToast(form.getAttribute("data-options-msg") || "Please choose your options first.", "warn");
+        }
+      })
+      .catch(function () { setBusy(false); form.removeAttribute("data-no-loader"); form.submit(); });
+  });
+})();
