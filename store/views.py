@@ -133,11 +133,14 @@ def product_detail(request, category_slug, product_slug):
                     "pct": int(dist[s] / review_count * 100) if review_count else 0}
                    for s in (5, 4, 3, 2, 1)]
 
-    # Single-item shipping estimate for the detected country.
+    # Single-item shipping estimate for the detected country (honest, source-aware).
+    from shipping.constants import COUNTRIES as SHIP_COUNTRIES
+    from shipping.localization import localize_shipping
     from shipping.geo import detect_country
     from shipping.services import fallback_quote
     shipping_quote = fallback_quote(detect_country(request), total_quantity=1,
                                     subtotal=single_product.price)
+    shipping_local = localize_shipping(request, subtotal=single_product.price)
 
     lang = (getattr(request, "LANGUAGE_CODE", "en") or "en")[:2]
     product_faqs = []
@@ -178,6 +181,8 @@ def product_detail(request, category_slug, product_slug):
         'review_avg': review_avg,
         'review_dist': review_dist,
         'shipping_quote': shipping_quote,
+        'shipping_local': shipping_local,
+        'SHIP_COUNTRIES': SHIP_COUNTRIES,
         'related_products': related,
         'recently_viewed': recently_viewed,
         'product_faqs': product_faqs,
@@ -207,10 +212,8 @@ def quick_view(request, product_id):
     review_count = reviews.count()
     review_avg = round(reviews.aggregate(a=Avg("rating"))["a"] or 0, 1)
 
-    from shipping.geo import detect_country
-    from shipping.services import fallback_quote
-    shipping_quote = fallback_quote(detect_country(request), total_quantity=1,
-                                    subtotal=product.price)
+    from shipping.localization import localize_shipping
+    shipping_local = localize_shipping(request, subtotal=product.price)
 
     context = {
         "p": product,
@@ -218,7 +221,7 @@ def quick_view(request, product_id):
         "sizes": product.variation_set.sizes(),
         "review_count": review_count,
         "review_avg": review_avg,
-        "shipping_quote": shipping_quote,
+        "shipping_local": shipping_local,
     }
     return render(request, "store/_quick_view.html", context)
 

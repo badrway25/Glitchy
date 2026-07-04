@@ -180,3 +180,112 @@
       .catch(function () { setBusy(false); form.removeAttribute("data-no-loader"); form.submit(); });
   });
 })();
+
+/* "Ships to" country picker (PDP) — AJAX country switch that refreshes the honest shipping
+   line in place. Lives inside #pdpForm, so it uses buttons + fetch (no nested form).
+   JS-only affordance: without JS the toggle stays hidden and the honest line still renders. */
+(function () {
+  "use strict";
+  var box = document.getElementById("shipsTo");
+  if (!box || !window.fetch) return;
+  var toggle = box.querySelector("[data-shipsto-toggle]");
+  var menu = box.querySelector("[data-shipsto-menu]");
+  var line = box.querySelector("[data-shipsto-line]");
+  var endpoint = box.getAttribute("data-endpoint");
+  if (!toggle || !menu || !endpoint) return;
+  toggle.hidden = false;                      // JS available -> reveal the picker
+
+  function csrf() {
+    var i = document.querySelector("input[name=csrfmiddlewaretoken]");
+    if (i) return i.value;
+    var m = document.cookie.match("(^|;)\s*csrftoken\s*=\s*([^;]+)");
+    return m ? m.pop() : "";
+  }
+  function close(){ menu.hidden = true; toggle.setAttribute("aria-expanded","false"); }
+  toggle.addEventListener("click", function (e) {
+    e.stopPropagation();
+    menu.hidden = !menu.hidden;
+    toggle.setAttribute("aria-expanded", menu.hidden ? "false" : "true");
+    if (!menu.hidden) { var a = menu.querySelector(".is-active") || menu.querySelector("button"); if (a) a.focus(); }
+  });
+  document.addEventListener("click", function (e) { if (!box.contains(e.target)) close(); });
+  box.addEventListener("keydown", function (e) { if (e.key === "Escape") { close(); toggle.focus(); } });
+
+  menu.addEventListener("click", function (e) {
+    var btn = e.target.closest && e.target.closest("[data-country]");
+    if (!btn) return;
+    close();
+    var fd = new FormData();
+    fd.set("csrfmiddlewaretoken", csrf());
+    fd.set("country", btn.getAttribute("data-country"));
+    fd.set("subtotal", box.getAttribute("data-subtotal") || "0");
+    line.style.opacity = ".45";
+    fetch(endpoint, { method: "POST", credentials: "same-origin",
+      headers: { "X-Requested-With": "XMLHttpRequest" }, body: fd })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (d && d.ok && d.localized) {
+          line.textContent = d.localized.line_label;
+          menu.querySelectorAll(".shipsto-opt").forEach(function (o) {
+            var on = o.getAttribute("data-country") === d.country;
+            o.classList.toggle("is-active", on);
+            o.parentElement.setAttribute("aria-selected", on ? "true" : "false");
+          });
+        }
+      })
+      .catch(function () { /* silent — the honest static line stays */ })
+      .finally(function () { line.style.opacity = ""; });
+  });
+})();
+
+/* Intl phone prefix — swap the native select for a flag-SVG dropdown (progressive).
+   The hidden-native select stays the source of truth (posted as phone_prefix). */
+(function () {
+  "use strict";
+  var wrap = document.querySelector("[data-pfx]");
+  var select = document.querySelector("[data-pfx-select]");
+  if (!wrap || !select) return;
+  var btn = wrap.querySelector("[data-pfx-toggle]");
+  var menu = wrap.querySelector("[data-pfx-menu]");
+  var flagHost = wrap.querySelector("[data-pfx-flag]");
+  var dialHost = wrap.querySelector("[data-pfx-dial]");
+
+  function optFor(code) {
+    return menu.querySelector('.pfx-opt[data-code="' + code + '"]');
+  }
+  function syncFromSelect() {
+    var opt = select.options[select.selectedIndex];
+    if (!opt) return;
+    var rich = optFor(opt.getAttribute("data-code"));
+    if (rich) {
+      flagHost.innerHTML = rich.querySelector(".pfx-flag").innerHTML;
+      dialHost.textContent = rich.querySelector(".pfx-dial").textContent;
+    }
+  }
+  select.hidden = true; select.setAttribute("tabindex", "-1");
+  select.classList.add("pfx-native-hidden");
+  wrap.hidden = false;
+  syncFromSelect();
+
+  function close(){ menu.hidden = true; btn.setAttribute("aria-expanded","false"); }
+  btn.addEventListener("click", function (e) {
+    e.stopPropagation();
+    menu.hidden = !menu.hidden;
+    btn.setAttribute("aria-expanded", menu.hidden ? "false" : "true");
+    if (!menu.hidden) { var f = menu.querySelector(".pfx-opt"); if (f) f.focus(); }
+  });
+  document.addEventListener("click", function (e) { if (!wrap.contains(e.target)) close(); });
+  wrap.addEventListener("keydown", function (e) { if (e.key === "Escape") { close(); btn.focus(); } });
+  menu.addEventListener("click", function (e) {
+    var o = e.target.closest && e.target.closest(".pfx-opt");
+    if (!o) return;
+    // update the REAL select (posted value) then mirror the button
+    for (var i = 0; i < select.options.length; i++) {
+      if (select.options[i].value === o.getAttribute("data-dial") &&
+          select.options[i].getAttribute("data-code") === o.getAttribute("data-code")) {
+        select.selectedIndex = i; break;
+      }
+    }
+    syncFromSelect(); close(); btn.focus();
+  });
+})();

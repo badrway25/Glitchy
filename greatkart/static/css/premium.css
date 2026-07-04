@@ -3468,3 +3468,66 @@ form .form-control,form .custom-select{transition:border-color .18s var(--ease),
   padding:.6rem 1.1rem;border-radius:0 0 10px 0;font-weight:700;text-decoration:none;}
 .skip-link:focus{left:0;}
 #main-content:focus{outline:none;}
+
+/* "Ships to" line + discreet premium country picker (PDP) */
+.shipsto{display:inline-flex;align-items:center;gap:.45rem;flex-wrap:wrap;}
+.shipsto-change{position:relative;display:inline-block;}
+.shipsto-btn{background:none;border:0;padding:.1rem .3rem;font-size:.82rem;font-weight:600;
+  color:var(--primary);cursor:pointer;border-radius:6px;}
+.shipsto-btn:hover{text-decoration:underline;}
+.shipsto-btn:focus-visible{outline:2px solid var(--primary);outline-offset:2px;}
+.shipsto-menu{position:absolute;z-index:1200;top:calc(100% + 6px);left:0;min-width:13rem;max-height:280px;
+  overflow:auto;margin:0;padding:.4rem;list-style:none;background:var(--bg,#fff);
+  border:1px solid rgba(120,110,95,.25);border-radius:12px;
+  box-shadow:0 14px 40px -12px rgba(40,32,16,.28);}
+[data-theme="dark"] .shipsto-menu{background:#221f1a;border-color:rgba(210,195,170,.2);}
+.shipsto-opt{display:block;width:100%;text-align:start;background:none;border:0;padding:.45rem .6rem;
+  border-radius:8px;font-size:.86rem;color:inherit;cursor:pointer;}
+.shipsto-opt:hover,.shipsto-opt:focus-visible{background:rgba(184,151,90,.13);outline:none;}
+.shipsto-opt.is-active{font-weight:700;}
+@media (max-width:575.98px){ .shipsto-menu{left:auto;right:0;} }
+
+/* Checkout: bot honeypot (visually removed, still in DOM for bots), intl phone row, inline errors */
+.co-hp{position:absolute!important;left:-9999px!important;top:-9999px!important;height:0;overflow:hidden;}
+.phone-row{display:flex;gap:.5rem;}
+.phone-row .phone-prefix{flex:0 0 8.2rem;font-variant-emoji:emoji;}
+.phone-row input{flex:1 1 auto;}
+.phone-row.has-error input,.form-control.is-invalid{border-color:#c0392b!important;}
+.field-error{color:#c0392b;font-size:.8rem;font-weight:600;margin-top:.3rem;}
+[data-theme="dark"] .field-error{color:#e08a80;}
+@media (max-width:575.98px){ .phone-row .phone-prefix{flex-basis:7.2rem;} }
+
+/* Intl phone prefix — custom dropdown with real SVG flags */
+.pfx{position:relative;flex:0 0 auto;}
+.pfx-btn{display:inline-flex;align-items:center;gap:.45rem;min-height:38px;padding:.45rem .6rem;
+  border:1px solid rgba(120,110,95,.3);border-radius:10px;background:var(--bg,#fff);cursor:pointer;
+  font-size:.88rem;font-weight:600;color:inherit;}
+.pfx-btn:focus-visible{outline:2px solid var(--primary);outline-offset:2px;}
+[data-theme="dark"] .pfx-btn{background:#221f1a;border-color:rgba(210,195,170,.22);}
+.pfx-flag svg{display:block;border-radius:2px;box-shadow:0 0 0 1px rgba(0,0,0,.08);}
+.pfx-caret{font-size:.6rem;opacity:.55;}
+.pfx-menu{position:absolute;z-index:1300;top:calc(100% + 6px);left:0;min-width:15rem;max-height:280px;
+  overflow:auto;margin:0;padding:.4rem;list-style:none;background:var(--bg,#fff);
+  border:1px solid rgba(120,110,95,.25);border-radius:12px;
+  box-shadow:0 14px 40px -12px rgba(40,32,16,.28);}
+[data-theme="dark"] .pfx-menu{background:#221f1a;border-color:rgba(210,195,170,.2);}
+.pfx-opt{display:flex;align-items:center;gap:.6rem;width:100%;text-align:start;background:none;border:0;
+  padding:.45rem .6rem;border-radius:8px;font-size:.86rem;color:inherit;cursor:pointer;}
+.pfx-opt:hover,.pfx-opt:focus-visible{background:rgba(184,151,90,.13);outline:none;}
+.pfx-opt .pfx-dial{font-weight:700;min-width:3.2rem;}
+.pfx-opt .pfx-name{opacity:.75;}
+.pfx-native-hidden{display:none!important;}
+
+/* Checkout address verification warning (warning-only, never blocks) + Places selected state */
+.addr-warning{margin:0 0 1.1rem;padding:.85rem 1rem;border:1px solid rgba(214,158,46,.45);
+  border-radius:12px;background:rgba(214,158,46,.09);}
+.addr-warning-msg{font-size:.9rem;font-weight:600;color:#7a5510;}
+[data-theme="dark"] .addr-warning-msg{color:#e6bd6a;}
+.addr-warning-confirm{display:flex;align-items:center;gap:.5rem;margin:.55rem 0 0;font-size:.86rem;cursor:pointer;}
+#addressLine1.addr-selected{border-color:#16a34a!important;}
+/* Google's suggestion dropdown, restyled premium */
+.pac-container{border-radius:12px;border:1px solid rgba(120,110,95,.25);
+  box-shadow:0 14px 40px -12px rgba(40,32,16,.28);font-family:inherit;margin-top:4px;}
+.pac-item{padding:.5rem .7rem;font-size:.86rem;cursor:pointer;}
+.pac-item:hover{background:rgba(184,151,90,.12);}
+.pac-item-selected{background:rgba(184,151,90,.16);}

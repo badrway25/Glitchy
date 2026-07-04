@@ -66,11 +66,10 @@ Customer-facing data only — no internal Printify ids/costs.{% endcomment %}
       {% endif %}
     </form>
 
-    {% if shipping_quote and shipping_quote.available %}
+    {% if shipping_local.supported %}
     <div class="qv-deliv">
       {% icon "truck" "ic" 15 %}
-      <span>{% trans "Estimated delivery" %}: <strong>{{ shipping_quote.eta_label }}</strong>
-        {% if shipping_quote.free %}· {% trans "Free shipping" %}{% endif %}</span>
+      <span>{{ shipping_local.line_label }}</span>
     </div>
     {% endif %}
 

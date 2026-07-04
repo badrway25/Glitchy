@@ -78,30 +78,32 @@ def _from_api(ip: str) -> str | None:
 AUTO_KEY = "ship_country_auto"      # cached best-effort detection (once per visitor, discreet)
 
 
-def detect_country(request) -> str:
-    """Return a best-effort ISO-3166 alpha-2 country code (never empty).
+def detect_country_info(request) -> dict:
+    """Best-effort country + HOW we know it: {"code": "FR", "source": "..."}.
 
-    Detection is discreet and server-side: an explicit choice wins, then the CDN/proxy country
-    header (e.g. Cloudflare CF-IPCountry — no external call, no PII), then an optional cached
-    IP lookup. The auto-detected value is cached in the session so the (possible) lookup runs
-    at most once per visitor and the country stays stable while they browse."""
+    source ∈ manual (user picked), header (CDN country header), cached (earlier auto-detect),
+    ip (geo lookup), default (nothing detected — an ASSUMPTION, not knowledge). Callers that
+    show customer-facing copy must treat source=="default" as "unknown destination" and use
+    neutral "calculated at checkout" wording instead of presenting the default as fact.
+    Detection stays discreet and server-side (no precise browser geolocation, no consent-less
+    external calls)."""
     default = getattr(settings, "SHIPPING_DEFAULT_COUNTRY", "IT")
 
     # 1. Manual override (country switcher) — always wins.
     manual = (request.session.get(SESSION_KEY) or "").strip().upper()
     if manual and len(manual) == 2:
-        return manual
+        return {"code": manual, "source": "manual"}
 
     # 2. CDN / proxy headers (fresh every request — cheap, reflects the real visitor).
     header_country = _from_headers(request)
     if header_country:
         request.session[AUTO_KEY] = header_country
-        return header_country
+        return {"code": header_country, "source": "header"}
 
     # 3. Cached auto-detection from a previous request (avoids repeat IP lookups).
     cached = (request.session.get(AUTO_KEY) or "").strip().upper()
     if cached and len(cached) == 2:
-        return cached
+        return {"code": cached, "source": "cached"}
 
     # 4. IP-based lookups (only for routable public IPs); cache the result.
     ip = get_client_ip(request)
@@ -110,10 +112,15 @@ def detect_country(request) -> str:
             code = resolver(ip)
             if code:
                 request.session[AUTO_KEY] = code
-                return code
+                return {"code": code, "source": "ip"}
 
     # 5. Fallback (not cached, so detection can still succeed on a later request).
-    return default
+    return {"code": default, "source": "default"}
+
+
+def detect_country(request) -> str:
+    """Return a best-effort ISO-3166 alpha-2 country code (never empty). See detect_country_info."""
+    return detect_country_info(request)["code"]
 
 
 def set_manual_country(request, country: str) -> None:

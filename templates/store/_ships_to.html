@@ -1,0 +1,27 @@
+{% load i18n %}
+{% comment %}Honest, localized "Ships to …" line + a discreet premium country picker.
+Renders from shipping_local (shipping.localization.localize_shipping): real config figures when
+the destination is known, neutral "calculated at checkout" when it is not.
+NOTE: this partial lives INSIDE #pdpForm — no nested <form> (invalid HTML). The picker is a
+JS-driven listbox that POSTs via fetch (CSRF token read from the enclosing form); without JS the
+honest line still renders and the country can be set from the cart estimator / checkout.{% endcomment %}
+<span class="shipsto" id="shipsTo" data-subtotal="{{ single_product.price }}"
+      data-endpoint="{% url 'set_country' %}">
+  <i class="fa fa-truck mr-1" aria-hidden="true"></i>
+  <span class="shipsto-line" data-shipsto-line>{{ shipping_local.line_label }}</span>
+  <span class="shipsto-change">
+    <button type="button" class="shipsto-btn" data-shipsto-toggle hidden
+            aria-haspopup="listbox" aria-expanded="false"
+            aria-label="{% trans 'Change shipping country' %}">{% trans "Change" %} ▾</button>
+    <ul class="shipsto-menu" role="listbox" hidden data-shipsto-menu>
+      {% for code, name in SHIP_COUNTRIES %}
+        <li role="option" aria-selected="{% if code == shipping_local.country_code %}true{% else %}false{% endif %}">
+          <button type="button" data-country="{{ code }}"
+                  class="shipsto-opt{% if code == shipping_local.country_code %} is-active{% endif %}">
+            {{ name }}{% if code == shipping_local.country_code %} ✓{% endif %}
+          </button>
+        </li>
+      {% endfor %}
+    </ul>
+  </span>
+</span>

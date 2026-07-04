@@ -135,7 +135,7 @@
 
               <!-- Shipping + returns reassurance -->
               <div class="pdp-trust mt-3 mb-1" style="display:flex;flex-wrap:wrap;gap:14px;font-size:.86rem;color:#475569;">
-                <span><i class="fa fa-truck mr-1"></i>{% blocktrans with c=ship_country_name %}Ships to {{ c }}{% endblocktrans %}{% if shipping_quote %} · {% if shipping_quote.free %}{% trans "Free shipping" %}{% else %}{{ CURRENCY_SYMBOL }}{{ shipping_quote.cost }}{% endif %} · {{ shipping_quote.eta_label }}{% endif %}</span>
+                {% include 'store/_ships_to.html' %}
                 <span><i class="fa fa-undo mr-1"></i>{% blocktrans with d=RETURN_WINDOW_DAYS %}Free {{ d }}-day returns{% endblocktrans %}</span>
               </div>
 
