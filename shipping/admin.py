@@ -63,6 +63,12 @@ class CheckoutApiConfigForm(forms.ModelForm):
             raise forms.ValidationError(
                 _("Encryption key missing — the key was NOT saved (it is never stored in plain "
                   "text). Ask the server administrator to configure PAYMENT_CONFIG_KEY, then try again."))
+        browser = (self.cleaned_data.get("maps_browser_key")
+                   or getattr(self.instance, "maps_browser_key", "") or "").strip()
+        if val and browser and val == browser:
+            raise forms.ValidationError(
+                _("This is your BROWSER key — the server key must be a DIFFERENT key, restricted "
+                  "by the server's IP (not by referrer), with the Address Validation API enabled."))
         return val
 
 
@@ -76,12 +82,24 @@ class CheckoutApiConfigAdmin(BaseModelAdmin):
     fieldsets = (
         (_("Status"), {"fields": ("is_enabled", "enable_autocomplete", "enable_address_validation",
                                "validation_mode")}),
-        (_("Google keys"), {
-            "description": _("Browser key: Google Cloud console → Credentials → API key restricted "
-                             "by HTTP referrer, Places API enabled (public by design). Server key: "
-                             "a SEPARATE key restricted by IP, Address Validation API enabled — this "
-                             "one is a secret and is stored encrypted."),
-            "fields": ("maps_browser_key", "allowed_domains_note", "new_server_key", "server_key_state")}),
+        (_("Browser key — client-side autocomplete (public)"), {
+            "description": _("Use a PUBLIC browser key restricted by HTTP referrers. It powers the "
+                             "address suggestions in checkout and is visible in the page by design. "
+                             "Never put a server/IP-restricted key here. Checklist: Maps JavaScript "
+                             "API enabled · Places API enabled · billing enabled · website referrers "
+                             "include https://glitchy.graphics/* and https://www.glitchy.graphics/* · "
+                             "API restrictions limited to Maps JavaScript API + Places API. A "
+                             "referrer-restricted key CANNOT be tested from the server — use the "
+                             "'Test browser key in this browser' button below."),
+            "fields": ("maps_browser_key", "allowed_domains_note")}),
+        (_("Server key — address validation (secret)"), {
+            "description": _("Use a PRIVATE server key restricted by the server's IP address. It "
+                             "powers server-side address validation, is encrypted at rest and never "
+                             "shown again. Checklist: Address Validation API enabled · Places API "
+                             "enabled if Place Details is used · billing enabled · restricted by the "
+                             "server IP · PAYMENT_CONFIG_KEY configured · NEVER paste this key into "
+                             "the browser-key field above."),
+            "fields": ("new_server_key", "server_key_state")}),
         (_("Connection status"), {"fields": ("connection_state",)}),
         (_("Meta"), {"fields": ("created_at", "updated_at")}),
     )

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: greatkart 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-04 18:51+0200\n"
+"POT-Creation-Date: 2026-07-04 22:20+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -457,7 +457,7 @@ msgstr "Destinatario"
 
 #: .\notifications\admin.py:21 .\orders\admin.py:167
 #: .\printify_integration\admin.py:566 .\returns\admin.py:40
-#: .\shipping\admin.py:77 .\templates\accounts\dashboard.html:162
+#: .\shipping\admin.py:83 .\templates\accounts\dashboard.html:162
 #: .\templates\accounts\transactions.html:100
 #: .\templates\orders\order_complete.html:186
 msgid "Status"
@@ -767,7 +767,7 @@ msgstr "Non spediamo ancora in questo paese."
 msgid "We're sorry, we don't ship to the selected country yet."
 msgstr "Non spediamo ancora in questo Paese."
 
-#: .\orders\views.py:487 .\shipping\address_validation.py:132
+#: .\orders\views.py:487 .\shipping\address_validation.py:170
 msgid "Please select a verified address from the suggestions."
 msgstr "Seleziona un indirizzo verificato dai suggerimenti."
 
@@ -775,7 +775,9 @@ msgstr "Seleziona un indirizzo verificato dai suggerimenti."
 msgid ""
 "This address is not verified. Confirm it to continue, or pick it from the "
 "suggestions."
-msgstr "Questo indirizzo non è verificato. Confermalo per continuare, oppure sceglilo dai suggerimenti."
+msgstr ""
+"Questo indirizzo non è verificato. Confermalo per continuare, oppure "
+"sceglilo dai suggerimenti."
 
 #: .\orders\views.py:501
 msgid "Please review your address below."
@@ -836,12 +838,12 @@ msgid "Safety gates"
 msgstr "Blocchi di sicurezza"
 
 #: .\payments\admin.py:108 .\payments\admin.py:117
-#: .\printify_integration\admin.py:318 .\shipping\admin.py:85
+#: .\printify_integration\admin.py:318 .\shipping\admin.py:103
 msgid "Connection status"
 msgstr ""
 
 #: .\payments\admin.py:109 .\payments\admin.py:118
-#: .\printify_integration\admin.py:96 .\shipping\admin.py:86
+#: .\printify_integration\admin.py:96 .\shipping\admin.py:104
 msgid "Meta"
 msgstr ""
 
@@ -858,11 +860,11 @@ msgid "TEST"
 msgstr ""
 
 #: .\payments\admin.py:173 .\printify_integration\admin.py:311
-#: .\shipping\admin.py:120 .\templates\admin\index.html:82
+#: .\shipping\admin.py:138 .\templates\admin\index.html:82
 msgid "Connection"
 msgstr ""
 
-#: .\payments\admin.py:177 .\shipping\admin.py:125
+#: .\payments\admin.py:177 .\shipping\admin.py:143
 msgid "not tested"
 msgstr ""
 
@@ -886,16 +888,16 @@ msgstr ""
 msgid "PayPal secret"
 msgstr ""
 
-#: .\payments\admin.py:193 .\shipping\admin.py:134
+#: .\payments\admin.py:193 .\shipping\admin.py:152
 msgid "Updated by"
 msgstr ""
 
 #: .\payments\admin.py:196 .\printify_integration\admin.py:95
-#: .\shipping\admin.py:137
+#: .\shipping\admin.py:155
 msgid "Connection status (read-only)"
 msgstr ""
 
-#: .\payments\admin.py:199 .\shipping\admin.py:140
+#: .\payments\admin.py:199 .\shipping\admin.py:158
 msgid "Never tested. Use 'Test connection'."
 msgstr ""
 
@@ -924,12 +926,12 @@ msgid ""
 "Test connection is read-only — it never creates a payment, capture or refund."
 msgstr ""
 
-#: .\payments\admin.py:244 .\shipping\admin.py:166
+#: .\payments\admin.py:244 .\shipping\admin.py:184
 #, python-format
 msgid "Connection OK — %(d)s"
 msgstr ""
 
-#: .\payments\admin.py:246 .\shipping\admin.py:168
+#: .\payments\admin.py:246 .\shipping\admin.py:186
 #, python-format
 msgid "Connection failed — %(e)s"
 msgstr ""
@@ -985,7 +987,6 @@ msgstr "Provider di pagamento"
 #: .\payments\models.py:148
 #: .\templates\admin\payments\paymentproviderconfig\change_form.html:13
 #: .\templates\admin\printify_integration\printifyaccountconfig\change_form.html:16
-#: .\templates\admin\shipping\checkoutapiconfig\change_form.html:25
 msgid "Test connection"
 msgstr "Prova connessione"
 
@@ -1723,39 +1724,84 @@ msgid ""
 "you are sure it is right."
 msgstr ""
 
-#: .\shipping\address_validation.py:84 .\shipping\address_validation.py:85
+#: .\shipping\address_validation.py:83
+msgid ""
+"Google rejected this key (403). Common causes: the Address Validation API is "
+"not enabled on the project, billing is disabled, the key is restricted to "
+"the wrong application type, this server's IP is not in the key's allowed "
+"IPs, or a referrer-restricted BROWSER key was pasted into the server-key "
+"field (a browser key cannot be tested from the server — use the client-side "
+"test instead)."
+msgstr "Google ha rifiutato questa chiave (403). Cause comuni: l'API Address Validation non è abilitata sul progetto, la fatturazione è disattivata, la chiave è ristretta al tipo di applicazione sbagliato, l'IP di questo server non è tra gli IP consentiti della chiave, oppure una BROWSER key referrer-restricted è stata incollata nel campo server key (una browser key non può essere testata dal server — usa il test client-side)."
+
+#: .\shipping\address_validation.py:99 .\shipping\address_validation.py:100
 msgid "No server key set."
 msgstr "Nessuna chiave server impostata."
 
-#: .\shipping\address_validation.py:95 .\shipping\address_validation.py:96
-#, python-format
-msgid "Key rejected (%d)."
-msgstr "Chiave rifiutata (%d)."
+#: .\shipping\address_validation.py:105 .\shipping\address_validation.py:134
+#, fuzzy
+#| msgid "Encryption key missing"
+msgid "Encryption key missing."
+msgstr "Chiave di cifratura mancante"
 
-#: .\shipping\address_validation.py:98 .\shipping\address_validation.py:99
+#: .\shipping\address_validation.py:107 .\shipping\address_validation.py:136
+msgid ""
+"PAYMENT_CONFIG_KEY is not configured on the server — the stored key cannot "
+"be decrypted. Configure it, then save the server key again."
+msgstr "PAYMENT_CONFIG_KEY non è configurata sul server — la chiave salvata non può essere decifrata. Configurala, poi salva di nuovo la server key."
+
+#: .\shipping\address_validation.py:119
+#, python-format
+msgid "Key rejected (%d) — see diagnostics."
+msgstr "Chiave rifiutata (%d) — vedi diagnostica."
+
+#: .\shipping\address_validation.py:122
+msgid "Invalid key or malformed request (400)."
+msgstr ""
+
+#: .\shipping\address_validation.py:124
+msgid ""
+"Google answered 400 — the key looks malformed or truncated. Re-copy it from "
+"the Google console."
+msgstr "Google ha risposto 400 — la chiave sembra malformata o troncata. Ricopiala dalla console Google."
+
+#: .\shipping\address_validation.py:127
+msgid "Quota exceeded (429)."
+msgstr ""
+
+#: .\shipping\address_validation.py:129
+msgid "Quota exceeded (429) — check the project's quotas and billing."
+msgstr "Quota superata (429) — controlla quote e fatturazione del progetto."
+
+#: .\shipping\address_validation.py:131 .\shipping\address_validation.py:132
 msgid "Address Validation API reachable."
 msgstr "API Address Validation raggiungibile."
 
-#: .\shipping\address_validation.py:101 .\shipping\address_validation.py:102
+#: .\shipping\address_validation.py:139 .\shipping\address_validation.py:140
 msgid "Could not reach Google (network/timeout)."
 msgstr "Impossibile raggiungere Google (rete/timeout)."
 
-#: .\shipping\address_validation.py:136
+#: .\shipping\address_validation.py:174
 msgid ""
 "Please double-check the postal code and street, then pick the address from "
 "the suggestions again."
-msgstr "Ricontrolla CAP e via, poi scegli di nuovo l'indirizzo dai suggerimenti."
+msgstr ""
+"Ricontrolla CAP e via, poi scegli di nuovo l'indirizzo dai suggerimenti."
 
-#: .\shipping\address_validation.py:155 .\shipping\address_validation.py:164
+#: .\shipping\address_validation.py:193 .\shipping\address_validation.py:202
 msgid ""
 "We could not verify this address right now — please try again in a moment."
-msgstr "Al momento non riusciamo a verificare questo indirizzo — riprova tra un istante."
+msgstr ""
+"Al momento non riusciamo a verificare questo indirizzo — riprova tra un "
+"istante."
 
-#: .\shipping\address_validation.py:159
+#: .\shipping\address_validation.py:197
 msgid ""
 "This address could not be fully verified — please pick it from the "
 "suggestions or correct it."
-msgstr "Questo indirizzo non è stato verificato completamente — sceglilo dai suggerimenti o correggilo."
+msgstr ""
+"Questo indirizzo non è stato verificato completamente — sceglilo dai "
+"suggerimenti o correggilo."
 
 #: .\shipping\admin.py:31
 msgid "Set / replace Address Validation server key"
@@ -1771,27 +1817,52 @@ msgstr ""
 "memorizzata in chiaro). Chiedi all'amministratore del server di configurare "
 "PAYMENT_CONFIG_KEY, poi riprova."
 
-#: .\shipping\admin.py:79
-msgid "Google keys"
-msgstr ""
-
-#: .\shipping\admin.py:80
+#: .\shipping\admin.py:70
 msgid ""
-"Browser key: Google Cloud console → Credentials → API key restricted by HTTP "
-"referrer, Places API enabled (public by design). Server key: a SEPARATE key "
-"restricted by IP, Address Validation API enabled — this one is a secret and "
-"is stored encrypted."
+"This is your BROWSER key — the server key must be a DIFFERENT key, "
+"restricted by the server's IP (not by referrer), with the Address Validation "
+"API enabled."
+msgstr "Questa è la tua BROWSER key — la server key deve essere una chiave DIVERSA, ristretta per IP del server (non per referrer), con l'API Address Validation abilitata."
+
+#: .\shipping\admin.py:85
+msgid "Browser key — client-side autocomplete (public)"
+msgstr "Browser key — autocomplete lato client (pubblica)"
+
+#: .\shipping\admin.py:86
+msgid ""
+"Use a PUBLIC browser key restricted by HTTP referrers. It powers the address "
+"suggestions in checkout and is visible in the page by design. Never put a "
+"server/IP-restricted key here. Checklist: Maps JavaScript API enabled · "
+"Places API enabled · billing enabled · website referrers include https://"
+"glitchy.graphics/* and https://www.glitchy.graphics/* · API restrictions "
+"limited to Maps JavaScript API + Places API. A referrer-restricted key "
+"CANNOT be tested from the server — use the 'Test browser key in this "
+"browser' button below."
 msgstr ""
 
-#: .\shipping\admin.py:127
+#: .\shipping\admin.py:95
+msgid "Server key — address validation (secret)"
+msgstr "Server key — validazione indirizzo (segreta)"
+
+#: .\shipping\admin.py:96
+msgid ""
+"Use a PRIVATE server key restricted by the server's IP address. It powers "
+"server-side address validation, is encrypted at rest and never shown again. "
+"Checklist: Address Validation API enabled · Places API enabled if Place "
+"Details is used · billing enabled · restricted by the server IP · "
+"PAYMENT_CONFIG_KEY configured · NEVER paste this key into the browser-key "
+"field above."
+msgstr ""
+
+#: .\shipping\admin.py:145
 msgid "Server key status"
 msgstr "Stato segreto"
 
-#: .\shipping\admin.py:130
+#: .\shipping\admin.py:148
 msgid "Save first, then add the server key."
 msgstr ""
 
-#: .\shipping\admin.py:131
+#: .\shipping\admin.py:149
 msgid "Address Validation key"
 msgstr "Indirizzo riga 1"
 
@@ -1879,7 +1950,8 @@ msgstr ""
 
 #: .\shipping\models.py:29
 msgid "Server-side Google Address Validation (used by the mode below)."
-msgstr "Validazione indirizzo Google lato server (usata dalla modalità qui sotto)."
+msgstr ""
+"Validazione indirizzo Google lato server (usata dalla modalità qui sotto)."
 
 #: .\shipping\models.py:34
 msgid "Disabled — manual entry, local checks only"
@@ -1887,7 +1959,8 @@ msgstr "Disattivata — inserimento manuale, solo controlli locali"
 
 #: .\shipping\models.py:35
 msgid "Warning — unverified addresses need an explicit confirmation"
-msgstr "Avviso — gli indirizzi non verificati richiedono una conferma esplicita"
+msgstr ""
+"Avviso — gli indirizzi non verificati richiedono una conferma esplicita"
 
 #: .\shipping\models.py:36
 msgid "Strict — only Google-verified addresses can order"
@@ -1897,7 +1970,10 @@ msgstr "Rigorosa — solo indirizzi verificati da Google possono ordinare"
 msgid ""
 "How hard to enforce address verification at checkout. Strict needs Google "
 "configured; it degrades to Warning if neither key is usable."
-msgstr "Quanto rigidamente applicare la verifica indirizzo al checkout. Rigorosa richiede Google configurato; degrada ad Avviso se nessuna chiave è utilizzabile."
+msgstr ""
+"Quanto rigidamente applicare la verifica indirizzo al checkout. Rigorosa "
+"richiede Google configurato; degrada ad Avviso se nessuna chiave è "
+"utilizzabile."
 
 #: .\shipping\models.py:43
 msgid ""
@@ -3356,14 +3432,46 @@ msgid "API operations"
 msgstr "Operazioni di pagamento"
 
 #: .\templates\admin\shipping\checkoutapiconfig\change_form.html:28
-msgid "Add the server key first, then Test connection will appear here."
-msgstr ""
+msgid "Save a browser key first, then test it here."
+msgstr "Salva prima una browser key, poi provala qui."
+
+#: .\templates\admin\shipping\checkoutapiconfig\change_form.html:29
+msgid "Loading Google Maps JS in this browser…"
+msgstr "Caricamento di Google Maps JS in questo browser…"
+
+#: .\templates\admin\shipping\checkoutapiconfig\change_form.html:30
+msgid "Browser key works — live suggestions received in this browser."
+msgstr "La browser key funziona — suggerimenti ricevuti in questo browser."
+
+#: .\templates\admin\shipping\checkoutapiconfig\change_form.html:31
+msgid ""
+"Google rejected this key in the browser. Check: Maps JavaScript API + Places "
+"API enabled, billing enabled, and THIS domain present in the HTTP referrers "
+"of the key."
+msgstr "Google ha rifiutato questa chiave nel browser. Controlla: Maps JavaScript API + Places API abilitate, fatturazione attiva e QUESTO dominio presente nei referrer HTTP della chiave."
 
 #: .\templates\admin\shipping\checkoutapiconfig\change_form.html:32
+msgid "Places responded with status:"
+msgstr "Places ha risposto con stato:"
+
+#: .\templates\admin\shipping\checkoutapiconfig\change_form.html:33
+msgid "Test browser key in this browser"
+msgstr "Prova la browser key in questo browser"
+
+#: .\templates\admin\shipping\checkoutapiconfig\change_form.html:36
+msgid "Test server key (server-side)"
+msgstr "Prova la server key (lato server)"
+
+#: .\templates\admin\shipping\checkoutapiconfig\change_form.html:39
+msgid "Add the server key to unlock the server-side test."
+msgstr "Aggiungi la server key per sbloccare il test lato server."
+
+#: .\templates\admin\shipping\checkoutapiconfig\change_form.html:45
 msgid ""
-"Test connection is read-only — it validates a fixed dummy address, never a "
-"customer's. Autocomplete and validation stay OFF until enabled above; "
-"checkout always works without them."
+"Both tests are read-only. The browser-key test runs entirely in this browser "
+"(the referrer check needs a real page); the server-key test validates a "
+"fixed dummy address — never a customer's. Checkout always keeps working "
+"without Google."
 msgstr ""
 
 #: .\templates\base.html:67
@@ -5473,7 +5581,9 @@ msgstr "Indirizzo non ancora verificato"
 #: .\templates\store\checkout.html:237
 msgid ""
 "Manual address mode — suggestions appear when Google Places is configured."
-msgstr "Modalità indirizzo manuale — i suggerimenti compaiono quando Google Places è configurato."
+msgstr ""
+"Modalità indirizzo manuale — i suggerimenti compaiono quando Google Places è "
+"configurato."
 
 #: .\templates\store\checkout.html:242
 msgid "Order note (optional)"
