@@ -31,6 +31,10 @@ class Order(models.Model):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     phone = models.CharField(max_length=20)  # fits E.164 (+15 digits) after intl validation
+    # Address verification audit trail (professional Google address flow)
+    google_place_id = models.CharField(max_length=128, blank=True, default="")
+    address_verified = models.BooleanField(default=False)
+    address_manual_confirmed = models.BooleanField(default=False)
     email = models.EmailField(max_length=100)
     address_line_1 = models.CharField(max_length=100)
     address_line_2 = models.CharField(max_length=100, blank=True)

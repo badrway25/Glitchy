@@ -100,3 +100,68 @@ def test_connection(cfg):
     except Exception:
         cfg.record_connection("failed", _("Could not reach Google (network/timeout)."))
         return {"ok": False, "detail": "", "error": _("Could not reach Google (network/timeout).")}
+
+
+# --------------------------------------------------------------------------- #
+# Professional address flow — effective mode + order-time verification
+# --------------------------------------------------------------------------- #
+def effective_mode(cfg):
+    """The mode checkout actually enforces. Strict is only meaningful when SOME Google surface
+    is usable (browser autocomplete or server validation); otherwise it degrades to warning so
+    a misconfigured admin can never lock every customer out."""
+    if cfg is None or not cfg.is_enabled:
+        return "disabled"
+    mode = getattr(cfg, "validation_mode", "disabled") or "disabled"
+    if mode == "strict" and not (cfg.autocomplete_ready() or cfg.validation_ready()):
+        return "warning"
+    return mode
+
+
+def verify_for_order(cfg, data, place_id, claimed_verified=False):
+    """Order-time server verdict. Returns (ok, error_message).
+
+    STRICT: never trusts hidden fields alone — requires a Places place_id from the suggestion
+    flow AND, when the server key is configured, a fail-CLOSED Google Address Validation pass;
+    without a server key it falls back to place_id presence + strict local checks (documented
+    browser-trust mode). WARNING/DISABLED are handled by the caller's confirm flow.
+    No PII is ever logged; no mutation; short timeouts.
+    """
+    from django.utils.translation import gettext as _
+    place_id = (place_id or "").strip()[:128]
+    if not place_id or any(ord(c) < 33 for c in place_id):
+        return False, _("Please select a verified address from the suggestions.")
+
+    level, _msg = validate_locally(data)
+    if level != "ok":
+        return False, _("Please double-check the postal code and street, then pick the address "
+                        "from the suggestions again.")
+
+    if cfg is not None and cfg.validation_ready():
+        # fail-CLOSED in strict: an unreachable validator must not wave orders through
+        try:
+            import requests
+            resp = requests.post(
+                "https://addressvalidation.googleapis.com/v1:validateAddress",
+                params={"key": cfg.get_server_key()},
+                json={"address": {
+                    "regionCode": (data.get("country") or "").upper(),
+                    "postalCode": data.get("postal_code") or "",
+                    "locality": data.get("city") or "",
+                    "addressLines": [data.get("address_line_1") or ""],
+                }},
+                timeout=5)
+            if resp.status_code != 200:
+                logger.info("strict address validation http=%s (fail-closed)", resp.status_code)
+                return False, _("We could not verify this address right now — please try again "
+                                "in a moment.")
+            verdict = (resp.json().get("result") or {}).get("verdict") or {}
+            if verdict.get("hasUnconfirmedComponents"):
+                return False, _("This address could not be fully verified — please pick it from "
+                                "the suggestions or correct it.")
+            return True, ""
+        except Exception as exc:
+            logger.info("strict address validation error=%s (fail-closed)", type(exc).__name__)
+            return False, _("We could not verify this address right now — please try again in a "
+                            "moment.")
+    # no server key: browser-trust mode (place_id from the suggestion flow + local checks)
+    return True, ""

@@ -398,9 +398,11 @@ def _checkout_extras(request, prefill):
     prefixes = [{"code": c, "dial": _DIAL.get(c, ""), "flag": _flag(c), "name": str(n)}
                 for c, n in COUNTRIES if _DIAL.get(c)]
     from shipping.models import CheckoutApiConfig
+    from shipping.address_validation import effective_mode
     api_cfg = CheckoutApiConfig.load()
     return {
         "checkout_api": api_cfg if (api_cfg and api_cfg.autocomplete_ready()) else None,
+        "address_mode": effective_mode(api_cfg),
         "address_warning": restore.get("address_warning") or "",
         "form_errors": restore.get("errors") or {},
         "form_ts": signing.dumps(time.time(), salt="checkout-ts"),

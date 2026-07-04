@@ -26,7 +26,16 @@ class CheckoutApiConfig(models.Model):
     enable_autocomplete = models.BooleanField(
         default=False, help_text=_("Load Google Places Autocomplete on the checkout address field."))
     enable_address_validation = models.BooleanField(
-        default=False, help_text=_("Server-side Google Address Validation (warning-only, never blocks)."))
+        default=False, help_text=_("Server-side Google Address Validation (used by the mode below)."))
+
+    MODE_DISABLED, MODE_WARNING, MODE_STRICT = "disabled", "warning", "strict"
+    validation_mode = models.CharField(
+        max_length=10, default=MODE_DISABLED,
+        choices=[(MODE_DISABLED, _("Disabled — manual entry, local checks only")),
+                 (MODE_WARNING, _("Warning — unverified addresses need an explicit confirmation")),
+                 (MODE_STRICT, _("Strict — only Google-verified addresses can order"))],
+        help_text=_("How hard to enforce address verification at checkout. Strict needs Google "
+                    "configured; it degrades to Warning if neither key is usable."))
 
     # public, referrer-restricted browser key (like a publishable key)
     maps_browser_key = models.CharField(

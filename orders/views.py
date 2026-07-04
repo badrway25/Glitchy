@@ -468,17 +468,43 @@ def place_order(request, total=0, quantity=0):
         messages.error(request, _("We're sorry, we don't ship to the selected country yet."))
         return redirect("checkout")
 
-    # Optional address verification (warning-only — NEVER blocks a confirmed address).
-    if not request.POST.get("address_confirmed"):
-        from shipping.address_validation import validate_address
-        from shipping.models import CheckoutApiConfig
-        level, warn_msg = validate_address(form.cleaned_data, CheckoutApiConfig.load())
-        if level == "warning":
-            _stash_checkout(request, address_warning=str(warn_msg))
-            messages.warning(request, _("Please review your address below."))
+    # ---- Address verification contract (professional Google address flow) -------------
+    # Modes: disabled (local checks + confirm flow) / warning (unverified needs the explicit
+    # "I confirm" checkbox) / strict (a Places selection is REQUIRED and, with a server key,
+    # re-verified fail-closed — hidden fields alone are never trusted).
+    from shipping.address_validation import effective_mode, validate_address, verify_for_order
+    from shipping.models import CheckoutApiConfig
+    _api_cfg = CheckoutApiConfig.load()
+    _mode = effective_mode(_api_cfg)
+    _place_id = (request.POST.get("google_place_id") or "").strip()[:128]
+    _manual_confirmed = bool(request.POST.get("address_confirmed"))
+    _addr_verified = False
+
+    if _mode == "strict":
+        ok, err = verify_for_order(_api_cfg, form.cleaned_data, _place_id)
+        if not ok:
+            _stash_checkout(request, address_warning=str(err))
+            messages.error(request, _("Please select a verified address from the suggestions."))
             return redirect("checkout")
+        _addr_verified = True
+    else:
+        # warning/disabled: honest local (+optional Google, fail-open) check; unverified
+        # addresses can proceed only through the explicit confirmation checkbox.
+        _addr_verified = bool(_place_id) and request.POST.get("address_verified") == "true"
+        if not _manual_confirmed and not _addr_verified:
+            level, warn_msg = validate_address(form.cleaned_data, _api_cfg)
+            if level == "warning" or (_mode == "warning" and not _addr_verified):
+                msg = str(warn_msg) if level == "warning" else str(
+                    _("This address is not verified. Confirm it to continue, or pick it from "
+                      "the suggestions."))
+                _stash_checkout(request, address_warning=msg)
+                messages.warning(request, _("Please review your address below."))
+                return redirect("checkout")
 
     data = Order()
+    data.google_place_id = _place_id
+    data.address_verified = _addr_verified
+    data.address_manual_confirmed = _manual_confirmed and not _addr_verified
     if is_authed:
         data.user = current_user
     else:

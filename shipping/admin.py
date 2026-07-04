@@ -36,22 +36,24 @@ class CheckoutApiConfigForm(forms.ModelForm):
     class Meta:
         model = CheckoutApiConfig
         fields = ("is_enabled", "enable_autocomplete", "enable_address_validation",
-                  "maps_browser_key", "allowed_domains_note")
+                  "validation_mode", "maps_browser_key", "allowed_domains_note")
         widgets = {"maps_browser_key": forms.TextInput(
             attrs={"placeholder": "AIza… (browser, referrer-restricted)"})}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         try:
-            from unfold.widgets import INPUT_CLASSES, CHECKBOX_CLASSES
+            from unfold.widgets import INPUT_CLASSES, CHECKBOX_CLASSES, SELECT_CLASSES
         except Exception:
             return
-        text, checkbox = " ".join(INPUT_CLASSES), " ".join(CHECKBOX_CLASSES)
+        text, checkbox, sel = " ".join(INPUT_CLASSES), " ".join(CHECKBOX_CLASSES), " ".join(SELECT_CLASSES)
         for field in self.fields.values():
             w = field.widget
             cur = w.attrs.get("class", "")
             if isinstance(w, forms.CheckboxInput):
                 w.attrs["class"] = (cur + " " + checkbox).strip()
+            elif isinstance(w, forms.Select):
+                w.attrs["class"] = (cur + " " + sel).strip()
             elif isinstance(w, (forms.TextInput, forms.PasswordInput)):
                 w.attrs["class"] = (cur + " " + text).strip()
 
@@ -69,10 +71,11 @@ class CheckoutApiConfigAdmin(BaseModelAdmin):
     form = CheckoutApiConfigForm
     change_form_template = "admin/shipping/checkoutapiconfig/change_form.html"
     list_display = ("__str__", "is_enabled", "enable_autocomplete", "enable_address_validation",
-                    "connection_badge", "updated_at")
+                    "validation_mode", "connection_badge", "updated_at")
     readonly_fields = ("server_key_state", "connection_state", "created_at", "updated_at")
     fieldsets = (
-        (_("Status"), {"fields": ("is_enabled", "enable_autocomplete", "enable_address_validation")}),
+        (_("Status"), {"fields": ("is_enabled", "enable_autocomplete", "enable_address_validation",
+                               "validation_mode")}),
         (_("Google keys"), {
             "description": _("Browser key: Google Cloud console → Credentials → API key restricted "
                              "by HTTP referrer, Places API enabled (public by design). Server key: "
@@ -89,7 +92,7 @@ class CheckoutApiConfigAdmin(BaseModelAdmin):
     def get_readonly_fields(self, request, obj=None):
         ro = list(super().get_readonly_fields(request, obj))
         if not _is_superadmin(request.user):
-            ro += ["is_enabled", "enable_autocomplete", "enable_address_validation"]
+            ro += ["is_enabled", "enable_autocomplete", "enable_address_validation", "validation_mode"]
         return ro
 
     def get_form(self, request, obj=None, **kwargs):
