@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: greatkart 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-04 18:05+0200\n"
+"POT-Creation-Date: 2026-07-04 18:51+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,17 +20,17 @@ msgstr ""
 #: .\accounts\admin.py:22 .\orders\admin.py:153
 #: .\templates\accounts\address_form.html:45 .\templates\accounts\login.html:37
 #: .\templates\legal\cookies.html:26 .\templates\legal\privacy.html:31
-#: .\templates\legal\terms.html:25 .\templates\store\checkout.html:115
+#: .\templates\legal\terms.html:25 .\templates\store\checkout.html:127
 msgid "Email"
 msgstr "E-mail"
 
-#: .\accounts\forms.py:17 .\templates\store\checkout.html:187
+#: .\accounts\forms.py:17 .\templates\store\checkout.html:180
 msgid "Select country"
 msgstr "Sélectionner un pays"
 
 #: .\accounts\forms.py:18 .\templates\accounts\address_form.html:62
 #: .\templates\includes\shipping_estimator.html:37
-#: .\templates\store\checkout.html:184
+#: .\templates\store\checkout.html:177
 msgid "Country"
 msgstr "Pays"
 
@@ -145,7 +145,7 @@ msgstr "Adresse par défaut mise à jour."
 #: .\templates\legal\terms.html:12
 #: .\templates\notifications\email\transactional.html:89
 #: .\templates\orders\payments.html:115 .\templates\store\cart.html:175
-#: .\templates\store\checkout.html:255
+#: .\templates\store\checkout.html:301
 msgid "Shipping"
 msgstr "Livraison"
 
@@ -161,7 +161,7 @@ msgid "Refunds"
 msgstr "Remboursements"
 
 #: .\assistant\models.py:20 .\templates\store\cart.html:199
-#: .\templates\store\checkout.html:272
+#: .\templates\store\checkout.html:318
 msgid "Payments"
 msgstr "Paiements"
 
@@ -457,7 +457,7 @@ msgstr "Destinataire"
 
 #: .\notifications\admin.py:21 .\orders\admin.py:167
 #: .\printify_integration\admin.py:566 .\returns\admin.py:40
-#: .\shipping\admin.py:75 .\templates\accounts\dashboard.html:162
+#: .\shipping\admin.py:77 .\templates\accounts\dashboard.html:162
 #: .\templates\accounts\transactions.html:100
 #: .\templates\orders\order_complete.html:186
 msgid "Status"
@@ -755,7 +755,17 @@ msgstr "Nous ne livrons pas encore dans ce pays."
 msgid "We're sorry, we don't ship to the selected country yet."
 msgstr "Nous ne livrons pas encore dans ce pays."
 
-#: .\orders\views.py:478
+#: .\orders\views.py:487 .\shipping\address_validation.py:132
+msgid "Please select a verified address from the suggestions."
+msgstr "Veuillez sélectionner une adresse vérifiée parmi les suggestions."
+
+#: .\orders\views.py:498
+msgid ""
+"This address is not verified. Confirm it to continue, or pick it from the "
+"suggestions."
+msgstr "Cette adresse n'est pas vérifiée. Confirmez-la pour continuer, ou choisissez-la parmi les suggestions."
+
+#: .\orders\views.py:501
 msgid "Please review your address below."
 msgstr "Vérifiez votre adresse ci-dessous."
 
@@ -814,12 +824,12 @@ msgid "Safety gates"
 msgstr ""
 
 #: .\payments\admin.py:108 .\payments\admin.py:117
-#: .\printify_integration\admin.py:318 .\shipping\admin.py:82
+#: .\printify_integration\admin.py:318 .\shipping\admin.py:85
 msgid "Connection status"
 msgstr ""
 
 #: .\payments\admin.py:109 .\payments\admin.py:118
-#: .\printify_integration\admin.py:96 .\shipping\admin.py:83
+#: .\printify_integration\admin.py:96 .\shipping\admin.py:86
 msgid "Meta"
 msgstr ""
 
@@ -836,11 +846,11 @@ msgid "TEST"
 msgstr ""
 
 #: .\payments\admin.py:173 .\printify_integration\admin.py:311
-#: .\shipping\admin.py:117 .\templates\admin\index.html:82
+#: .\shipping\admin.py:120 .\templates\admin\index.html:82
 msgid "Connection"
 msgstr ""
 
-#: .\payments\admin.py:177 .\shipping\admin.py:122
+#: .\payments\admin.py:177 .\shipping\admin.py:125
 msgid "not tested"
 msgstr ""
 
@@ -864,16 +874,16 @@ msgstr ""
 msgid "PayPal secret"
 msgstr ""
 
-#: .\payments\admin.py:193 .\shipping\admin.py:131
+#: .\payments\admin.py:193 .\shipping\admin.py:134
 msgid "Updated by"
 msgstr ""
 
 #: .\payments\admin.py:196 .\printify_integration\admin.py:95
-#: .\shipping\admin.py:134
+#: .\shipping\admin.py:137
 msgid "Connection status (read-only)"
 msgstr ""
 
-#: .\payments\admin.py:199 .\shipping\admin.py:137
+#: .\payments\admin.py:199 .\shipping\admin.py:140
 msgid "Never tested. Use 'Test connection'."
 msgstr ""
 
@@ -902,12 +912,12 @@ msgid ""
 "Test connection is read-only — it never creates a payment, capture or refund."
 msgstr ""
 
-#: .\payments\admin.py:244 .\shipping\admin.py:163
+#: .\payments\admin.py:244 .\shipping\admin.py:166
 #, python-format
 msgid "Connection OK — %(d)s"
 msgstr ""
 
-#: .\payments\admin.py:246 .\shipping\admin.py:165
+#: .\payments\admin.py:246 .\shipping\admin.py:168
 #, python-format
 msgid "Connection failed — %(e)s"
 msgstr ""
@@ -1446,7 +1456,7 @@ msgstr "Indisponible"
 #: .\templates\accounts\order_detail.html:174
 #: .\templates\includes\shipping_estimator.html:20
 #: .\templates\orders\payments.html:115 .\templates\store\cart.html:176
-#: .\templates\store\checkout.html:256
+#: .\templates\store\checkout.html:302
 msgid "Free"
 msgstr "Gratuite"
 
@@ -1692,22 +1702,42 @@ msgstr "API Address Validation joignable."
 msgid "Could not reach Google (network/timeout)."
 msgstr "Google injoignable (réseau/délai dépassé)."
 
+#: .\shipping\address_validation.py:136
+msgid ""
+"Please double-check the postal code and street, then pick the address from "
+"the suggestions again."
+msgstr ""
+
+#: .\shipping\address_validation.py:155 .\shipping\address_validation.py:164
+msgid ""
+"We could not verify this address right now — please try again in a moment."
+msgstr "Impossible de vérifier cette adresse pour le moment — réessayez dans un instant."
+
+#: .\shipping\address_validation.py:159
+msgid ""
+"This address could not be fully verified — please pick it from the "
+"suggestions or correct it."
+msgstr ""
+
 #: .\shipping\admin.py:31
 msgid "Set / replace Address Validation server key"
 msgstr ""
 
-#: .\shipping\admin.py:62
+#: .\shipping\admin.py:64
 msgid ""
 "Encryption key missing — the key was NOT saved (it is never stored in plain "
 "text). Ask the server administrator to configure PAYMENT_CONFIG_KEY, then "
 "try again."
-msgstr "Clé de chiffrement manquante — la clé n'a PAS été enregistrée (elle n'est jamais stockée en clair). Demandez à l'administrateur du serveur de configurer PAYMENT_CONFIG_KEY, puis réessayez."
+msgstr ""
+"Clé de chiffrement manquante — la clé n'a PAS été enregistrée (elle n'est "
+"jamais stockée en clair). Demandez à l'administrateur du serveur de "
+"configurer PAYMENT_CONFIG_KEY, puis réessayez."
 
-#: .\shipping\admin.py:76
+#: .\shipping\admin.py:79
 msgid "Google keys"
 msgstr ""
 
-#: .\shipping\admin.py:77
+#: .\shipping\admin.py:80
 msgid ""
 "Browser key: Google Cloud console → Credentials → API key restricted by HTTP "
 "referrer, Places API enabled (public by design). Server key: a SEPARATE key "
@@ -1715,15 +1745,15 @@ msgid ""
 "is stored encrypted."
 msgstr ""
 
-#: .\shipping\admin.py:124
+#: .\shipping\admin.py:127
 msgid "Server key status"
 msgstr "Statut actuel"
 
-#: .\shipping\admin.py:127
+#: .\shipping\admin.py:130
 msgid "Save first, then add the server key."
 msgstr ""
 
-#: .\shipping\admin.py:128
+#: .\shipping\admin.py:131
 msgid "Address Validation key"
 msgstr "Adresse ligne 1"
 
@@ -1810,20 +1840,38 @@ msgid "Load Google Places Autocomplete on the checkout address field."
 msgstr ""
 
 #: .\shipping\models.py:29
-msgid "Server-side Google Address Validation (warning-only, never blocks)."
+msgid "Server-side Google Address Validation (used by the mode below)."
 msgstr ""
 
 #: .\shipping\models.py:34
+msgid "Disabled — manual entry, local checks only"
+msgstr ""
+
+#: .\shipping\models.py:35
+msgid "Warning — unverified addresses need an explicit confirmation"
+msgstr ""
+
+#: .\shipping\models.py:36
+msgid "Strict — only Google-verified addresses can order"
+msgstr ""
+
+#: .\shipping\models.py:37
+msgid ""
+"How hard to enforce address verification at checkout. Strict needs Google "
+"configured; it degrades to Warning if neither key is usable."
+msgstr ""
+
+#: .\shipping\models.py:43
 msgid ""
 "Places JS browser key — public by design; restrict it by referrer in the "
 "Google console. Never use a server key here."
 msgstr ""
 
-#: .\shipping\models.py:38
+#: .\shipping\models.py:47
 msgid "Reminder of the referrer restrictions configured in the Google console."
 msgstr ""
 
-#: .\shipping\models.py:56 .\shipping\models.py:57
+#: .\shipping\models.py:65 .\shipping\models.py:66
 msgid "Checkout API settings"
 msgstr ""
 
@@ -2282,6 +2330,7 @@ msgstr "Retour aux commandes"
 #: .\templates\accounts\address_form.html:39
 #: .\templates\includes\footer.html:82 .\templates\legal\cookies.html:25
 #: .\templates\legal\privacy.html:30 .\templates\legal\terms.html:24
+#: .\templates\store\checkout.html:115
 msgid "Contact"
 msgstr "Contact"
 
@@ -2290,17 +2339,17 @@ msgid "Who should we address the parcel to?"
 msgstr "À qui adressons-nous le colis ?"
 
 #: .\templates\accounts\address_form.html:43
-#: .\templates\accounts\register.html:45 .\templates\store\checkout.html:106
+#: .\templates\accounts\register.html:45 .\templates\store\checkout.html:118
 msgid "First name"
 msgstr "Prénom"
 
 #: .\templates\accounts\address_form.html:44
-#: .\templates\accounts\register.html:46 .\templates\store\checkout.html:111
+#: .\templates\accounts\register.html:46 .\templates\store\checkout.html:123
 msgid "Last name"
 msgstr "Nom"
 
 #: .\templates\accounts\address_form.html:46
-#: .\templates\store\checkout.html:120
+#: .\templates\store\checkout.html:132
 msgid "Phone"
 msgstr "Téléphone"
 
@@ -2309,12 +2358,10 @@ msgid "Where should we deliver your order?"
 msgstr "Où livrons-nous votre commande ?"
 
 #: .\templates\accounts\address_form.html:57
-#: .\templates\store\checkout.html:159
 msgid "Address line 1"
 msgstr "Adresse ligne 1"
 
 #: .\templates\accounts\address_form.html:58
-#: .\templates\store\checkout.html:167
 msgid "Address line 2"
 msgstr "Adresse ligne 2"
 
@@ -2323,7 +2370,7 @@ msgid "(optional)"
 msgstr "(facultatif)"
 
 #: .\templates\accounts\address_form.html:59
-#: .\templates\store\checkout.html:171
+#: .\templates\store\checkout.html:191
 msgid "City"
 msgstr "Ville"
 
@@ -2334,7 +2381,7 @@ msgstr "État / Province"
 #: .\templates\accounts\address_form.html:61
 #: .\templates\includes\shipping_estimator.html:47
 #: .\templates\includes\shipping_estimator.html:50
-#: .\templates\store\checkout.html:180
+#: .\templates\store\checkout.html:196
 msgid "Postal code"
 msgstr "Code postal"
 
@@ -2376,7 +2423,7 @@ msgstr "Rechercher des adresses"
 msgid "Search"
 msgstr "Recherche"
 
-#: .\templates\accounts\address_list.html:51 .\templates\store\checkout.html:95
+#: .\templates\accounts\address_list.html:51 .\templates\store\checkout.html:99
 msgid "Default"
 msgstr "Par défaut"
 
@@ -2511,7 +2558,7 @@ msgstr "Adresses"
 
 #: .\templates\accounts\dashboard.html:66 .\templates\returns\request.html:73
 #: .\templates\returns\status.html:61 .\templates\store\cart.html:25
-#: .\templates\store\cart.html:189 .\templates\store\checkout.html:268
+#: .\templates\store\cart.html:189 .\templates\store\checkout.html:314
 #: .\templates\wishlist\saved_items.html:17
 #: .\templates\wishlist\saved_items.html:173
 msgid "Continue shopping"
@@ -2830,12 +2877,12 @@ msgstr "Aucun paiement associé."
 #: .\templates\notifications\email\transactional.html:88
 #: .\templates\orders\order_complete.html:230
 #: .\templates\orders\payments.html:114 .\templates\store\cart.html:51
-#: .\templates\store\cart.html:170 .\templates\store\checkout.html:250
+#: .\templates\store\cart.html:170 .\templates\store\checkout.html:296
 msgid "Subtotal"
 msgstr "Sous-total"
 
 #: .\templates\accounts\order_detail.html:178 .\templates\store\cart.html:172
-#: .\templates\store\checkout.html:252
+#: .\templates\store\checkout.html:298
 msgid "Discount"
 msgstr "Compte"
 
@@ -2843,14 +2890,14 @@ msgstr "Compte"
 #: .\templates\notifications\email\transactional.html:90
 #: .\templates\orders\order_complete.html:234
 #: .\templates\orders\payments.html:116 .\templates\store\cart.html:178
-#: .\templates\store\checkout.html:258
+#: .\templates\store\checkout.html:304
 msgid "Tax"
 msgstr "TVA"
 
 #: .\templates\accounts\order_detail.html:187
 #: .\templates\orders\order_complete.html:238
 #: .\templates\orders\payments.html:117 .\templates\store\cart.html:179
-#: .\templates\store\checkout.html:259
+#: .\templates\store\checkout.html:305
 msgid "Grand total"
 msgstr "Total général"
 
@@ -2866,7 +2913,7 @@ msgstr "Article"
 #: .\templates\accounts\order_detail.html:208
 #: .\templates\orders\order_complete.html:197
 #: .\templates\returns\request.html:54 .\templates\returns\status.html:45
-#: .\templates\store\checkout.html:241
+#: .\templates\store\checkout.html:287
 msgid "Qty"
 msgstr "Qté"
 
@@ -4300,7 +4347,7 @@ msgstr "Prix : décroissant"
 
 #: .\templates\merchandising\collection.html:74
 #: .\templates\orders\payments.html:170 .\templates\store\cart.html:193
-#: .\templates\store\checkout.html:277 .\templates\store\product_detail.html:81
+#: .\templates\store\checkout.html:323 .\templates\store\product_detail.html:81
 #, python-format
 msgid "%(d)s-day returns"
 msgstr "Retours sous %(d)s jours"
@@ -4812,7 +4859,7 @@ msgstr "Voir"
 msgid "Qty:"
 msgstr "Qté :"
 
-#: .\templates\orders\payments.html:92 .\templates\store\checkout.html:241
+#: .\templates\orders\payments.html:92 .\templates\store\checkout.html:287
 msgid "each"
 msgstr "l'unité"
 
@@ -4828,7 +4875,7 @@ msgstr "Après le paiement, votre commande sera confirmée automatiquement."
 msgid "Pay"
 msgstr "Payer"
 
-#: .\templates\orders\payments.html:169 .\templates\store\checkout.html:277
+#: .\templates\orders\payments.html:169 .\templates\store\checkout.html:323
 msgid "Secure payment"
 msgstr "Paiement sécurisé"
 
@@ -5082,7 +5129,7 @@ msgstr "Changer"
 msgid "Shopping cart"
 msgstr "Panier"
 
-#: .\templates\store\cart.html:16 .\templates\store\checkout.html:219
+#: .\templates\store\cart.html:16 .\templates\store\checkout.html:265
 #, python-format
 msgid "%(c)s item"
 msgid_plural "%(c)s items"
@@ -5147,7 +5194,7 @@ msgstr "Options sélectionnées incluses"
 msgid "Save for later"
 msgstr "Enregistrer pour plus tard"
 
-#: .\templates\store\cart.html:132 .\templates\store\checkout.html:218
+#: .\templates\store\cart.html:132 .\templates\store\checkout.html:264
 msgid "Order summary"
 msgstr "Récapitulatif de la commande"
 
@@ -5221,69 +5268,118 @@ msgstr "Vous commandez en tant qu'invité. Aucun compte requis."
 msgid "Have an account? Sign in"
 msgstr "Vous avez un compte ? Connectez-vous"
 
-#: .\templates\store\checkout.html:59
+#: .\templates\store\checkout.html:48
+msgid "Type at least 3 characters…"
+msgstr "Saisissez au moins 3 caractères…"
+
+#: .\templates\store\checkout.html:49
+msgid "No suggestions — you can keep typing the full address."
+msgstr "Aucune suggestion — vous pouvez continuer à saisir l'adresse complète."
+
+#: .\templates\store\checkout.html:50
+msgid "Suggestion applied — please complete the missing fields."
+msgstr ""
+
+#: .\templates\store\checkout.html:51
+msgid "Google Places is not available — enter the address manually."
+msgstr "Google Places n'est pas disponible — saisissez l'adresse manuellement."
+
+#: .\templates\store\checkout.html:63
 msgid "My address is correct — continue"
 msgstr "Mon adresse est correcte — continuer"
 
-#: .\templates\store\checkout.html:69
+#: .\templates\store\checkout.html:73
 msgid "Billing address"
 msgstr "Adresse de facturation"
 
-#: .\templates\store\checkout.html:70
+#: .\templates\store\checkout.html:74
 msgid "Secure"
 msgstr "Sécurisé"
 
-#: .\templates\store\checkout.html:75
+#: .\templates\store\checkout.html:79
 msgid "Use saved address"
 msgstr "Utiliser une adresse enregistrée"
 
-#: .\templates\store\checkout.html:82
+#: .\templates\store\checkout.html:86
 msgid "Default:"
 msgstr "Par défaut :"
 
-#: .\templates\store\checkout.html:83
+#: .\templates\store\checkout.html:87
 msgid "Select an address"
 msgstr "Sélectionner une adresse"
 
-#: .\templates\store\checkout.html:100
+#: .\templates\store\checkout.html:104
 msgid "Pick one to autofill your billing details."
 msgstr ""
 "Sélectionnez-en une pour remplir automatiquement vos informations de "
 "facturation."
 
-#: .\templates\store\checkout.html:128 .\templates\store\checkout.html:145
+#: .\templates\store\checkout.html:140 .\templates\store\checkout.html:157
 msgid "Phone prefix"
 msgstr "Indicatif téléphonique"
 
-#: .\templates\store\checkout.html:154
+#: .\templates\store\checkout.html:166
 msgid "e.g. 333 1234567"
 msgstr ""
 
-#: .\templates\store\checkout.html:163
-msgid "Start typing your address…"
-msgstr "Commencez à saisir votre adresse…"
+#: .\templates\store\checkout.html:174
+msgid "Delivery destination"
+msgstr "Destination de livraison"
 
-#: .\templates\store\checkout.html:176
-msgid "State"
-msgstr "Région"
+#: .\templates\store\checkout.html:187
+msgid "State / Region / Province"
+msgstr "État / Région / Province"
 
-#: .\templates\store\checkout.html:196
+#: .\templates\store\checkout.html:204 .\templates\store\checkout.html:207
+msgid "Street address"
+msgstr "Adresse (rue)"
+
+#: .\templates\store\checkout.html:207
+msgid "street and number"
+msgstr "rue et numéro"
+
+#: .\templates\store\checkout.html:213
+msgid "Start typing your street…"
+msgstr "Commencez à saisir votre rue…"
+
+#: .\templates\store\checkout.html:213
+msgid "Street and number"
+msgstr ""
+
+#: .\templates\store\checkout.html:219
+msgid "Apartment, suite, floor (optional)"
+msgstr "Appartement, étage (facultatif)"
+
+#: .\templates\store\checkout.html:233
+msgid "Address verified"
+msgstr "Adresse vérifiée"
+
+#: .\templates\store\checkout.html:235
+msgid "Address not verified yet"
+msgstr "Adresse pas encore vérifiée"
+
+#: .\templates\store\checkout.html:237
+msgid ""
+"Manual address mode — suggestions appear when Google Places is configured."
+msgstr "Mode adresse manuel — les suggestions apparaissent quand Google Places est configuré."
+
+#: .\templates\store\checkout.html:242
 msgid "Order note (optional)"
 msgstr "Note de commande (facultatif)"
 
-#: .\templates\store\checkout.html:198
+#: .\templates\store\checkout.html:244
 msgid "Delivery instructions, notes for the seller..."
 msgstr "Instructions de livraison, notes pour le vendeur..."
 
-#: .\templates\store\checkout.html:204
+#: .\templates\store\checkout.html:250
 msgid "Save / update my default address"
 msgstr "Enregistrer / mettre à jour mon adresse par défaut"
 
-#: .\templates\store\checkout.html:208
+#: .\templates\store\checkout.html:254
 msgid "You can create an account after checkout to track your order."
 msgstr "Vous pouvez créer un compte après la commande pour suivre votre colis."
 
-#: .\templates\store\checkout.html:266
+#: .\templates\store\checkout.html:312
 msgid "Continue to payment"
 msgstr "Passer au paiement"
 
@@ -5879,6 +5975,9 @@ msgstr "Articles de la liste de favoris"
 #: .\wishlist\views.py:117
 msgid "Saved for later."
 msgstr "Enregistré pour plus tard."
+
+#~ msgid "State"
+#~ msgstr "Région"
 
 #~ msgid "Estimated delivery"
 #~ msgstr "Livraison estimée"
