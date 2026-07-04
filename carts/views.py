@@ -373,6 +373,43 @@ def cart(request, total=0, quantity=0, cart_items=None):
     return render(request, 'store/cart.html', context)
 
 
+def _checkout_extras(request, prefill):
+    """Field preservation + form security context for the checkout render.
+
+    Pops the place_order stash (typed fields + per-field errors) so an invalid submit
+    restores everything the shopper typed; issues the signed timestamp the anti-bot
+    minimum-form-time check verifies; provides the international dial-prefix choices."""
+    from django.core import signing
+    import time
+    from orders.views import CHECKOUT_RESTORE_KEY
+    from shipping.constants import COUNTRIES
+
+    restore = request.session.pop(CHECKOUT_RESTORE_KEY, None) or {}
+    data = restore.get("data") or {}
+    for k, v in data.items():
+        if k in prefill and v:
+            prefill[k] = v
+    # dial prefixes for the curated shipping countries (flag emoji + code)
+    _DIAL = {"IT": "+39", "FR": "+33", "DE": "+49", "ES": "+34", "NL": "+31", "BE": "+32",
+             "AT": "+43", "PT": "+351", "IE": "+353", "CH": "+41", "GB": "+44", "US": "+1",
+             "CA": "+1", "AU": "+61"}
+    def _flag(cc):
+        return chr(0x1F1E6 + ord(cc[0]) - 65) + chr(0x1F1E6 + ord(cc[1]) - 65)
+    prefixes = [{"code": c, "dial": _DIAL.get(c, ""), "flag": _flag(c), "name": str(n)}
+                for c, n in COUNTRIES if _DIAL.get(c)]
+    from shipping.models import CheckoutApiConfig
+    api_cfg = CheckoutApiConfig.load()
+    return {
+        "checkout_api": api_cfg if (api_cfg and api_cfg.autocomplete_ready()) else None,
+        "address_warning": restore.get("address_warning") or "",
+        "form_errors": restore.get("errors") or {},
+        "form_ts": signing.dumps(time.time(), salt="checkout-ts"),
+        "phone_prefixes": prefixes,
+        "restored": bool(data),
+        "prefill_prefix": data.get("phone_prefix") or "",
+    }
+
+
 def checkout(request, total=0, quantity=0, cart_items=None):
     from orders.totals import compute_cart_totals
     from shipping.geo import detect_country
@@ -408,6 +445,7 @@ def checkout(request, total=0, quantity=0, cart_items=None):
             "addresses": [], "default_addr": None, "is_guest": True,
             "coupon": coupon, "discount": discount,
         }
+        context.update(_checkout_extras(request, prefill))
         return render(request, "store/checkout.html", context)
 
     raw_qs = Address.objects.filter(user=request.user).order_by("-is_default", "-updated_at", "-id")
@@ -477,4 +515,5 @@ def checkout(request, total=0, quantity=0, cart_items=None):
         "is_guest": False,
         "coupon": coupon, "discount": discount,
     }
+    context.update(_checkout_extras(request, prefill))
     return render(request, "store/checkout.html", context)

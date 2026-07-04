@@ -28,11 +28,17 @@ class GuestCheckoutTests(TestCase):
 
     def test_guest_place_order_creates_guest_order(self):
         self.client.get(reverse("add_cart", args=[self.product.id]))
+        # NEW contract (smart-checkout phase): a signed form timestamp (anti-bot minimum
+        # form time) and a REAL international phone (validated via phonenumbers, stored E.164).
+        from django.core import signing
+        import time
         resp = self.client.post(reverse("place_order"), {
-            "first_name": "Guest", "last_name": "User", "phone": "123456",
+            "first_name": "Guest", "last_name": "User", "phone": "333 1234567",
+            "phone_prefix": "+39",
             "email": "guest@example.com", "address_line_1": "Via Test 1",
             "address_line_2": "", "country": "IT", "state": "RM",
             "postal_code": "00100", "city": "Rome", "order_note": "",
+            "website": "", "form_ts": signing.dumps(time.time() - 10, salt="checkout-ts"),
         })
         self.assertEqual(resp.status_code, 200)  # renders payments page
         order = Order.objects.get(email="guest@example.com")

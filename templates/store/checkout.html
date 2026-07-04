@@ -44,8 +44,21 @@
     </div>
     {% endif %}
 
-    <form action="{% url 'place_order' %}" method="POST">
+    <form action="{% url 'place_order' %}" method="POST" id="checkoutForm">
       {% csrf_token %}
+      {% comment %}Bot protection: invisible honeypot (real browsers leave it empty) + a signed
+      server timestamp for the minimum-form-time check. Neither affects real shoppers.{% endcomment %}
+      <div class="co-hp" aria-hidden="true"><label>Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+      <input type="hidden" name="form_ts" value="{{ form_ts }}">
+      {% if address_warning %}
+      <div class="addr-warning" role="alert">
+        <div class="addr-warning-msg"><i class="fa fa-exclamation-triangle mr-2" aria-hidden="true"></i>{{ address_warning }}</div>
+        <label class="addr-warning-confirm">
+          <input type="checkbox" name="address_confirmed" value="1">
+          {% trans "My address is correct — continue" %}
+        </label>
+      </div>
+      {% endif %}
       <div class="row">
 
         <!-- ================= Billing ================= -->
@@ -90,7 +103,8 @@
             <div class="checkout-grid">
               <div class="form-group mb-0">
                 <label>{% trans "First name" %}</label>
-                <input type="text" name="first_name" class="form-control" value="{{ prefill.first_name }}" required>
+                <input type="text" name="first_name" class="form-control{% if form_errors.first_name %} is-invalid{% endif %}" value="{{ prefill.first_name }}" required>
+                {% if form_errors.first_name %}<div class="field-error">{{ form_errors.first_name }}</div>{% endif %}
               </div>
               <div class="form-group mb-0">
                 <label>{% trans "Last name" %}</label>
@@ -98,15 +112,54 @@
               </div>
               <div class="form-group mb-0">
                 <label>{% trans "Email" %}</label>
-                <input type="email" name="email" class="form-control" value="{{ prefill.email }}" required>
+                <input type="email" name="email" class="form-control{% if form_errors.email %} is-invalid{% endif %}" value="{{ prefill.email }}" required>
+                {% if form_errors.email %}<div class="field-error">{{ form_errors.email }}</div>{% endif %}
               </div>
               <div class="form-group mb-0">
-                <label>{% trans "Phone" %}</label>
-                <input type="text" name="phone" class="form-control" value="{{ prefill.phone }}" required>
+                <label for="phoneInput">{% trans "Phone" %}</label>
+                <div class="phone-row{% if form_errors.phone %} has-error{% endif %}">
+                  {% comment %}Custom prefix dropdown with REAL SVG flags (Windows renders flag
+                  emoji as plain letters). Progressive: the native select is the no-JS fallback;
+                  phone-prefix.js swaps it for the flag listbox and keeps the value in sync.{% endcomment %}
+                  <div class="pfx" data-pfx hidden>
+                    <button type="button" class="pfx-btn" data-pfx-toggle
+                            aria-haspopup="listbox" aria-expanded="false" aria-label="{% trans 'Phone prefix' %}">
+                      <span class="pfx-flag" data-pfx-flag></span>
+                      <span class="pfx-dial" data-pfx-dial></span>
+                      <span class="pfx-caret" aria-hidden="true">▾</span>
+                    </button>
+                    <ul class="pfx-menu" role="listbox" hidden data-pfx-menu>
+                      {% for p in phone_prefixes %}
+                        <li role="option">
+                          <button type="button" class="pfx-opt" data-dial="{{ p.dial }}" data-code="{{ p.code }}">
+                            <span class="pfx-flag">{% include 'includes/_flag_svg.html' with code=p.code %}</span>
+                            <span class="pfx-dial">{{ p.dial }}</span>
+                            <span class="pfx-name">{{ p.name }}</span>
+                          </button>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                  <select name="phone_prefix" class="form-control phone-prefix" data-pfx-select aria-label="{% trans 'Phone prefix' %}">
+                    {% for p in phone_prefixes %}
+                      <option value="{{ p.dial }}" data-code="{{ p.code }}"
+                        {% if prefill_prefix and p.dial == prefill_prefix %}selected{% elif not prefill_prefix and p.code == prefill.country %}selected{% endif %}>
+                        {{ p.code }} {{ p.dial }}</option>
+                    {% endfor %}
+                  </select>
+                  <input type="tel" name="phone" id="phoneInput" class="form-control" value="{{ prefill.phone }}"
+                         inputmode="tel" autocomplete="tel-national"
+                         placeholder="{% trans 'e.g. 333 1234567' %}" required>
+                </div>
+                {% if form_errors.phone %}<div class="field-error">{{ form_errors.phone }}</div>{% endif %}
               </div>
               <div class="form-group mb-0">
                 <label>{% trans "Address line 1" %}</label>
-                <input type="text" name="address_line_1" class="form-control" value="{{ prefill.address_line_1 }}" required>
+                <input type="text" name="address_line_1" id="addressLine1"
+                       class="form-control{% if form_errors.address_line_1 %} is-invalid{% endif %}"
+                       value="{{ prefill.address_line_1 }}" autocomplete="address-line1"
+                       {% if checkout_api %}placeholder="{% trans 'Start typing your address…' %}"{% endif %} required>
+                {% if form_errors.address_line_1 %}<div class="field-error">{{ form_errors.address_line_1 }}</div>{% endif %}
               </div>
               <div class="form-group mb-0">
                 <label>{% trans "Address line 2" %}</label>
@@ -114,7 +167,8 @@
               </div>
               <div class="form-group mb-0">
                 <label>{% trans "City" %}</label>
-                <input type="text" name="city" class="form-control" value="{{ prefill.city }}" required>
+                <input type="text" name="city" class="form-control{% if form_errors.city %} is-invalid{% endif %}" value="{{ prefill.city }}" required>
+                {% if form_errors.city %}<div class="field-error">{{ form_errors.city }}</div>{% endif %}
               </div>
               <div class="form-group mb-0">
                 <label>{% trans "State" %}</label>
@@ -126,6 +180,7 @@
               </div>
               <div class="form-group mb-0">
                 <label>{% trans "Country" %}</label>
+                {% if form_errors.country %}<div class="field-error mb-1">{{ form_errors.country }}</div>{% endif %}
                 <select name="country" id="countryInput" class="form-control" required>
                   <option value="">{% trans "Select country" %}</option>
                   {% for code, name in ship_countries %}
@@ -230,4 +285,39 @@
 
 {% block extra_js %}
 <script src="{% static 'js/shipping-estimate.js' %}?v={{ ASSET_VERSION }}"></script>
+
+{% if checkout_api %}
+{% comment %}Google Places Autocomplete — loaded ONLY when the admin enabled it and set a
+referrer-restricted BROWSER key (public by design). Manual typing always keeps working; if the
+script fails to load nothing changes. The selected place fills city/postal/country.{% endcomment %}
+<script>
+  window.__glxPlaces = function () {
+    var input = document.getElementById("addressLine1");
+    if (!input || !window.google || !google.maps || !google.maps.places) return;
+    var ac = new google.maps.places.Autocomplete(input, {
+      types: ["address"], fields: ["address_components"]
+    });
+    ac.addListener("place_changed", function () {
+      var p = ac.getPlace();
+      if (!p || !p.address_components) return;
+      var get = function (type, short) {
+        var c = p.address_components.find(function (x) { return x.types.indexOf(type) > -1; });
+        return c ? (short ? c.short_name : c.long_name) : "";
+      };
+      var route = get("route"), num = get("street_number");
+      if (route) input.value = (route + " " + num).trim();
+      var set = function (name, v) { var el = document.querySelector('[name="' + name + '"]'); if (el && v) el.value = v; };
+      set("city", get("locality") || get("postal_town") || get("administrative_area_level_3"));
+      set("postal_code", get("postal_code"));
+      set("state", get("administrative_area_level_2", true) || get("administrative_area_level_1", true));
+      var cc = get("country", true);
+      var sel = document.querySelector('select[name="country"]');
+      if (sel && cc) { sel.value = cc; sel.dispatchEvent(new Event("change", { bubbles: true })); }
+      input.classList.add("addr-selected");
+    });
+  };
+</script>
+<script async defer
+  src="https://maps.googleapis.com/maps/api/js?key={{ checkout_api.maps_browser_key|urlencode }}&libraries=places&callback=__glxPlaces&loading=async"></script>
+{% endif %}
 {% endblock %}

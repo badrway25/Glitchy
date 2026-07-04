@@ -1,4 +1,5 @@
 import logging
+from django.utils.translation import gettext as _
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
@@ -372,6 +373,62 @@ def _place_order_cart_items(request):
     return items, request.session.session_key
 
 
+# --------------------------------------------------------------------------- #
+# Checkout protection + field preservation
+# --------------------------------------------------------------------------- #
+CHECKOUT_RESTORE_KEY = "checkout_restore"        # session stash: typed fields + field errors
+_CHECKOUT_FIELDS = ("first_name", "last_name", "email", "phone", "phone_prefix",
+                    "address_line_1", "address_line_2", "city", "state",
+                    "postal_code", "country", "order_note")
+
+
+def _stash_checkout(request, form=None, extra_errors=None, address_warning=""):
+    """Preserve what the shopper typed (and per-field errors) across the redirect —
+    an invalid submit must never wipe ten fields because one was wrong."""
+    data = {f: (request.POST.get(f) or "")[:200] for f in _CHECKOUT_FIELDS}
+    errors = {}
+    if form is not None:
+        for field, errs in form.errors.items():
+            errors[field] = str(errs[0]) if errs else ""
+    if extra_errors:
+        errors.update(extra_errors)
+    request.session[CHECKOUT_RESTORE_KEY] = {"data": data, "errors": errors,
+                                             "address_warning": address_warning}
+
+
+def _checkout_guard(request):
+    """Anti-bot: honeypot + minimum form time + a light rate limit. Returns an error
+    string (safe, generic) when the submission looks automated, else None.
+    Never blocks legitimate shoppers: the honeypot is invisible, the minimum time is
+    3 seconds and the rate limit allows 8 attempts per 10 minutes."""
+    from django.core.cache import cache
+    from django.core import signing
+
+    # 1) honeypot — real browsers never fill it
+    if (request.POST.get("website") or "").strip():
+        return "bot"
+
+    # 2) minimum form time (signed server timestamp rendered into the form)
+    token = request.POST.get("form_ts") or ""
+    try:
+        issued = signing.loads(token, salt="checkout-ts", max_age=3600)
+        import time
+        if time.time() - float(issued) < 3:
+            return "too_fast"
+    except (signing.BadSignature, ValueError, TypeError):
+        return "bad_token"
+
+    # 3) rate limit per session/IP (cache-based, no PII stored — key is hashed)
+    import hashlib
+    ident = request.session.session_key or (request.META.get("REMOTE_ADDR") or "?")
+    key = "co_rl:" + hashlib.sha256(ident.encode()).hexdigest()[:24]
+    n = cache.get(key, 0)
+    if n >= 8:
+        return "rate_limited"
+    cache.set(key, n + 1, 600)
+    return None
+
+
 def place_order(request, total=0, quantity=0):
     from django.utils import translation
     from orders.totals import compute_cart_totals
@@ -389,9 +446,16 @@ def place_order(request, total=0, quantity=0):
         messages.warning(request, "Please complete your billing details to continue.")
         return redirect("checkout")
 
+    bot = _checkout_guard(request)
+    if bot:
+        # Generic message — no detail an automation author could use.
+        messages.error(request, _("We could not process this request. Please try again."))
+        return redirect("checkout")
+
     form = OrderForm(request.POST)
     if not form.is_valid():
-        messages.error(request, "Please check your billing details and try again.")
+        _stash_checkout(request, form)
+        messages.error(request, _("Please review the highlighted fields and try again."))
         return redirect("checkout")
 
     # Address country has priority over IP for the final quote.
@@ -400,8 +464,19 @@ def place_order(request, total=0, quantity=0):
     quote = totals.shipping_quote
 
     if not quote.available:
-        messages.error(request, "We're sorry, we don't ship to the selected country yet.")
+        _stash_checkout(request, extra_errors={"country": str(_("We don't ship to this country yet."))})
+        messages.error(request, _("We're sorry, we don't ship to the selected country yet."))
         return redirect("checkout")
+
+    # Optional address verification (warning-only — NEVER blocks a confirmed address).
+    if not request.POST.get("address_confirmed"):
+        from shipping.address_validation import validate_address
+        from shipping.models import CheckoutApiConfig
+        level, warn_msg = validate_address(form.cleaned_data, CheckoutApiConfig.load())
+        if level == "warning":
+            _stash_checkout(request, address_warning=str(warn_msg))
+            messages.warning(request, _("Please review your address below."))
+            return redirect("checkout")
 
     data = Order()
     if is_authed:
