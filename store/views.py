@@ -75,6 +75,8 @@ def store(request, category_slug=None):
         "recommendations": recommendations,
         "recently_viewed": get_recently_viewed(request, limit=8),
         "querystring": request.GET.urlencode(),
+        "page_range": list(paginator.get_elided_page_range(paged_products.number, on_each_side=1, on_ends=1)) if paged_products.has_other_pages else [],
+        "page_ellipsis": paginator.ELLIPSIS,
     }
     return render(request, "store/store.html", context)
 

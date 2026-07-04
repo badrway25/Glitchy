@@ -10,6 +10,9 @@ from django.db.models import Avg, Count
 
 
 
+NEW_ARRIVAL_DAYS = 14  # one "New" window site-wide (badge + store filter)
+
+
 class Product(models.Model):
     product_name    = models.CharField(max_length=200, unique=True)
     slug            = models.SlugField(max_length=200, unique=True)
@@ -77,11 +80,14 @@ class Product(models.Model):
     def __str__(self):
         return self.product_name
 
-    def is_new_arrival(self, days=30):
+    def is_new_arrival(self, days=None):
+        """True while the product is genuinely recent (NEW_ARRIVAL_DAYS — the same window
+        the store 'New' filter uses). Replaces the old countReview==0 heuristic, which kept
+        old unreviewed products 'New' forever."""
         from django.utils import timezone
         if not self.created_date:
             return False
-        return (timezone.now() - self.created_date).days <= days
+        return (timezone.now() - self.created_date).days <= (days or NEW_ARRIVAL_DAYS)
 
     def meta_description(self, length=160):
         """Clean single-line description for SEO meta / JSON-LD (no newlines, no HTML)."""

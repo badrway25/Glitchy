@@ -8,7 +8,7 @@ from django.utils import timezone
 
 # sort key -> (orm order_by, label key)
 SORT_OPTIONS = ["newest", "price_asc", "price_desc", "rating", "name_asc", "name_desc"]
-_NEW_DAYS = 14
+from store.models import NEW_ARRIVAL_DAYS as _NEW_DAYS
 _BOOL = {"1", "true", "on", "yes"}
 
 

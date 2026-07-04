@@ -67,3 +67,15 @@ def qs_set(context, **kwargs):
         else:
             qd[k] = v
     return qd.urlencode()
+
+
+@register.simple_tag(takes_context=True)
+def qs_page(context, number):
+    """Current querystring with ONLY `page` swapped — pagination keeps every active
+    filter/sort/keyword (before this, page links silently dropped all filters)."""
+    request = context.get("request")
+    if not request:
+        return "page=%s" % number
+    qd = request.GET.copy()
+    qd["page"] = number
+    return qd.urlencode()

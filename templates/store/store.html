@@ -202,8 +202,8 @@
     {% endif %}
 
     {% if product.on_sale %}
-      <span class="badge-corner badge-out">{% trans "Sale" %}</span>
-    {% elif product.countReview == 0 %}
+      <span class="badge-corner badge-sale">{% trans "Sale" %}</span>
+    {% elif product.is_new_arrival %}
       <span class="badge-corner badge-new">{% trans "New" %}</span>
     {% endif %}
   </div>
@@ -293,13 +293,15 @@
                         <span class="rating-stars"><span class="rating-stars-fill" style="width:{% widthratio product.averageReview 5 100 %}%"></span></span>
                         <span class="rating-meta">{{ product.averageReview|floatformat:1 }} <em>({{ product.countReview }})</em></span>
                       </div>
-                    {% else %}
+                    {% elif product.is_new_arrival %}
                       <span class="pill">{% icon "spark" "ic" 14 %} {% trans "New" %}</span>
                     {% endif %}
                   </div>
 
                   <div class="product-actions pa-stack">
-                    {% if product.card_variants %}
+                    {% if not product.is_available or product.stock <= 0 %}
+                      <button type="button" class="btn btn-primary pa-cta" disabled aria-disabled="true">{% trans "Sold out" %}</button>
+                    {% elif product.card_variants %}
                       <button type="button" class="btn btn-primary pa-cta" data-quick-view="{{ product.id }}">{% trans "Choose options" %}</button>
                     {% else %}
                       <button type="button" class="btn btn-primary pa-cta" data-quick-add="{{ product.id }}"
@@ -323,7 +325,7 @@
           {% empty %}
             <div class="col-12">
               <div class="store-empty lux-empty" {% if active_filters.keyword %}data-track-no-results="{{ active_filters.keyword }}"{% endif %} data-reveal>
-                <div class="lux-empty-ic"><i class="fa fa-magnifying-glass" aria-hidden="true"></i></div>
+                <div class="lux-empty-ic"><i class="fa fa-search" aria-hidden="true"></i></div>
                 {% if active_filters.keyword %}
                   <h3 class="mb-2">{% blocktrans with q=active_filters.keyword %}No results for “{{ q }}”{% endblocktrans %}</h3>
                 {% else %}
@@ -368,44 +370,35 @@
           {% endfor %}
         </div>
 
-        <!-- PAGINATION -->
+        <!-- PAGINATION: keeps every active filter/sort/keyword; elided range; aria-current -->
         {% if products.has_other_pages %}
-        <nav class="mt-2">
+        <nav class="mt-2" aria-label="{% trans 'Product pages' %}">
           <ul class="pagination justify-content-center">
 
             {% if products.has_previous %}
               <li class="page-item">
-                <a class="page-link"
-                   href="?page={{ products.previous_page_number }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.keyword %}&keyword={{ request.GET.keyword }}{% endif %}">
-                  «
-                </a>
+                <a class="page-link" href="?{% qs_page products.previous_page_number %}" aria-label="{% trans 'Previous page' %}">«</a>
               </li>
             {% else %}
-              <li class="page-item disabled"><span class="page-link">«</span></li>
+              <li class="page-item disabled"><span class="page-link" aria-hidden="true">«</span></li>
             {% endif %}
 
-            {% for i in products.paginator.page_range %}
-              {% if products.number == i %}
-                <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+            {% for i in page_range %}
+              {% if i == page_ellipsis %}
+                <li class="page-item disabled"><span class="page-link" aria-hidden="true">{{ i }}</span></li>
+              {% elif products.number == i %}
+                <li class="page-item active"><span class="page-link" aria-current="page">{{ i }}</span></li>
               {% else %}
-                <li class="page-item">
-                  <a class="page-link"
-                     href="?page={{ i }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.keyword %}&keyword={{ request.GET.keyword }}{% endif %}">
-                    {{ i }}
-                  </a>
-                </li>
+                <li class="page-item"><a class="page-link" href="?{% qs_page i %}">{{ i }}</a></li>
               {% endif %}
             {% endfor %}
 
             {% if products.has_next %}
               <li class="page-item">
-                <a class="page-link"
-                   href="?page={{ products.next_page_number }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.keyword %}&keyword={{ request.GET.keyword }}{% endif %}">
-                  »
-                </a>
+                <a class="page-link" href="?{% qs_page products.next_page_number %}" aria-label="{% trans 'Next page' %}">»</a>
               </li>
             {% else %}
-              <li class="page-item disabled"><span class="page-link">»</span></li>
+              <li class="page-item disabled"><span class="page-link" aria-hidden="true">»</span></li>
             {% endif %}
 
           </ul>
