@@ -48,7 +48,8 @@
       data-addr-min="{% trans 'Type at least 3 characters…' %}"
       data-addr-none="{% trans 'No suggestions — you can keep typing the full address.' %}"
       data-addr-partial="{% trans 'Suggestion applied — please complete the missing fields.' %}"
-      data-addr-noapi="{% trans 'Google Places is not available — enter the address manually.' %}">
+      data-addr-noapi="{% trans 'Google Places is not available — enter the address manually.' %}"
+      data-addr-cap-street="{% trans 'Postal code not unique here — it completes automatically when you pick the street.' %}">
       {% csrf_token %}
       {% comment %}Bot protection: invisible honeypot (real browsers leave it empty) + a signed
       server timestamp for the minimum-form-time check. Neither affects real shoppers.{% endcomment %}
@@ -180,18 +181,33 @@
                   {% endfor %}
                 </select>
               </div>
-              <div class="form-group mb-0">
-                <label>{% trans "State / Region / Province" %}</label>
-                <input type="text" name="state" id="stateInput" class="form-control" value="{{ prefill.state }}" data-addr-context required>
+              <div class="form-group mb-0 addr-ac-wrap">
+                <label for="stateInput">{% trans "State / Region / Province" %}</label>
+                <input type="text" name="state" id="stateInput" class="form-control" value="{{ prefill.state }}"
+                       data-addr-context autocomplete="{% if checkout_api %}off{% else %}address-level1{% endif %}"
+                       role="combobox" aria-expanded="false" aria-autocomplete="list"
+                       {% if checkout_api %}placeholder="{% trans 'Start typing a province or region…' %}"{% endif %} required>
+                <ul class="addr-suggest" role="listbox" hidden data-state-suggest></ul>
+                <div class="addr-ac-hint" data-state-hint hidden></div>
               </div>
-              <div class="form-group mb-0">
-                <label>{% trans "City" %}</label>
-                <input type="text" name="city" id="cityInput" class="form-control{% if form_errors.city %} is-invalid{% endif %}" value="{{ prefill.city }}" data-addr-context required>
+              <div class="form-group mb-0 addr-ac-wrap">
+                <label for="cityInput">{% trans "City" %}</label>
+                <input type="text" name="city" id="cityInput" class="form-control{% if form_errors.city %} is-invalid{% endif %}"
+                       value="{{ prefill.city }}" data-addr-context autocomplete="{% if checkout_api %}off{% else %}address-level2{% endif %}"
+                       role="combobox" aria-expanded="false" aria-autocomplete="list"
+                       {% if checkout_api %}placeholder="{% trans 'Start typing a city…' %}"{% endif %} required>
+                <ul class="addr-suggest" role="listbox" hidden data-city-suggest></ul>
+                <div class="addr-ac-hint" data-city-hint hidden></div>
                 {% if form_errors.city %}<div class="field-error">{{ form_errors.city }}</div>{% endif %}
               </div>
-              <div class="form-group mb-0">
-                <label>{% trans "Postal code" %}</label>
-                <input type="text" name="postal_code" id="postalCodeInput" class="form-control{% if form_errors.postal_code %} is-invalid{% endif %}" value="{{ prefill.postal_code }}" data-addr-context required>
+              <div class="form-group mb-0 addr-ac-wrap">
+                <label for="postalCodeInput">{% trans "Postal code" %}</label>
+                <input type="text" name="postal_code" id="postalCodeInput" class="form-control{% if form_errors.postal_code %} is-invalid{% endif %}"
+                       value="{{ prefill.postal_code }}" data-addr-context autocomplete="{% if checkout_api %}off{% else %}postal-code{% endif %}"
+                       role="combobox" aria-expanded="false" aria-autocomplete="list"
+                       {% if checkout_api %}placeholder="{% trans 'Start typing a postal code…' %}"{% endif %} required>
+                <ul class="addr-suggest" role="listbox" hidden data-postal-suggest></ul>
+                <div class="addr-ac-hint" data-postal-hint hidden></div>
                 {% if form_errors.postal_code %}<div class="field-error">{{ form_errors.postal_code }}</div>{% endif %}
               </div>
               </div>
