@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: greatkart 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-04 11:05+0200\n"
+"POT-Creation-Date: 2026-07-04 12:20+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,17 +20,17 @@ msgstr ""
 #: .\accounts\admin.py:22 .\orders\admin.py:153
 #: .\templates\accounts\address_form.html:45 .\templates\accounts\login.html:37
 #: .\templates\legal\cookies.html:26 .\templates\legal\privacy.html:31
-#: .\templates\legal\terms.html:25 .\templates\store\checkout.html:100
+#: .\templates\legal\terms.html:25 .\templates\store\checkout.html:115
 msgid "Email"
 msgstr "Email"
 
-#: .\accounts\forms.py:17 .\templates\store\checkout.html:130
+#: .\accounts\forms.py:17 .\templates\store\checkout.html:187
 msgid "Select country"
 msgstr "Seleziona Paese"
 
 #: .\accounts\forms.py:18 .\templates\accounts\address_form.html:62
 #: .\templates\includes\shipping_estimator.html:37
-#: .\templates\store\checkout.html:128
+#: .\templates\store\checkout.html:184
 msgid "Country"
 msgstr "Paese"
 
@@ -46,7 +46,7 @@ msgstr "Inserisci una città."
 msgid "Please enter a postal code."
 msgstr "Inserisci un CAP."
 
-#: .\accounts\forms.py:48
+#: .\accounts\forms.py:48 .\orders\forms.py:47
 msgid "Please enter a valid phone number."
 msgstr "Inserisci un numero di telefono valido."
 
@@ -145,7 +145,7 @@ msgstr "Indirizzo predefinito aggiornato."
 #: .\templates\legal\terms.html:12
 #: .\templates\notifications\email\transactional.html:89
 #: .\templates\orders\payments.html:115 .\templates\store\cart.html:175
-#: .\templates\store\checkout.html:198
+#: .\templates\store\checkout.html:255
 msgid "Shipping"
 msgstr "Spedizione"
 
@@ -161,7 +161,7 @@ msgid "Refunds"
 msgstr "Rimborsi"
 
 #: .\assistant\models.py:20 .\templates\store\cart.html:199
-#: .\templates\store\checkout.html:215
+#: .\templates\store\checkout.html:272
 msgid "Payments"
 msgstr "Pagamenti"
 
@@ -457,7 +457,7 @@ msgstr "Destinatario"
 
 #: .\notifications\admin.py:21 .\orders\admin.py:167
 #: .\printify_integration\admin.py:566 .\returns\admin.py:40
-#: .\templates\accounts\dashboard.html:162
+#: .\shipping\admin.py:74 .\templates\accounts\dashboard.html:162
 #: .\templates\accounts\transactions.html:100
 #: .\templates\orders\order_complete.html:186
 msgid "Status"
@@ -735,11 +735,47 @@ msgstr "Costo di spedizione"
 msgid "Payment fee"
 msgstr "Commissione di pagamento"
 
+#: .\orders\forms.py:38
+msgid "Phone numbers can only contain digits, spaces and + ( ) - ."
+msgstr "Il numero di telefono può contenere solo cifre, spazi e + ( ) - ."
+
+#: .\orders\forms.py:45
+msgid "This phone number looks too short or too long."
+msgstr "Questo numero di telefono sembra troppo corto o troppo lungo."
+
+#: .\orders\forms.py:52
+msgid "Please enter a valid phone number (e.g. +39 333 1234567)."
+msgstr "Inserisci un numero di telefono valido (es. +39 333 1234567)."
+
+#: .\orders\forms.py:60
+msgid "This field contains invalid characters."
+msgstr "Questo campo contiene caratteri non validi."
+
+#: .\orders\views.py:452
+msgid "We could not process this request. Please try again."
+msgstr "Non siamo riusciti a elaborare la richiesta. Riprova."
+
+#: .\orders\views.py:458
+msgid "Please review the highlighted fields and try again."
+msgstr "Controlla i campi evidenziati e riprova."
+
+#: .\orders\views.py:467
+msgid "We don't ship to this country yet."
+msgstr "Non spediamo ancora in questo paese."
+
+#: .\orders\views.py:468
+msgid "We're sorry, we don't ship to the selected country yet."
+msgstr "Non spediamo ancora in questo Paese."
+
+#: .\orders\views.py:478
+msgid "Please review your address below."
+msgstr "Controlla il tuo indirizzo qui sotto."
+
 #: .\payments\admin.py:35
 msgid "Set / replace Stripe secret key"
 msgstr ""
 
-#: .\payments\admin.py:37
+#: .\payments\admin.py:37 .\shipping\admin.py:34
 msgid ""
 "Write-only. Leave blank to keep the current key. Encrypted at rest, never "
 "shown again."
@@ -790,14 +826,12 @@ msgid "Safety gates"
 msgstr "Blocchi di sicurezza"
 
 #: .\payments\admin.py:108 .\payments\admin.py:117
-#: .\printify_integration\admin.py:318
-#, fuzzy
-#| msgid "Return status"
+#: .\printify_integration\admin.py:318 .\shipping\admin.py:81
 msgid "Connection status"
 msgstr "Stato connessione"
 
 #: .\payments\admin.py:109 .\payments\admin.py:118
-#: .\printify_integration\admin.py:96
+#: .\printify_integration\admin.py:96 .\shipping\admin.py:82
 msgid "Meta"
 msgstr ""
 
@@ -814,13 +848,11 @@ msgid "TEST"
 msgstr ""
 
 #: .\payments\admin.py:173 .\printify_integration\admin.py:311
-#: .\templates\admin\index.html:82
-#, fuzzy
-#| msgid "Collection"
+#: .\shipping\admin.py:116 .\templates\admin\index.html:82
 msgid "Connection"
 msgstr "Collezione"
 
-#: .\payments\admin.py:177
+#: .\payments\admin.py:177 .\shipping\admin.py:121
 msgid "not tested"
 msgstr ""
 
@@ -844,17 +876,16 @@ msgstr ""
 msgid "PayPal secret"
 msgstr ""
 
-#: .\payments\admin.py:193
-#, fuzzy
-#| msgid "Up to date"
+#: .\payments\admin.py:193 .\shipping\admin.py:130
 msgid "Updated by"
 msgstr "Aggiornato"
 
 #: .\payments\admin.py:196 .\printify_integration\admin.py:95
+#: .\shipping\admin.py:133
 msgid "Connection status (read-only)"
 msgstr ""
 
-#: .\payments\admin.py:199
+#: .\payments\admin.py:199 .\shipping\admin.py:136
 msgid "Never tested. Use 'Test connection'."
 msgstr ""
 
@@ -867,20 +898,14 @@ msgid "Active credential source"
 msgstr ""
 
 #: .\payments\admin.py:218
-#, fuzzy
-#| msgid "Before checkout"
 msgid "Ready for checkout"
 msgstr "Prima del checkout"
 
 #: .\payments\admin.py:218
-#, fuzzy
-#| msgid "Yes"
 msgid "yes"
 msgstr "Sì"
 
 #: .\payments\admin.py:218
-#, fuzzy
-#| msgid "Info"
 msgid "no"
 msgstr "Informazione"
 
@@ -889,25 +914,21 @@ msgid ""
 "Test connection is read-only — it never creates a payment, capture or refund."
 msgstr ""
 
-#: .\payments\admin.py:244
+#: .\payments\admin.py:244 .\shipping\admin.py:162
 #, python-format
 msgid "Connection OK — %(d)s"
 msgstr ""
 
-#: .\payments\admin.py:246
+#: .\payments\admin.py:246 .\shipping\admin.py:164
 #, python-format
 msgid "Connection failed — %(e)s"
 msgstr ""
 
 #: .\payments\admin.py:274
-#, fuzzy
-#| msgid "Resume"
 msgid "Result"
 msgstr "Riprendi"
 
 #: .\payments\admin.py:277
-#, fuzzy
-#| msgid "Work"
 msgid "ok"
 msgstr "Lavoro"
 
@@ -920,8 +941,6 @@ msgid "Stripe webhook signing secret"
 msgstr ""
 
 #: .\payments\models.py:20
-#, fuzzy
-#| msgid "Payments & security"
 msgid "PayPal client secret"
 msgstr "Pagamento ricevuto"
 
@@ -956,6 +975,7 @@ msgstr "Provider di pagamento"
 #: .\payments\models.py:148
 #: .\templates\admin\payments\paymentproviderconfig\change_form.html:13
 #: .\templates\admin\printify_integration\printifyaccountconfig\change_form.html:16
+#: .\templates\admin\shipping\checkoutapiconfig\change_form.html:13
 msgid "Test connection"
 msgstr "Prova connessione"
 
@@ -964,8 +984,6 @@ msgid "Webhook"
 msgstr ""
 
 #: .\payments\models.py:149
-#, fuzzy
-#| msgid "Verified purchase"
 msgid "Verify capture"
 msgstr "Acquisto verificato"
 
@@ -1002,8 +1020,6 @@ msgid ""
 msgstr ""
 
 #: .\printify_integration\admin.py:70 .\templates\admin\index.html:85
-#, fuzzy
-#| msgid "Reset"
 msgid "set"
 msgstr "Reimposta"
 
@@ -1016,8 +1032,6 @@ msgid "API token (write-only)"
 msgstr ""
 
 #: .\printify_integration\admin.py:92 .\printify_integration\admin.py:127
-#, fuzzy
-#| msgid "Printify shipping profiles"
 msgid "Printify shop & operations"
 msgstr "Registri di sincronizzazione Printify"
 
@@ -1036,8 +1050,6 @@ msgid "Save the account first, then use 'Discover shops'."
 msgstr ""
 
 #: .\printify_integration\admin.py:134
-#, fuzzy
-#| msgid "Select size"
 msgid "Selected shop"
 msgstr "Seleziona taglia"
 
@@ -1070,8 +1082,6 @@ msgid "Needs review — missing price: %(p)d, missing image: %(i)d"
 msgstr ""
 
 #: .\printify_integration\admin.py:169
-#, fuzzy
-#| msgid "Sizing & products"
 msgid "View hidden products"
 msgstr "Risincronizzazione singolo prodotto"
 
@@ -1146,14 +1156,10 @@ msgid "Token"
 msgstr ""
 
 #: .\printify_integration\admin.py:304
-#, fuzzy
-#| msgid "Return status"
 msgid "Token status"
 msgstr "Stato del reso"
 
 #: .\printify_integration\admin.py:307
-#, fuzzy
-#| msgid "Explore the store"
 msgid "no token stored"
 msgstr "Esplora lo store"
 
@@ -1171,15 +1177,12 @@ msgid "%(n)s: no token set."
 msgstr ""
 
 #: .\printify_integration\admin.py:366
-#, fuzzy, python-format
-#| msgid "%(n)s collection"
-#| msgid_plural "%(n)s collections"
+#, python-format
 msgid "%(n)s: connected."
 msgstr "%(n)s collezione"
 
 #: .\printify_integration\admin.py:371 .\printify_integration\admin.py:376
-#, fuzzy, python-format
-#| msgid "%(n)d collection(s) featured."
+#, python-format
 msgid "%(n)s: connection failed."
 msgstr "%(n)d collezione/i in evidenza."
 
@@ -1201,8 +1204,7 @@ msgid "Only a superuser can apply a catalog sync."
 msgstr ""
 
 #: .\printify_integration\admin.py:391
-#, fuzzy, python-format
-#| msgid "Product sync finished: +%(c)d ~%(u)d (errors %(e)d)."
+#, python-format
 msgid "Catalog sync: +%(c)d ~%(u)d (errors %(e)d)."
 msgstr "Sincronizzazione prodotti completata: +%(c)d ~%(u)d (errori %(e)d)."
 
@@ -1233,8 +1235,6 @@ msgid "Purged %(n)d expired estimate row(s)."
 msgstr "Eliminate %(n)d stime scadute."
 
 #: .\printify_integration\admin.py:462
-#, fuzzy
-#| msgid "Was this helpful?"
 msgid "What is this?"
 msgstr "È stato utile?"
 
@@ -1262,14 +1262,10 @@ msgid "Back to Printify account (run sync)"
 msgstr ""
 
 #: .\printify_integration\admin.py:491 .\printify_integration\admin.py:542
-#, fuzzy
-#| msgid "Products & orders"
 msgid "Products needing review"
 msgstr "Prodotti e ordini"
 
 #: .\printify_integration\admin.py:493
-#, fuzzy
-#| msgid "Single product resync"
 msgid "Recent product syncs"
 msgstr "Risincronizzazione singolo prodotto"
 
@@ -1286,14 +1282,10 @@ msgid "disabled"
 msgstr "disattivato"
 
 #: .\printify_integration\admin.py:521
-#, fuzzy
-#| msgid "Support"
 msgid "Report"
 msgstr "Assistenza"
 
 #: .\printify_integration\admin.py:522
-#, fuzzy
-#| msgid "Country"
 msgid "Counts"
 msgstr "Paese"
 
@@ -1302,8 +1294,6 @@ msgid "Timing"
 msgstr ""
 
 #: .\printify_integration\admin.py:526
-#, fuzzy
-#| msgid "View details"
 msgid "Raw detail"
 msgstr "Vedi dettagli"
 
@@ -1312,26 +1302,18 @@ msgid "Sync report"
 msgstr ""
 
 #: .\printify_integration\admin.py:536
-#, fuzzy
-#| msgid "Duration"
 msgid "Operation"
 msgstr "Durata"
 
 #: .\printify_integration\admin.py:557
-#, fuzzy
-#| msgid "Compare products"
 msgid "Sample products"
 msgstr "Confronta prodotti"
 
 #: .\printify_integration\admin.py:561
-#, fuzzy
-#| msgid "No image"
 msgid "has image"
 msgstr "Nessuna immagine"
 
 #: .\printify_integration\admin.py:561
-#, fuzzy
-#| msgid "No image"
 msgid "no image"
 msgstr "Nessuna immagine"
 
@@ -1378,14 +1360,10 @@ msgid "Superuser only. Keep OFF."
 msgstr ""
 
 #: .\printify_integration\models.py:61
-#, fuzzy
-#| msgid "Printify costs"
 msgid "Printify account"
 msgstr "Costi Printify"
 
 #: .\printify_integration\models.py:144 .\printify_integration\models.py:145
-#, fuzzy
-#| msgid "Printify sync log"
 msgid "Printify Sync Monitor"
 msgstr "Registro di sincronizzazione Printify"
 
@@ -1479,7 +1457,7 @@ msgstr "Non disponibile"
 #: .\templates\accounts\order_detail.html:174
 #: .\templates\includes\shipping_estimator.html:20
 #: .\templates\orders\payments.html:115 .\templates\store\cart.html:176
-#: .\templates\store\checkout.html:199
+#: .\templates\store\checkout.html:256
 msgid "Free"
 msgstr "Gratuita"
 
@@ -1718,6 +1696,73 @@ msgstr "Questa email non corrisponde a questo ordine."
 msgid "Your return request has been submitted. We'll be in touch shortly."
 msgstr "La tua richiesta di reso è stata inviata. Ti contatteremo a breve."
 
+#: .\shipping\address_validation.py:30
+#, python-format
+msgid ""
+"The postal code doesn't look like a valid %(c)s postal code — please double-"
+"check it."
+msgstr ""
+
+#: .\shipping\address_validation.py:34
+msgid "The address looks incomplete — please include the street and number."
+msgstr "L'indirizzo sembra incompleto — includi via e numero civico."
+
+#: .\shipping\address_validation.py:63
+msgid ""
+"We could not fully verify this address. You can correct it, or continue if "
+"you are sure it is right."
+msgstr ""
+
+#: .\shipping\address_validation.py:84 .\shipping\address_validation.py:85
+msgid "No server key set."
+msgstr "Usa indirizzo salvato"
+
+#: .\shipping\address_validation.py:95 .\shipping\address_validation.py:96
+#, python-format
+msgid "Key rejected (%d)."
+msgstr "Reso rifiutato"
+
+#: .\shipping\address_validation.py:98 .\shipping\address_validation.py:99
+msgid "Address Validation API reachable."
+msgstr ""
+
+#: .\shipping\address_validation.py:101 .\shipping\address_validation.py:102
+msgid "Could not reach Google (network/timeout)."
+msgstr ""
+
+#: .\shipping\admin.py:31
+msgid "Set / replace Address Validation server key"
+msgstr ""
+
+#: .\shipping\admin.py:62
+msgid ""
+"PAYMENT_CONFIG_KEY is not configured on the server — cannot encrypt the key."
+msgstr ""
+
+#: .\shipping\admin.py:75
+msgid "Google keys"
+msgstr ""
+
+#: .\shipping\admin.py:76
+msgid ""
+"Browser key: Google Cloud console → Credentials → API key restricted by HTTP "
+"referrer, Places API enabled (public by design). Server key: a SEPARATE key "
+"restricted by IP, Address Validation API enabled — this one is a secret and "
+"is stored encrypted."
+msgstr ""
+
+#: .\shipping\admin.py:123
+msgid "Server key status"
+msgstr "Stato segreto"
+
+#: .\shipping\admin.py:126
+msgid "Save first, then add the server key."
+msgstr ""
+
+#: .\shipping\admin.py:127
+msgid "Address Validation key"
+msgstr "Indirizzo riga 1"
+
 #: .\shipping\constants.py:7
 msgid "Italy"
 msgstr "Italia"
@@ -1774,14 +1819,51 @@ msgstr "Canada"
 msgid "Australia"
 msgstr "Australia"
 
-#: .\shipping\services.py:81 .\templates\store\_quick_view.html:74
-#: .\templates\store\product_detail.html:138
+#: .\shipping\localization.py:52
+msgid "Shipping calculated at checkout based on destination"
+msgstr "Spedizione calcolata al checkout in base alla destinazione"
+
+#: .\shipping\localization.py:58
+#, python-format
+msgid "Ships to %(country)s · calculated at checkout"
+msgstr "Spedizione verso %(country)s · calcolata al checkout"
+
+#: .\shipping\localization.py:66 .\shipping\services.py:81
 msgid "Free shipping"
 msgstr "Spedizione gratuita"
 
+#: .\shipping\localization.py:70
+#, python-format
+msgid "Ships to %(country)s"
+msgstr "Spedizione verso %(country)s"
+
+#: .\shipping\models.py:25
+msgid "Master switch. OFF = plain manual address entry."
+msgstr ""
+
+#: .\shipping\models.py:27
+msgid "Load Google Places Autocomplete on the checkout address field."
+msgstr ""
+
+#: .\shipping\models.py:29
+msgid "Server-side Google Address Validation (warning-only, never blocks)."
+msgstr ""
+
+#: .\shipping\models.py:34
+msgid ""
+"Places JS browser key — public by design; restrict it by referrer in the "
+"Google console. Never use a server key here."
+msgstr ""
+
+#: .\shipping\models.py:38
+msgid "Reminder of the referrer restrictions configured in the Google console."
+msgstr ""
+
+#: .\shipping\models.py:56 .\shipping\models.py:57
+msgid "Checkout API settings"
+msgstr ""
+
 #: .\store\admin.py:21
-#, fuzzy
-#| msgid "No image"
 msgid "image"
 msgstr "Nessuna immagine"
 
@@ -1790,26 +1872,18 @@ msgid "Missing image"
 msgstr ""
 
 #: .\store\admin.py:35
-#, fuzzy
-#| msgid "Price"
 msgid "price"
 msgstr "Prezzo"
 
 #: .\store\admin.py:39
-#, fuzzy
-#| msgid "Min price"
 msgid "Missing / zero price"
 msgstr "Prezzo min"
 
 #: .\store\admin.py:52
-#, fuzzy
-#| msgid "Printify costs"
 msgid "Printify products"
 msgstr "Costi Printify"
 
 #: .\store\admin.py:52
-#, fuzzy
-#| msgid "In stock only"
 msgid "Local only"
 msgstr "Solo disponibili"
 
@@ -1818,8 +1892,6 @@ msgid "sync freshness"
 msgstr ""
 
 #: .\store\admin.py:67
-#, fuzzy
-#| msgid "Printify sync log"
 msgid "Stale Printify sync"
 msgstr "Registro di sincronizzazione Printify"
 
@@ -1828,15 +1900,10 @@ msgid "Up to date"
 msgstr "Aggiornato"
 
 #: .\store\admin.py:146
-#, fuzzy
-#| msgid "review"
-#| msgid_plural "reviews"
 msgid "Full preview"
 msgstr "recensione"
 
 #: .\store\admin.py:161
-#, fuzzy
-#| msgid "No image"
 msgid "No images"
 msgstr "Nessuna immagine"
 
@@ -1849,14 +1916,11 @@ msgid "Vars"
 msgstr ""
 
 #: .\store\admin.py:181
-#, fuzzy
-#| msgid "Active filters"
 msgid "Activate selected"
 msgstr "Filtri attivi"
 
 #: .\store\admin.py:184
-#, fuzzy, python-format
-#| msgid "Rejected %(n)d return(s)."
+#, python-format
 msgid "Activated %(n)d product(s)."
 msgstr "Rifiutati %(n)d resi."
 
@@ -1865,20 +1929,16 @@ msgid "Deactivate selected"
 msgstr ""
 
 #: .\store\admin.py:189
-#, fuzzy, python-format
-#| msgid "Rejected %(n)d return(s)."
+#, python-format
 msgid "Deactivated %(n)d product(s)."
 msgstr "Rifiutati %(n)d resi."
 
 #: .\store\admin.py:191
-#, fuzzy
-#| msgid "Printify sync logs"
 msgid "Mark Printify sync stale (selected)"
 msgstr "Registri di sincronizzazione Printify"
 
 #: .\store\admin.py:196
-#, fuzzy, python-format
-#| msgid "Marked %(n)d return(s) as refunded."
+#, python-format
 msgid "Marked %(n)d Printify product(s) as stale."
 msgstr "Segnati %(n)d resi come rimborsati."
 
@@ -1987,37 +2047,37 @@ msgstr "Confronta"
 msgid "Colours"
 msgstr "Colori"
 
-#: .\store\views.py:276
+#: .\store\views.py:279
 msgid "Shipping & delivery"
 msgstr "Indirizzo di spedizione"
 
-#: .\store\views.py:276 .\templates\includes\footer.html:83
+#: .\store\views.py:279 .\templates\includes\footer.html:83
 #: .\templates\returns\policy.html:3 .\templates\returns\policy.html:11
 #: .\templates\returns\policy.html:15
 msgid "Returns & refunds"
 msgstr "Resi e rimborsi"
 
-#: .\store\views.py:277
+#: .\store\views.py:280
 msgid "Payments & security"
 msgstr "Pagamento ricevuto"
 
-#: .\store\views.py:277
+#: .\store\views.py:280
 msgid "Orders & tracking"
 msgstr "Consegna / tracciamento"
 
-#: .\store\views.py:278
+#: .\store\views.py:281
 msgid "Account & wishlist"
 msgstr "Account e preferiti"
 
-#: .\store\views.py:278
+#: .\store\views.py:281
 msgid "Sizing & products"
 msgstr "Risincronizzazione singolo prodotto"
 
-#: .\store\views.py:279
+#: .\store\views.py:282
 msgid "Coupons & offers"
 msgstr "Coupon"
 
-#: .\store\views.py:279
+#: .\store\views.py:282
 msgid "Support & assistant"
 msgstr "Carrello"
 
@@ -2265,17 +2325,17 @@ msgid "Who should we address the parcel to?"
 msgstr "A chi intestiamo il pacco?"
 
 #: .\templates\accounts\address_form.html:43
-#: .\templates\accounts\register.html:45 .\templates\store\checkout.html:92
+#: .\templates\accounts\register.html:45 .\templates\store\checkout.html:106
 msgid "First name"
 msgstr "Nome"
 
 #: .\templates\accounts\address_form.html:44
-#: .\templates\accounts\register.html:46 .\templates\store\checkout.html:96
+#: .\templates\accounts\register.html:46 .\templates\store\checkout.html:111
 msgid "Last name"
 msgstr "Cognome"
 
 #: .\templates\accounts\address_form.html:46
-#: .\templates\store\checkout.html:104
+#: .\templates\store\checkout.html:120
 msgid "Phone"
 msgstr "Telefono"
 
@@ -2284,12 +2344,12 @@ msgid "Where should we deliver your order?"
 msgstr "Dove consegniamo il tuo ordine?"
 
 #: .\templates\accounts\address_form.html:57
-#: .\templates\store\checkout.html:108
+#: .\templates\store\checkout.html:159
 msgid "Address line 1"
 msgstr "Indirizzo riga 1"
 
 #: .\templates\accounts\address_form.html:58
-#: .\templates\store\checkout.html:112
+#: .\templates\store\checkout.html:167
 msgid "Address line 2"
 msgstr "Indirizzo riga 2"
 
@@ -2298,7 +2358,7 @@ msgid "(optional)"
 msgstr "(facoltativo)"
 
 #: .\templates\accounts\address_form.html:59
-#: .\templates\store\checkout.html:116
+#: .\templates\store\checkout.html:171
 msgid "City"
 msgstr "Città"
 
@@ -2309,7 +2369,7 @@ msgstr "Stato / Provincia"
 #: .\templates\accounts\address_form.html:61
 #: .\templates\includes\shipping_estimator.html:47
 #: .\templates\includes\shipping_estimator.html:50
-#: .\templates\store\checkout.html:124
+#: .\templates\store\checkout.html:180
 msgid "Postal code"
 msgstr "CAP"
 
@@ -2351,7 +2411,7 @@ msgstr "Cerca indirizzi"
 msgid "Search"
 msgstr "Cerca"
 
-#: .\templates\accounts\address_list.html:51 .\templates\store\checkout.html:81
+#: .\templates\accounts\address_list.html:51 .\templates\store\checkout.html:95
 msgid "Default"
 msgstr "Predefinito"
 
@@ -2486,7 +2546,7 @@ msgstr "Indirizzi"
 
 #: .\templates\accounts\dashboard.html:66 .\templates\returns\request.html:73
 #: .\templates\returns\status.html:61 .\templates\store\cart.html:25
-#: .\templates\store\cart.html:189 .\templates\store\checkout.html:211
+#: .\templates\store\cart.html:189 .\templates\store\checkout.html:268
 #: .\templates\wishlist\saved_items.html:17
 #: .\templates\wishlist\saved_items.html:173
 msgid "Continue shopping"
@@ -2809,12 +2869,12 @@ msgstr "Nessun pagamento associato."
 #: .\templates\notifications\email\transactional.html:88
 #: .\templates\orders\order_complete.html:230
 #: .\templates\orders\payments.html:114 .\templates\store\cart.html:51
-#: .\templates\store\cart.html:170 .\templates\store\checkout.html:193
+#: .\templates\store\cart.html:170 .\templates\store\checkout.html:250
 msgid "Subtotal"
 msgstr "Subtotale"
 
 #: .\templates\accounts\order_detail.html:178 .\templates\store\cart.html:172
-#: .\templates\store\checkout.html:195
+#: .\templates\store\checkout.html:252
 msgid "Discount"
 msgstr "Account"
 
@@ -2822,14 +2882,14 @@ msgstr "Account"
 #: .\templates\notifications\email\transactional.html:90
 #: .\templates\orders\order_complete.html:234
 #: .\templates\orders\payments.html:116 .\templates\store\cart.html:178
-#: .\templates\store\checkout.html:201
+#: .\templates\store\checkout.html:258
 msgid "Tax"
 msgstr "IVA"
 
 #: .\templates\accounts\order_detail.html:187
 #: .\templates\orders\order_complete.html:238
 #: .\templates\orders\payments.html:117 .\templates\store\cart.html:179
-#: .\templates\store\checkout.html:202
+#: .\templates\store\checkout.html:259
 msgid "Grand total"
 msgstr "Totale complessivo"
 
@@ -2845,7 +2905,7 @@ msgstr "Articolo"
 #: .\templates\accounts\order_detail.html:208
 #: .\templates\orders\order_complete.html:197
 #: .\templates\returns\request.html:54 .\templates\returns\status.html:45
-#: .\templates\store\checkout.html:184
+#: .\templates\store\checkout.html:241
 msgid "Qty"
 msgstr "Qtà"
 
@@ -2855,8 +2915,6 @@ msgid "Price"
 msgstr "Prezzo"
 
 #: .\templates\accounts\register.html:4
-#, fuzzy
-#| msgid "Have an account?"
 msgid "Create account"
 msgstr "Hai già un account?"
 
@@ -2873,8 +2931,6 @@ msgid "Saved details for a smoother order."
 msgstr "Dati salvati per un ordine più fluido."
 
 #: .\templates\accounts\register.html:19
-#, fuzzy
-#| msgid "Save address"
 msgid "Saved addresses"
 msgstr "Usa indirizzo salvato"
 
@@ -3024,8 +3080,6 @@ msgid "to fix"
 msgstr ""
 
 #: .\templates\admin\index.html:50
-#, fuzzy
-#| msgid "Production cost"
 msgid "Product status"
 msgstr "Costo di produzione"
 
@@ -3034,14 +3088,10 @@ msgid "Active vs hidden products"
 msgstr ""
 
 #: .\templates\admin\index.html:63
-#, fuzzy
-#| msgid "Printify sync logs"
 msgid "Printify vs manual products"
 msgstr "Registri di sincronizzazione Printify"
 
 #: .\templates\admin\index.html:80
-#, fuzzy
-#| msgid "Printify sync logs"
 msgid "Printify sync health"
 msgstr "Registri di sincronizzazione Printify"
 
@@ -3050,20 +3100,14 @@ msgid "enabled"
 msgstr ""
 
 #: .\templates\admin\index.html:87
-#, fuzzy
-#| msgid "All products"
 msgid "Stale products"
 msgstr "Tutti i prodotti"
 
 #: .\templates\admin\index.html:88
-#, fuzzy
-#| msgid "In error"
 msgid "Sync errors"
 msgstr "In errore"
 
 #: .\templates\admin\index.html:89
-#, fuzzy
-#| msgid "Set as default"
 msgid "Safe defaults"
 msgstr "Imposta come predefinito"
 
@@ -3072,8 +3116,6 @@ msgid "publish"
 msgstr ""
 
 #: .\templates\admin\index.html:92
-#, fuzzy
-#| msgid "Orders"
 msgid "orders"
 msgstr "Ordini"
 
@@ -3122,8 +3164,6 @@ msgid "Every product has an image, price and category."
 msgstr ""
 
 #: .\templates\admin\index.html:154
-#, fuzzy
-#| msgid "Categories"
 msgid "Category readiness"
 msgstr "Categorie"
 
@@ -3132,14 +3172,10 @@ msgid "Demand signals — wishlist"
 msgstr ""
 
 #: .\templates\admin\index.html:177
-#, fuzzy
-#| msgid "Saved items"
 msgid "saved items"
 msgstr "Articoli salvati"
 
 #: .\templates\admin\index.html:189
-#, fuzzy
-#| msgid "Quick stats"
 msgid "Quick actions"
 msgstr "Statistiche rapide"
 
@@ -3169,14 +3205,10 @@ msgid "Welcome back — enter your studio credentials."
 msgstr ""
 
 #: .\templates\admin\login.html:62
-#, fuzzy
-#| msgid "Network error. Please check your connection and try again."
 msgid "Please check your username and password and try again."
 msgstr "Errore di rete. Controlla la connessione e riprova."
 
 #: .\templates\admin\login.html:79
-#, fuzzy
-#| msgid "Forgot password?"
 msgid "Forgot your password?"
 msgstr "Password dimenticata?"
 
@@ -3211,8 +3243,6 @@ msgid ""
 msgstr ""
 
 #: .\templates\admin\printify_integration\printifyaccountconfig\change_form.html:9
-#, fuzzy
-#| msgid "Printify costs"
 msgid "Printify operations"
 msgstr "Costi Printify"
 
@@ -3225,8 +3255,6 @@ msgid "Dry-run catalog sync"
 msgstr ""
 
 #: .\templates\admin\printify_integration\printifyaccountconfig\change_form.html:23
-#, fuzzy
-#| msgid "Search products"
 msgid "Sync products now"
 msgstr "Cerca prodotti"
 
@@ -3243,8 +3271,6 @@ msgid ""
 msgstr ""
 
 #: .\templates\admin\printify_integration\printifyaccountconfig\change_form.html:37
-#, fuzzy
-#| msgid "Available options"
 msgid "Available Printify shops"
 msgstr "Opzioni disponibili"
 
@@ -3253,10 +3279,23 @@ msgid "suggested"
 msgstr ""
 
 #: .\templates\admin\printify_integration\printifyaccountconfig\change_form.html:45
-#, fuzzy
-#| msgid "Was this helpful?"
 msgid "Use this shop"
 msgstr "È stato utile?"
+
+#: .\templates\admin\shipping\checkoutapiconfig\change_form.html:9
+msgid "API operations"
+msgstr "Operazioni di pagamento"
+
+#: .\templates\admin\shipping\checkoutapiconfig\change_form.html:16
+msgid "Add the server key first, then Test connection will appear here."
+msgstr ""
+
+#: .\templates\admin\shipping\checkoutapiconfig\change_form.html:20
+msgid ""
+"Test connection is read-only — it validates a fixed dummy address, never a "
+"customer's. Autocomplete and validation stay OFF until enabled above; "
+"checkout always works without them."
+msgstr ""
 
 #: .\templates\base.html:67
 msgid "Could not load this product. Please try again."
@@ -3539,8 +3578,6 @@ msgstr ""
 
 #: .\templates\home.html:250 .\templates\home.html:256
 #: .\templates\home.html:262 .\templates\home.html:268
-#, fuzzy
-#| msgid "Learn more"
 msgid "Read more"
 msgstr "Scopri di più"
 
@@ -4310,7 +4347,7 @@ msgstr "Prezzo: dal più alto"
 
 #: .\templates\merchandising\collection.html:74
 #: .\templates\orders\payments.html:170 .\templates\store\cart.html:193
-#: .\templates\store\checkout.html:220 .\templates\store\product_detail.html:81
+#: .\templates\store\checkout.html:277 .\templates\store\product_detail.html:81
 #, python-format
 msgid "%(d)s-day returns"
 msgstr "Resi entro %(d)s giorni"
@@ -4403,7 +4440,7 @@ msgid "Clear filter"
 msgstr "Rimuovi filtro"
 
 #: .\templates\merchandising\collections_index.html:104
-#, fuzzy, python-format
+#, python-format
 msgid "%(l)s collections"
 msgstr "%(n)s collezione"
 
@@ -4843,7 +4880,7 @@ msgstr "Vedi"
 msgid "Qty:"
 msgstr "Qtà:"
 
-#: .\templates\orders\payments.html:92 .\templates\store\checkout.html:184
+#: .\templates\orders\payments.html:92 .\templates\store\checkout.html:241
 msgid "each"
 msgstr "cad."
 
@@ -4859,7 +4896,7 @@ msgstr "Dopo il pagamento, il tuo ordine verrà confermato automaticamente."
 msgid "Pay"
 msgstr "Paga"
 
-#: .\templates\orders\payments.html:169 .\templates\store\checkout.html:220
+#: .\templates\orders\payments.html:169 .\templates\store\checkout.html:277
 msgid "Secure payment"
 msgstr "Pagamento sicuro"
 
@@ -5120,23 +5157,27 @@ msgstr "Esaurito"
 msgid "Add to cart"
 msgstr "Aggiungi al carrello"
 
-#: .\templates\store\_quick_view.html:73
-msgid "Estimated delivery"
-msgstr "Consegna stimata"
-
-#: .\templates\store\_quick_view.html:78
+#: .\templates\store\_quick_view.html:77
 msgid "View full details"
 msgstr "Vedi tutti i dettagli"
 
-#: .\templates\store\_quick_view.html:79
+#: .\templates\store\_quick_view.html:78
 msgid "Made on demand · printed just for you"
 msgstr "Prodotto su richiesta · stampato per te"
+
+#: .\templates\store\_ships_to.html:16
+msgid "Change shipping country"
+msgstr "Cambia paese di spedizione"
+
+#: .\templates\store\_ships_to.html:16
+msgid "Change"
+msgstr "Cambia"
 
 #: .\templates\store\cart.html:4 .\templates\store\cart.html:13
 msgid "Shopping cart"
 msgstr "Carrello"
 
-#: .\templates\store\cart.html:16 .\templates\store\checkout.html:162
+#: .\templates\store\cart.html:16 .\templates\store\checkout.html:219
 #, python-format
 msgid "%(c)s item"
 msgid_plural "%(c)s items"
@@ -5201,7 +5242,7 @@ msgstr "Opzioni selezionate incluse"
 msgid "Save for later"
 msgstr "Salva per dopo"
 
-#: .\templates\store\cart.html:132 .\templates\store\checkout.html:161
+#: .\templates\store\cart.html:132 .\templates\store\checkout.html:218
 msgid "Order summary"
 msgstr "Riepilogo dell'ordine"
 
@@ -5275,27 +5316,31 @@ msgstr "Stai effettuando l'acquisto come ospite. Nessun account necessario."
 msgid "Have an account? Sign in"
 msgstr "Hai già un account? Accedi"
 
-#: .\templates\store\checkout.html:55
+#: .\templates\store\checkout.html:59
+msgid "My address is correct — continue"
+msgstr "Il mio indirizzo è corretto — continua"
+
+#: .\templates\store\checkout.html:69
 msgid "Billing address"
 msgstr "Indirizzo di fatturazione"
 
-#: .\templates\store\checkout.html:56
+#: .\templates\store\checkout.html:70
 msgid "Secure"
 msgstr "Sicuro"
 
-#: .\templates\store\checkout.html:61
+#: .\templates\store\checkout.html:75
 msgid "Use saved address"
 msgstr "Usa indirizzo salvato"
 
-#: .\templates\store\checkout.html:68
+#: .\templates\store\checkout.html:82
 msgid "Default:"
 msgstr "Predefinito:"
 
-#: .\templates\store\checkout.html:69
+#: .\templates\store\checkout.html:83
 msgid "Select an address"
 msgstr "Seleziona un indirizzo"
 
-#: .\templates\store\checkout.html:86
+#: .\templates\store\checkout.html:100
 msgid "Pick one to autofill your billing details."
 msgstr ""
 "Selezionane uno per compilare automaticamente i dati di "
@@ -5314,27 +5359,39 @@ msgstr ""
 "fatturazione.Selezionane uno per compilare automaticamente i tuoi dati di "
 "fatturazione."
 
-#: .\templates\store\checkout.html:120
+#: .\templates\store\checkout.html:128 .\templates\store\checkout.html:145
+msgid "Phone prefix"
+msgstr "Prefisso telefonico"
+
+#: .\templates\store\checkout.html:154
+msgid "e.g. 333 1234567"
+msgstr "es. 333 1234567"
+
+#: .\templates\store\checkout.html:163
+msgid "Start typing your address…"
+msgstr "Inizia a digitare il tuo indirizzo…"
+
+#: .\templates\store\checkout.html:176
 msgid "State"
 msgstr "Provincia"
 
-#: .\templates\store\checkout.html:139
+#: .\templates\store\checkout.html:196
 msgid "Order note (optional)"
 msgstr "Nota all'ordine (facoltativa)"
 
-#: .\templates\store\checkout.html:141
+#: .\templates\store\checkout.html:198
 msgid "Delivery instructions, notes for the seller..."
 msgstr "Istruzioni per la consegna, note per il venditore..."
 
-#: .\templates\store\checkout.html:147
+#: .\templates\store\checkout.html:204
 msgid "Save / update my default address"
 msgstr "Salva / aggiorna il mio indirizzo predefinito"
 
-#: .\templates\store\checkout.html:151
+#: .\templates\store\checkout.html:208
 msgid "You can create an account after checkout to track your order."
 msgstr "Puoi creare un account dopo l'acquisto per tracciare il tuo ordine."
 
-#: .\templates\store\checkout.html:209
+#: .\templates\store\checkout.html:266
 msgid "Continue to payment"
 msgstr "Procedi al pagamento"
 
@@ -5392,11 +5449,6 @@ msgid "%(counter)s review"
 msgid_plural "%(counter)s reviews"
 msgstr[0] "%(counter)s recensione"
 msgstr[1] "%(counter)s recensioni"
-
-#: .\templates\store\product_detail.html:138
-#, python-format
-msgid "Ships to %(c)s"
-msgstr "Spedizione in %(c)s"
 
 #: .\templates\store\product_detail.html:139
 #, python-format
@@ -5948,6 +6000,9 @@ msgstr "Articoli dei preferiti"
 msgid "Saved for later."
 msgstr "Salvato per dopo."
 
+#~ msgid "Estimated delivery"
+#~ msgstr "Consegna stimata"
+
 #~ msgid "About"
 #~ msgstr "Chi siamo"
 
@@ -5975,9 +6030,6 @@ msgstr "Salvato per dopo."
 
 #~ msgid "Try a different keyword or clear the search."
 #~ msgstr "Prova una parola chiave diversa o azzera la ricerca."
-
-#~ msgid "No saved items yet"
-#~ msgstr "Usa indirizzo salvato"
 
 #~ msgid "Log In"
 #~ msgstr "Accedi"
