@@ -53,7 +53,7 @@
         if (btn && !btn.disabled) {
           btn.dataset._label = btn.innerHTML;
           btn.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> ' +
-            (btn.textContent.trim() || "Adding…");
+            (btn.textContent.trim() || document.body.getAttribute("data-adding-label") || "Adding…");
           btn.style.opacity = ".85";
         }
       });
@@ -71,16 +71,27 @@
     var backdrop = document.createElement("div");
     backdrop.className = opts.backdropClass;
     document.body.appendChild(backdrop);
+    var lastFocus = null, isOpen = false;
+    panel.setAttribute("role","dialog");
+    panel.setAttribute("aria-modal","true");
+    function setExpanded(v){ openers.forEach(function(o){ if(o) o.setAttribute("aria-expanded", v ? "true" : "false"); }); }
     function open(){
+      lastFocus = document.activeElement;
+      isOpen = true;
       panel.classList.add(opts.openClass);
       backdrop.classList.add("is-open");
       document.body.style.overflow="hidden";
+      setExpanded(true);
       var f = panel.querySelector("a,button,input,select"); if(f) f.focus();
     }
     function close(){
+      if(!isOpen) return;
+      isOpen = false;
       panel.classList.remove(opts.openClass);
       backdrop.classList.remove("is-open");
       document.body.style.overflow="";
+      setExpanded(false);
+      if(lastFocus && lastFocus.focus) lastFocus.focus();   // restore focus to the opener
     }
     openers.forEach(function(o){ o && o.addEventListener("click", function(e){ e.preventDefault(); open(); }); });
     backdrop.addEventListener("click", close);
@@ -88,7 +99,16 @@
     panel.addEventListener("click", function(e){
       if (e.target.closest && e.target.closest("[data-drawer-close]")) { e.preventDefault(); close(); }
     });
-    document.addEventListener("keydown", function(e){ if(e.key==="Escape") close(); });
+    document.addEventListener("keydown", function(e){ if(e.key==="Escape" && isOpen) close(); });
+    // keep Tab inside the open drawer (simple focus trap)
+    panel.addEventListener("keydown", function(e){
+      if(e.key!=="Tab" || !isOpen) return;
+      var items = panel.querySelectorAll("a[href],button:not([disabled]),input,select,textarea,[tabindex]:not([tabindex='-1'])");
+      if(!items.length) return;
+      var first=items[0], last=items[items.length-1];
+      if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+      else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+    });
     return { open: open, close: close };
   }
 
@@ -102,7 +122,7 @@
       var navDrawer = makeDrawer(nav, [toggler], {backdropClass:"nav-backdrop", openClass:"drawer-open"});
       // add a close button into the drawer
       if(!nav.querySelector(".drawer-close")){
-        var c=document.createElement("button"); c.className="drawer-close"; c.setAttribute("aria-label","Close menu");
+        var c=document.createElement("button"); c.className="drawer-close"; c.setAttribute("aria-label", document.body.getAttribute("data-close-label") || "Close menu");
         c.setAttribute("data-drawer-close",""); c.innerHTML="&times;"; c.style.fontSize="1.8rem";
         nav.insertBefore(c, nav.firstChild);
       }

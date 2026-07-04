@@ -12,6 +12,20 @@
              alt="" aria-hidden="true" width="160" height="29">
       </a>
 
+      {% comment %}Mobile-persistent shop actions: cart (with live count) + wishlist stay
+      visible in the header on <992px — before this they were buried inside the drawer.{% endcomment %}
+      <div class="nav-mobile-actions d-lg-none">
+        <a class="nav-icon" href="{% url 'wishlist:saved' %}" aria-label="{% trans 'Saved items' %}">
+          <i class="fa fa-heart"></i>
+          <span class="badge badge-pill badge-danger" data-wishlist-count
+                {% if not WISHLIST_COUNT %}style="display:none"{% endif %}>{{ WISHLIST_COUNT }}</span>
+        </a>
+        <a class="nav-icon" href="{% url 'cart' %}" aria-label="{% trans 'Cart' %}">
+          <i class="fa fa-shopping-cart"></i>
+          <span class="badge badge-pill badge-danger" data-cart-count>{{ cart_count }}</span>
+        </a>
+      </div>
+
       <!-- Toggler -->
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarMain"
               aria-controls="navbarMain" aria-expanded="false" aria-label="{% trans 'Toggle navigation' %}">

@@ -4033,7 +4033,7 @@ font-weight: 500;
   width:min(420px, calc(100vw - 36px));
 }
 
-.toast{
+.toast-wrap .toast{
   position:relative;
   display:grid;
   grid-template-columns: 42px 1fr 34px;
@@ -4052,18 +4052,18 @@ font-weight: 500;
   transition: transform .22s ease, opacity .22s ease;
 }
 
-.toast.is-in{
+.toast-wrap .toast.is-in{
   transform: translateY(0);
   opacity: 1;
 }
 
-.toast.is-out{
+.toast-wrap .toast.is-out{
   transform: translateY(-6px);
   opacity: 0;
 }
 
 /* icon bubble */
-.toast-icon{
+.toast-wrap .toast-icon{
   width:34px;
   height:34px;
   border-radius:12px;
@@ -4074,21 +4074,21 @@ font-weight: 500;
   border:1px solid rgba(37,99,235,.18);
 }
 
-.toast-title{
+.toast-wrap .toast-title{
   font-weight:900;
   font-size:13px;
   color:#0f172a;
   line-height:1.1;
 }
 
-.toast-text{
+.toast-wrap .toast-text{
   font-size:13px;
   color:#475569;
   margin-top:2px;
   line-height:1.35;
 }
 
-.toast-close{
+.toast-wrap .toast-close{
   width:34px;
   height:34px;
   border:none;
@@ -4099,13 +4099,13 @@ font-weight: 500;
   cursor:pointer;
   color:#64748b;
 }
-.toast-close:hover{
+.toast-wrap .toast-close:hover{
   background:#f1f5f9;
   color:#0f172a;
 }
 
 /* progress bar */
-.toast-bar{
+.toast-wrap .toast-bar{
   position:absolute;
   left:0;
   bottom:0;
@@ -4117,53 +4117,53 @@ font-weight: 500;
 }
 
 /* Variants */
-.toast-success{
+.toast-wrap .toast-success{
   border-color: rgba(16,185,129,.22);
 }
-.toast-success .toast-icon{
+.toast-wrap .toast-success .toast-icon{
   background: rgba(236,253,245,.95);
   border-color: rgba(16,185,129,.22);
 }
-.toast-success .toast-icon::before{
+.toast-wrap .toast-success .toast-icon::before{
   content:"✓";
   font-weight:900;
   color:#059669;
 }
 
-.toast-error{
+.toast-wrap .toast-error{
   border-color: rgba(239,68,68,.22);
 }
-.toast-error .toast-icon{
+.toast-wrap .toast-error .toast-icon{
   background: rgba(254,242,242,.95);
   border-color: rgba(239,68,68,.22);
 }
-.toast-error .toast-icon::before{
+.toast-wrap .toast-error .toast-icon::before{
   content:"!";
   font-weight:900;
   color:#ef4444;
 }
 
-.toast-warning{
+.toast-wrap .toast-warning{
   border-color: rgba(245,158,11,.25);
 }
-.toast-warning .toast-icon{
+.toast-wrap .toast-warning .toast-icon{
   background: rgba(255,251,235,.95);
   border-color: rgba(245,158,11,.25);
 }
-.toast-warning .toast-icon::before{
+.toast-wrap .toast-warning .toast-icon::before{
   content:"⚠";
   font-weight:900;
   color:#f59e0b;
 }
 
-.toast-info{
+.toast-wrap .toast-info{
   border-color: rgba(59,130,246,.22);
 }
-.toast-info .toast-icon{
+.toast-wrap .toast-info .toast-icon{
   background: rgba(239,246,255,.95);
   border-color: rgba(59,130,246,.22);
 }
-.toast-info .toast-icon::before{
+.toast-wrap .toast-info .toast-icon::before{
   content:"i";
   font-weight:900;
   color:#2563eb;
@@ -4173,3 +4173,12 @@ font-weight: 500;
 @media (max-width: 520px){
   .toast-wrap{ right:12px; left:12px; width:auto; }
 }
+
+/* Dark-mode surface for Django-message toasts (was hardcoded white) */
+:root[data-theme="dark"] .toast-wrap .toast{
+  background:rgba(32,28,22,.94); border-color:rgba(210,195,170,.18);
+  box-shadow:0 14px 40px rgba(0,0,0,.5);
+}
+:root[data-theme="dark"] .toast-wrap .toast-title{color:#efe7d6;}
+:root[data-theme="dark"] .toast-wrap .toast-text{color:#cbbfa8;}
+:root[data-theme="dark"] .toast-wrap .toast-close{color:#cbbfa8;}

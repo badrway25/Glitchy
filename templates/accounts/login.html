@@ -30,7 +30,6 @@
         <p class="text-muted mb-0">{% trans "Welcome back to Glitchy." %}</p>
       </div>
 
-      {% include 'includes/alerts.html' %}
 
       <form action="{% url 'login' %}" method="POST" class="auth-form" novalidate>
         {% csrf_token %}
