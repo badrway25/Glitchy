@@ -165,3 +165,64 @@ class PlaceOrderModeTests(TestCase):
         self.assertIn("data-addr-placeid", html)
         self.assertIn('data-mode="strict"', html)
         self.assertIn("address-autocomplete.js", html)
+
+
+@override_settings(ALLOWED_HOSTS=["testserver", "127.0.0.1", "localhost"])
+class LocationAutocompleteMarkupTests(TestCase):
+    """City / province / postal autocomplete phase — markup + contract guards."""
+
+    def _checkout_html(self):
+        from category.models import Category
+        from store.models import Product
+        from carts.models import Cart, CartItem
+        _cfg(validation_mode="warning")
+        cat, _ = Category.objects.get_or_create(category_name="Tees", slug="tees")
+        p, _ = Product.objects.get_or_create(
+            product_name="Test Tee", slug="test-tee", category=cat,
+            defaults={"price": 25, "stock": 10, "is_available": True, "description": "t"})
+        c = Client()
+        c.get("/")
+        cart, _x = Cart.objects.get_or_create(cart_id=c.session.session_key)
+        CartItem.objects.create(product=p, cart=cart, quantity=1)
+        return c.get("/cart/checkout/").content.decode()
+
+    def test_all_three_location_fields_have_suggest_lists(self):
+        html = self._checkout_html()
+        for marker in ("data-city-suggest", "data-state-suggest", "data-postal-suggest",
+                       "data-city-hint", "data-state-hint", "data-postal-hint"):
+            self.assertIn(marker, html)
+
+    def test_field_order_unchanged_and_single_prefix(self):
+        html = self._checkout_html()
+        self.assertLess(html.index('name="country"'), html.index('name="state"'))
+        self.assertLess(html.index('name="state"'), html.index('name="city"'))
+        self.assertLess(html.index('name="city"'), html.index('name="postal_code"'))
+        self.assertLess(html.index('name="postal_code"'), html.index('name="address_line_1"'))
+        self.assertEqual(html.count('name="phone_prefix"'), 1)
+
+    def test_honest_cap_hint_string_wired(self):
+        html = self._checkout_html()
+        self.assertIn("data-addr-cap-street", html)
+
+    def test_controller_js_has_honest_cap_rule_and_type_filters(self):
+        import pathlib
+        from django.conf import settings as dj
+        js = (pathlib.Path(dj.BASE_DIR) / "greatkart" / "static" / "js" /
+              "address-autocomplete.js").read_text(encoding="utf-8")
+        self.assertIn("maybeFillPostal", js)                     # honest CAP entry point
+        self.assertIn('"(cities)"', js)                          # city collection
+        self.assertIn('"(regions)"', js)                         # regions collection
+        self.assertIn('indexOf("postal_code") > -1', js)         # postal filter
+        self.assertIn("administrative_area_level_2", js)         # province filter
+        self.assertNotIn("console.log", js)                      # no input logging
+
+    def test_server_validation_includes_administrative_area(self):
+        from unittest.mock import MagicMock, patch
+        cfg = _cfg(enable_address_validation=True, validation_mode="strict")
+        with override_settings(PAYMENT_CONFIG_KEY=FERNET_KEY):
+            cfg.set_server_key("AIzaFAKE_server"); cfg.save()
+            with patch("requests.post") as post:
+                post.return_value = MagicMock(status_code=200, json=lambda: {"result": {"verdict": {}}})
+                verify_for_order(cfg, dict(GOOD, state="MI"), "pl_x")
+            body = post.call_args.kwargs["json"]["address"]
+        self.assertEqual(body["administrativeArea"], "MI")       # province coherence sent to Google
