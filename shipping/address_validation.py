@@ -49,6 +49,7 @@ def validate_with_google(cfg, data):
                 "regionCode": (data.get("country") or "").upper(),
                 "postalCode": data.get("postal_code") or "",
                 "locality": data.get("city") or "",
+                "administrativeArea": data.get("state") or "",
                 "addressLines": [data.get("address_line_1") or ""],
             }
         }
@@ -185,6 +186,7 @@ def verify_for_order(cfg, data, place_id, claimed_verified=False):
                     "regionCode": (data.get("country") or "").upper(),
                     "postalCode": data.get("postal_code") or "",
                     "locality": data.get("city") or "",
+                    "administrativeArea": data.get("state") or "",
                     "addressLines": [data.get("address_line_1") or ""],
                 }},
                 timeout=5)
