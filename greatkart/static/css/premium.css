@@ -3546,3 +3546,48 @@ form .form-control,form .custom-select{transition:border-color .18s var(--ease),
   .cart-header{align-items:flex-start;}
   .cart-header .btn{white-space:nowrap;flex:0 0 auto;padding:.45rem .8rem;font-size:.78rem;}
 }
+
+/* ============================================================================
+   Professional address checkout flow — sections, street suggestions, status
+   ========================================================================= */
+.co-section{margin:0 0 1.6rem;padding:1.15rem 1.2rem 1.3rem;border:1px solid rgba(120,110,95,.16);
+  border-radius:14px;background:rgba(250,247,240,.5);}
+[data-theme="dark"] .co-section{background:rgba(255,255,255,.02);border-color:rgba(210,195,170,.14);}
+.co-section-head{display:flex;align-items:center;gap:.6rem;margin:0 0 1rem;
+  font-weight:800;font-size:.95rem;letter-spacing:.02em;}
+.co-step-n{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;
+  background:var(--primary);color:#fff;font-size:.75rem;font-weight:800;}
+[data-theme="dark"] .co-step-n{color:#17140f;}
+.co-street-grid{display:grid;gap:1rem;}
+.lbl-hint{font-weight:400;font-size:.78rem;opacity:.6;}
+
+/* street suggestions (custom Places prediction list) */
+.addr-ac-wrap{position:relative;}
+.addr-suggest{position:absolute;z-index:1250;left:0;right:0;top:calc(100% - 2px);margin:0;
+  padding:.4rem;list-style:none;background:var(--bg,#fff);
+  border:1px solid rgba(120,110,95,.25);border-radius:12px;
+  box-shadow:0 16px 44px -14px rgba(40,32,16,.3);max-height:290px;overflow:auto;}
+[data-theme="dark"] .addr-suggest{background:#221f1a;border-color:rgba(210,195,170,.2);}
+.addr-opt{display:flex;align-items:flex-start;gap:.6rem;padding:.55rem .65rem;border-radius:9px;cursor:pointer;}
+.addr-opt:hover,.addr-opt.is-active{background:rgba(184,151,90,.13);}
+.addr-opt-ic{flex:0 0 auto;color:var(--primary);opacity:.75;padding-top:.15rem;}
+.addr-opt-txt{display:flex;flex-direction:column;min-width:0;}
+.addr-opt-main{font-weight:600;font-size:.88rem;}
+.addr-opt-sec{font-size:.78rem;opacity:.65;}
+.addr-ac-hint{margin-top:.35rem;font-size:.78rem;opacity:.7;}
+#addressLine1.is-loading{background-image:linear-gradient(90deg,transparent,rgba(184,151,90,.15),transparent);
+  background-size:200% 100%;animation:addr-shimmer 1s linear infinite;}
+@keyframes addr-shimmer{to{background-position:-200% 0;}}
+@media (prefers-reduced-motion:reduce){#addressLine1.is-loading{animation:none;}}
+
+/* verification status badges */
+.addr-status{margin-top:.9rem;display:flex;flex-wrap:wrap;gap:.5rem;}
+.addr-badge{display:inline-flex;align-items:center;gap:.4rem;padding:.35rem .7rem;border-radius:999px;
+  font-size:.78rem;font-weight:700;}
+.addr-badge-ok{background:rgba(22,163,74,.12);color:#15803d;border:1px solid rgba(22,163,74,.3);}
+[data-theme="dark"] .addr-badge-ok{color:#4ade80;}
+.addr-badge-warn{background:rgba(214,158,46,.1);color:#8a5a12;border:1px solid rgba(214,158,46,.35);}
+[data-theme="dark"] .addr-badge-warn{color:#e6bd6a;}
+.addr-badge-muted{background:rgba(120,110,95,.08);color:inherit;opacity:.7;border:1px dashed rgba(120,110,95,.3);
+  font-weight:600;}
+@media (max-width:575.98px){ .co-section{padding:.95rem .85rem 1.05rem;} .addr-suggest{max-height:240px;} }

@@ -44,7 +44,11 @@
     </div>
     {% endif %}
 
-    <form action="{% url 'place_order' %}" method="POST" id="checkoutForm">
+    <form action="{% url 'place_order' %}" method="POST" id="checkoutForm"
+      data-addr-min="{% trans 'Type at least 3 characters…' %}"
+      data-addr-none="{% trans 'No suggestions — you can keep typing the full address.' %}"
+      data-addr-partial="{% trans 'Suggestion applied — please complete the missing fields.' %}"
+      data-addr-noapi="{% trans 'Google Places is not available — enter the address manually.' %}">
       {% csrf_token %}
       {% comment %}Bot protection: invisible honeypot (real browsers leave it empty) + a signed
       server timestamp for the minimum-form-time check. Neither affects real shoppers.{% endcomment %}
@@ -100,7 +104,14 @@
             </div>
             {% endif %}
 
-            <div class="checkout-grid">
+            {% comment %}Professional address flow: Contact -> Destination (country/state/
+            city/postal BEFORE the street) -> Street with Google suggestions -> verification
+            status. Hidden contract fields carry the Places result; the server re-validates
+            (never trusts address_verified alone in strict mode).{% endcomment %}
+
+            <div class="co-section">
+              <div class="co-section-head"><span class="co-step-n">1</span>{% trans "Contact" %}</div>
+              <div class="checkout-grid">
               <div class="form-group mb-0">
                 <label>{% trans "First name" %}</label>
                 <input type="text" name="first_name" class="form-control{% if form_errors.first_name %} is-invalid{% endif %}" value="{{ prefill.first_name }}" required>
@@ -153,43 +164,76 @@
                 </div>
                 {% if form_errors.phone %}<div class="field-error">{{ form_errors.phone }}</div>{% endif %}
               </div>
-              <div class="form-group mb-0">
-                <label>{% trans "Address line 1" %}</label>
-                <input type="text" name="address_line_1" id="addressLine1"
-                       class="form-control{% if form_errors.address_line_1 %} is-invalid{% endif %}"
-                       value="{{ prefill.address_line_1 }}" autocomplete="address-line1"
-                       {% if checkout_api %}placeholder="{% trans 'Start typing your address…' %}"{% endif %} required>
-                {% if form_errors.address_line_1 %}<div class="field-error">{{ form_errors.address_line_1 }}</div>{% endif %}
               </div>
+            </div>
+
+            <div class="co-section">
+              <div class="co-section-head"><span class="co-step-n">2</span>{% trans "Delivery destination" %}</div>
+              <div class="checkout-grid">
               <div class="form-group mb-0">
-                <label>{% trans "Address line 2" %}</label>
-                <input type="text" name="address_line_2" class="form-control" value="{{ prefill.address_line_2 }}">
-              </div>
-              <div class="form-group mb-0">
-                <label>{% trans "City" %}</label>
-                <input type="text" name="city" class="form-control{% if form_errors.city %} is-invalid{% endif %}" value="{{ prefill.city }}" required>
-                {% if form_errors.city %}<div class="field-error">{{ form_errors.city }}</div>{% endif %}
-              </div>
-              <div class="form-group mb-0">
-                <label>{% trans "State" %}</label>
-                <input type="text" name="state" class="form-control" value="{{ prefill.state }}" required>
-              </div>
-              <div class="form-group mb-0">
-                <label>{% trans "Postal code" %}</label>
-                <input type="text" name="postal_code" id="postalCodeInput" class="form-control" value="{{ prefill.postal_code }}" required>
-              </div>
-              <div class="form-group mb-0">
-                <label>{% trans "Country" %}</label>
+                <label for="countryInput">{% trans "Country" %}</label>
                 {% if form_errors.country %}<div class="field-error mb-1">{{ form_errors.country }}</div>{% endif %}
-                <select name="country" id="countryInput" class="form-control" required>
+                <select name="country" id="countryInput" class="form-control" data-addr-context required>
                   <option value="">{% trans "Select country" %}</option>
                   {% for code, name in ship_countries %}
                     <option value="{{ code }}" {% if prefill.country == code %}selected{% endif %}>{{ name }}</option>
                   {% endfor %}
                 </select>
               </div>
+              <div class="form-group mb-0">
+                <label>{% trans "State / Region / Province" %}</label>
+                <input type="text" name="state" id="stateInput" class="form-control" value="{{ prefill.state }}" data-addr-context required>
+              </div>
+              <div class="form-group mb-0">
+                <label>{% trans "City" %}</label>
+                <input type="text" name="city" id="cityInput" class="form-control{% if form_errors.city %} is-invalid{% endif %}" value="{{ prefill.city }}" data-addr-context required>
+                {% if form_errors.city %}<div class="field-error">{{ form_errors.city }}</div>{% endif %}
+              </div>
+              <div class="form-group mb-0">
+                <label>{% trans "Postal code" %}</label>
+                <input type="text" name="postal_code" id="postalCodeInput" class="form-control{% if form_errors.postal_code %} is-invalid{% endif %}" value="{{ prefill.postal_code }}" data-addr-context required>
+                {% if form_errors.postal_code %}<div class="field-error">{{ form_errors.postal_code }}</div>{% endif %}
+              </div>
+              </div>
             </div>
 
+            <div class="co-section">
+              <div class="co-section-head"><span class="co-step-n">3</span>{% trans "Street address" %}</div>
+              <div class="co-street-grid">
+              <div class="form-group mb-0 addr-ac-wrap">
+                <label for="addressLine1">{% trans "Street address" %} <span class="lbl-hint">{% trans "street and number" %}</span></label>
+                <input type="text" name="address_line_1" id="addressLine1"
+                       class="form-control{% if form_errors.address_line_1 %} is-invalid{% endif %}"
+                       value="{{ prefill.address_line_1 }}"
+                       autocomplete="{% if checkout_api %}off{% else %}address-line1{% endif %}"
+                       role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="addrSuggest"
+                       placeholder="{% if checkout_api %}{% trans 'Start typing your street…' %}{% else %}{% trans 'Street and number' %}{% endif %}" required>
+                <ul class="addr-suggest" id="addrSuggest" role="listbox" hidden data-addr-suggest></ul>
+                <div class="addr-ac-hint" data-addr-hint hidden></div>
+                {% if form_errors.address_line_1 %}<div class="field-error">{{ form_errors.address_line_1 }}</div>{% endif %}
+              </div>
+              <div class="form-group mb-0">
+                <label>{% trans "Apartment, suite, floor (optional)" %}</label>
+                <input type="text" name="address_line_2" class="form-control" value="{{ prefill.address_line_2 }}">
+              </div>
+              </div>
+
+              {% comment %}Address contract (server re-validates; strict mode never trusts these
+              alone). Verified resets client-side on any street/destination edit.{% endcomment %}
+              <input type="hidden" name="google_place_id" value="" data-addr-placeid>
+              <input type="hidden" name="address_verified" value="" data-addr-verified>
+              <input type="hidden" name="address_validation_source" value="" data-addr-source>
+
+              <div class="addr-status" data-addr-status data-mode="{{ address_mode }}">
+                <span class="addr-badge addr-badge-ok" data-addr-badge-ok hidden>
+                  <i class="fa fa-check-circle" aria-hidden="true"></i> {% trans "Address verified" %}</span>
+                <span class="addr-badge addr-badge-warn" data-addr-badge-warn hidden>
+                  <i class="fa fa-info-circle" aria-hidden="true"></i> {% trans "Address not verified yet" %}</span>
+                {% if not checkout_api %}
+                  <span class="addr-badge addr-badge-muted">{% trans "Manual address mode — suggestions appear when Google Places is configured." %}</span>
+                {% endif %}
+              </div>
+            </div>
             <div class="checkout-note">
               <label>{% trans "Order note (optional)" %}</label>
               <textarea name="order_note" rows="3" class="form-control"
@@ -286,38 +330,12 @@
 {% block extra_js %}
 <script src="{% static 'js/shipping-estimate.js' %}?v={{ ASSET_VERSION }}"></script>
 
+<script src="{% static 'js/address-autocomplete.js' %}?v={{ ASSET_VERSION }}"></script>
 {% if checkout_api %}
-{% comment %}Google Places Autocomplete — loaded ONLY when the admin enabled it and set a
-referrer-restricted BROWSER key (public by design). Manual typing always keeps working; if the
-script fails to load nothing changes. The selected place fills city/postal/country.{% endcomment %}
-<script>
-  window.__glxPlaces = function () {
-    var input = document.getElementById("addressLine1");
-    if (!input || !window.google || !google.maps || !google.maps.places) return;
-    var ac = new google.maps.places.Autocomplete(input, {
-      types: ["address"], fields: ["address_components"]
-    });
-    ac.addListener("place_changed", function () {
-      var p = ac.getPlace();
-      if (!p || !p.address_components) return;
-      var get = function (type, short) {
-        var c = p.address_components.find(function (x) { return x.types.indexOf(type) > -1; });
-        return c ? (short ? c.short_name : c.long_name) : "";
-      };
-      var route = get("route"), num = get("street_number");
-      if (route) input.value = (route + " " + num).trim();
-      var set = function (name, v) { var el = document.querySelector('[name="' + name + '"]'); if (el && v) el.value = v; };
-      set("city", get("locality") || get("postal_town") || get("administrative_area_level_3"));
-      set("postal_code", get("postal_code"));
-      set("state", get("administrative_area_level_2", true) || get("administrative_area_level_1", true));
-      var cc = get("country", true);
-      var sel = document.querySelector('select[name="country"]');
-      if (sel && cc) { sel.value = cc; sel.dispatchEvent(new Event("change", { bubbles: true })); }
-      input.classList.add("addr-selected");
-    });
-  };
-</script>
+{% comment %}Google Places loader — ONLY when the admin enabled autocomplete and set a
+referrer-restricted BROWSER key (public by design). The callback boots the custom prediction
+list; gm_authFailure falls back to plain manual entry.{% endcomment %}
 <script async defer
-  src="https://maps.googleapis.com/maps/api/js?key={{ checkout_api.maps_browser_key|urlencode }}&libraries=places&callback=__glxPlaces&loading=async"></script>
+  src="https://maps.googleapis.com/maps/api/js?key={{ checkout_api.maps_browser_key|urlencode }}&libraries=places&callback=__glxAddrInit&loading=async"></script>
 {% endif %}
 {% endblock %}
