@@ -285,7 +285,7 @@ msgstr ""
 
 #: .\greatkart\admin_ext.py:33
 msgid "Production"
-msgstr "Produit"
+msgstr ""
 
 #: .\greatkart\settings.py:174 .\greatkart\settings.py:175
 msgid "Glitchy Commerce Studio"
@@ -301,7 +301,7 @@ msgstr ""
 
 #: .\greatkart\settings.py:205
 msgid "Products"
-msgstr "Produit"
+msgstr ""
 
 #: .\greatkart\settings.py:206 .\templates\includes\navbar.html:80
 msgid "Categories"
@@ -314,7 +314,7 @@ msgstr "Commandes"
 
 #: .\greatkart\settings.py:208
 msgid "Customers"
-msgstr "Client"
+msgstr ""
 
 #: .\greatkart\settings.py:212
 msgid "Printify control"
@@ -323,19 +323,19 @@ msgstr "Contrôle Printify"
 #: .\greatkart\settings.py:215 .\printify_integration\models.py:62
 #: .\templates\admin\index.html:99
 msgid "Printify accounts"
-msgstr "Coûts Printify"
+msgstr ""
 
 #: .\greatkart\settings.py:216
 msgid "Sync monitor"
-msgstr "Paiement en attente"
+msgstr ""
 
 #: .\greatkart\settings.py:217
 msgid "Sync logs"
-msgstr "En erreur"
+msgstr ""
 
 #: .\greatkart\settings.py:218
 msgid "Shipping profiles"
-msgstr "Journaux de synchronisation Printify"
+msgstr ""
 
 #: .\greatkart\settings.py:222
 msgid "Payment control"
@@ -816,7 +816,7 @@ msgstr ""
 #: .\payments\admin.py:108 .\payments\admin.py:117
 #: .\printify_integration\admin.py:318 .\shipping\admin.py:81
 msgid "Connection status"
-msgstr "Statut du retour"
+msgstr ""
 
 #: .\payments\admin.py:109 .\payments\admin.py:118
 #: .\printify_integration\admin.py:96 .\shipping\admin.py:82
@@ -838,7 +838,7 @@ msgstr ""
 #: .\payments\admin.py:173 .\printify_integration\admin.py:311
 #: .\shipping\admin.py:116 .\templates\admin\index.html:82
 msgid "Connection"
-msgstr "Collection"
+msgstr ""
 
 #: .\payments\admin.py:177 .\shipping\admin.py:121
 msgid "not tested"
@@ -846,7 +846,7 @@ msgstr ""
 
 #: .\payments\admin.py:181
 msgid "Secret status"
-msgstr "Statut actuel"
+msgstr ""
 
 #: .\payments\admin.py:184
 msgid "Save first, then add credentials."
@@ -866,7 +866,7 @@ msgstr ""
 
 #: .\payments\admin.py:193 .\shipping\admin.py:130
 msgid "Updated by"
-msgstr "À jour"
+msgstr ""
 
 #: .\payments\admin.py:196 .\printify_integration\admin.py:95
 #: .\shipping\admin.py:133
@@ -887,15 +887,15 @@ msgstr ""
 
 #: .\payments\admin.py:218
 msgid "Ready for checkout"
-msgstr "Avant le paiement"
+msgstr ""
 
 #: .\payments\admin.py:218
 msgid "yes"
-msgstr "Oui"
+msgstr ""
 
 #: .\payments\admin.py:218
 msgid "no"
-msgstr "Info"
+msgstr ""
 
 #: .\payments\admin.py:220
 msgid ""
@@ -914,11 +914,11 @@ msgstr ""
 
 #: .\payments\admin.py:274
 msgid "Result"
-msgstr "Reprendre"
+msgstr ""
 
 #: .\payments\admin.py:277
 msgid "ok"
-msgstr "Travail"
+msgstr ""
 
 #: .\payments\admin.py:277
 msgid "fail"
@@ -930,7 +930,7 @@ msgstr ""
 
 #: .\payments\models.py:20
 msgid "PayPal client secret"
-msgstr "Paiement reçu"
+msgstr ""
 
 #: .\payments\models.py:33
 msgid "Test / sandbox"
@@ -973,7 +973,7 @@ msgstr ""
 
 #: .\payments\models.py:149
 msgid "Verify capture"
-msgstr "Achat vérifié"
+msgstr ""
 
 #: .\payments\models.py:149 .\returns\admin.py:51
 msgid "Refund"
@@ -1009,7 +1009,7 @@ msgstr ""
 
 #: .\printify_integration\admin.py:70 .\templates\admin\index.html:85
 msgid "set"
-msgstr "Réinitialiser"
+msgstr ""
 
 #: .\printify_integration\admin.py:70 .\templates\admin\index.html:85
 msgid "none"
@@ -1021,7 +1021,7 @@ msgstr ""
 
 #: .\printify_integration\admin.py:92 .\printify_integration\admin.py:127
 msgid "Printify shop & operations"
-msgstr "Journaux de synchronisation Printify"
+msgstr ""
 
 #: .\printify_integration\admin.py:93 .\printify_integration\admin.py:105
 msgid "Sync governance"
@@ -1039,7 +1039,7 @@ msgstr ""
 
 #: .\printify_integration\admin.py:134
 msgid "Selected shop"
-msgstr "Sélectionner une taille"
+msgstr ""
 
 #: .\printify_integration\admin.py:137
 msgid "Title"
@@ -1071,7 +1071,7 @@ msgstr ""
 
 #: .\printify_integration\admin.py:169
 msgid "View hidden products"
-msgstr "Resynchronisation d'un seul produit"
+msgstr ""
 
 #: .\printify_integration\admin.py:169 .\templates\includes\navbar.html:89
 #: .\templates\merchandising\collections_index.html:158
@@ -1145,11 +1145,11 @@ msgstr ""
 
 #: .\printify_integration\admin.py:304
 msgid "Token status"
-msgstr "Statut du retour"
+msgstr ""
 
 #: .\printify_integration\admin.py:307
 msgid "no token stored"
-msgstr "Explorer la boutique"
+msgstr ""
 
 #: .\printify_integration\admin.py:321
 msgid "Never tested. Use the 'Test connection' action."
@@ -1167,12 +1167,12 @@ msgstr ""
 #: .\printify_integration\admin.py:366
 #, python-format
 msgid "%(n)s: connected."
-msgstr "%(n)s collection"
+msgstr "%(n)s : connexion réussie."
 
 #: .\printify_integration\admin.py:371 .\printify_integration\admin.py:376
 #, python-format
 msgid "%(n)s: connection failed."
-msgstr "%(n)d collection(s) à la une."
+msgstr "%(n)s : échec de la connexion."
 
 #: .\printify_integration\admin.py:378
 msgid "Sync now — DRY RUN (no writes)"
@@ -1194,7 +1194,7 @@ msgstr ""
 #: .\printify_integration\admin.py:391
 #, python-format
 msgid "Catalog sync: +%(c)d ~%(u)d (errors %(e)d)."
-msgstr "Synchronisation des produits terminée : +%(c)d ~%(u)d (erreurs %(e)d)."
+msgstr ""
 
 #: .\printify_integration\admin.py:402
 msgid "ETA"
@@ -1224,7 +1224,7 @@ msgstr "%(n)d estimation(s) expirée(s) purgée(s)."
 
 #: .\printify_integration\admin.py:462
 msgid "What is this?"
-msgstr "Cela vous a-t-il aidé ?"
+msgstr ""
 
 #: .\printify_integration\admin.py:463
 msgid "Health"
@@ -1251,11 +1251,11 @@ msgstr ""
 
 #: .\printify_integration\admin.py:491 .\printify_integration\admin.py:542
 msgid "Products needing review"
-msgstr "Produits et commandes"
+msgstr ""
 
 #: .\printify_integration\admin.py:493
 msgid "Recent product syncs"
-msgstr "Resynchronisation d'un seul produit"
+msgstr ""
 
 #: .\printify_integration\admin.py:501
 msgid "Sync daemon"
@@ -1271,11 +1271,11 @@ msgstr ""
 
 #: .\printify_integration\admin.py:521
 msgid "Report"
-msgstr "Assistance"
+msgstr ""
 
 #: .\printify_integration\admin.py:522
 msgid "Counts"
-msgstr "Pays"
+msgstr ""
 
 #: .\printify_integration\admin.py:525
 msgid "Timing"
@@ -1283,7 +1283,7 @@ msgstr ""
 
 #: .\printify_integration\admin.py:526
 msgid "Raw detail"
-msgstr "Voir les détails"
+msgstr ""
 
 #: .\printify_integration\admin.py:530
 msgid "Sync report"
@@ -1291,19 +1291,19 @@ msgstr ""
 
 #: .\printify_integration\admin.py:536
 msgid "Operation"
-msgstr "Durée"
+msgstr ""
 
 #: .\printify_integration\admin.py:557
 msgid "Sample products"
-msgstr "Comparer les produits"
+msgstr ""
 
 #: .\printify_integration\admin.py:561
 msgid "has image"
-msgstr "Aucune image"
+msgstr ""
 
 #: .\printify_integration\admin.py:561
 msgid "no image"
-msgstr "Aucune image"
+msgstr ""
 
 #: .\printify_integration\admin.py:574
 msgid "Duration"
@@ -1350,11 +1350,11 @@ msgstr ""
 
 #: .\printify_integration\models.py:61
 msgid "Printify account"
-msgstr "Coûts Printify"
+msgstr ""
 
 #: .\printify_integration\models.py:144 .\printify_integration\models.py:145
 msgid "Printify Sync Monitor"
-msgstr "Journal de synchronisation Printify"
+msgstr ""
 
 #: .\printify_integration\models.py:208
 msgid "Products sync"
@@ -1677,20 +1677,20 @@ msgstr ""
 
 #: .\shipping\address_validation.py:84 .\shipping\address_validation.py:85
 msgid "No server key set."
-msgstr "Utiliser une adresse enregistrée"
+msgstr "Aucune clé serveur définie."
 
 #: .\shipping\address_validation.py:95 .\shipping\address_validation.py:96
 #, python-format
 msgid "Key rejected (%d)."
-msgstr "Retour refusé"
+msgstr "Clé rejetée (%d)."
 
 #: .\shipping\address_validation.py:98 .\shipping\address_validation.py:99
 msgid "Address Validation API reachable."
-msgstr ""
+msgstr "API Address Validation joignable."
 
 #: .\shipping\address_validation.py:101 .\shipping\address_validation.py:102
 msgid "Could not reach Google (network/timeout)."
-msgstr ""
+msgstr "Google injoignable (réseau/délai dépassé)."
 
 #: .\shipping\admin.py:31
 msgid "Set / replace Address Validation server key"
@@ -1827,7 +1827,7 @@ msgstr ""
 
 #: .\store\admin.py:21
 msgid "image"
-msgstr "Aucune image"
+msgstr ""
 
 #: .\store\admin.py:25
 msgid "Missing image"
@@ -1835,19 +1835,19 @@ msgstr ""
 
 #: .\store\admin.py:35
 msgid "price"
-msgstr "Prix"
+msgstr ""
 
 #: .\store\admin.py:39
 msgid "Missing / zero price"
-msgstr "Prix min"
+msgstr ""
 
 #: .\store\admin.py:52
 msgid "Printify products"
-msgstr "Coûts Printify"
+msgstr ""
 
 #: .\store\admin.py:52
 msgid "Local only"
-msgstr "En stock uniquement"
+msgstr ""
 
 #: .\store\admin.py:63
 msgid "sync freshness"
@@ -1855,7 +1855,7 @@ msgstr ""
 
 #: .\store\admin.py:67
 msgid "Stale Printify sync"
-msgstr "Journal de synchronisation Printify"
+msgstr ""
 
 #: .\store\admin.py:96 .\store\admin.py:311
 msgid "Up to date"
@@ -1863,11 +1863,11 @@ msgstr "À jour"
 
 #: .\store\admin.py:146
 msgid "Full preview"
-msgstr "avis"
+msgstr ""
 
 #: .\store\admin.py:161
 msgid "No images"
-msgstr "Aucune image"
+msgstr ""
 
 #: .\store\admin.py:168
 msgid "Imgs"
@@ -1879,12 +1879,12 @@ msgstr ""
 
 #: .\store\admin.py:181
 msgid "Activate selected"
-msgstr "Filtres actifs"
+msgstr ""
 
 #: .\store\admin.py:184
 #, python-format
 msgid "Activated %(n)d product(s)."
-msgstr "%(n)d retour(s) refusé(s)."
+msgstr ""
 
 #: .\store\admin.py:186
 msgid "Deactivate selected"
@@ -1893,16 +1893,16 @@ msgstr ""
 #: .\store\admin.py:189
 #, python-format
 msgid "Deactivated %(n)d product(s)."
-msgstr "%(n)d retour(s) refusé(s)."
+msgstr ""
 
 #: .\store\admin.py:191
 msgid "Mark Printify sync stale (selected)"
-msgstr "Journaux de synchronisation Printify"
+msgstr ""
 
 #: .\store\admin.py:196
 #, python-format
 msgid "Marked %(n)d Printify product(s) as stale."
-msgstr "%(n)d retour(s) marqué(s) comme remboursé(s)."
+msgstr ""
 
 #: .\store\admin.py:199
 msgid "Pricing & stock"
@@ -2875,7 +2875,7 @@ msgstr "Prix"
 
 #: .\templates\accounts\register.html:4
 msgid "Create account"
-msgstr "Vous avez déjà un compte ?"
+msgstr ""
 
 #: .\templates\accounts\register.html:13
 msgid "Join Glitchy."
@@ -2891,7 +2891,7 @@ msgstr "Vos infos enregistrées pour une commande fluide."
 
 #: .\templates\accounts\register.html:19
 msgid "Saved addresses"
-msgstr "Utiliser une adresse enregistrée"
+msgstr ""
 
 #: .\templates\accounts\register.html:20
 msgid "Ship anywhere in a couple of taps."
@@ -3040,7 +3040,7 @@ msgstr ""
 
 #: .\templates\admin\index.html:50
 msgid "Product status"
-msgstr "Coût de production"
+msgstr ""
 
 #: .\templates\admin\index.html:54
 msgid "Active vs hidden products"
@@ -3048,11 +3048,11 @@ msgstr ""
 
 #: .\templates\admin\index.html:63
 msgid "Printify vs manual products"
-msgstr "Journaux de synchronisation Printify"
+msgstr ""
 
 #: .\templates\admin\index.html:80
 msgid "Printify sync health"
-msgstr "Journaux de synchronisation Printify"
+msgstr ""
 
 #: .\templates\admin\index.html:86
 msgid "enabled"
@@ -3060,15 +3060,15 @@ msgstr ""
 
 #: .\templates\admin\index.html:87
 msgid "Stale products"
-msgstr "Tous les produits"
+msgstr ""
 
 #: .\templates\admin\index.html:88
 msgid "Sync errors"
-msgstr "En erreur"
+msgstr ""
 
 #: .\templates\admin\index.html:89
 msgid "Safe defaults"
-msgstr "Définir par défaut"
+msgstr ""
 
 #: .\templates\admin\index.html:91
 msgid "publish"
@@ -3076,7 +3076,7 @@ msgstr ""
 
 #: .\templates\admin\index.html:92
 msgid "orders"
-msgstr "Commandes"
+msgstr ""
 
 #: .\templates\admin\index.html:97
 msgid "No Printify account configured"
@@ -3124,7 +3124,7 @@ msgstr ""
 
 #: .\templates\admin\index.html:154
 msgid "Category readiness"
-msgstr "Catégories"
+msgstr ""
 
 #: .\templates\admin\index.html:175
 msgid "Demand signals — wishlist"
@@ -3132,11 +3132,11 @@ msgstr ""
 
 #: .\templates\admin\index.html:177
 msgid "saved items"
-msgstr "Articles enregistrés"
+msgstr ""
 
 #: .\templates\admin\index.html:189
 msgid "Quick actions"
-msgstr "Statistiques rapides"
+msgstr ""
 
 #: .\templates\admin\login.html:34
 msgid "Print-on-demand, run like a maison."
@@ -3165,11 +3165,11 @@ msgstr ""
 
 #: .\templates\admin\login.html:62
 msgid "Please check your username and password and try again."
-msgstr "Erreur réseau. Vérifiez votre connexion et réessayez."
+msgstr ""
 
 #: .\templates\admin\login.html:79
 msgid "Forgot your password?"
-msgstr "Mot de passe oublié ?"
+msgstr ""
 
 #: .\templates\admin\login.html:83
 msgid "Secure access · staff only"
@@ -3203,7 +3203,7 @@ msgstr ""
 
 #: .\templates\admin\printify_integration\printifyaccountconfig\change_form.html:9
 msgid "Printify operations"
-msgstr "Coûts Printify"
+msgstr ""
 
 #: .\templates\admin\printify_integration\printifyaccountconfig\change_form.html:14
 msgid "Discover shops"
@@ -3215,7 +3215,7 @@ msgstr ""
 
 #: .\templates\admin\printify_integration\printifyaccountconfig\change_form.html:23
 msgid "Sync products now"
-msgstr "Rechercher des produits"
+msgstr ""
 
 #: .\templates\admin\printify_integration\printifyaccountconfig\change_form.html:27
 msgid ""
@@ -3231,7 +3231,7 @@ msgstr ""
 
 #: .\templates\admin\printify_integration\printifyaccountconfig\change_form.html:37
 msgid "Available Printify shops"
-msgstr "Options disponibles"
+msgstr ""
 
 #: .\templates\admin\printify_integration\printifyaccountconfig\change_form.html:43
 msgid "suggested"
@@ -3239,7 +3239,7 @@ msgstr ""
 
 #: .\templates\admin\printify_integration\printifyaccountconfig\change_form.html:45
 msgid "Use this shop"
-msgstr "Cela vous a-t-il aidé ?"
+msgstr ""
 
 #: .\templates\admin\shipping\checkoutapiconfig\change_form.html:9
 msgid "API operations"
@@ -3526,7 +3526,7 @@ msgstr ""
 #: .\templates\home.html:250 .\templates\home.html:256
 #: .\templates\home.html:262 .\templates\home.html:268
 msgid "Read more"
-msgstr "En savoir plus"
+msgstr ""
 
 #: .\templates\home.html:255
 msgid "Printed only when you order — less waste, always fresh."
@@ -4379,7 +4379,7 @@ msgstr "Effacer le filtre"
 #: .\templates\merchandising\collections_index.html:104
 #, python-format
 msgid "%(l)s collections"
-msgstr "%(n)s collection"
+msgstr "%(l)s collections"
 
 #: .\templates\merchandising\collections_index.html:134
 msgid ""
