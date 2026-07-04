@@ -41,7 +41,7 @@
     <div class="hero-x-copy">
       <span class="hero-kicker">{% trans "New season" %}</span>
       <h1 class="hero-x-title">{% trans "Wear something worth keeping." %}</h1>
-      <p class="hero-x-sub">{% trans "Considered essentials, made on demand. Premium fabrics, honest pricing, free 14-day returns." %}</p>
+      <p class="hero-x-sub">{% blocktrans with d=RETURN_WINDOW_DAYS %}Considered essentials, made on demand. Premium fabrics, honest pricing, free {{ d }}-day returns.{% endblocktrans %}</p>
       <div class="hero-rotator" aria-hidden="true" data-rotator>
         <span class="rot is-on">{% trans "Premium tees. Printed on demand. Delivered transparently." %}</span>
         <span class="rot">{% trans "Your style, estimated before checkout." %}</span>

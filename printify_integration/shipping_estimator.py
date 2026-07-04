@@ -441,8 +441,24 @@ def _options_from_live(cost_map_cents, free, selected_method):
     return options, selected_method
 
 
-def _single_option(method, cost, free, handling_min=None, handling_max=None):
-    win = _delivery_window(method, handling_min, handling_max)
+def _single_option(method, cost, free, handling_min=None, handling_max=None, days_override=None):
+    """days_override=(min,max): use the rate-table door-to-door business days verbatim
+    (the same numbers the PDP quote and the order snapshot show) instead of the generic
+    production+transit model — one delivery-time model funnel-wide."""
+    if days_override and days_override[1]:
+        dmin, dmax = int(days_override[0]), int(days_override[1])
+        if dmax < dmin:
+            dmin, dmax = dmax, dmin
+        today = timezone.localdate()
+        win = {
+            "production_days_min": 0, "production_days_max": 0,
+            "transit_days_min": dmin, "transit_days_max": dmax,
+            "delivery_days_min": dmin, "delivery_days_max": dmax,
+            "estimated_delivery_from": add_business_days(today, dmin).isoformat(),
+            "estimated_delivery_to": add_business_days(today, dmax).isoformat(),
+        }
+    else:
+        win = _delivery_window(method, handling_min, handling_max)
     c = 0.0 if free else round(float(cost), 2)
     return ShippingOption(
         method=method, label=_method_label(method), cost=c, cost_display=_money(c),
@@ -540,7 +556,8 @@ def estimate_for_cart(cart_items, country, *, postal_code="", region="", city=""
             available=False, source=SOURCE_UNAVAILABLE,
             country=country, currency=currency, disclaimer=fq.message,
             errors_safe=errors + ["country_unsupported"])
-    opt, win = _single_option(selected, fq.cost, fq.free or free)
+    opt, win = _single_option(selected, fq.cost, fq.free or free,
+                              days_override=(fq.min_days, fq.max_days))
     result = _finalise([opt], selected, SOURCE_LOCAL,
                        country, currency, fq.free or free, mixed, errors, win=win)
     if use_cache:

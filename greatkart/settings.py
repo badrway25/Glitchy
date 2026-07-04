@@ -483,9 +483,18 @@ STORE_CURRENCY_SYMBOL = env("STORE_CURRENCY_SYMBOL", "€")
 # --------------------------------------------------------------------------- #
 # Shipping (fallback configuration used when Printify rates are unavailable)
 # --------------------------------------------------------------------------- #
+# Social profiles (footer): empty = the button simply doesn't render (no dead links)
+SOCIAL_INSTAGRAM = env("SOCIAL_INSTAGRAM", "")
+SOCIAL_TIKTOK = env("SOCIAL_TIKTOK", "")
+SOCIAL_YOUTUBE = env("SOCIAL_YOUTUBE", "")
+SOCIAL_FACEBOOK = env("SOCIAL_FACEBOOK", "")
+
 SHIPPING_DEFAULT_COUNTRY = env("SHIPPING_DEFAULT_COUNTRY", "IT")
 SHIPPING_FREE_THRESHOLD = float(env("SHIPPING_FREE_THRESHOLD", "80"))
 # Fallback rate table: ISO2 -> {first_item, additional_item, min_days, max_days}
+# NOTE: min_days/max_days below are DOOR-TO-DOOR business-day estimates (they already
+# include production) — the PDP quote, the cart/checkout estimator fallback and the order
+# snapshot all show these same numbers (one delivery-time model funnel-wide).
 SHIPPING_FALLBACK_RATES = {
     "IT": {"first": 4.90, "additional": 1.90, "min_days": 3, "max_days": 6},
     "FR": {"first": 6.90, "additional": 2.40, "min_days": 4, "max_days": 8},
