@@ -140,7 +140,7 @@
                       {% endfor %}
                     </ul>
                   </div>
-                  <select name="phone_prefix" class="form-control phone-prefix" data-pfx-select aria-label="{% trans 'Phone prefix' %}">
+                  <select name="phone_prefix" class="form-control phone-prefix" data-pfx-select data-no-enhance aria-label="{% trans 'Phone prefix' %}">
                     {% for p in phone_prefixes %}
                       <option value="{{ p.dial }}" data-code="{{ p.code }}"
                         {% if prefill_prefix and p.dial == prefill_prefix %}selected{% elif not prefill_prefix and p.code == prefill.country %}selected{% endif %}>

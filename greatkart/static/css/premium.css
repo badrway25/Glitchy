@@ -3489,13 +3489,17 @@ form .form-control,form .custom-select{transition:border-color .18s var(--ease),
 
 /* Checkout: bot honeypot (visually removed, still in DOM for bots), intl phone row, inline errors */
 .co-hp{position:absolute!important;left:-9999px!important;top:-9999px!important;height:0;overflow:hidden;}
-.phone-row{display:flex;gap:.5rem;}
-.phone-row .phone-prefix{flex:0 0 8.2rem;font-variant-emoji:emoji;}
-.phone-row input{flex:1 1 auto;}
+.phone-row{display:flex;gap:.5rem;align-items:stretch;}
+/* guaranteed 50/50 split: prefix and number always the same width (user-requested parity) */
+.phone-row .pfx,
+.phone-row .phone-prefix:not(.pfx-native-hidden),
+.phone-row input[type="tel"]{flex:0 0 calc(50% - .25rem);max-width:calc(50% - .25rem);min-width:0;}
+.phone-row .pfx{display:flex;}
+.phone-row .pfx-btn{width:100%;height:100%;justify-content:space-between;}
 .phone-row.has-error input,.form-control.is-invalid{border-color:#c0392b!important;}
 .field-error{color:#c0392b;font-size:.8rem;font-weight:600;margin-top:.3rem;}
 [data-theme="dark"] .field-error{color:#e08a80;}
-@media (max-width:575.98px){ .phone-row .phone-prefix{flex-basis:7.2rem;} }
+
 
 /* Intl phone prefix — custom dropdown with real SVG flags */
 .pfx{position:relative;flex:0 0 auto;}
@@ -3531,3 +3535,14 @@ form .form-control,form .custom-select{transition:border-color .18s var(--ease),
 .pac-item{padding:.5rem .7rem;font-size:.86rem;cursor:pointer;}
 .pac-item:hover{background:rgba(184,151,90,.12);}
 .pac-item-selected{background:rgba(184,151,90,.16);}
+
+/* Phone prefix: when the flag dropdown is ACTIVE, any premium-select clone of the native
+   select must not render as a second flagless selector (dup-selector fix). Scoped to
+   [data-pfx]:not([hidden]) so a JS-failure still leaves exactly one usable control. */
+.phone-row [data-pfx]:not([hidden]) ~ .pmsel{display:none!important;}
+
+/* Mobile: "Back to cart" must be a compact one-line pill, not a 3-line block */
+@media (max-width:575.98px){
+  .cart-header{align-items:flex-start;}
+  .cart-header .btn{white-space:nowrap;flex:0 0 auto;padding:.45rem .8rem;font-size:.78rem;}
+}

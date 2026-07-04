@@ -264,6 +264,11 @@
   }
   select.hidden = true; select.setAttribute("tabindex", "-1");
   select.classList.add("pfx-native-hidden");
+  // Belt-and-braces: if premium-select.js already wrapped the native select in a .pmsel
+  // (older cached JS without the data-no-enhance opt-out), hide that whole wrapper too —
+  // otherwise its .pmsel-btn shows as a SECOND, flagless prefix selector.
+  var pmsel = select.closest(".pmsel");
+  if (pmsel) { pmsel.classList.add("pfx-native-hidden"); }
   wrap.hidden = false;
   syncFromSelect();
 
