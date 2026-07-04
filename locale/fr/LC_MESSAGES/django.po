@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: greatkart 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-03 09:06+0200\n"
+"POT-Creation-Date: 2026-07-04 11:05+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: .\accounts\admin.py:22 .\orders\admin.py:153
-#: .\templates\accounts\address_form.html:45 .\templates\accounts\login.html:38
+#: .\templates\accounts\address_form.html:45 .\templates\accounts\login.html:37
 #: .\templates\legal\cookies.html:26 .\templates\legal\privacy.html:31
 #: .\templates\legal\terms.html:25 .\templates\store\checkout.html:100
 msgid "Email"
@@ -88,7 +88,7 @@ msgstr "Adresse de livraison mise à jour"
 
 #: .\accounts\views.py:127 .\templates\merchandising\_product_card.html:10
 #: .\templates\store\_quick_view.html:18
-#: .\templates\store\product_detail.html:240 .\templates\store\store.html:213
+#: .\templates\store\product_detail.html:246 .\templates\store\store.html:213
 msgid "Saved to wishlist"
 msgstr "Enregistré dans la liste de souhaits"
 
@@ -139,7 +139,7 @@ msgid "Default address updated."
 msgstr "Adresse par défaut mise à jour."
 
 #: .\assistant\models.py:17 .\templates\accounts\order_detail.html:173
-#: .\templates\includes\footer.html:79
+#: .\templates\includes\footer.html:84
 #: .\templates\includes\shipping_estimator.html:18
 #: .\templates\includes\shipping_estimator.html:74
 #: .\templates\legal\terms.html:12
@@ -149,7 +149,7 @@ msgstr "Adresse par défaut mise à jour."
 msgid "Shipping"
 msgstr "Livraison"
 
-#: .\assistant\models.py:18 .\templates\includes\footer.html:112
+#: .\assistant\models.py:18 .\templates\includes\footer.html:117
 #: .\templates\legal\terms.html:15
 #: .\templates\merchandising\collections_index.html:160
 #: .\templates\returns\request.html:11
@@ -170,8 +170,8 @@ msgid "Sizing"
 msgstr "Tailles"
 
 #: .\assistant\models.py:22 .\printify_integration\admin.py:89
-#: .\printify_integration\admin.py:101 .\templates\accounts\dashboard.html:26
-#: .\templates\includes\navbar.html:113
+#: .\printify_integration\admin.py:101 .\templates\accounts\dashboard.html:25
+#: .\templates\includes\navbar.html:128
 msgid "Account"
 msgstr "Compte"
 
@@ -188,11 +188,12 @@ msgstr "Produit"
 msgid "Print on demand"
 msgstr "Fabriqués à la demande"
 
-#: .\assistant\models.py:26 .\templates\includes\footer.html:74
+#: .\assistant\models.py:26 .\templates\includes\footer.html:79
 msgid "Support"
 msgstr "Assistance"
 
-#: .\assistant\models.py:27 .\templates\includes\footer.html:108
+#: .\assistant\models.py:27 .\templates\includes\footer.html:73
+#: .\templates\includes\footer.html:113
 msgid "Privacy"
 msgstr "Confidentialité"
 
@@ -256,16 +257,21 @@ msgstr ""
 msgid "Sorry, something went wrong. Please try again or contact support."
 msgstr "Désolé, une erreur s'est produite. Réessayez ou contactez le support."
 
-#: .\carts\views.py:60 .\carts\views.py:123
+#: .\carts\views.py:75 .\carts\views.py:142
 msgid "Please choose a colour and size before adding this item to your cart."
 msgstr ""
 "Choisissez une couleur et une taille avant d'ajouter cet article au panier."
 
-#: .\carts\views.py:293
+#: .\carts\views.py:118 .\carts\views.py:190
+#, python-format
+msgid "Added %(name)s to your bag."
+msgstr "%(name)s ajouté à votre panier."
+
+#: .\carts\views.py:314
 msgid "Too many requests. Please wait a moment."
 msgstr "Trop de requêtes. Veuillez patienter un instant."
 
-#: .\carts\views.py:304 .\templates\includes\shipping_estimator.html:16
+#: .\carts\views.py:325 .\templates\includes\shipping_estimator.html:16
 msgid "Please choose a delivery country."
 msgstr "Veuillez choisir un pays de livraison."
 
@@ -301,7 +307,7 @@ msgstr ""
 msgid "Products"
 msgstr "Produit"
 
-#: .\greatkart\settings.py:206 .\templates\includes\navbar.html:65
+#: .\greatkart\settings.py:206 .\templates\includes\navbar.html:80
 msgid "Categories"
 msgstr "Catégories"
 
@@ -369,7 +375,7 @@ msgstr "Italiano"
 msgid "Français"
 msgstr "Français"
 
-#: .\greatkart\urls.py:36 .\templates\includes\footer.html:25
+#: .\greatkart\urls.py:36 .\templates\includes\footer.html:29
 msgid "Privacy Policy"
 msgstr "Politique de confidentialité"
 
@@ -465,7 +471,7 @@ msgstr "Destinataire"
 
 #: .\notifications\admin.py:21 .\orders\admin.py:167
 #: .\printify_integration\admin.py:566 .\returns\admin.py:40
-#: .\templates\accounts\dashboard.html:163
+#: .\templates\accounts\dashboard.html:162
 #: .\templates\accounts\transactions.html:100
 #: .\templates\orders\order_complete.html:186
 msgid "Status"
@@ -485,7 +491,7 @@ msgid "From"
 msgstr "De"
 
 #: .\notifications\admin.py:52 .\returns\admin.py:36
-#: .\templates\accounts\dashboard.html:162
+#: .\templates\accounts\dashboard.html:161
 #: .\templates\accounts\transactions.html:95
 #: .\templates\returns\request.html:17 .\templates\returns\status.html:9
 msgid "Order"
@@ -546,7 +552,7 @@ msgid "Update from %(brand)s"
 msgstr "Actualité de %(brand)s"
 
 #: .\notifications\models.py:18 .\templates\accounts\billing.html:47
-#: .\templates\accounts\dashboard.html:182
+#: .\templates\accounts\dashboard.html:181
 #: .\templates\accounts\order_detail.html:161
 msgid "Pending"
 msgstr "En attente"
@@ -577,12 +583,12 @@ msgstr "Événements sortants (Django → n8n)"
 
 #: .\notifications\models.py:80 .\templates\home.html:309
 #: .\templates\store\_quick_view.html:28
-#: .\templates\store\product_detail.html:72 .\templates\store\store.html:207
+#: .\templates\store\product_detail.html:78 .\templates\store\store.html:207
 #: .\templates\store\store.html:298
 msgid "New"
 msgstr "Nouveau"
 
-#: .\notifications\models.py:81 .\templates\accounts\dashboard.html:94
+#: .\notifications\models.py:81 .\templates\accounts\dashboard.html:93
 msgid "In progress"
 msgstr "En cours"
 
@@ -606,7 +612,7 @@ msgstr "Abonné à la newsletter"
 msgid "Newsletter subscribers"
 msgstr "Abonnés à la newsletter"
 
-#: .\notifications\views.py:25
+#: .\notifications\views.py:25 .\templates\includes\footer.html:17
 msgid "Please enter a valid email address."
 msgstr "Veuillez saisir une adresse e-mail valide."
 
@@ -689,10 +695,10 @@ msgstr "Invité"
 msgid "Printify"
 msgstr "Printify"
 
-#: .\orders\admin.py:183 .\templates\accounts\dashboard.html:164
+#: .\orders\admin.py:183 .\templates\accounts\dashboard.html:163
 #: .\templates\notifications\email\transactional.html:91
 #: .\templates\orders\order_complete.html:198
-#: .\templates\store\product_detail.html:359
+#: .\templates\store\product_detail.html:365
 msgid "Total"
 msgstr "Total"
 
@@ -764,7 +770,7 @@ msgid ""
 msgstr ""
 
 #: .\payments\admin.py:99 .\payments\admin.py:103 .\payments\admin.py:112
-#: .\payments\admin.py:157
+#: .\payments\admin.py:166
 msgid "Provider"
 msgstr ""
 
@@ -776,7 +782,7 @@ msgstr ""
 msgid "Stripe keys"
 msgstr ""
 
-#: .\payments\admin.py:106 .\payments\admin.py:115 .\payments\admin.py:201
+#: .\payments\admin.py:106 .\payments\admin.py:115 .\payments\admin.py:210
 #: .\templates\admin\payments\paymentproviderconfig\change_form.html:9
 msgid "Payment operations"
 msgstr "Opérations de paiement"
@@ -801,115 +807,115 @@ msgstr ""
 msgid "PayPal credentials"
 msgstr ""
 
-#: .\payments\admin.py:159
+#: .\payments\admin.py:168
 msgid "LIVE"
 msgstr ""
 
-#: .\payments\admin.py:159
+#: .\payments\admin.py:168
 msgid "TEST"
 msgstr ""
 
-#: .\payments\admin.py:164 .\printify_integration\admin.py:311
+#: .\payments\admin.py:173 .\printify_integration\admin.py:311
 #: .\templates\admin\index.html:82
 #, fuzzy
 #| msgid "Collection"
 msgid "Connection"
 msgstr "Collection"
 
-#: .\payments\admin.py:168
+#: .\payments\admin.py:177
 msgid "not tested"
 msgstr ""
 
-#: .\payments\admin.py:172
+#: .\payments\admin.py:181
 #, fuzzy
 #| msgid "Current status"
 msgid "Secret status"
 msgstr "Statut actuel"
 
-#: .\payments\admin.py:175
+#: .\payments\admin.py:184
 msgid "Save first, then add credentials."
 msgstr ""
 
-#: .\payments\admin.py:177 .\payments\models.py:18
+#: .\payments\admin.py:186 .\payments\models.py:18
 msgid "Stripe secret key"
 msgstr ""
 
-#: .\payments\admin.py:178
+#: .\payments\admin.py:187
 msgid "Webhook secret"
 msgstr ""
 
-#: .\payments\admin.py:179
+#: .\payments\admin.py:188
 msgid "PayPal secret"
 msgstr ""
 
-#: .\payments\admin.py:184
+#: .\payments\admin.py:193
 #, fuzzy
 #| msgid "Up to date"
 msgid "Updated by"
 msgstr "À jour"
 
-#: .\payments\admin.py:187 .\printify_integration\admin.py:95
+#: .\payments\admin.py:196 .\printify_integration\admin.py:95
 msgid "Connection status (read-only)"
 msgstr ""
 
-#: .\payments\admin.py:190
+#: .\payments\admin.py:199
 msgid "Never tested. Use 'Test connection'."
 msgstr ""
 
-#: .\payments\admin.py:204
+#: .\payments\admin.py:213
 msgid "Save first, then Test connection."
 msgstr ""
 
-#: .\payments\admin.py:208
+#: .\payments\admin.py:217
 msgid "Active credential source"
 msgstr ""
 
-#: .\payments\admin.py:209
+#: .\payments\admin.py:218
 #, fuzzy
 #| msgid "Before checkout"
 msgid "Ready for checkout"
 msgstr "Avant le paiement"
 
-#: .\payments\admin.py:209
+#: .\payments\admin.py:218
 #, fuzzy
 #| msgid "Yes"
 msgid "yes"
 msgstr "Oui"
 
-#: .\payments\admin.py:209
+#: .\payments\admin.py:218
 #, fuzzy
 #| msgid "Info"
 msgid "no"
 msgstr "Info"
 
-#: .\payments\admin.py:211
+#: .\payments\admin.py:220
 msgid ""
 "Test connection is read-only — it never creates a payment, capture or refund."
 msgstr ""
 
-#: .\payments\admin.py:235
+#: .\payments\admin.py:244
 #, python-format
 msgid "Connection OK — %(d)s"
 msgstr ""
 
-#: .\payments\admin.py:237
+#: .\payments\admin.py:246
 #, python-format
 msgid "Connection failed — %(e)s"
 msgstr ""
 
-#: .\payments\admin.py:265
+#: .\payments\admin.py:274
 #, fuzzy
 #| msgid "Resume"
 msgid "Result"
 msgstr "Reprendre"
 
-#: .\payments\admin.py:268
+#: .\payments\admin.py:277
 #, fuzzy
 #| msgid "Work"
 msgid "ok"
 msgstr "Travail"
 
-#: .\payments\admin.py:268
+#: .\payments\admin.py:277
 msgid "fail"
 msgstr ""
 
@@ -1073,7 +1079,7 @@ msgstr ""
 msgid "View hidden products"
 msgstr "Resynchronisation d'un seul produit"
 
-#: .\printify_integration\admin.py:169 .\templates\includes\navbar.html:74
+#: .\printify_integration\admin.py:169 .\templates\includes\navbar.html:89
 #: .\templates\merchandising\collections_index.html:158
 #: .\templates\store\_filters.html:24 .\templates\store\store.html:33
 msgid "All products"
@@ -1408,7 +1414,7 @@ msgstr "Resynchronisation d'un seul produit"
 msgid "Running"
 msgstr "En cours d'exécution"
 
-#: .\printify_integration\models.py:220 .\templates\base.html:109
+#: .\printify_integration\models.py:220 .\templates\base.html:138
 msgid "Success"
 msgstr "Succès"
 
@@ -1416,7 +1422,7 @@ msgstr "Succès"
 msgid "Partial"
 msgstr "Partiel"
 
-#: .\printify_integration\models.py:222 .\templates\base.html:110
+#: .\printify_integration\models.py:222 .\templates\base.html:139
 msgid "Error"
 msgstr "Erreur"
 
@@ -1515,11 +1521,11 @@ msgstr "Certains articles utilisent des données d'expédition estimées."
 msgid "Estimated delivery — not guaranteed."
 msgstr "Livraison estimée — non garantie."
 
-#: .\printify_integration\shipping_estimator.py:473
+#: .\printify_integration\shipping_estimator.py:489
 msgid "Add an item to estimate delivery."
 msgstr "Ajoutez un article pour estimer la livraison."
 
-#: .\printify_integration\shipping_estimator.py:481 .\shipping\services.py:68
+#: .\printify_integration\shipping_estimator.py:497 .\shipping\services.py:68
 msgid "We do not ship to this country yet."
 msgstr "Nous ne livrons pas encore dans ce pays."
 
@@ -1631,7 +1637,7 @@ msgstr "%(n)d retour(s) marqué(s) comme remboursé(s)."
 msgid "Email on the order"
 msgstr "E-mail figurant sur la commande"
 
-#: .\returns\forms.py:9 .\templates\accounts\login.html:40
+#: .\returns\forms.py:9 .\templates\accounts\login.html:39
 msgid "you@example.com"
 msgstr "vous@exemple.com"
 
@@ -1747,7 +1753,7 @@ msgid "Australia"
 msgstr "Australie"
 
 #: .\shipping\services.py:81 .\templates\store\_quick_view.html:74
-#: .\templates\store\product_detail.html:132
+#: .\templates\store\product_detail.html:138
 msgid "Free shipping"
 msgstr "Livraison gratuite"
 
@@ -1926,7 +1932,7 @@ msgstr "Options disponibles"
 #: .\store\test_phase66_gallery.py:118 .\templates\home.html:254
 #: .\templates\merchandising\collection.html:49
 #: .\templates\merchandising\collections_index.html:133
-#: .\templates\store\product_detail.html:301 .\templates\store\store.html:112
+#: .\templates\store\product_detail.html:307 .\templates\store\store.html:112
 #: .\templates\store\store.html:182
 msgid "Made on demand"
 msgstr "Fabriqués à la demande"
@@ -1938,18 +1944,18 @@ msgid "Secure checkout"
 msgstr "Paiement sécurisé"
 
 #: .\store\test_phase67_features.py:125 .\templates\store\_compare.html:20
-#: .\templates\store\product_detail.html:290
+#: .\templates\store\product_detail.html:296
 msgid "Sizes"
 msgstr "Tailles"
 
 #: .\store\test_phase67_features.py:126 .\templates\store\_compare.html:25
-#: .\templates\store\product_detail.html:223
-#: .\templates\store\product_detail.html:232 .\templates\store\store.html:304
+#: .\templates\store\product_detail.html:229
+#: .\templates\store\product_detail.html:238 .\templates\store\store.html:306
 msgid "Choose options"
 msgstr "Choisir les options"
 
-#: .\store\test_phase67_features.py:128 .\templates\store\store.html:316
-#: .\templates\store\store.html:444 .\templates\store\store.html:453
+#: .\store\test_phase67_features.py:128 .\templates\store\store.html:318
+#: .\templates\store\store.html:437 .\templates\store\store.html:446
 msgid "Compare"
 msgstr "Comparer"
 
@@ -1959,37 +1965,37 @@ msgstr "Comparer"
 msgid "Colours"
 msgstr "Couleurs"
 
-#: .\store\views.py:274
+#: .\store\views.py:276
 msgid "Shipping & delivery"
 msgstr "Adresse de livraison"
 
-#: .\store\views.py:274 .\templates\includes\footer.html:78
+#: .\store\views.py:276 .\templates\includes\footer.html:83
 #: .\templates\returns\policy.html:3 .\templates\returns\policy.html:11
 #: .\templates\returns\policy.html:15
 msgid "Returns & refunds"
 msgstr "Retours et remboursements"
 
-#: .\store\views.py:275
+#: .\store\views.py:277
 msgid "Payments & security"
 msgstr "Paiement reçu"
 
-#: .\store\views.py:275
+#: .\store\views.py:277
 msgid "Orders & tracking"
 msgstr "Livraison / suivi"
 
-#: .\store\views.py:276
+#: .\store\views.py:278
 msgid "Account & wishlist"
 msgstr "Compte et favoris"
 
-#: .\store\views.py:276
+#: .\store\views.py:278
 msgid "Sizing & products"
 msgstr "Resynchronisation d'un seul produit"
 
-#: .\store\views.py:277
+#: .\store\views.py:279
 msgid "Coupons & offers"
 msgstr "Coupons"
 
-#: .\store\views.py:277
+#: .\store\views.py:279
 msgid "Support & assistant"
 msgstr "Panier"
 
@@ -2020,14 +2026,14 @@ msgstr "Événements analytiques"
 #: .\templates\accounts\_order_status_badge.html:1
 #: .\templates\accounts\_portal_filters.html:16
 #: .\templates\accounts\_portal_filters.html:34
-#: .\templates\accounts\dashboard.html:189
+#: .\templates\accounts\dashboard.html:188
 #: .\templates\accounts\order_detail.html:32
 msgid "Completed"
 msgstr "Terminée"
 
 #: .\templates\accounts\_order_status_badge.html:1
 #: .\templates\accounts\_portal_filters.html:35
-#: .\templates\accounts\dashboard.html:191
+#: .\templates\accounts\dashboard.html:190
 #: .\templates\accounts\order_detail.html:34
 #: .\templates\orders\order_complete.html:104
 #: .\templates\orders\order_complete.html:140
@@ -2037,7 +2043,7 @@ msgstr "Annulée"
 #: .\templates\accounts\_order_status_badge.html:1
 #: .\templates\accounts\_portal_filters.html:14
 #: .\templates\accounts\_portal_filters.html:33
-#: .\templates\accounts\dashboard.html:193
+#: .\templates\accounts\dashboard.html:192
 #: .\templates\accounts\order_detail.html:36
 #: .\templates\orders\order_complete.html:88
 #: .\templates\orders\order_complete.html:124
@@ -2047,7 +2053,7 @@ msgstr "Préparée"
 #: .\templates\accounts\_order_status_badge.html:1
 #: .\templates\accounts\_portal_filters.html:12
 #: .\templates\accounts\_portal_filters.html:32
-#: .\templates\accounts\dashboard.html:195
+#: .\templates\accounts\dashboard.html:194
 #: .\templates\accounts\order_detail.html:38
 #: .\templates\orders\order_complete.html:80
 #: .\templates\orders\order_complete.html:116
@@ -2110,7 +2116,7 @@ msgstr "Appliquer"
 
 #: .\templates\accounts\_portal_filters.html:48
 #: .\templates\accounts\address_list.html:38
-#: .\templates\includes\navbar.html:27 .\templates\store\store.html:152
+#: .\templates\includes\navbar.html:42 .\templates\store\store.html:152
 #: .\templates\wishlist\saved_items.html:86
 msgid "Clear"
 msgstr "Effacer"
@@ -2169,7 +2175,7 @@ msgstr "Aperçu"
 #: .\templates\accounts\_sidebar.html:19 .\templates\accounts\my_orders.html:4
 #: .\templates\accounts\my_orders.html:20
 #: .\templates\accounts\transactions.html:27
-#: .\templates\includes\navbar.html:123
+#: .\templates\includes\navbar.html:138
 msgid "My orders"
 msgstr "Mes commandes"
 
@@ -2178,10 +2184,10 @@ msgstr "Mes commandes"
 msgid "Billing & receipts"
 msgstr "Facturation et reçus"
 
-#: .\templates\accounts\_sidebar.html:31 .\templates\accounts\dashboard.html:64
-#: .\templates\accounts\dashboard.html:112
-#: .\templates\accounts\register.html:25 .\templates\includes\navbar.html:135
-#: .\templates\wishlist\saved_items.html:3
+#: .\templates\accounts\_sidebar.html:31 .\templates\accounts\dashboard.html:63
+#: .\templates\accounts\dashboard.html:111
+#: .\templates\accounts\register.html:25 .\templates\includes\navbar.html:19
+#: .\templates\includes\navbar.html:150 .\templates\wishlist\saved_items.html:3
 #: .\templates\wishlist\saved_items.html:12
 msgid "Saved items"
 msgstr "Articles enregistrés"
@@ -2228,7 +2234,7 @@ msgid "Back to addresses"
 msgstr "Retour aux commandes"
 
 #: .\templates\accounts\address_form.html:39
-#: .\templates\includes\footer.html:77 .\templates\legal\cookies.html:25
+#: .\templates\includes\footer.html:82 .\templates\legal\cookies.html:25
 #: .\templates\legal\privacy.html:30 .\templates\legal\terms.html:24
 msgid "Contact"
 msgstr "Contact"
@@ -2238,12 +2244,12 @@ msgid "Who should we address the parcel to?"
 msgstr "À qui adressons-nous le colis ?"
 
 #: .\templates\accounts\address_form.html:43
-#: .\templates\accounts\register.html:46 .\templates\store\checkout.html:92
+#: .\templates\accounts\register.html:45 .\templates\store\checkout.html:92
 msgid "First name"
 msgstr "Prénom"
 
 #: .\templates\accounts\address_form.html:44
-#: .\templates\accounts\register.html:47 .\templates\store\checkout.html:96
+#: .\templates\accounts\register.html:46 .\templates\store\checkout.html:96
 msgid "Last name"
 msgstr "Nom"
 
@@ -2320,7 +2326,7 @@ msgid "Search addresses"
 msgstr "Rechercher des adresses"
 
 #: .\templates\accounts\address_list.html:37
-#: .\templates\includes\navbar.html:39 .\templates\wishlist\saved_items.html:85
+#: .\templates\includes\navbar.html:54 .\templates\wishlist\saved_items.html:85
 msgid "Search"
 msgstr "Recherche"
 
@@ -2351,10 +2357,10 @@ msgstr "Ajoutez une adresse pour accélérer votre prochaine commande."
 
 #: .\templates\accounts\address_list.html:105 .\templates\home.html:277
 #: .\templates\includes\assistant_widget.html:24
-#: .\templates\store\cart.html:212 .\templates\store\product_detail.html:224
-#: .\templates\store\product_detail.html:228
-#: .\templates\store\product_detail.html:639 .\templates\store\store.html:146
-#: .\templates\store\store.html:456
+#: .\templates\store\cart.html:212 .\templates\store\product_detail.html:230
+#: .\templates\store\product_detail.html:234
+#: .\templates\store\product_detail.html:644 .\templates\store\store.html:146
+#: .\templates\store\store.html:449
 msgid "Close"
 msgstr "Fermer"
 
@@ -2370,13 +2376,13 @@ msgstr "Téléchargez le reçu de l'une de vos commandes."
 msgid "Paid orders"
 msgstr "Commandes payées"
 
-#: .\templates\accounts\billing.html:41 .\templates\accounts\dashboard.html:58
-#: .\templates\accounts\dashboard.html:100
+#: .\templates\accounts\billing.html:41 .\templates\accounts\dashboard.html:57
+#: .\templates\accounts\dashboard.html:99
 #: .\templates\accounts\my_orders.html:25
 msgid "Receipts"
 msgstr "Reçus"
 
-#: .\templates\accounts\billing.html:44 .\templates\accounts\dashboard.html:103
+#: .\templates\accounts\billing.html:44 .\templates\accounts\dashboard.html:102
 msgid "Available"
 msgstr "Disponibles"
 
@@ -2405,7 +2411,7 @@ msgid "Try a different search or clear the filters."
 msgstr "Essayez une autre recherche ou effacez les filtres."
 
 #: .\templates\accounts\billing.html:99 .\templates\accounts\my_orders.html:67
-#: .\templates\store\store.html:344 .\templates\wishlist\saved_items.html:172
+#: .\templates\store\store.html:346 .\templates\wishlist\saved_items.html:172
 msgid "Clear filters"
 msgstr "Effacer la recherche"
 
@@ -2418,46 +2424,46 @@ msgid "Your order receipts will appear here after your first purchase."
 msgstr "Vos reçus apparaîtront ici après votre premier achat."
 
 #: .\templates\accounts\billing.html:106
-#: .\templates\accounts\dashboard.html:216
+#: .\templates\accounts\dashboard.html:215
 #: .\templates\accounts\my_orders.html:74
 #: .\templates\accounts\transactions.html:186 .\templates\store\cart.html:37
 msgid "Browse products"
 msgstr "Parcourir les produits"
 
-#: .\templates\accounts\dashboard.html:4 .\templates\includes\navbar.html:122
+#: .\templates\accounts\dashboard.html:4 .\templates\includes\navbar.html:137
 msgid "Dashboard"
 msgstr "Tableau de bord"
 
-#: .\templates\accounts\dashboard.html:27
+#: .\templates\accounts\dashboard.html:26
 #, python-format
 msgid "Hi, %(name)s"
 msgstr "Bonjour, %(name)s"
 
-#: .\templates\accounts\dashboard.html:28
+#: .\templates\accounts\dashboard.html:27
 msgid "Track your orders, payments and deliveries — all in one place."
 msgstr "Suivez vos commandes, paiements et livraisons — au même endroit."
 
-#: .\templates\accounts\dashboard.html:32
+#: .\templates\accounts\dashboard.html:31
 #: .\templates\accounts\my_orders.html:28
 #: .\templates\accounts\transactions.html:51
-#: .\templates\includes\footer.html:56
+#: .\templates\includes\footer.html:61
 msgid "Shop"
 msgstr "Boutique"
 
-#: .\templates\accounts\dashboard.html:34
+#: .\templates\accounts\dashboard.html:33
 msgid "View all orders"
 msgstr "Voir toutes les commandes"
 
-#: .\templates\accounts\dashboard.html:55
+#: .\templates\accounts\dashboard.html:54
 msgid "View orders"
 msgstr "Voir les commandes"
 
-#: .\templates\accounts\dashboard.html:61
-#: .\templates\accounts\dashboard.html:106
+#: .\templates\accounts\dashboard.html:60
+#: .\templates\accounts\dashboard.html:105
 msgid "Addresses"
 msgstr "Adresses"
 
-#: .\templates\accounts\dashboard.html:67 .\templates\returns\request.html:73
+#: .\templates\accounts\dashboard.html:66 .\templates\returns\request.html:73
 #: .\templates\returns\status.html:61 .\templates\store\cart.html:25
 #: .\templates\store\cart.html:189 .\templates\store\checkout.html:211
 #: .\templates\wishlist\saved_items.html:17
@@ -2465,68 +2471,68 @@ msgstr "Adresses"
 msgid "Continue shopping"
 msgstr "Continuer mes achats"
 
-#: .\templates\accounts\dashboard.html:75
+#: .\templates\accounts\dashboard.html:74
 msgid "Quick stats"
 msgstr "Statistiques rapides"
 
-#: .\templates\accounts\dashboard.html:76
+#: .\templates\accounts\dashboard.html:75
 msgid "All time overview"
 msgstr "Aperçu de toute la période"
 
-#: .\templates\accounts\dashboard.html:82
+#: .\templates\accounts\dashboard.html:81
 msgid "Total orders"
 msgstr "Total des commandes"
 
-#: .\templates\accounts\dashboard.html:85
-#: .\templates\accounts\dashboard.html:91
+#: .\templates\accounts\dashboard.html:84
+#: .\templates\accounts\dashboard.html:90
 msgid "All time"
 msgstr "Depuis toujours"
 
-#: .\templates\accounts\dashboard.html:88
+#: .\templates\accounts\dashboard.html:87
 msgid "Spent"
 msgstr "Dépensé"
 
-#: .\templates\accounts\dashboard.html:97
+#: .\templates\accounts\dashboard.html:96
 msgid "New / Accepted"
 msgstr "Nouvelle / Acceptée"
 
-#: .\templates\accounts\dashboard.html:109
-#: .\templates\store\product_detail.html:241
-#: .\templates\store\product_detail.html:245
+#: .\templates\accounts\dashboard.html:108
+#: .\templates\store\product_detail.html:247
+#: .\templates\store\product_detail.html:251
 #: .\templates\wishlist\saved_items.html:24
 msgid "Saved"
 msgstr "Enregistrés"
 
-#: .\templates\accounts\dashboard.html:115
+#: .\templates\accounts\dashboard.html:114
 msgid "Wishlist"
 msgstr "Liste de souhaits"
 
-#: .\templates\accounts\dashboard.html:125
+#: .\templates\accounts\dashboard.html:124
 msgid "Recent activity"
 msgstr "Activité récente"
 
-#: .\templates\accounts\dashboard.html:126
+#: .\templates\accounts\dashboard.html:125
 msgid "Your latest account events"
 msgstr "Vos derniers événements de compte"
 
-#: .\templates\accounts\dashboard.html:148
+#: .\templates\accounts\dashboard.html:147
 msgid "Recent orders"
 msgstr "Commandes récentes"
 
-#: .\templates\accounts\dashboard.html:149
+#: .\templates\accounts\dashboard.html:148
 msgid "Last 5 orders"
 msgstr "5 dernières commandes"
 
-#: .\templates\accounts\dashboard.html:152
+#: .\templates\accounts\dashboard.html:151
 msgid "See all"
 msgstr "Tout voir"
 
-#: .\templates\accounts\dashboard.html:165
+#: .\templates\accounts\dashboard.html:164
 #: .\templates\accounts\transactions.html:101
 msgid "Action"
 msgstr "Action"
 
-#: .\templates\accounts\dashboard.html:203
+#: .\templates\accounts\dashboard.html:202
 #: .\templates\accounts\my_orders.html:53
 #: .\templates\accounts\order_detail.html:118
 #: .\templates\accounts\transactions.html:142 .\templates\home.html:205
@@ -2534,12 +2540,12 @@ msgstr "Action"
 msgid "Details"
 msgstr "Détails"
 
-#: .\templates\accounts\dashboard.html:214
+#: .\templates\accounts\dashboard.html:213
 #: .\templates\accounts\my_orders.html:72
 msgid "No orders yet"
 msgstr "Aucune commande"
 
-#: .\templates\accounts\dashboard.html:215
+#: .\templates\accounts\dashboard.html:214
 #: .\templates\accounts\my_orders.html:73
 msgid "Start shopping to see your orders here."
 msgstr "Commencez vos achats pour voir vos commandes ici."
@@ -2548,26 +2554,26 @@ msgstr "Commencez vos achats pour voir vos commandes ici."
 msgid "Forgot Password"
 msgstr "Mot de passe oublié"
 
-#: .\templates\accounts\forgotPassword.html:21
+#: .\templates\accounts\forgotPassword.html:20
 msgid "Email Address"
 msgstr "Adresse e-mail"
 
-#: .\templates\accounts\forgotPassword.html:25
+#: .\templates\accounts\forgotPassword.html:24
 msgid "Got password? Login"
 msgstr "Vous avez votre mot de passe ? Connectez-vous"
 
-#: .\templates\accounts\forgotPassword.html:29
+#: .\templates\accounts\forgotPassword.html:28
 msgid "Submit"
 msgstr "Envoyer"
 
-#: .\templates\accounts\forgotPassword.html:35
-#: .\templates\accounts\resetPassword.html:35
+#: .\templates\accounts\forgotPassword.html:34
+#: .\templates\accounts\resetPassword.html:34
 msgid "Don't have account?"
 msgstr "Pas encore de compte ?"
 
-#: .\templates\accounts\forgotPassword.html:35
-#: .\templates\accounts\login.html:64
-#: .\templates\accounts\resetPassword.html:35
+#: .\templates\accounts\forgotPassword.html:34
+#: .\templates\accounts\login.html:63
+#: .\templates\accounts\resetPassword.html:34
 msgid "Sign up"
 msgstr "Créer un compte"
 
@@ -2609,30 +2615,30 @@ msgstr "Connexion chiffrée · nous ne partageons jamais vos données"
 msgid "Welcome back to Glitchy."
 msgstr "Bon retour sur Glitchy."
 
-#: .\templates\accounts\login.html:44
+#: .\templates\accounts\login.html:43
 msgid "Password"
 msgstr "Mot de passe"
 
-#: .\templates\accounts\login.html:49 .\templates\accounts\login.html:50
-#: .\templates\accounts\register.html:58 .\templates\accounts\register.html:59
-#: .\templates\accounts\register.html:65 .\templates\accounts\register.html:66
+#: .\templates\accounts\login.html:48 .\templates\accounts\login.html:49
+#: .\templates\accounts\register.html:57 .\templates\accounts\register.html:58
+#: .\templates\accounts\register.html:64 .\templates\accounts\register.html:65
 msgid "Show password"
 msgstr "Afficher le mot de passe"
 
-#: .\templates\accounts\login.html:49 .\templates\accounts\register.html:58
-#: .\templates\accounts\register.html:65
+#: .\templates\accounts\login.html:48 .\templates\accounts\register.html:57
+#: .\templates\accounts\register.html:64
 msgid "Hide password"
 msgstr "Masquer le mot de passe"
 
-#: .\templates\accounts\login.html:57
+#: .\templates\accounts\login.html:56
 msgid "Forgot password?"
 msgstr "Mot de passe oublié ?"
 
-#: .\templates\accounts\login.html:60 .\templates\includes\navbar.html:129
+#: .\templates\accounts\login.html:59 .\templates\includes\navbar.html:144
 msgid "Login"
 msgstr "Connexion"
 
-#: .\templates\accounts\login.html:63
+#: .\templates\accounts\login.html:62
 msgid "Don't have an account?"
 msgstr "Vous n'avez pas de compte ?"
 
@@ -2753,7 +2759,7 @@ msgid "Send to support"
 msgstr "Envoyer au support"
 
 #: .\templates\accounts\order_detail.html:125 .\templates\store\faq.html:53
-#: .\templates\store\store.html:346
+#: .\templates\store\store.html:348
 msgid "Ask the assistant"
 msgstr "Demander à l'assistant"
 
@@ -2875,32 +2881,32 @@ msgstr "Créez votre compte"
 msgid "It takes less than a minute."
 msgstr "Cela prend moins d'une minute."
 
-#: .\templates\accounts\register.html:50 .\templates\includes\footer.html:19
-#: .\templates\store\product_detail.html:267
+#: .\templates\accounts\register.html:49 .\templates\includes\footer.html:23
+#: .\templates\store\product_detail.html:273
 msgid "Email address"
 msgstr "Adresse e-mail"
 
-#: .\templates\accounts\register.html:52
+#: .\templates\accounts\register.html:51
 msgid "Phone number"
 msgstr "Numéro de téléphone"
 
-#: .\templates\accounts\register.html:55
+#: .\templates\accounts\register.html:54
 msgid "Create password"
 msgstr "Créer un mot de passe"
 
-#: .\templates\accounts\register.html:62
+#: .\templates\accounts\register.html:61
 msgid "Repeat password"
 msgstr "Répéter le mot de passe"
 
-#: .\templates\accounts\register.html:70 .\templates\includes\navbar.html:130
+#: .\templates\accounts\register.html:69 .\templates\includes\navbar.html:145
 msgid "Register"
 msgstr "S'inscrire"
 
-#: .\templates\accounts\register.html:73
+#: .\templates\accounts\register.html:72
 msgid "Have an account?"
 msgstr "Vous avez déjà un compte ?"
 
-#: .\templates\accounts\register.html:73
+#: .\templates\accounts\register.html:72
 #: .\templates\wishlist\saved_items.html:38
 msgid "Log in"
 msgstr "Se connecter"
@@ -2909,15 +2915,15 @@ msgstr "Se connecter"
 msgid "Reset Password"
 msgstr "Réinitialiser le mot de passe"
 
-#: .\templates\accounts\resetPassword.html:21
+#: .\templates\accounts\resetPassword.html:20
 msgid "Create Password"
 msgstr "Créer un mot de passe"
 
-#: .\templates\accounts\resetPassword.html:24
+#: .\templates\accounts\resetPassword.html:23
 msgid "Confirm Password"
 msgstr "Confirmer le mot de passe"
 
-#: .\templates\accounts\resetPassword.html:29
+#: .\templates\accounts\resetPassword.html:28
 #: .\templates\accounts\transactions.html:87 .\templates\store\store.html:90
 msgid "Reset"
 msgstr "Réinitialiser"
@@ -3227,15 +3233,31 @@ msgstr ""
 msgid "Use this shop"
 msgstr "Cela vous a-t-il aidé ?"
 
-#: .\templates\base.html:63
+#: .\templates\base.html:67
 msgid "Could not load this product. Please try again."
 msgstr "Impossible de charger le produit. Veuillez réessayer."
 
-#: .\templates\base.html:111
+#: .\templates\base.html:68
+msgid "Close menu"
+msgstr "Fermer le menu"
+
+#: .\templates\base.html:68
+msgid "Adding…"
+msgstr "Ajout…"
+
+#: .\templates\base.html:70
+msgid "Skip to content"
+msgstr "Aller au contenu"
+
+#: .\templates\base.html:100
+msgid "Loading"
+msgstr "Chargement"
+
+#: .\templates\base.html:140
 msgid "Warning"
 msgstr "Avertissement"
 
-#: .\templates\base.html:112
+#: .\templates\base.html:141
 msgid "Info"
 msgstr "Info"
 
@@ -3256,9 +3278,13 @@ msgid "Wear something worth keeping."
 msgstr "Portez quelque chose qui en vaut la peine."
 
 #: .\templates\home.html:45
+#, fuzzy, python-format
+#| msgid ""
+#| "Considered essentials, made on demand. Premium fabrics, honest pricing, "
+#| "free 14-day returns."
 msgid ""
 "Considered essentials, made on demand. Premium fabrics, honest pricing, free "
-"14-day returns."
+"%(d)s-day returns."
 msgstr ""
 "Des essentiels soigneusement sélectionnés, pensés pour le confort au "
 "quotidien. Qualité premium, livraison rapide, retours simplifiés."
@@ -3517,7 +3543,7 @@ msgstr "Tout juste ajoutés — à ne pas manquer"
 msgid "See new"
 msgstr "Voir les nouveautés"
 
-#: .\templates\home.html:310 .\templates\store\product_detail.html:73
+#: .\templates\home.html:310 .\templates\store\product_detail.html:79
 msgid "Bestseller"
 msgstr "Meilleure vente"
 
@@ -3635,9 +3661,8 @@ msgid "Stay in the loop"
 msgstr "Restez informé"
 
 #: .\templates\includes\footer.html:11
-#, python-format
-msgid "Join the list — early drops & 10%% off"
-msgstr "Rejoignez-nous — avant-premières et 10%% de réduction"
+msgid "Join the list — early drops & member offers"
+msgstr "Rejoignez la liste — avant-premières et offres membres"
 
 #: .\templates\includes\footer.html:12
 msgid ""
@@ -3647,31 +3672,48 @@ msgstr ""
 "Nouveautés, offres réservées aux membres et conseils de style. Pas de spam, "
 "désabonnement à tout moment."
 
-#: .\templates\includes\footer.html:19
+#: .\templates\includes\footer.html:15
+msgid "You're in — check your inbox."
+msgstr "Inscription confirmée — vérifiez votre boîte mail."
+
+#: .\templates\includes\footer.html:16
+msgid "You're already on the list."
+msgstr "Vous êtes déjà inscrit."
+
+#: .\templates\includes\footer.html:18
+msgid "You're in"
+msgstr "Inscrit"
+
+#: .\templates\includes\footer.html:23
 msgid "Enter your email address"
 msgstr "Saisissez votre adresse e-mail"
 
-#: .\templates\includes\footer.html:21
+#: .\templates\includes\footer.html:25
 msgid "Subscribe"
 msgstr "S'abonner"
 
-#: .\templates\includes\footer.html:25
+#: .\templates\includes\footer.html:29
 msgid "By subscribing, you agree to our"
 msgstr "En vous abonnant, vous acceptez notre"
 
-#: .\templates\includes\footer.html:44
+#: .\templates\includes\footer.html:48
+#, fuzzy
+#| msgid ""
+#| "Curated essentials, designed for everyday comfort. Premium quality, fast "
+#| "shipping, easy returns."
 msgid ""
-"Curated essentials, designed for everyday comfort. Premium quality, fast "
-"shipping, easy returns."
+"Curated essentials, designed for everyday comfort. Premium quality, honest "
+"pricing, easy returns."
 msgstr ""
 "Des essentiels soigneusement sélectionnés, pensés pour le confort au "
 "quotidien. Qualité premium, livraison rapide, retours simplifiés."
 
-#: .\templates\includes\footer.html:58
+#: .\templates\includes\footer.html:63
 msgid "All Products"
 msgstr "Tous les produits"
 
-#: .\templates\includes\footer.html:59 .\templates\includes\navbar.html:55
+#: .\templates\includes\footer.html:64 .\templates\includes\footer.html:72
+#: .\templates\includes\navbar.html:70
 #: .\templates\merchandising\collection.html:16
 #: .\templates\merchandising\collection.html:116
 #: .\templates\merchandising\collections_index.html:3
@@ -3682,67 +3724,55 @@ msgstr "Tous les produits"
 msgid "Collections"
 msgstr "Collections"
 
-#: .\templates\includes\footer.html:60
+#: .\templates\includes\footer.html:65
 #: .\templates\merchandising\style_quiz.html:3
 #: .\templates\merchandising\style_quiz.html:10
 msgid "Style quiz"
 msgstr "Style quiz"
 
-#: .\templates\includes\footer.html:65
+#: .\templates\includes\footer.html:70
 msgid "Company"
 msgstr "Entreprise"
 
-#: .\templates\includes\footer.html:67
-msgid "About"
-msgstr "À propos"
+#: .\templates\includes\footer.html:74 .\templates\includes\footer.html:111
+msgid "Terms"
+msgstr "Conditions"
 
-#: .\templates\includes\footer.html:68
-msgid "Sustainability"
-msgstr "Développement durable"
-
-#: .\templates\includes\footer.html:69
-msgid "Press"
-msgstr "Presse"
-
-#: .\templates\includes\footer.html:76
+#: .\templates\includes\footer.html:81
 #: .\templates\merchandising\collections_index.html:159
 msgid "FAQ"
 msgstr "FAQ"
 
-#: .\templates\includes\footer.html:85
+#: .\templates\includes\footer.html:90
 msgid "Ship to"
 msgstr "Livrer en"
 
-#: .\templates\includes\footer.html:92
+#: .\templates\includes\footer.html:97
 msgid "Store benefits"
 msgstr "Avantages de la boutique"
 
-#: .\templates\includes\footer.html:93
+#: .\templates\includes\footer.html:98
 msgid "Fast Shipping"
 msgstr "Livraison rapide"
 
-#: .\templates\includes\footer.html:94
+#: .\templates\includes\footer.html:99
 #, python-format
 msgid "%(d)s-Day Returns"
 msgstr "Retours sous %(d)s jours"
 
-#: .\templates\includes\footer.html:95
+#: .\templates\includes\footer.html:100
 msgid "Secure Checkout"
 msgstr "Paiement sécurisé"
 
-#: .\templates\includes\footer.html:96 .\templates\store\cart.html:195
+#: .\templates\includes\footer.html:101 .\templates\store\cart.html:195
 msgid "Support 7/7"
 msgstr "Assistance 7j/7"
 
-#: .\templates\includes\footer.html:103
+#: .\templates\includes\footer.html:108
 msgid "All rights reserved."
 msgstr "Tous droits réservés."
 
-#: .\templates\includes\footer.html:106
-msgid "Terms"
-msgstr "Conditions"
-
-#: .\templates\includes\footer.html:110
+#: .\templates\includes\footer.html:115
 msgid "Cookies"
 msgstr "Cookies"
 
@@ -3758,67 +3788,67 @@ msgstr "Langue"
 msgid "Choose language"
 msgstr "Choisir la langue"
 
-#: .\templates\includes\navbar.html:17
+#: .\templates\includes\navbar.html:24 .\templates\includes\navbar.html:157
+msgid "Cart"
+msgstr "Panier"
+
+#: .\templates\includes\navbar.html:32
 msgid "Toggle navigation"
 msgstr "Afficher/masquer la navigation"
 
-#: .\templates\includes\navbar.html:23
+#: .\templates\includes\navbar.html:38
 msgid "View all results"
 msgstr "Voir tous les résultats"
 
-#: .\templates\includes\navbar.html:24
+#: .\templates\includes\navbar.html:39
 msgid "No matches — try another term."
 msgstr "Aucun résultat — essayez un autre terme."
 
-#: .\templates\includes\navbar.html:25
+#: .\templates\includes\navbar.html:40
 msgid "Recent searches"
 msgstr "Recherches récentes"
 
-#: .\templates\includes\navbar.html:26
+#: .\templates\includes\navbar.html:41
 msgid "Popular"
 msgstr "Populaire"
 
-#: .\templates\includes\navbar.html:33
+#: .\templates\includes\navbar.html:48
 msgid "Search products"
 msgstr "Rechercher des produits"
 
-#: .\templates\includes\navbar.html:34
+#: .\templates\includes\navbar.html:49
 msgid "Search products, collections…"
 msgstr "Rechercher produits, collections…"
 
-#: .\templates\includes\navbar.html:36
+#: .\templates\includes\navbar.html:51
 msgid "Clear search"
 msgstr "Effacer la recherche"
 
-#: .\templates\includes\navbar.html:50 .\templates\store\product_detail.html:14
-#: .\templates\store\product_detail.html:688 .\templates\store\store.html:4
+#: .\templates\includes\navbar.html:65 .\templates\store\product_detail.html:18
+#: .\templates\store\product_detail.html:701 .\templates\store\store.html:4
 #: .\templates\store\store.html:25
 msgid "Store"
 msgstr "Boutique"
 
-#: .\templates\includes\navbar.html:60
+#: .\templates\includes\navbar.html:75
 msgid "New in"
 msgstr "Nouvelle saison"
 
-#: .\templates\includes\navbar.html:68 .\templates\store\store.html:349
+#: .\templates\includes\navbar.html:83 .\templates\store\store.html:351
 msgid "Browse categories"
 msgstr "Parcourir les catégories"
 
-#: .\templates\includes\navbar.html:91
+#: .\templates\includes\navbar.html:106
 msgid "No categories available"
 msgstr "Aucune catégorie disponible"
 
-#: .\templates\includes\navbar.html:105
+#: .\templates\includes\navbar.html:120
 msgid "Theme"
 msgstr "Thème"
 
-#: .\templates\includes\navbar.html:124
+#: .\templates\includes\navbar.html:139
 msgid "Logout"
 msgstr "Déconnexion"
-
-#: .\templates\includes\navbar.html:142
-msgid "Cart"
-msgstr "Panier"
 
 #: .\templates\includes\shipping_estimator.html:14
 msgid "Could not estimate shipping. Please try again."
@@ -3867,8 +3897,8 @@ msgstr "Options de livraison"
 #: .\templates\merchandising\collection.html:115
 #: .\templates\merchandising\collections_index.html:185
 #: .\templates\returns\policy.html:10 .\templates\returns\request.html:10
-#: .\templates\store\product_detail.html:13
-#: .\templates\store\product_detail.html:687 .\templates\store\store.html:22
+#: .\templates\store\product_detail.html:17
+#: .\templates\store\product_detail.html:700 .\templates\store\store.html:22
 msgid "Home"
 msgstr "Accueil"
 
@@ -4154,20 +4184,20 @@ msgstr ""
 
 #: .\templates\merchandising\_product_card.html:6
 #: .\templates\store\_quick_view.html:10
-#: .\templates\store\product_detail.html:74 .\templates\store\store.html:205
+#: .\templates\store\product_detail.html:80 .\templates\store\store.html:205
 #: .\templates\wishlist\_saved_card.html:5
 msgid "Sale"
 msgstr "Soldes"
 
 #: .\templates\merchandising\_product_card.html:10
 #: .\templates\store\_quick_view.html:18
-#: .\templates\store\product_detail.html:240 .\templates\store\store.html:213
+#: .\templates\store\product_detail.html:246 .\templates\store\store.html:213
 msgid "Removed from wishlist"
 msgstr "Retiré de la liste de souhaits"
 
 #: .\templates\merchandising\_product_card.html:11
 #: .\templates\store\_quick_view.html:19
-#: .\templates\store\product_detail.html:243 .\templates\store\store.html:215
+#: .\templates\store\product_detail.html:249 .\templates\store\store.html:215
 msgid "Save to wishlist"
 msgstr "Ajouter aux favoris"
 
@@ -4231,8 +4261,9 @@ msgstr "Prix : croissant"
 msgid "Price: high to low"
 msgstr "Prix : décroissant"
 
-#: .\templates\merchandising\collection.html:74 .\templates\store\cart.html:193
-#: .\templates\store\checkout.html:220 .\templates\store\product_detail.html:75
+#: .\templates\merchandising\collection.html:74
+#: .\templates\orders\payments.html:170 .\templates\store\cart.html:193
+#: .\templates\store\checkout.html:220 .\templates\store\product_detail.html:81
 #, python-format
 msgid "%(d)s-day returns"
 msgstr "Retours sous %(d)s jours"
@@ -4723,7 +4754,7 @@ msgstr ""
 "contactez l'assistance en indiquant votre numéro de commande."
 
 #: .\templates\orders\order_complete.html:253
-#: .\templates\store\product_detail.html:374 .\templates\store\store.html:360
+#: .\templates\store\product_detail.html:380 .\templates\store\store.html:362
 msgid "Recommended for you"
 msgstr "Recommandé pour vous"
 
@@ -4735,10 +4766,18 @@ msgstr "D'après votre achat"
 msgid "Browse all"
 msgstr "Tout parcourir"
 
-#: .\templates\orders\order_complete.html:285 .\templates\store\store.html:312
+#: .\templates\orders\order_complete.html:285 .\templates\store\store.html:314
 #: .\templates\wishlist\_saved_card.html:48
 msgid "View"
 msgstr "Voir"
+
+#: .\templates\orders\payments.html:92
+msgid "Qty:"
+msgstr "Qté :"
+
+#: .\templates\orders\payments.html:92 .\templates\store\checkout.html:184
+msgid "each"
+msgstr "l'unité"
 
 #: .\templates\orders\payments.html:134
 msgid "Card"
@@ -4747,6 +4786,14 @@ msgstr "Carte"
 #: .\templates\orders\payments.html:148
 msgid "After payment, your order will be confirmed automatically."
 msgstr "Après le paiement, votre commande sera confirmée automatiquement."
+
+#: .\templates\orders\payments.html:158
+msgid "Pay"
+msgstr "Payer"
+
+#: .\templates\orders\payments.html:169 .\templates\store\checkout.html:220
+msgid "Secure payment"
+msgstr "Paiement sécurisé"
 
 #: .\templates\returns\policy.html:17
 #, python-format
@@ -4904,8 +4951,8 @@ msgstr "Couleur"
 
 #: .\templates\store\_filters.html:85 .\templates\store\_quick_view.html:50
 #: .\templates\store\_quick_view.html:51
-#: .\templates\store\product_detail.html:179
-#: .\templates\store\product_detail.html:644
+#: .\templates\store\product_detail.html:185
+#: .\templates\store\product_detail.html:649
 #: .\templates\wishlist\saved_items.html:121
 msgid "Size"
 msgstr "Taille"
@@ -4919,7 +4966,7 @@ msgid "Availability"
 msgstr "Disponibilité"
 
 #: .\templates\store\_filters.html:132
-#: .\templates\store\product_detail.html:105
+#: .\templates\store\product_detail.html:111
 msgid "In stock"
 msgstr "En stock"
 
@@ -4938,41 +4985,43 @@ msgid "Show results"
 msgstr "Voir les résultats"
 
 #: .\templates\store\_filters.html:144 .\templates\store\store.html:127
-#: .\templates\store\store.html:455 .\templates\wishlist\saved_items.html:66
+#: .\templates\store\store.html:448 .\templates\wishlist\saved_items.html:66
 msgid "Clear all"
 msgstr "Effacer"
 
 #: .\templates\store\_quick_view.html:9 .\templates\store\store.html:199
+#: .\templates\store\store.html:304
 msgid "Sold out"
 msgstr "Épuisé"
 
 #: .\templates\store\_quick_view.html:36
+#: .\templates\store\product_detail.html:71
 msgid "Please choose a colour and size first."
 msgstr "Choisissez d'abord la couleur et la taille."
 
 #: .\templates\store\_quick_view.html:41 .\templates\store\_quick_view.html:42
-#: .\templates\store\product_detail.html:144
+#: .\templates\store\product_detail.html:150
 msgid "Color"
 msgstr "Couleur"
 
 #: .\templates\store\_quick_view.html:43
-#: .\templates\store\product_detail.html:156
+#: .\templates\store\product_detail.html:162
 msgid "Select color"
 msgstr "Sélectionner une couleur"
 
 #: .\templates\store\_quick_view.html:52
-#: .\templates\store\product_detail.html:195
+#: .\templates\store\product_detail.html:201
 msgid "Select size"
 msgstr "Sélectionner une taille"
 
 #: .\templates\store\_quick_view.html:62
-#: .\templates\store\product_detail.html:111
-#: .\templates\store\product_detail.html:249
-#: .\templates\store\product_detail.html:709
+#: .\templates\store\product_detail.html:117
+#: .\templates\store\product_detail.html:255
+#: .\templates\store\product_detail.html:722
 msgid "Out of stock"
 msgstr "Rupture de stock"
 
-#: .\templates\store\_quick_view.html:65 .\templates\store\store.html:309
+#: .\templates\store\_quick_view.html:65 .\templates\store\store.html:311
 msgid "Add to cart"
 msgstr "Ajouter au panier"
 
@@ -5177,17 +5226,9 @@ msgstr "Enregistrer / mettre à jour mon adresse par défaut"
 msgid "You can create an account after checkout to track your order."
 msgstr "Vous pouvez créer un compte après la commande pour suivre votre colis."
 
-#: .\templates\store\checkout.html:184
-msgid "each"
-msgstr "l'unité"
-
 #: .\templates\store\checkout.html:209
 msgid "Continue to payment"
 msgstr "Passer au paiement"
-
-#: .\templates\store\checkout.html:220
-msgid "Secure payment"
-msgstr "Paiement sécurisé"
 
 #: .\templates\store\faq.html:3
 msgid "Help & FAQ"
@@ -5236,146 +5277,150 @@ msgstr ""
 msgid "Email support"
 msgstr "Contacter le support"
 
-#: .\templates\store\product_detail.html:98
+#: .\templates\store\product_detail.html:70
+msgid "Added to your bag"
+msgstr "Ajouté à votre panier"
+
+#: .\templates\store\product_detail.html:104
 #, python-format
 msgid "%(counter)s review"
 msgid_plural "%(counter)s reviews"
 msgstr[0] "%(counter)s avis"
 msgstr[1] "%(counter)s avis"
 
-#: .\templates\store\product_detail.html:132
+#: .\templates\store\product_detail.html:138
 #, python-format
 msgid "Ships to %(c)s"
 msgstr "Livraison vers %(c)s"
 
-#: .\templates\store\product_detail.html:133
+#: .\templates\store\product_detail.html:139
 #, python-format
 msgid "Free %(d)s-day returns"
 msgstr "Retours gratuits sous %(d)s jours"
 
-#: .\templates\store\product_detail.html:172
+#: .\templates\store\product_detail.html:178
 msgid "No color options"
 msgstr "Aucune option de couleur"
 
-#: .\templates\store\product_detail.html:181
-#: .\templates\store\product_detail.html:636
-#: .\templates\store\product_detail.html:638
+#: .\templates\store\product_detail.html:187
+#: .\templates\store\product_detail.html:641
+#: .\templates\store\product_detail.html:643
 msgid "Size guide"
 msgstr "Guide des tailles"
 
-#: .\templates\store\product_detail.html:211
+#: .\templates\store\product_detail.html:217
 msgid "No size options"
 msgstr "Aucune option de taille"
 
-#: .\templates\store\product_detail.html:219
-#: .\templates\store\product_detail.html:230
+#: .\templates\store\product_detail.html:225
+#: .\templates\store\product_detail.html:236
 msgid "Please choose your options"
 msgstr "Veuillez choisir vos options"
 
-#: .\templates\store\product_detail.html:220
+#: .\templates\store\product_detail.html:226
 msgid "Choose a colour and size before adding this item to your cart."
 msgstr ""
 "Choisissez une couleur et une taille avant d'ajouter cet article au panier."
 
-#: .\templates\store\product_detail.html:221
+#: .\templates\store\product_detail.html:227
 msgid "Choose a colour before adding this item to your cart."
 msgstr "Choisissez une couleur avant d'ajouter cet article au panier."
 
-#: .\templates\store\product_detail.html:222
+#: .\templates\store\product_detail.html:228
 msgid "Choose a size before adding this item to your cart."
 msgstr "Choisissez une taille avant d'ajouter cet article au panier."
 
-#: .\templates\store\product_detail.html:241
-#: .\templates\store\product_detail.html:245
+#: .\templates\store\product_detail.html:247
+#: .\templates\store\product_detail.html:251
 msgid "Save"
 msgstr "Enregistrer"
 
-#: .\templates\store\product_detail.html:252
-#: .\templates\store\product_detail.html:712
+#: .\templates\store\product_detail.html:258
+#: .\templates\store\product_detail.html:725
 msgid "Add to Cart"
 msgstr "Ajouter au panier"
 
-#: .\templates\store\product_detail.html:260
+#: .\templates\store\product_detail.html:266
 msgid "Please enter a valid email and tick consent."
 msgstr "Veuillez saisir un e-mail valide et cocher le consentement."
 
-#: .\templates\store\product_detail.html:261
+#: .\templates\store\product_detail.html:267
 msgid "Notify me when it's back"
 msgstr "Prévenez-moi du retour"
 
-#: .\templates\store\product_detail.html:262
+#: .\templates\store\product_detail.html:268
 msgid "We'll email you if this item becomes available again. No spam."
 msgstr "Nous vous écrirons si cet article redevient disponible. Pas de spam."
 
-#: .\templates\store\product_detail.html:267
+#: .\templates\store\product_detail.html:273
 msgid "your@email.com"
 msgstr "your@email.com"
 
-#: .\templates\store\product_detail.html:268
+#: .\templates\store\product_detail.html:274
 msgid "Notify me"
 msgstr "Me prévenir"
 
-#: .\templates\store\product_detail.html:270
+#: .\templates\store\product_detail.html:276
 msgid "Email me once, about this item only."
 msgstr "Écrivez-moi une seule fois, uniquement au sujet de cet article."
 
-#: .\templates\store\product_detail.html:280
+#: .\templates\store\product_detail.html:286
 msgid "More information"
 msgstr "Plus d'informations"
 
-#: .\templates\store\product_detail.html:285
+#: .\templates\store\product_detail.html:291
 msgid "Composition"
 msgstr "Composition"
 
-#: .\templates\store\product_detail.html:285
+#: .\templates\store\product_detail.html:291
 msgid "Premium quality materials."
 msgstr "Matières de qualité premium."
 
-#: .\templates\store\product_detail.html:287
+#: .\templates\store\product_detail.html:293
 msgid "Fit"
 msgstr "Coupe"
 
-#: .\templates\store\product_detail.html:289
+#: .\templates\store\product_detail.html:295
 msgid "Care"
 msgstr "Entretien"
 
-#: .\templates\store\product_detail.html:289
+#: .\templates\store\product_detail.html:295
 msgid "Machine wash cold, do not tumble dry."
 msgstr "Lavage en machine à froid, ne pas sécher au sèche-linge."
 
-#: .\templates\store\product_detail.html:291
+#: .\templates\store\product_detail.html:297
 msgid "One size"
 msgstr "Taille unique"
 
-#: .\templates\store\product_detail.html:303
+#: .\templates\store\product_detail.html:309
 msgid "Each piece is printed only when you order — less waste, always fresh."
 msgstr ""
 "Chaque pièce est imprimée uniquement à la commande — moins de gaspillage, "
 "toujours neuve."
 
-#: .\templates\store\product_detail.html:305
+#: .\templates\store\product_detail.html:311
 msgid "Printed to order"
 msgstr "Imprimé à la commande"
 
-#: .\templates\store\product_detail.html:307
+#: .\templates\store\product_detail.html:313
 msgid "Vetted print partner"
 msgstr "Partenaire d'impression vérifié"
 
-#: .\templates\store\product_detail.html:310
+#: .\templates\store\product_detail.html:316
 #, python-format
 msgid "%(c)s colour"
 msgid_plural "%(c)s colours"
 msgstr[0] "%(c)s couleur"
 msgstr[1] "%(c)s couleurs"
 
-#: .\templates\store\product_detail.html:311
+#: .\templates\store\product_detail.html:317
 #, python-format
 msgid "%(s)s size"
 msgid_plural "%(s)s sizes"
 msgstr[0] "%(s)s taille"
 msgstr[1] "%(s)s tailles"
 
-#: .\templates\store\product_detail.html:314
+#: .\templates\store\product_detail.html:320
 msgid ""
 "Because items are produced on demand, please allow a short production time "
 "before shipping. You'll get a tracking link by email as soon as your order "
@@ -5385,39 +5430,39 @@ msgstr ""
 "production avant l'expédition. Vous recevrez un lien de suivi par e-mail dès "
 "l'expédition de votre commande."
 
-#: .\templates\store\product_detail.html:329
+#: .\templates\store\product_detail.html:335
 msgid "Complete the look"
 msgstr "Complétez le look"
 
-#: .\templates\store\product_detail.html:330
+#: .\templates\store\product_detail.html:336
 msgid "Pairs well with"
 msgstr "S'accorde avec"
 
-#: .\templates\store\product_detail.html:332
+#: .\templates\store\product_detail.html:338
 msgid "Style it together"
 msgstr "Assortissez-les"
 
-#: .\templates\store\product_detail.html:343
+#: .\templates\store\product_detail.html:349
 msgid "This item"
 msgstr "Cet article"
 
-#: .\templates\store\product_detail.html:361
+#: .\templates\store\product_detail.html:367
 msgid "Add selected to cart"
 msgstr "Ajouter la sélection au panier"
 
-#: .\templates\store\product_detail.html:373
+#: .\templates\store\product_detail.html:379
 msgid "You may also like"
 msgstr "Vous aimerez aussi"
 
-#: .\templates\store\product_detail.html:402
+#: .\templates\store\product_detail.html:408
 msgid "Good to know"
 msgstr "Bon à savoir"
 
-#: .\templates\store\product_detail.html:403
+#: .\templates\store\product_detail.html:409
 msgid "Everything you need, before you buy"
 msgstr "Tout ce qu'il vous faut, avant d'acheter"
 
-#: .\templates\store\product_detail.html:404
+#: .\templates\store\product_detail.html:410
 msgid ""
 "The details that matter — materials, fit, care, shipping and our easy "
 "returns."
@@ -5425,34 +5470,34 @@ msgstr ""
 "Les détails qui comptent — matières, coupe, entretien, livraison et nos "
 "retours en toute simplicité."
 
-#: .\templates\store\product_detail.html:405
+#: .\templates\store\product_detail.html:411
 msgid "See all FAQs"
 msgstr "Voir toutes les FAQ"
 
-#: .\templates\store\product_detail.html:443
+#: .\templates\store\product_detail.html:449
 msgid "review"
 msgid_plural "reviews"
 msgstr[0] "avis"
 msgstr[1] "avis"
 
-#: .\templates\store\product_detail.html:447
+#: .\templates\store\product_detail.html:453
 msgid "Rating distribution"
 msgstr "Répartition des notes"
 
-#: .\templates\store\product_detail.html:553
+#: .\templates\store\product_detail.html:558
 msgid "Verified purchase"
 msgstr "Achat vérifié"
 
-#: .\templates\store\product_detail.html:610 .\templates\store\store.html:419
+#: .\templates\store\product_detail.html:615 .\templates\store\store.html:412
 msgid "Keep browsing"
 msgstr "Continuez à explorer"
 
-#: .\templates\store\product_detail.html:611 .\templates\store\store.html:417
-#: .\templates\store\store.html:420
+#: .\templates\store\product_detail.html:616 .\templates\store\store.html:410
+#: .\templates\store\store.html:413
 msgid "Recently viewed"
 msgstr "Vus récemment"
 
-#: .\templates\store\product_detail.html:642
+#: .\templates\store\product_detail.html:647
 msgid ""
 "Measurements are approximate (cm). If you're between sizes, we suggest "
 "sizing up."
@@ -5460,19 +5505,19 @@ msgstr ""
 "Les mesures sont approximatives (cm). Si vous hésitez entre deux tailles, "
 "nous vous conseillons de choisir la taille au-dessus."
 
-#: .\templates\store\product_detail.html:644
+#: .\templates\store\product_detail.html:649
 msgid "Chest"
 msgstr "Poitrine"
 
-#: .\templates\store\product_detail.html:644
+#: .\templates\store\product_detail.html:649
 msgid "Length"
 msgstr "Longueur"
 
-#: .\templates\store\product_detail.html:644
+#: .\templates\store\product_detail.html:649
 msgid "Sleeve"
 msgstr "Manche"
 
-#: .\templates\store\product_detail.html:654
+#: .\templates\store\product_detail.html:659
 #, python-format
 msgid "Not the right fit? Free returns within %(d)s days."
 msgstr "Ce n'est pas la bonne taille ? Retours gratuits sous %(d)s jours."
@@ -5579,64 +5624,76 @@ msgstr "Image suivante"
 msgid "Quick view"
 msgstr "Aperçu"
 
-#: .\templates\store\store.html:307
+#: .\templates\store\store.html:309
 msgid "Added to cart"
 msgstr "Ajouté au panier"
 
-#: .\templates\store\store.html:308
+#: .\templates\store\store.html:310
 msgid "No longer available"
 msgstr "Plus disponible"
 
-#: .\templates\store\store.html:314
+#: .\templates\store\store.html:316
 msgid "Added to compare"
 msgstr "Ajouté au comparateur"
 
-#: .\templates\store\store.html:314
+#: .\templates\store\store.html:316
 msgid "Removed from compare"
 msgstr "Retiré du comparateur"
 
-#: .\templates\store\store.html:315
+#: .\templates\store\store.html:317
 msgid "You can compare up to 3 items"
 msgstr "Vous pouvez comparer jusqu'à 3 articles"
 
-#: .\templates\store\store.html:316
+#: .\templates\store\store.html:318
 msgid "Add to compare"
 msgstr "Ajouter au comparateur"
 
-#: .\templates\store\store.html:329
+#: .\templates\store\store.html:331
 #, python-format
 msgid "No results for “%(q)s”"
 msgstr "Aucun résultat pour « %(q)s »"
 
-#: .\templates\store\store.html:331
+#: .\templates\store\store.html:333
 msgid "No products match these filters"
 msgstr "Aucun produit disponible."
 
-#: .\templates\store\store.html:334
+#: .\templates\store\store.html:336
 msgid "Try removing a filter to see more."
 msgstr "Essayez de retirer un filtre pour voir plus."
 
-#: .\templates\store\store.html:341
+#: .\templates\store\store.html:343
 msgid "There are no products in this view right now."
 msgstr "Il n'y a aucun produit dans cette vue pour le moment."
 
-#: .\templates\store\store.html:345
+#: .\templates\store\store.html:347
 msgid "Browse collections"
 msgstr "Pas encore de collections"
 
-#: .\templates\store\store.html:359
+#: .\templates\store\store.html:361
 msgid "You might like"
 msgstr "Vous aimerez aussi"
 
-#: .\templates\store\store.html:443
+#: .\templates\store\store.html:376
+msgid "Product pages"
+msgstr "Pages produits"
+
+#: .\templates\store\store.html:381
+msgid "Previous page"
+msgstr "Page précédente"
+
+#: .\templates\store\store.html:399
+msgid "Next page"
+msgstr "Page suivante"
+
+#: .\templates\store\store.html:436
 msgid "to compare"
 msgstr "à comparer"
 
-#: .\templates\store\store.html:445
+#: .\templates\store\store.html:438
 msgid "Clear compare"
 msgstr "Vider le comparateur"
 
-#: .\templates\store\store.html:449
+#: .\templates\store\store.html:442
 msgid "Compare products"
 msgstr "Comparer les produits"
 
@@ -5770,6 +5827,15 @@ msgstr "Articles de la liste de favoris"
 #: .\wishlist\views.py:117
 msgid "Saved for later."
 msgstr "Enregistré pour plus tard."
+
+#~ msgid "About"
+#~ msgstr "À propos"
+
+#~ msgid "Sustainability"
+#~ msgstr "Développement durable"
+
+#~ msgid "Press"
+#~ msgstr "Presse"
 
 #~ msgid "Reviews"
 #~ msgstr "Avis"

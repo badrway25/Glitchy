@@ -8,10 +8,14 @@
       <div class="footer-news-grid">
         <div class="footer-news-copy">
           <div class="footer-news-eyebrow">{% trans "Stay in the loop" %}</div>
-          <h3 class="footer-news-title">{% trans "Join the list — early drops & 10% off" %}</h3>
+          <h3 class="footer-news-title">{% trans "Join the list — early drops & member offers" %}</h3>
           <p class="footer-news-sub">{% trans "New arrivals, members-only offers and styling notes. No spam, unsubscribe anytime." %}</p>
         </div>
-        <form class="footer-news-form" method="post" action="{% url 'newsletter_subscribe' %}">
+        <form class="footer-news-form" method="post" action="{% url 'newsletter_subscribe' %}" data-newsletter data-no-loader
+              data-ok-msg="{% trans "You're in — check your inbox." %}"
+              data-dup-msg="{% trans "You're already on the list." %}"
+              data-err-msg="{% trans 'Please enter a valid email address.' %}"
+              data-done-label="{% trans "You're in" %} ✓">
           {% csrf_token %}
           <div class="news-field">
             <span class="news-icon">{% icon "mail" "ic" 18 %}</span>
@@ -41,14 +45,15 @@
                  alt="{{ SITE_NAME }} fashion store" width="200" height="43">
           </a>
           <p class="footer-desc">
-            {% trans "Curated essentials, designed for everyday comfort. Premium quality, fast shipping, easy returns." %}
+            {% trans "Curated essentials, designed for everyday comfort. Premium quality, honest pricing, easy returns." %}
           </p>
+          {% if SOCIAL_LINKS %}
           <div class="footer-social">
-            <a class="social-btn" href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-            <a class="social-btn" href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-            <a class="social-btn" href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
-            <a class="social-btn" href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+            {% for name, icon, url in SOCIAL_LINKS %}
+              <a class="social-btn" href="{{ url }}" target="_blank" rel="noopener" aria-label="{{ name }}"><i class="fab {{ icon }}"></i></a>
+            {% endfor %}
           </div>
+          {% endif %}
         </div>
 
         <!-- Links -->
@@ -64,9 +69,9 @@
         <div class="col-6 col-md-4 col-lg-2 mb-4 mb-lg-0">
           <div class="footer-title">{% trans "Company" %}</div>
           <ul class="footer-list">
-            <li><a class="footer-link" href="#">{% trans "About" %}</a></li>
-            <li><a class="footer-link" href="#">{% trans "Sustainability" %}</a></li>
-            <li><a class="footer-link" href="#">{% trans "Press" %}</a></li>
+            <li><a class="footer-link" href="{% url 'merchandising:collections' %}">{% trans "Collections" %}</a></li>
+            <li><a class="footer-link" href="{% url 'privacy' %}">{% trans "Privacy" %}</a></li>
+            <li><a class="footer-link" href="{% url 'terms' %}">{% trans "Terms" %}</a></li>
           </ul>
         </div>
 
@@ -76,7 +81,7 @@
             <li><a class="footer-link" href="{% url 'faq' %}">{% trans "FAQ" %}</a></li>
             <li><a class="footer-link" href="mailto:{{ SUPPORT_EMAIL }}">{% trans "Contact" %}</a></li>
             <li><a class="footer-link" href="{% url 'returns:policy' %}">{% trans "Returns & refunds" %}</a></li>
-            <li><a class="footer-link" href="{% url 'returns:policy' %}">{% trans "Shipping" %}</a></li>
+            <li><a class="footer-link" href="{% url 'faq' %}#shipping">{% trans "Shipping" %}</a></li>
           </ul>
         </div>
 

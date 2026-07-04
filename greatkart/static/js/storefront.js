@@ -86,3 +86,35 @@
     }
   });
 })();
+
+/* Footer newsletter — inline AJAX success (endpoint already returns JSON for XHR).
+   Before: full page reload via redirect, losing scroll position. No-JS: same old POST. */
+(function () {
+  "use strict";
+  var form = document.querySelector("[data-newsletter]");
+  if (!form || !window.fetch) return;
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var btn = form.querySelector(".news-btn");
+    if (btn) btn.disabled = true;
+    fetch(form.action, {
+      method: "POST", credentials: "same-origin",
+      headers: { "X-Requested-With": "XMLHttpRequest" },
+      body: new FormData(form)
+    }).then(function (r) { return r.json().then(function (d) { return d; }); })
+      .then(function (d) {
+        if (d && d.ok) {
+          if (btn) { btn.textContent = form.getAttribute("data-done-label") || "✓"; }
+          var input = form.querySelector(".news-input");
+          if (input) { input.value = ""; input.blur(); }
+          if (window.glToast) window.glToast(
+            d.created ? form.getAttribute("data-ok-msg") : form.getAttribute("data-dup-msg"),
+            d.created ? "success" : "info");
+        } else {
+          if (btn) btn.disabled = false;
+          if (window.glToast) window.glToast(form.getAttribute("data-err-msg") || "Invalid email", "warn");
+        }
+      })
+      .catch(function () { if (btn) btn.disabled = false; form.submit(); });
+  });
+})();

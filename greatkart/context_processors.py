@@ -49,6 +49,13 @@ def site_globals(request):
         "CURRENCY_SYMBOL": getattr(settings, "STORE_CURRENCY_SYMBOL", "€"),
         "RETURN_WINDOW_DAYS": getattr(settings, "RETURN_WINDOW_DAYS", 14),
         "FREE_SHIPPING_THRESHOLD": getattr(settings, "SHIPPING_FREE_THRESHOLD", 0),
+        # Social profiles: rendered ONLY when configured via env (no dead placeholder links)
+        "SOCIAL_LINKS": [t for t in [
+            ("Instagram", "fa-instagram", getattr(settings, "SOCIAL_INSTAGRAM", "")),
+            ("TikTok", "fa-tiktok", getattr(settings, "SOCIAL_TIKTOK", "")),
+            ("YouTube", "fa-youtube", getattr(settings, "SOCIAL_YOUTUBE", "")),
+            ("Facebook", "fa-facebook-f", getattr(settings, "SOCIAL_FACEBOOK", "")),
+        ] if t[2]],
         "PAYPAL_CLIENT_ID": getattr(settings, "PAYPAL_CLIENT_ID", ""),
         "PAYPAL_CURRENCY": getattr(settings, "PAYPAL_CURRENCY", "EUR"),
         "PAYPAL_ENABLED": getattr(settings, "PAYPAL_ENABLED", False),
