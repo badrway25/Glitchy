@@ -114,8 +114,18 @@ def dispatch_event(
     language: str = "en",
     order=None,
     return_request=None,
+    dedupe: bool = False,
 ) -> OutboundEvent:
     """Create + dispatch an outbound event. Always returns a persisted record."""
+    if dedupe and order is not None:
+        # Idempotency: one customer email per (order, event) — reconciliation retries and
+        # page refreshes must never double-send. A previously FAILED event may be retried.
+        existing = (OutboundEvent.objects
+                    .filter(order=order, event_type=event_type)
+                    .exclude(status=OutboundEvent.STATUS_FAILED)
+                    .first())
+        if existing:
+            return existing
     event = OutboundEvent.objects.create(
         event_type=event_type,
         recipient_email=recipient_email or "",

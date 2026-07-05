@@ -74,6 +74,7 @@ def notify_order_event(order, event_type) -> None:
         recipient_email=order.email,
         language=order.language_code or "en",
         order=order,
+        dedupe=True,   # one customer email per (order, event) — idempotent by design
     )
 
 
