@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: greatkart 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-05 17:08+0200\n"
+"POT-Creation-Date: 2026-07-05 17:55+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -214,8 +214,8 @@ msgstr "Resi"
 msgid "Refunds"
 msgstr "Rimborsi"
 
-#: .\assistant\models.py:20 .\templates\store\cart.html:199
-#: .\templates\store\checkout.html:334
+#: .\assistant\models.py:20 .\templates\admin\index.html:194
+#: .\templates\store\cart.html:199 .\templates\store\checkout.html:334
 msgid "Payments"
 msgstr "Pagamenti"
 
@@ -358,7 +358,10 @@ msgstr "API Address Validation raggiungibile."
 msgid ""
 "OpenAI key works — but the assistant is still DISABLED: turn on 'Is enabled' "
 "above and save, or the store keeps answering in limited mode."
-msgstr "La chiave OpenAI funziona — ma l'assistente è ancora DISATTIVATO: attiva 'Is enabled' qui sopra e salva, altrimenti lo store continua a rispondere in modalità limitata."
+msgstr ""
+"La chiave OpenAI funziona — ma l'assistente è ancora DISATTIVATO: attiva 'Is "
+"enabled' qui sopra e salva, altrimenti lo store continua a rispondere in "
+"modalità limitata."
 
 #: .\assistant\services_openai.py:43
 msgid "OpenAI connection OK — key valid, model available."
@@ -403,7 +406,7 @@ msgstr ""
 "Impossibile raggiungere OpenAI (rete/timeout). Controlla la connettività del "
 "server."
 
-#: .\assistant\views.py:91
+#: .\assistant\views.py:89
 msgid ""
 "You've reached the message limit for now. Please try again later or contact "
 "our support team."
@@ -411,7 +414,7 @@ msgstr ""
 "Hai raggiunto il limite di messaggi per ora. Riprova più tardi o contatta il "
 "nostro team di assistenza."
 
-#: .\assistant\views.py:101
+#: .\assistant\views.py:99
 msgid "Sorry, something went wrong. Please try again or contact support."
 msgstr "Spiacenti, qualcosa è andato storto. Riprova o contatta l'assistenza."
 
@@ -689,7 +692,7 @@ msgstr "Aggiornamento da %(brand)s"
 
 #: .\notifications\models.py:18 .\templates\accounts\billing.html:47
 #: .\templates\accounts\dashboard.html:181
-#: .\templates\accounts\order_detail.html:161
+#: .\templates\accounts\order_detail.html:161 .\templates\admin\index.html:210
 msgid "Pending"
 msgstr "In attesa"
 
@@ -697,9 +700,9 @@ msgstr "In attesa"
 msgid "Sent"
 msgstr "Inviato"
 
-#: .\notifications\models.py:20
+#: .\notifications\models.py:20 .\templates\admin\index.html:211
 msgid "Failed"
-msgstr "Non riuscito"
+msgstr "Fallite"
 
 #: .\notifications\models.py:21
 msgid "Retrying"
@@ -3106,7 +3109,7 @@ msgstr "Attività recente"
 msgid "Your latest account events"
 msgstr "Gli ultimi eventi del tuo account"
 
-#: .\templates\accounts\dashboard.html:147
+#: .\templates\accounts\dashboard.html:147 .\templates\admin\index.html:238
 msgid "Recent orders"
 msgstr "Ordini recenti"
 
@@ -3653,7 +3656,7 @@ msgstr ""
 msgid "Printify sync health"
 msgstr ""
 
-#: .\templates\admin\index.html:86
+#: .\templates\admin\index.html:86 .\templates\admin\index.html:208
 msgid "enabled"
 msgstr ""
 
@@ -3733,7 +3736,75 @@ msgstr ""
 msgid "saved items"
 msgstr ""
 
-#: .\templates\admin\index.html:189
+#: .\templates\admin\index.html:195
+msgid "Paid orders (24h)"
+msgstr "Ordini pagati (24h)"
+
+#: .\templates\admin\index.html:196
+msgid "Revenue (7d)"
+msgstr "Ricavi (7g)"
+
+#: .\templates\admin\index.html:197
+msgid "Awaiting payment (7d)"
+msgstr "In attesa di pagamento (7g)"
+
+#: .\templates\admin\index.html:199
+msgid "Methods (7d)"
+msgstr "Metodi (7g)"
+
+#: .\templates\admin\index.html:207
+msgid "Email outbox"
+msgstr "Coda email"
+
+#: .\templates\admin\index.html:208
+msgid "SMTP fallback"
+msgstr "Fallback SMTP"
+
+#: .\templates\admin\index.html:209
+msgid "Sent (7d)"
+msgstr "Inviate (7g)"
+
+#: .\templates\admin\index.html:217
+msgid "Assistant"
+msgstr "Assistente"
+
+#: .\templates\admin\index.html:218
+msgid "Mode"
+msgstr "Modalità"
+
+#: .\templates\admin\index.html:218
+msgid "online (AI)"
+msgstr "online (AI)"
+
+#: .\templates\admin\index.html:218
+msgid "limited"
+msgstr "limitata"
+
+#: .\templates\admin\index.html:219
+msgid "Model"
+msgstr ""
+
+#: .\templates\admin\index.html:220
+msgid "Messages (24h)"
+msgstr "Messaggi (24h)"
+
+#: .\templates\admin\index.html:221
+msgid "Safety blocks (24h)"
+msgstr "Blocchi sicurezza (24h)"
+
+#: .\templates\admin\index.html:227
+msgid "Operational health"
+msgstr "Salute operativa"
+
+#: .\templates\admin\index.html:230
+msgid "configured"
+msgstr "configurato"
+
+#: .\templates\admin\index.html:230
+msgid "not configured"
+msgstr "non configurato"
+
+#: .\templates\admin\index.html:249
 msgid "Quick actions"
 msgstr ""
 
@@ -4250,8 +4321,8 @@ msgid "Shopping assistant"
 msgstr "Carrello"
 
 #: .\templates\includes\assistant_widget.html:20
-msgid "Assistant"
-msgstr "Assistente"
+msgid "Support Assistant"
+msgstr "Assistente di Supporto"
 
 #: .\templates\includes\assistant_widget.html:22
 msgid "AI assistant · online"
@@ -4262,23 +4333,27 @@ msgid "Limited mode — curated store answers"
 msgstr "Modalità limitata — risposte curate del negozio"
 
 #: .\templates\includes\assistant_widget.html:23
-msgid "Answers from our store & policies"
-msgstr "Risposte dal nostro negozio e dalle policy"
+msgid "Products · Delivery · Payments · Orders"
+msgstr "Prodotti · Consegna · Pagamenti · Ordini"
 
-#: .\templates\includes\assistant_widget.html:37
+#: .\templates\includes\assistant_widget.html:33
+msgid "I keep the context of this chat while you browse."
+msgstr "Mantengo il contesto di questa chat mentre navighi."
+
+#: .\templates\includes\assistant_widget.html:38
 msgid "Ask about shipping, returns, sizes…"
 msgstr "Chiedi di spedizioni, resi, taglie…"
 
-#: .\templates\includes\assistant_widget.html:38
+#: .\templates\includes\assistant_widget.html:39
 msgid "Your question"
 msgstr "La tua domanda"
 
-#: .\templates\includes\assistant_widget.html:39
-#: .\templates\includes\assistant_widget.html:60
+#: .\templates\includes\assistant_widget.html:40
+#: .\templates\includes\assistant_widget.html:61
 msgid "Send"
 msgstr "Invia"
 
-#: .\templates\includes\assistant_widget.html:45
+#: .\templates\includes\assistant_widget.html:46
 msgid "AI answers may be imperfect — verify important details."
 msgstr ""
 "Le risposte dell'IA possono essere imperfette — verifica i dettagli "
@@ -4294,40 +4369,40 @@ msgstr ""
 "risposte dell'IA possono non essere perfette — verifica i dettagli "
 "importanti."
 
-#: .\templates\includes\assistant_widget.html:51
+#: .\templates\includes\assistant_widget.html:52
 msgid "Thinking…"
 msgstr "Sto pensando…"
 
-#: .\templates\includes\assistant_widget.html:52
+#: .\templates\includes\assistant_widget.html:53
 msgid "Something went wrong. Please try again."
 msgstr "Qualcosa è andato storto. Riprova."
 
-#: .\templates\includes\assistant_widget.html:53
+#: .\templates\includes\assistant_widget.html:54
 msgid "Was this helpful?"
 msgstr "È stato utile?"
 
-#: .\templates\includes\assistant_widget.html:54
+#: .\templates\includes\assistant_widget.html:55
 msgid "Yes"
 msgstr "Sì"
 
-#: .\templates\includes\assistant_widget.html:55
+#: .\templates\includes\assistant_widget.html:56
 msgid "No"
 msgstr "No"
 
-#: .\templates\includes\assistant_widget.html:56
+#: .\templates\includes\assistant_widget.html:57
 msgid "Thanks for your feedback."
 msgstr "Grazie per il tuo feedback."
 
-#: .\templates\includes\assistant_widget.html:57
+#: .\templates\includes\assistant_widget.html:58
 #: .\templates\orders\order_complete.html:63
 msgid "Contact support"
 msgstr "Contatta l'assistenza"
 
-#: .\templates\includes\assistant_widget.html:58
+#: .\templates\includes\assistant_widget.html:59
 msgid "Your request was sent. Our team will get back to you."
 msgstr "La tua richiesta è stata inviata. Il nostro team ti ricontatterà."
 
-#: .\templates\includes\assistant_widget.html:59
+#: .\templates\includes\assistant_widget.html:60
 msgid "Leave your email and we will get back to you:"
 msgstr "Lascia la tua email e ti ricontatteremo:"
 
@@ -6709,6 +6784,9 @@ msgstr "Articoli dei preferiti"
 #: .\wishlist\views.py:117
 msgid "Saved for later."
 msgstr "Salvato per dopo."
+
+#~ msgid "Answers from our store & policies"
+#~ msgstr "Risposte dal nostro negozio e dalle policy"
 
 #~ msgid ""
 #~ "I can't access sensitive account, database or admin data — I can help "
