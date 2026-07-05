@@ -76,7 +76,47 @@ def get_or_create_conversation(request):
     return conv, lang
 
 
+
+_SENSITIVE_PATTERNS = (
+    # raw database / SQL
+    "select ", "select*", "drop table", "sql", "database", "tabella", "table payments",
+    "raw query", "query sql",
+    # all users / other customers
+    "tutti gli ordini", "all orders", "toutes les commandes", "email utenti", "user emails",
+    "all users", "tutti gli utenti", "altro cliente", "another customer", "other user",
+    "di un altro",
+    # secrets / credentials / admin
+    "api key", "chiave stripe", "stripe key", "secret", "segreto", "password", "token",
+    "credenzial", "credential", "admin", "webhook",
+    # internal billing / margins
+    "fatturazione interna", "internal billing", "margini", "margins", "printify cost",
+    "costi printify", "provider config",
+    # prompt injection
+    "ignora le regole", "ignore the rules", "ignore previous", "ignora le istruzioni",
+    "system prompt", "le tue istruzioni", "your instructions", "jailbreak",
+)
+
+
+def sensitive_block(query):
+    """True for questions that must be refused BEFORE any retrieval or LLM call:
+    raw DB/SQL, other users' data, secrets/admin/config, internal billing, injection."""
+    ql = (query or "").lower()
+    return any(p in ql for p in _SENSITIVE_PATTERNS)
+
+
+def sensitive_refusal(lang):
+    from django.utils.translation import gettext as _
+    return str(_("I can't access sensitive account, database or admin data — I can help "
+                 "with products, shipping, payments and your own orders. For anything "
+                 "else, our support team is happy to help."))
+
 def answer_question(request, query):
+    # HARD SECURITY GATE — refuse sensitive scopes before retrieval, context or LLM.
+    if sensitive_block(query):
+        conv0, lang0 = get_or_create_conversation(request)
+        AssistantMessage.objects.create(conversation=conv0, role="user", content=query[:600])
+        return _finalise(conv0, sensitive_refusal(lang0),
+                         provider="guardrail", grounded=False, sources=[])
     """Main entry point. Returns a dict the view serialises to JSON."""
     query = (query or "").strip()
     conv, lang = get_or_create_conversation(request)
@@ -116,7 +156,7 @@ def answer_question(request, query):
         try:
             answer = provider.complete(system_prompt, history)
             grounded = decline.split(".")[0] not in answer
-            return _finalise(conv, answer, provider=provider.name,
+            return _finalise(conv, answer, provider=provider.name, products=products,
                              grounded=grounded, sources=sources)
         except ProviderError:
             pass  # fall through to curated fallback
@@ -125,7 +165,7 @@ def answer_question(request, query):
     fb = FallbackProvider()
     answer = fb.answer_from_knowledge(knowledge, lang, decline)
     grounded = bool(knowledge)
-    return _finalise(conv, answer, provider="fallback", grounded=grounded, sources=sources)
+    return _finalise(conv, answer, provider="fallback", grounded=grounded, sources=sources, products=products)
 
 
 def _recent_history(conv, limit=6):
@@ -134,16 +174,36 @@ def _recent_history(conv, limit=6):
     return [{"role": m.role, "content": m.content} for m in msgs if m.role in ("user", "assistant")]
 
 
-def _finalise(conv, answer, provider, grounded, sources):
+def _public_product_cards(products):
+    """PUBLIC card data only: name, price, sale price, url, image. No internal costs,
+    no provider ids — safe by construction for the chat UI."""
+    cards = []
+    for p in (products or [])[:3]:
+        try:
+            cards.append({
+                "name": p.product_name,
+                "price": float(p.price),
+                "url": p.get_url(),
+                "image": p.images.url if getattr(p, "images", None) else "",
+            })
+        except Exception:
+            continue
+    return cards
+
+
+def _finalise(conv, answer, provider, grounded, sources, products=None):
     msg = AssistantMessage.objects.create(
         conversation=conv, role="assistant", content=answer,
         provider=provider, grounded=grounded, used_sources=sources,
     )
     conv.save(update_fields=[]) if False else None
-    return {
+    out = {
         "answer": answer,
         "grounded": grounded,
         "provider": provider,
         "message_id": msg.id,
         "can_contact_support": not grounded,
     }
+    if products:
+        out["products"] = _public_product_cards(products)
+    return out

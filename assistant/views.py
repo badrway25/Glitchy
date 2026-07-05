@@ -53,8 +53,14 @@ def _rate_limited(request):
 def suggestions(request):
     lang = _lang(request)
     enabled = getattr(settings, "AI_ASSISTANT_ENABLED", True)
+    try:
+        from .providers import OpenAIProvider
+        ai_ready = OpenAIProvider().available()
+    except Exception:
+        ai_ready = False
     return JsonResponse({
         "enabled": bool(enabled),
+        "ai_ready": bool(ai_ready),
         "questions": [{"key": q["key"], "text": q.get(lang, q["en"])} for q in QUICK_QUESTIONS],
         "greeting": {
             "en": "Hi! Ask me about shipping, returns, sizes, payments or our products.",
