@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: greatkart 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-05 12:22+0200\n"
+"POT-Creation-Date: 2026-07-05 13:28+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -144,6 +144,7 @@ msgstr "Adresse par défaut mise à jour."
 #: .\templates\includes\shipping_estimator.html:74
 #: .\templates\legal\terms.html:12
 #: .\templates\notifications\email\transactional.html:89
+#: .\templates\orders\order_complete.html:203
 #: .\templates\orders\payments.html:115 .\templates\store\cart.html:175
 #: .\templates\store\checkout.html:317
 msgid "Shipping"
@@ -179,7 +180,7 @@ msgstr "Compte"
 msgid "Tracking"
 msgstr "Suivi"
 
-#: .\assistant\models.py:24 .\templates\orders\order_complete.html:196
+#: .\assistant\models.py:24 .\templates\orders\order_complete.html:165
 #: .\templates\store\cart.html:49
 msgid "Product"
 msgstr "Produit"
@@ -459,7 +460,7 @@ msgstr "Destinataire"
 #: .\printify_integration\admin.py:566 .\returns\admin.py:40
 #: .\shipping\admin.py:83 .\templates\accounts\dashboard.html:162
 #: .\templates\accounts\transactions.html:100
-#: .\templates\orders\order_complete.html:186
+#: .\templates\orders\order_complete.html:155
 msgid "Status"
 msgstr "Statut"
 
@@ -683,7 +684,7 @@ msgstr "Printify"
 
 #: .\orders\admin.py:183 .\templates\accounts\dashboard.html:163
 #: .\templates\notifications\email\transactional.html:91
-#: .\templates\orders\order_complete.html:198
+#: .\templates\orders\order_complete.html:167
 #: .\templates\store\product_detail.html:365
 msgid "Total"
 msgstr "Total"
@@ -739,6 +740,66 @@ msgstr "Veuillez saisir un numéro de téléphone valide."
 msgid "This field contains invalid characters."
 msgstr ""
 
+#: .\orders\timeline.py:39 .\templates\orders\order_complete.html:47
+msgid "Payment confirmed"
+msgstr "Paiement confirmé"
+
+#: .\orders\timeline.py:40
+msgid "Your payment was verified and your order is locked in."
+msgstr ""
+
+#: .\orders\timeline.py:46
+msgid "Sent to production"
+msgstr "Envoyé en production"
+
+#: .\orders\timeline.py:47
+#, fuzzy
+#| msgid "Your order is in production"
+msgid "Your order has been handed to our production partner."
+msgstr "Votre commande est en production"
+
+#: .\orders\timeline.py:49
+msgid ""
+"Production sync pending — this page updates as production information "
+"becomes available."
+msgstr "Synchronisation production en attente — cette page se met à jour dès que les informations arrivent."
+
+#: .\orders\timeline.py:57
+msgid "In production"
+msgstr "En production"
+
+#: .\orders\timeline.py:58
+msgid "Your items are being printed and quality-checked."
+msgstr ""
+
+#: .\orders\timeline.py:60
+msgid "Production starts after the order is accepted by the factory."
+msgstr ""
+
+#: .\orders\timeline.py:66
+msgid "Shipped"
+msgstr "Expédié"
+
+#: .\orders\timeline.py:67
+msgid "Your parcel is with the carrier."
+msgstr ""
+
+#: .\orders\timeline.py:68 .\templates\orders\order_complete.html:110
+msgid "Tracking will appear when the carrier receives the parcel."
+msgstr "Le suivi apparaîtra quand le transporteur recevra le colis."
+
+#: .\orders\timeline.py:75
+msgid "Delivered"
+msgstr "Livré"
+
+#: .\orders\timeline.py:76
+msgid "Enjoy!"
+msgstr ""
+
+#: .\orders\timeline.py:77
+msgid "Marked automatically once the carrier confirms delivery."
+msgstr ""
+
 #: .\orders\views.py:123
 #, fuzzy
 #| msgid "Order info"
@@ -779,33 +840,35 @@ msgid "PayPal order could not be created. Please try again or use card."
 msgstr ""
 "Impossible de créer la commande PayPal. Réessayez ou utilisez la carte."
 
-#: .\orders\views.py:191
+#: .\orders\views.py:216
 #, fuzzy
 #| msgid "Order info"
 msgid "Order not found or already confirmed."
 msgstr "Informations de la commande"
 
-#: .\orders\views.py:199
+#: .\orders\views.py:224
 msgid "Your payment method was declined inside PayPal. Please try another one."
 msgstr "Votre moyen de paiement a été refusé dans PayPal. Essayez-en un autre."
 
-#: .\orders\views.py:208
+#: .\orders\views.py:233
 msgid "Do not pay again until we check this order. Please contact us."
-msgstr "Ne payez pas à nouveau avant notre vérification de cette commande. Contactez-nous."
+msgstr ""
+"Ne payez pas à nouveau avant notre vérification de cette commande. Contactez-"
+"nous."
 
-#: .\orders\views.py:212 .\orders\views.py:224
+#: .\orders\views.py:237 .\orders\views.py:249
 msgid "PayPal could not confirm the payment. Please try again or use card."
 msgstr ""
 "PayPal n'a pas pu confirmer le paiement. Réessayez ou utilisez la carte."
 
-#: .\orders\views.py:220
+#: .\orders\views.py:245
 msgid ""
 "Your PayPal payment is pending review. We will confirm it by email shortly."
 msgstr ""
 "Votre paiement PayPal est en cours de vérification. Nous le confirmerons par "
 "e-mail sous peu."
 
-#: .\orders\views.py:234
+#: .\orders\views.py:259
 #, fuzzy
 #| msgid ""
 #| "Payment amount mismatch prevented for your safety. Please refresh and try "
@@ -815,21 +878,21 @@ msgid ""
 msgstr ""
 "Écart de montant bloqué pour votre sécurité. Actualisez la page et réessayez."
 
-#: .\orders\views.py:248
+#: .\orders\views.py:273
 msgid ""
 "Payment succeeded, but we could not finalize your order. Please contact "
 "support."
 msgstr ""
 
-#: .\orders\views.py:251
+#: .\orders\views.py:276
 msgid "Payment successful. Your order is confirmed."
 msgstr ""
 
-#: .\orders\views.py:301
+#: .\orders\views.py:326
 msgid "Invalid order total."
 msgstr "Total de commande invalide."
 
-#: .\orders\views.py:308
+#: .\orders\views.py:333
 msgid ""
 "Card payments are not configured yet. Please choose another payment method "
 "or contact us."
@@ -837,7 +900,7 @@ msgstr ""
 "Les paiements par carte ne sont pas encore configurés. Choisissez un autre "
 "moyen de paiement ou contactez-nous."
 
-#: .\orders\views.py:329
+#: .\orders\views.py:354
 msgid ""
 "We could not start the card payment. Please try again in a moment or choose "
 "another payment method."
@@ -845,27 +908,27 @@ msgstr ""
 "Impossible de démarrer le paiement par carte. Réessayez dans un instant ou "
 "choisissez un autre moyen."
 
-#: .\orders\views.py:641
+#: .\orders\views.py:666
 msgid "We could not process this request. Please try again."
 msgstr "Impossible de charger le produit. Veuillez réessayer."
 
-#: .\orders\views.py:647
+#: .\orders\views.py:672
 msgid "Please review the highlighted fields and try again."
 msgstr "Vérifiez les champs en surbrillance et réessayez."
 
-#: .\orders\views.py:656
+#: .\orders\views.py:681
 msgid "We don't ship to this country yet."
 msgstr "Nous ne livrons pas encore dans ce pays."
 
-#: .\orders\views.py:657
+#: .\orders\views.py:682
 msgid "We're sorry, we don't ship to the selected country yet."
 msgstr "Nous ne livrons pas encore dans ce pays."
 
-#: .\orders\views.py:676 .\shipping\address_validation.py:171
+#: .\orders\views.py:701 .\shipping\address_validation.py:171
 msgid "Please select a verified address from the suggestions."
 msgstr "Veuillez sélectionner une adresse vérifiée parmi les suggestions."
 
-#: .\orders\views.py:687
+#: .\orders\views.py:712
 msgid ""
 "This address is not verified. Confirm it to continue, or pick it from the "
 "suggestions."
@@ -873,7 +936,7 @@ msgstr ""
 "Cette adresse n'est pas vérifiée. Confirmez-la pour continuer, ou choisissez-"
 "la parmi les suggestions."
 
-#: .\orders\views.py:690
+#: .\orders\views.py:715
 msgid "Please review your address below."
 msgstr "Vérifiez votre adresse ci-dessous."
 
@@ -1612,6 +1675,7 @@ msgstr "Indisponible"
 #: .\printify_integration\shipping_estimator.py:130
 #: .\templates\accounts\order_detail.html:174
 #: .\templates\includes\shipping_estimator.html:20
+#: .\templates\orders\order_complete.html:204
 #: .\templates\orders\payments.html:115 .\templates\store\cart.html:176
 #: .\templates\store\checkout.html:318
 msgid "Free"
@@ -2353,8 +2417,6 @@ msgstr "Terminée"
 #: .\templates\accounts\_portal_filters.html:35
 #: .\templates\accounts\dashboard.html:190
 #: .\templates\accounts\order_detail.html:34
-#: .\templates\orders\order_complete.html:104
-#: .\templates\orders\order_complete.html:140
 msgid "Cancelled"
 msgstr "Annulée"
 
@@ -2363,8 +2425,6 @@ msgstr "Annulée"
 #: .\templates\accounts\_portal_filters.html:33
 #: .\templates\accounts\dashboard.html:192
 #: .\templates\accounts\order_detail.html:36
-#: .\templates\orders\order_complete.html:88
-#: .\templates\orders\order_complete.html:124
 msgid "Packed"
 msgstr "Préparée"
 
@@ -2373,8 +2433,6 @@ msgstr "Préparée"
 #: .\templates\accounts\_portal_filters.html:32
 #: .\templates\accounts\dashboard.html:194
 #: .\templates\accounts\order_detail.html:38
-#: .\templates\orders\order_complete.html:80
-#: .\templates\orders\order_complete.html:116
 msgid "Confirmed"
 msgstr "Confirmée"
 
@@ -2815,13 +2873,14 @@ msgstr "Voir les commandes"
 msgid "Addresses"
 msgstr "Adresses"
 
-#: .\templates\accounts\dashboard.html:66 .\templates\returns\request.html:73
-#: .\templates\returns\status.html:61 .\templates\store\cart.html:25
-#: .\templates\store\cart.html:189 .\templates\store\checkout.html:330
-#: .\templates\wishlist\saved_items.html:17
+#: .\templates\accounts\dashboard.html:66
+#: .\templates\orders\order_complete.html:60
+#: .\templates\returns\request.html:73 .\templates\returns\status.html:61
+#: .\templates\store\cart.html:25 .\templates\store\cart.html:189
+#: .\templates\store\checkout.html:330 .\templates\wishlist\saved_items.html:17
 #: .\templates\wishlist\saved_items.html:173
 msgid "Continue shopping"
-msgstr "Continuer mes achats"
+msgstr "Continuer vos achats"
 
 #: .\templates\accounts\dashboard.html:74
 msgid "Quick stats"
@@ -2888,7 +2947,7 @@ msgstr "Action"
 #: .\templates\accounts\my_orders.html:53
 #: .\templates\accounts\order_detail.html:118
 #: .\templates\accounts\transactions.html:142 .\templates\home.html:205
-#: .\templates\home.html:315 .\templates\orders\order_complete.html:286
+#: .\templates\home.html:315 .\templates\orders\order_complete.html:265
 msgid "Details"
 msgstr "Détails"
 
@@ -3061,6 +3120,7 @@ msgid "Your order is on its way"
 msgstr "Votre commande est en route"
 
 #: .\templates\accounts\order_detail.html:88
+#: .\templates\orders\order_complete.html:76
 msgid "Track parcel"
 msgstr "Suivre le colis"
 
@@ -3116,7 +3176,7 @@ msgid "Ask the assistant"
 msgstr "Demander à l'assistant"
 
 #: .\templates\accounts\order_detail.html:155
-#: .\templates\orders\order_complete.html:164
+#: .\templates\orders\order_complete.html:133
 #: .\templates\orders\payments.html:4 .\templates\store\checkout.html:32
 msgid "Payment"
 msgstr "Paiement"
@@ -3134,27 +3194,28 @@ msgstr "Aucun paiement associé."
 #: .\templates\includes\shipping_estimator.html:17
 #: .\templates\includes\shipping_estimator.html:73
 #: .\templates\notifications\email\transactional.html:88
-#: .\templates\orders\order_complete.html:230
+#: .\templates\orders\order_complete.html:199
 #: .\templates\orders\payments.html:114 .\templates\store\cart.html:51
 #: .\templates\store\cart.html:170 .\templates\store\checkout.html:312
 msgid "Subtotal"
 msgstr "Sous-total"
 
-#: .\templates\accounts\order_detail.html:178 .\templates\store\cart.html:172
+#: .\templates\accounts\order_detail.html:178
+#: .\templates\orders\order_complete.html:208 .\templates\store\cart.html:172
 #: .\templates\store\checkout.html:314
 msgid "Discount"
 msgstr "Compte"
 
 #: .\templates\accounts\order_detail.html:183
 #: .\templates\notifications\email\transactional.html:90
-#: .\templates\orders\order_complete.html:234
+#: .\templates\orders\order_complete.html:213
 #: .\templates\orders\payments.html:116 .\templates\store\cart.html:178
 #: .\templates\store\checkout.html:320
 msgid "Tax"
 msgstr "TVA"
 
 #: .\templates\accounts\order_detail.html:187
-#: .\templates\orders\order_complete.html:238
+#: .\templates\orders\order_complete.html:217
 #: .\templates\orders\payments.html:117 .\templates\store\cart.html:179
 #: .\templates\store\checkout.html:321
 msgid "Grand total"
@@ -3170,7 +3231,7 @@ msgid "Item"
 msgstr "Article"
 
 #: .\templates\accounts\order_detail.html:208
-#: .\templates\orders\order_complete.html:197
+#: .\templates\orders\order_complete.html:166
 #: .\templates\returns\request.html:54 .\templates\returns\status.html:45
 #: .\templates\store\checkout.html:303
 msgid "Qty"
@@ -3999,8 +4060,9 @@ msgid "Thanks for your feedback."
 msgstr "Merci pour votre retour."
 
 #: .\templates\includes\assistant_widget.html:55
+#: .\templates\orders\order_complete.html:63
 msgid "Contact support"
-msgstr "Contact"
+msgstr "Contacter le support"
 
 #: .\templates\includes\assistant_widget.html:56
 msgid "Your request was sent. Our team will get back to you."
@@ -5064,71 +5126,67 @@ msgstr "Merci ! Votre commande a été confirmée et est en cours de traitement.
 msgid "Transaction %(t)s"
 msgstr "Transaction %(t)s"
 
-#: .\templates\orders\order_complete.html:54
+#: .\templates\orders\order_complete.html:50
+msgid "Sandbox / test payment"
+msgstr "Paiement sandbox / test"
+
+#: .\templates\orders\order_complete.html:57
 msgid "Download PDF invoice"
 msgstr "Télécharger la facture PDF"
 
-#: .\templates\orders\order_complete.html:59
-msgid "Shop more"
-msgstr "Continuer mes achats"
+#: .\templates\orders\order_complete.html:84
+msgid "This page updates as production information becomes available."
+msgstr "Cette page se met à jour dès que les informations de production arrivent."
 
-#: .\templates\orders\order_complete.html:81
-#: .\templates\orders\order_complete.html:117
-msgid "Order received"
-msgstr "Commande reçue"
+#: .\templates\orders\order_complete.html:93
+msgid "Confirmation email sent"
+msgstr "E-mail de confirmation envoyé"
 
-#: .\templates\orders\order_complete.html:89
-#: .\templates\orders\order_complete.html:125
-msgid "Preparing shipment"
-msgstr "Préparation de l'expédition"
+#: .\templates\orders\order_complete.html:94
+msgid "We'll email your confirmation"
+msgstr "Nous vous enverrons la confirmation par e-mail"
 
-#: .\templates\orders\order_complete.html:96
-#: .\templates\orders\order_complete.html:132
-msgid "Shipped"
-msgstr "Expédiée"
+#: .\templates\orders\order_complete.html:102
+msgid "Made to order"
+msgstr "Fabriqué à la commande"
 
-#: .\templates\orders\order_complete.html:97
-#: .\templates\orders\order_complete.html:133
-msgid "On the way"
-msgstr "En route"
+#: .\templates\orders\order_complete.html:103
+msgid "Production starts after payment confirmation."
+msgstr "La production démarre après la confirmation du paiement."
 
-#: .\templates\orders\order_complete.html:105
-msgid "This order has been cancelled"
-msgstr "Cette commande a été annulée"
+#: .\templates\orders\order_complete.html:109
+msgid "Tracking on its way"
+msgstr "Suivi bientôt disponible"
 
-#: .\templates\orders\order_complete.html:141
-msgid "Only if payment fails or you cancel"
-msgstr "Uniquement en cas d'échec du paiement ou d'annulation de votre part"
-
-#: .\templates\orders\order_complete.html:153
+#: .\templates\orders\order_complete.html:122
 msgid "Invoice"
 msgstr "Facture"
 
-#: .\templates\orders\order_complete.html:154
+#: .\templates\orders\order_complete.html:123
 msgid "Order details & receipt"
 msgstr "Détails de la commande et reçu"
 
-#: .\templates\orders\order_complete.html:160
+#: .\templates\orders\order_complete.html:129
 msgid "Order date"
 msgstr "Date de la commande"
 
-#: .\templates\orders\order_complete.html:172
+#: .\templates\orders\order_complete.html:141
 msgid "Invoiced to"
 msgstr "Facturé à"
 
-#: .\templates\orders\order_complete.html:182
+#: .\templates\orders\order_complete.html:151
 msgid "Order info"
 msgstr "Informations de la commande"
 
-#: .\templates\orders\order_complete.html:184
+#: .\templates\orders\order_complete.html:153
 msgid "Order #"
 msgstr "N° de commande"
 
-#: .\templates\orders\order_complete.html:185
+#: .\templates\orders\order_complete.html:154
 msgid "Transaction"
 msgstr "Transaction"
 
-#: .\templates\orders\order_complete.html:244
+#: .\templates\orders\order_complete.html:223
 msgid ""
 "Thank you for shopping with us — if you need help, contact support with your "
 "order number."
@@ -5136,20 +5194,20 @@ msgstr ""
 "Merci d'avoir effectué vos achats chez nous — si vous avez besoin d'aide, "
 "contactez l'assistance en indiquant votre numéro de commande."
 
-#: .\templates\orders\order_complete.html:253
+#: .\templates\orders\order_complete.html:232
 #: .\templates\store\product_detail.html:380 .\templates\store\store.html:362
 msgid "Recommended for you"
 msgstr "Recommandé pour vous"
 
-#: .\templates\orders\order_complete.html:254
+#: .\templates\orders\order_complete.html:233
 msgid "Based on your purchase"
 msgstr "D'après votre achat"
 
-#: .\templates\orders\order_complete.html:258
+#: .\templates\orders\order_complete.html:237
 msgid "Browse all"
 msgstr "Tout parcourir"
 
-#: .\templates\orders\order_complete.html:285 .\templates\store\store.html:314
+#: .\templates\orders\order_complete.html:264 .\templates\store\store.html:314
 #: .\templates\wishlist\_saved_card.html:48
 msgid "View"
 msgstr "Voir"
@@ -5189,7 +5247,9 @@ msgstr "Après le paiement, votre commande sera confirmée automatiquement."
 
 #: .\templates\orders\payments.html:165
 msgid "Card payments are not configured yet. Choose PayPal or contact us."
-msgstr "Les paiements par carte ne sont pas encore configurés. Choisissez PayPal ou contactez-nous."
+msgstr ""
+"Les paiements par carte ne sont pas encore configurés. Choisissez PayPal ou "
+"contactez-nous."
 
 #: .\templates\orders\payments.html:171
 msgid "Pay"
@@ -5211,13 +5271,17 @@ msgstr "Nous avons trouvé votre paiement PayPal terminé. Redirection…"
 msgid ""
 "Your payment is still being confirmed. Do not pay again — refresh this page "
 "in a moment."
-msgstr "Votre paiement est encore en cours de confirmation. Ne payez pas à nouveau — actualisez la page dans un instant."
+msgstr ""
+"Votre paiement est encore en cours de confirmation. Ne payez pas à nouveau — "
+"actualisez la page dans un instant."
 
 #: .\templates\orders\payments.html:279 .\templates\orders\payments.html:282
 msgid ""
 "We could not confirm the payment status. Do not pay again until we check "
 "this order — please contact us."
-msgstr "Impossible de confirmer le statut du paiement. Ne payez pas à nouveau avant notre vérification — contactez-nous."
+msgstr ""
+"Impossible de confirmer le statut du paiement. Ne payez pas à nouveau avant "
+"notre vérification — contactez-nous."
 
 #: .\templates\orders\payments.html:295
 msgid "Connecting to PayPal…"
@@ -6330,6 +6394,24 @@ msgstr "Articles de la liste de favoris"
 msgid "Saved for later."
 msgstr "Enregistré pour plus tard."
 
+#~ msgid "Shop more"
+#~ msgstr "Continuer mes achats"
+
+#~ msgid "Order received"
+#~ msgstr "Commande reçue"
+
+#~ msgid "Preparing shipment"
+#~ msgstr "Préparation de l'expédition"
+
+#~ msgid "On the way"
+#~ msgstr "En route"
+
+#~ msgid "This order has been cancelled"
+#~ msgstr "Cette commande a été annulée"
+
+#~ msgid "Only if payment fails or you cancel"
+#~ msgstr "Uniquement en cas d'échec du paiement ou d'annulation de votre part"
+
 #~ msgid "This payment was already captured."
 #~ msgstr "Ce paiement a déjà été encaissé."
 
@@ -6383,9 +6465,6 @@ msgstr "Enregistré pour plus tard."
 
 #~ msgid "Log In"
 #~ msgstr "Se connecter"
-
-#~ msgid "Delivered"
-#~ msgstr "Livrée"
 
 #~ msgid "Editorial fashion — premium tailoring"
 #~ msgstr "Mode éditoriale — tailoring premium"
