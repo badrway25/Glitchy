@@ -101,6 +101,22 @@ def chat(request):
             "answer": _("Sorry, something went wrong. Please try again or contact support."),
             "error": "internal", "can_contact_support": True,
         }, status=200)
+    if getattr(request.user, "is_staff", False):
+        # SAFE staff-only diagnostics: no key, no prompt, no PII — just enough to see
+        # whether the store is really online and which sources grounded the answer.
+        try:
+            from .providers import OpenAIProvider
+            from .models import AssistantConfig
+            cfg = AssistantConfig.load()
+            result["debug"] = {
+                "assistant_mode": "online" if OpenAIProvider().available() else "limited",
+                "provider_used": result.get("provider", ""),
+                "openai_called": result.get("provider") == "openai",
+                "config_enabled": bool(cfg and cfg.is_enabled),
+                "language": result.get("language", ""),
+            }
+        except Exception:
+            pass
     return JsonResponse(result)
 
 

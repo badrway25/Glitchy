@@ -84,6 +84,9 @@ _SENSITIVE_PATTERNS = (
     # all users / other customers
     "tutti gli ordini", "all orders", "toutes les commandes", "email utenti", "user emails",
     "all users", "tutti gli utenti", "altro cliente", "another customer", "other user",
+    "tous les utilisateurs", "tous les clients", "emails des utilisateurs",
+    "un autre client", "facturation interne", "ignore les regles", "ignore les règles",
+    "cle stripe", "clé stripe", "base de donnees", "base de données",
     "di un altro",
     # secrets / credentials / admin
     "api key", "chiave stripe", "stripe key", "secret", "segreto", "password", "token",
@@ -104,18 +107,31 @@ def sensitive_block(query):
     return any(p in ql for p in _SENSITIVE_PATTERNS)
 
 
+_REFUSALS = {
+    "en": ("I can't access sensitive account, database or admin data — I can help with "
+           "products, shipping, payments and your own orders. For anything else, our "
+           "support team is happy to help."),
+    "it": ("Non posso accedere a dati sensibili di account, database o amministrazione — "
+           "posso aiutarti con prodotti, spedizioni, pagamenti e i tuoi ordini. Per il "
+           "resto, il nostro supporto è a disposizione."),
+    "fr": ("Je ne peux pas accéder aux données sensibles de compte, base de données ou "
+           "administration — je peux vous aider avec les produits, la livraison, les "
+           "paiements et vos propres commandes. Pour le reste, notre support est là."),
+    "ar": ("لا يمكنني الوصول إلى بيانات الحساب أو قاعدة البيانات أو الإدارة الحساسة — "
+           "يمكنني مساعدتك في المنتجات والشحن والمدفوعات وطلباتك الخاصة."),
+}
+
+
 def sensitive_refusal(lang):
-    from django.utils.translation import gettext as _
-    return str(_("I can't access sensitive account, database or admin data — I can help "
-                 "with products, shipping, payments and your own orders. For anything "
-                 "else, our support team is happy to help."))
+    return _REFUSALS.get(lang, _REFUSALS["en"])
 
 def answer_question(request, query):
     # HARD SECURITY GATE — refuse sensitive scopes before retrieval, context or LLM.
     if sensitive_block(query):
         conv0, lang0 = get_or_create_conversation(request)
         AssistantMessage.objects.create(conversation=conv0, role="user", content=query[:600])
-        return _finalise(conv0, sensitive_refusal(lang0),
+        from .language import detect_language
+        return _finalise(conv0, sensitive_refusal(detect_language(query, site_lang=lang0)),
                          provider="guardrail", grounded=False, sources=[])
     """Main entry point. Returns a dict the view serialises to JSON."""
     query = (query or "").strip()
@@ -146,9 +162,12 @@ def answer_question(request, query):
                        if c.active_products().exists()]
     except Exception:
         collections = []
+    facts = retrieval.store_facts(query, lang)
     context = prompt_mod.build_context(knowledge, products, lang, order_ctx,
-                                       collections=collections)
-    system_prompt = prompt_mod.build_system_prompt(context, lang)
+                                       collections=collections, store_facts=facts)
+    from .language import detect_language
+    msg_lang = detect_language(query, site_lang=lang)
+    system_prompt = prompt_mod.build_system_prompt(context, lang, language_code=msg_lang)
 
     provider = get_provider()
     if provider is not None:
@@ -156,14 +175,18 @@ def answer_question(request, query):
         try:
             answer = provider.complete(system_prompt, history)
             grounded = decline.split(".")[0] not in answer
-            return _finalise(conv, answer, provider=provider.name, products=products,
+            return _finalise(conv, answer, provider=provider.name, products=products, language=msg_lang,
                              grounded=grounded, sources=sources)
         except ProviderError:
             pass  # fall through to curated fallback
 
     # Fallback: best curated answer (or decline). Always grounded, no API call.
     fb = FallbackProvider()
-    answer = fb.answer_from_knowledge(knowledge, lang, decline)
+    smart = _smart_fallback_answer(query, msg_lang)
+    if smart and not knowledge:
+        answer = smart
+    else:
+        answer = fb.answer_from_knowledge(knowledge, lang, decline)
     grounded = bool(knowledge)
     return _finalise(conv, answer, provider="fallback", grounded=grounded, sources=sources, products=products)
 
@@ -191,7 +214,94 @@ def _public_product_cards(products):
     return cards
 
 
-def _finalise(conv, answer, provider, grounded, sources, products=None):
+def _smart_fallback_answer(query, msg_lang):
+    """Limited-mode answers for the CORE topics, built from real store data and localized.
+    Returns None when the question is not one of the core topics (caller keeps its flow)."""
+    ql = (query or "").lower()
+    from django.conf import settings
+
+    ship_words = ("spediz", "consegn", "deliver", "shipping", "livrais", "délais", "delais")
+    pay_words = ("paga", "pagam", "pay", "paypal", "carta", "card", "stripe", "paie")
+    ret_words = ("reso", "resi", "rimbors", "return", "refund", "retour", "rembours")
+
+    if any(w in ql for w in ship_words):
+        try:
+            from shipping.constants import COUNTRY_NAMES
+            from shipping.services import fallback_quote
+            _NAMES = {"IT": ("italia", "italy", "italie"), "FR": ("francia", "france"),
+                      "BE": ("belgio", "belgium", "belgique"), "DE": ("germania", "germany", "allemagne"),
+                      "ES": ("spagna", "spain", "espagne"), "GB": ("regno unito", "uk", "royaume-uni"),
+                      "US": ("stati uniti", "usa", "états-unis", "etats-unis"), "CH": ("svizzera", "suisse", "switzerland"),
+                      "NL": ("olanda", "netherlands", "pays-bas"), "PT": ("portogallo", "portugal")}
+            code = next((cc for cc, names in _NAMES.items() if any(n in ql for n in names)), "")
+            if code:
+                fq = fallback_quote(code, total_quantity=1, subtotal=0.0)
+                if fq.available:
+                    nm = COUNTRY_NAMES.get(code, code)
+                    cost = f"{fq.cost:.2f}"
+                    eta = str(fq.eta_label)
+                    if msg_lang == "it":
+                        return (f"Spediamo in {nm}: costo di spedizione {cost} EUR, consegna "
+                                f"stimata {eta}. Il totale esatto lo vedi nel checkout prima "
+                                f"di pagare.")
+                    if msg_lang == "fr":
+                        return (f"Nous livrons en {nm} : frais de livraison {cost} EUR, délai "
+                                f"estimé {eta}. Le total exact apparaît au checkout avant le "
+                                f"paiement.")
+                    return (f"We ship to {nm}: shipping cost EUR {cost}, estimated delivery "
+                            f"{eta}. The exact total is shown at checkout before you pay.")
+        except Exception:
+            pass
+        if msg_lang == "it":
+            return ("I tempi e i costi di spedizione dipendono dalla destinazione: li vedi "
+                    "calcolati con precisione nel checkout prima di pagare. Dimmi il paese e "
+                    "ti do la stima configurata.")
+        if msg_lang == "fr":
+            return ("Les délais et frais de livraison dépendent de la destination : ils sont "
+                    "calculés précisément au checkout avant le paiement. Dites-moi le pays et "
+                    "je vous donne l'estimation configurée.")
+        return ("Shipping times and costs depend on the destination: they are calculated "
+                "precisely at checkout before you pay. Tell me the country and I'll give you "
+                "the configured estimate.")
+
+    if any(w in ql for w in pay_words):
+        methods = []
+        try:
+            from payments import config as pconf
+            if pconf.stripe_secret_key() and pconf.stripe_publishable_key():
+                methods.append("carta" if msg_lang == "it" else ("carte" if msg_lang == "fr" else "card"))
+            if pconf.paypal_available():
+                methods.append("PayPal")
+        except Exception:
+            pass
+        mtxt = " e ".join(methods) if msg_lang == "it" else (" et ".join(methods) if msg_lang == "fr" else " and ".join(methods))
+        if msg_lang == "it":
+            base = (f"Al checkout puoi pagare con {mtxt}. " if methods else "")
+            return (base + "Se un pagamento non va a buon fine: riprova, prova l'altro metodo "
+                    "oppure scrivici — nessun addebito avviene senza la tua conferma.")
+        if msg_lang == "fr":
+            base = (f"Au checkout vous pouvez payer par {mtxt}. " if methods else "")
+            return (base + "Si un paiement échoue : réessayez, essayez l'autre méthode ou "
+                    "contactez-nous — aucun débit sans votre confirmation.")
+        base = (f"At checkout you can pay with {mtxt}. " if methods else "")
+        return (base + "If a payment fails: retry, try the other method, or contact us — "
+                "nothing is charged without your confirmation.")
+
+    if any(w in ql for w in ret_words):
+        from django.conf import settings as st
+        days = getattr(st, "RETURN_WINDOW_DAYS", 14)
+        if msg_lang == "it":
+            return (f"Puoi richiedere un reso entro {days} giorni. Trovi la procedura "
+                    f"guidata nella pagina Resi; se serve una mano, il supporto è qui.")
+        if msg_lang == "fr":
+            return (f"Vous pouvez demander un retour sous {days} jours. La procédure guidée "
+                    f"est sur la page Retours ; notre support reste disponible.")
+        return (f"You can request a return within {days} days. The guided procedure is on "
+                f"the Returns page; support is here if you need a hand.")
+    return None
+
+
+def _finalise(conv, answer, provider, grounded, sources, products=None, language=""):
     msg = AssistantMessage.objects.create(
         conversation=conv, role="assistant", content=answer,
         provider=provider, grounded=grounded, used_sources=sources,
@@ -204,6 +314,8 @@ def _finalise(conv, answer, provider, grounded, sources, products=None):
         "message_id": msg.id,
         "can_contact_support": not grounded,
     }
+    if language:
+        out["language"] = language
     if products:
         out["products"] = _public_product_cards(products)
     return out
