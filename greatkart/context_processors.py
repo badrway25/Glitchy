@@ -2,6 +2,22 @@
 import os
 from django.conf import settings
 
+
+def _paypal_enabled():
+    try:
+        from payments import config as pconf
+        return pconf.paypal_available()
+    except Exception:
+        return bool(getattr(settings, "PAYPAL_ENABLED", False))
+
+
+def _paypal_client_id():
+    try:
+        from payments import config as pconf
+        return pconf.paypal_client_id()
+    except Exception:
+        return getattr(settings, "PAYPAL_CLIENT_ID", "")
+
 _ASSET_BASE = os.path.join(os.path.dirname(__file__), "static")
 
 
@@ -56,9 +72,12 @@ def site_globals(request):
             ("YouTube", "fa-youtube", getattr(settings, "SOCIAL_YOUTUBE", "")),
             ("Facebook", "fa-facebook-f", getattr(settings, "SOCIAL_FACEBOOK", "")),
         ] if t[2]],
-        "PAYPAL_CLIENT_ID": getattr(settings, "PAYPAL_CLIENT_ID", ""),
+        # PayPal availability/id come from the RESOLVER (admin DB config preferred, env
+        # fallback) — the raw env read here was why a PayPal configured in the admin never
+        # appeared at checkout.
+        "PAYPAL_CLIENT_ID": _paypal_client_id(),
         "PAYPAL_CURRENCY": getattr(settings, "PAYPAL_CURRENCY", "EUR"),
-        "PAYPAL_ENABLED": getattr(settings, "PAYPAL_ENABLED", False),
+        "PAYPAL_ENABLED": _paypal_enabled(),
         "STRIPE_CURRENCY": getattr(settings, "STRIPE_CURRENCY", "eur").upper(),
         "SUPPORT_EMAIL": getattr(settings, "SUPPORT_EMAIL", ""),
         "AI_ASSISTANT_ENABLED": getattr(settings, "AI_ASSISTANT_ENABLED", False),

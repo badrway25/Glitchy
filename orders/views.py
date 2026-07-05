@@ -1,5 +1,7 @@
 import logging
 from django.utils.translation import gettext as _
+
+logger = logging.getLogger(__name__)
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
@@ -125,6 +127,17 @@ def stripe_create_intent(request):
     except Exception:
         return JsonResponse({"error": "Invalid order total"}, status=400)
 
+    if amount_cents <= 0:
+        return JsonResponse({"error": str(_("Invalid order total."))}, status=400)
+
+    # Config first: an unconfigured Stripe must read as a clear service message, not a crash.
+    from payments import config as pconf
+    if not pconf.stripe_secret_key():
+        logger.warning("stripe intent refused: no secret key configured (db+env empty)")
+        return JsonResponse({"error": str(
+            _("Card payments are not configured yet. Please choose another payment method "
+              "or contact us."))}, status=503)
+
     try:
         _use_stripe()
         intent = stripe.PaymentIntent.create(
@@ -137,8 +150,14 @@ def stripe_create_intent(request):
             receipt_email=order.email or None,
             automatic_payment_methods={"enabled": True},
         )
-    except Exception:
-        return JsonResponse({"error": "Stripe intent creation failed"}, status=500)
+    except Exception as exc:
+        # Safe diagnostics: error class + Stripe code only — never the key, never PII.
+        code = getattr(exc, "code", "") or getattr(getattr(exc, "error", None), "code", "") or ""
+        logger.error("stripe intent creation failed: %s code=%s order=%s",
+                     type(exc).__name__, code, order.order_number)
+        return JsonResponse({"error": str(
+            _("We could not start the card payment. Please try again in a moment or choose "
+              "another payment method."))}, status=502)
 
     from payments import config as pconf
     return JsonResponse({

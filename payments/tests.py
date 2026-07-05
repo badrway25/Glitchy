@@ -152,3 +152,77 @@ class CredentialFieldsUXTests(TestCase):
 # NOTE: the F76B admin language-switcher / i18n-catalog tests were NOT ported here —
 # those commits (86cc950, 3b013ed) are intentionally excluded from this integration
 # (they conflict with 4 later i18n phases) and remain pending work.
+
+
+class PaymentAvailabilityFixTests(TestCase):
+    """Live-reported bugs: 'Stripe intent creation failed' + PayPal never visible."""
+
+    def _order(self):
+        from orders.models import Order
+        self.client.get("/")                                 # materialize the guest session
+        sk = self.client.session.session_key
+        return Order.objects.create(
+            order_number="T-1001", first_name="M", last_name="R", email="m@example.com",
+            phone="+393331234567", address_line_1="Via Roma 1", country="IT", state="MI",
+            city="Milano", postal_code="20100", order_total=26.0, tax=0.5, ip="127.0.0.1",
+            is_ordered=False, status="New", is_guest=True, session_key=sk)
+
+    def test_intent_without_any_key_returns_elegant_503_not_generic_500(self):
+        import json as _json
+        o = self._order()
+        s = self.client.session; s["pending_order_number"] = o.order_number; s.save()
+        with override_settings(STRIPE_SECRET_KEY=""):
+            r = self.client.post("/orders/stripe/create-intent/",
+                                 _json.dumps({"order_number": o.order_number}),
+                                 content_type="application/json")
+        self.assertEqual(r.status_code, 503)
+        body = r.json()["error"]
+        self.assertIn("not configured", body)
+        self.assertNotIn("sk_", body)
+
+    def test_intent_success_mocked(self):
+        import json as _json
+        from unittest.mock import patch, MagicMock
+        o = self._order()
+        s = self.client.session; s["pending_order_number"] = o.order_number; s.save()
+        with override_settings(STRIPE_SECRET_KEY="sk_test_x"):
+            with patch("orders.views.stripe.PaymentIntent.create") as create:
+                create.return_value = MagicMock(client_secret="pi_secret_123")
+                r = self.client.post("/orders/stripe/create-intent/",
+                                     _json.dumps({"order_number": o.order_number}),
+                                     content_type="application/json")
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.json()["clientSecret"], "pi_secret_123")
+        kwargs = create.call_args.kwargs
+        self.assertEqual(kwargs["amount"], 2600)            # cents, integer (order_total as-is)
+        self.assertNotIn("sk_test_x", str(r.content))
+
+    def test_intent_stripe_error_mocked_returns_friendly_502(self):
+        import json as _json
+        from unittest.mock import patch
+        o = self._order()
+        s = self.client.session; s["pending_order_number"] = o.order_number; s.save()
+        with override_settings(STRIPE_SECRET_KEY="sk_test_x"):
+            with patch("orders.views.stripe.PaymentIntent.create", side_effect=Exception("boom")):
+                r = self.client.post("/orders/stripe/create-intent/",
+                                     _json.dumps({"order_number": o.order_number}),
+                                     content_type="application/json")
+        self.assertEqual(r.status_code, 502)
+        self.assertNotIn("boom", r.json()["error"])          # internals never surface
+
+    @override_settings(PAYMENT_CONFIG_KEY=TEST_KEY, PAYPAL_ENABLED=False,
+                       PAYPAL_CLIENT_ID="", PAYPAL_SECRET="")
+    def test_paypal_visible_when_admin_config_ready_even_with_env_off(self):
+        from payments.models import PaymentProviderConfig
+        cfg = PaymentProviderConfig.objects.create(
+            provider="paypal", is_enabled=True, allow_checkout=True,
+            environment="test", paypal_client_id="AY_test_client")
+        cfg.set_secret("paypal_secret", "pp_secret_x", by="t"); cfg.save()
+        from greatkart.context_processors import _paypal_enabled, _paypal_client_id
+        self.assertTrue(_paypal_enabled())                   # was False before the fix
+        self.assertEqual(_paypal_client_id(), "AY_test_client")
+
+    @override_settings(PAYPAL_ENABLED=False, PAYPAL_CLIENT_ID="", PAYPAL_SECRET="")
+    def test_paypal_hidden_when_nothing_configured(self):
+        from greatkart.context_processors import _paypal_enabled
+        self.assertFalse(_paypal_enabled())
