@@ -3619,3 +3619,21 @@ form .form-control,form .custom-select{transition:border-color .18s var(--ease),
 }
 .addr-card .btn-soft.btn-sm:hover{ border-color:var(--primary); background:rgba(184,151,90,.08); }
 .addr-card .btn-soft.btn-sm.text-danger:hover{ border-color:#dc2626; background:rgba(220,38,38,.07); }
+
+/* PayPal panel — premium frame around the SDK buttons (the popup itself is PayPal-hosted) */
+.pp-panel{max-width:460px;margin:0 auto;padding:1.25rem 1.3rem 1.1rem;border:1px solid rgba(120,110,95,.18);
+  border-radius:16px;background:rgba(250,247,240,.55);}
+[data-theme="dark"] .pp-panel{background:rgba(255,255,255,.03);border-color:rgba(210,195,170,.16);}
+.pp-panel-head{margin-bottom:.9rem;text-align:center;}
+.pp-badge{display:inline-flex;align-items:center;gap:.45rem;padding:.35rem .8rem;border-radius:999px;
+  font-size:.78rem;font-weight:700;background:rgba(184,151,90,.12);color:#7a5f2e;
+  border:1px solid rgba(184,151,90,.3);}
+[data-theme="dark"] .pp-badge{color:#e0cfa6;}
+.pp-loading{display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.9rem 0;
+  font-size:.85rem;opacity:.75;}
+.pp-spinner{width:18px;height:18px;border-radius:50%;border:2px solid rgba(184,151,90,.3);
+  border-top-color:var(--primary);animation:gl-spin .8s linear infinite;display:inline-block;}
+@media (prefers-reduced-motion:reduce){ .pp-spinner{animation:none;} }
+.pp-error{margin:.7rem 0 0;padding:.65rem .85rem;border-radius:10px;font-size:.85rem;font-weight:600;
+  background:rgba(220,38,38,.08);color:#b91c1c;border:1px solid rgba(220,38,38,.25);}
+.pp-note{margin:.85rem 0 0;font-size:.78rem;line-height:1.55;opacity:.65;text-align:center;}

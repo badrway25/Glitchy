@@ -143,7 +143,15 @@
             <div class="pay-panels mt-3">
               {% if PAYPAL_ENABLED %}
               <div id="payPanelPaypal" class="pay-panel">
-                <div id="paypal-button-container"></div>
+                <div class="pp-panel">
+                  <div class="pp-panel-head">
+                    <span class="pp-badge"><i class="fa fa-lock" aria-hidden="true"></i> {% trans "Secure checkout with PayPal" %}</span>
+                  </div>
+                  <div class="pp-loading" id="ppLoading"><span class="pp-spinner" aria-hidden="true"></span> {% trans "Loading PayPal…" %}</div>
+                  <div id="paypal-button-container" aria-live="polite"></div>
+                  <div class="pp-error" id="ppError" role="alert" hidden></div>
+                  <p class="pp-note">{% trans "You will review the exact order total and your delivery address inside PayPal before confirming. Nothing is charged until you approve." %}</p>
+                </div>
                 <small class="text-muted d-block mt-2" style="font-size:13px;">
                   {% trans "After payment, your order will be confirmed automatically." %}
                 </small>
@@ -177,7 +185,7 @@
   </div>
 </section>
 
-{% if PAYPAL_ENABLED %}<script src="https://www.paypal.com/sdk/js?client-id={{ PAYPAL_CLIENT_ID }}&currency={{ PAYPAL_CURRENCY }}&components=buttons"></script>{% endif %}
+{% if PAYPAL_ENABLED %}{% get_current_language as LANGUAGE_CODE %}<script src="https://www.paypal.com/sdk/js?client-id={{ PAYPAL_CLIENT_ID }}&currency={{ PAYPAL_CURRENCY }}&components=buttons&intent=capture&locale={% if LANGUAGE_CODE == 'it' %}it_IT{% elif LANGUAGE_CODE == 'fr' %}fr_FR{% else %}en_US{% endif %}"></script>{% endif %}
 <script>
   window.__STRIPE_CREATE_INTENT_URL = "{% url 'stripe_create_intent' %}";
   window.__STRIPE_CONFIRM_URL = "{% url 'stripe_confirm' %}";
@@ -223,40 +231,70 @@
   var payment_method = 'PayPal';
   var redirect_url = "{% url 'order_complete' %}";
 
-  // ✅ render once (only if the PayPal SDK actually loaded)
+  // PayPal — SERVER-SIDE order creation (checkout snapshot: exact totals, items, address,
+  // phone, SET_PROVIDED_ADDRESS). The popup now shows Glitchy data, never wallet defaults.
+  var ppCreateUrl = "{% url 'paypal_create_order' %}";
+  function ppShowError(text){
+    var e = document.getElementById("ppError");
+    if(e){ e.textContent = text; e.hidden = false; }
+  }
+  function ppHideLoading(){
+    var l = document.getElementById("ppLoading");
+    if(l) l.style.display = "none";
+  }
   if (window.paypal) {
   paypal.Buttons({
-    style: { shape: 'rect', label: 'pay', height: 44 },
+    style: { layout: 'vertical', shape: 'pill', color: 'black', label: 'pay', height: 48 },
 
-    createOrder: function(data, actions) {
-      return actions.order.create({
-        purchase_units: [{ amount: { value: String(amount) } }]
-      });
+    createOrder: function(){
+      var e = document.getElementById("ppError"); if(e) e.hidden = true;
+      return fetch(ppCreateUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRFToken": csrftoken },
+        credentials: "same-origin",
+        body: JSON.stringify({ order_number: orderID }),
+      }).then(function(res){ return res.json().then(function(d){ return {ok: res.ok, d: d}; }); })
+        .then(function(r){
+          if(!r.ok || !r.d.id){
+            ppShowError(r.d.error || "{% trans 'PayPal order could not be created. Please try again or use card.' %}");
+            throw new Error("pp_create_failed");
+          }
+          return r.d.id;
+        });
     },
 
     onApprove: function(data, actions) {
       return actions.order.capture().then(function(details) {
+        var capId = details.id;
+        try {
+          var pu = details.purchase_units && details.purchase_units[0];
+          var caps = pu && pu.payments && pu.payments.captures;
+          if (caps && caps[0] && caps[0].id) capId = caps[0].id;
+        } catch(e) {}
         return fetch(url, {
           method: "POST",
-          headers: {
-            "Content-type": "application/json",
-            "X-CSRFToken": csrftoken,
-          },
+          headers: { "Content-type": "application/json", "X-CSRFToken": csrftoken },
           body: JSON.stringify({
             orderID: orderID,
-            transID: details.id,
+            transID: capId,
             payment_method: payment_method,
             status: details.status,
           }),
         })
-        .then((response) => response.json())
-        .then((data) => {
+        .then(function(response){ return response.json(); })
+        .then(function(data){
+          if (data.error){ ppShowError(data.message || data.error); return; }
           window.location.href = redirect_url + '?order_number=' + data.order_number + '&payment_id=' + data.transID;
         });
       });
+    },
+
+    onError: function(){
+      ppShowError("{% trans 'PayPal encountered a problem. Please try again or use card.' %}");
     }
-  }).render('#paypal-button-container');
-  }
+  }).render('#paypal-button-container').then(ppHideLoading).catch(ppHideLoading);
+  } else { ppHideLoading(); ppShowError("{% trans 'PayPal is temporarily unavailable. Please use card.' %}"); }
+
 </script>
 
 
