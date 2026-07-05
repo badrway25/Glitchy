@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: greatkart 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-05 13:28+0200\n"
+"POT-Creation-Date: 2026-07-05 15:41+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -138,6 +138,63 @@ msgstr "Adresse supprimée."
 msgid "Default address updated."
 msgstr "Adresse par défaut mise à jour."
 
+#: .\assistant\admin.py:65
+msgid "Set / replace OpenAI API key"
+msgstr "Définir / remplacer la clé API OpenAI"
+
+#: .\assistant\admin.py:68 .\payments\admin.py:38 .\shipping\admin.py:34
+msgid ""
+"Write-only. Leave blank to keep the current key. Encrypted at rest, never "
+"shown again."
+msgstr ""
+
+#: .\assistant\admin.py:100 .\shipping\admin.py:64
+msgid ""
+"Encryption key missing — the key was NOT saved (it is never stored in plain "
+"text). Ask the server administrator to configure PAYMENT_CONFIG_KEY, then "
+"try again."
+msgstr ""
+"Clé de chiffrement manquante — la clé n'a PAS été enregistrée (elle n'est "
+"jamais stockée en clair). Demandez à l'administrateur du serveur de "
+"configurer PAYMENT_CONFIG_KEY, puis réessayez."
+
+#: .\assistant\admin.py:123 .\notifications\admin.py:21 .\orders\admin.py:167
+#: .\printify_integration\admin.py:566 .\returns\admin.py:40
+#: .\shipping\admin.py:83 .\templates\accounts\dashboard.html:162
+#: .\templates\accounts\transactions.html:100
+#: .\templates\orders\order_complete.html:155
+msgid "Status"
+msgstr "Statut"
+
+#: .\assistant\admin.py:124
+msgid "OpenAI API key — secret (encrypted)"
+msgstr ""
+
+#: .\assistant\admin.py:125
+msgid ""
+"Write-only, encrypted at rest with the server encryption key "
+"(PAYMENT_CONFIG_KEY). Only a fingerprint is shown after saving. The key "
+"never reaches the browser or the logs. Never paste a key anywhere else."
+msgstr ""
+
+#: .\assistant\admin.py:130
+#, fuzzy
+#| msgid "Assistant conversation"
+msgid "Assistant behaviour"
+msgstr "Conversation de l'assistant"
+
+#: .\assistant\admin.py:139
+#, fuzzy
+#| msgid "No server key set."
+msgid "No key saved yet."
+msgstr "Aucune clé serveur définie."
+
+#: .\assistant\admin.py:142
+#, fuzzy
+#| msgid "Store"
+msgid "Stored key"
+msgstr "Boutique"
+
 #: .\assistant\models.py:17 .\templates\accounts\order_detail.html:173
 #: .\templates\includes\footer.html:84
 #: .\templates\includes\shipping_estimator.html:18
@@ -246,7 +303,102 @@ msgstr "Faux lorsque l'assistant a refusé de répondre faute de contexte."
 msgid "Assistant feedback"
 msgstr "Retour sur l'assistant"
 
-#: .\assistant\views.py:85
+#: .\assistant\services.py:109
+msgid ""
+"I can't access sensitive account, database or admin data — I can help with "
+"products, shipping, payments and your own orders. For anything else, our "
+"support team is happy to help."
+msgstr "Je ne peux pas accéder aux données sensibles de compte, base de données ou administration — je peux vous aider avec les produits, la livraison, les paiements et vos propres commandes. Pour le reste, notre support est là."
+
+#: .\assistant\services_openai.py:13
+#, fuzzy
+#| msgid "No server key set."
+msgid "No API key saved."
+msgstr "Aucune clé serveur définie."
+
+#: .\assistant\services_openai.py:14
+msgid "No API key saved yet — set it above first."
+msgstr ""
+
+#: .\assistant\services_openai.py:16 .\shipping\address_validation.py:106
+#: .\shipping\address_validation.py:135
+#, fuzzy
+#| msgid "Encryption key missing"
+msgid "Encryption key missing."
+msgstr "Clé de chiffrement manquante"
+
+#: .\assistant\services_openai.py:18
+msgid ""
+"PAYMENT_CONFIG_KEY is not configured on the server — the stored key cannot "
+"be decrypted. Configure it, then save the API key again."
+msgstr ""
+
+#: .\assistant\services_openai.py:22
+msgid "Key cannot be decrypted."
+msgstr ""
+
+#: .\assistant\services_openai.py:24
+msgid ""
+"The stored key cannot be decrypted (was PAYMENT_CONFIG_KEY rotated?). Save "
+"the API key again."
+msgstr ""
+
+#: .\assistant\services_openai.py:33
+msgid "Key OK — model not in list."
+msgstr ""
+
+#: .\assistant\services_openai.py:35
+msgid ""
+"OpenAI key works, but the configured model was not found in your account's "
+"model list — double-check the model id."
+msgstr ""
+
+#: .\assistant\services_openai.py:37
+#, fuzzy
+#| msgid "Address Validation API reachable."
+msgid "OpenAI reachable."
+msgstr "API Address Validation joignable."
+
+#: .\assistant\services_openai.py:38
+msgid "OpenAI connection OK — key valid, model available."
+msgstr ""
+
+#: .\assistant\services_openai.py:40
+msgid "Invalid key (401)."
+msgstr ""
+
+#: .\assistant\services_openai.py:42
+msgid ""
+"OpenAI rejected the key (401) — it looks invalid or revoked. Re-copy it from "
+"the OpenAI dashboard."
+msgstr ""
+
+#: .\assistant\services_openai.py:45
+msgid "Quota/billing (429)."
+msgstr ""
+
+#: .\assistant\services_openai.py:47
+msgid ""
+"OpenAI answered 429 — quota exhausted or billing not active on the account."
+msgstr ""
+
+#: .\assistant\services_openai.py:51
+#, python-format
+msgid "OpenAI answered an unexpected status (%(code)s). Try again in a moment."
+msgstr ""
+
+#: .\assistant\services_openai.py:55
+msgid "Network timeout."
+msgstr ""
+
+#: .\assistant\services_openai.py:57
+#, fuzzy
+#| msgid "Could not reach Google (network/timeout)."
+msgid ""
+"Could not reach OpenAI (network/timeout). Check the server's connectivity."
+msgstr "Google injoignable (réseau/délai dépassé)."
+
+#: .\assistant\views.py:91
 msgid ""
 "You've reached the message limit for now. Please try again later or contact "
 "our support team."
@@ -254,7 +406,7 @@ msgstr ""
 "Vous avez atteint la limite de messages pour le moment. Veuillez réessayer "
 "plus tard ou contacter notre équipe d'assistance."
 
-#: .\assistant\views.py:95
+#: .\assistant\views.py:101
 msgid "Sorry, something went wrong. Please try again or contact support."
 msgstr "Désolé, une erreur s'est produite. Réessayez ou contactez le support."
 
@@ -455,14 +607,6 @@ msgstr "Nous vous écrirons par e-mail — pas de spam, c'est promis."
 #: .\notifications\admin.py:12
 msgid "Recipient"
 msgstr "Destinataire"
-
-#: .\notifications\admin.py:21 .\orders\admin.py:167
-#: .\printify_integration\admin.py:566 .\returns\admin.py:40
-#: .\shipping\admin.py:83 .\templates\accounts\dashboard.html:162
-#: .\templates\accounts\transactions.html:100
-#: .\templates\orders\order_complete.html:155
-msgid "Status"
-msgstr "Statut"
 
 #: .\notifications\admin.py:30
 msgid "Resend selected events to n8n"
@@ -762,7 +906,9 @@ msgstr "Votre commande est en production"
 msgid ""
 "Production sync pending — this page updates as production information "
 "becomes available."
-msgstr "Synchronisation production en attente — cette page se met à jour dès que les informations arrivent."
+msgstr ""
+"Synchronisation production en attente — cette page se met à jour dès que les "
+"informations arrivent."
 
 #: .\orders\timeline.py:57
 msgid "In production"
@@ -942,12 +1088,6 @@ msgstr "Vérifiez votre adresse ci-dessous."
 
 #: .\payments\admin.py:35
 msgid "Set / replace Stripe secret key"
-msgstr ""
-
-#: .\payments\admin.py:38 .\shipping\admin.py:34
-msgid ""
-"Write-only. Leave blank to keep the current key. Encrypted at rest, never "
-"shown again."
 msgstr ""
 
 #: .\payments\admin.py:40
@@ -1920,12 +2060,6 @@ msgstr ""
 msgid "No server key set."
 msgstr "Aucune clé serveur définie."
 
-#: .\shipping\address_validation.py:106 .\shipping\address_validation.py:135
-#, fuzzy
-#| msgid "Encryption key missing"
-msgid "Encryption key missing."
-msgstr "Clé de chiffrement manquante"
-
 #: .\shipping\address_validation.py:108 .\shipping\address_validation.py:137
 msgid ""
 "PAYMENT_CONFIG_KEY is not configured on the server — the stored key cannot "
@@ -1985,16 +2119,6 @@ msgstr ""
 #: .\shipping\admin.py:31
 msgid "Set / replace Address Validation server key"
 msgstr ""
-
-#: .\shipping\admin.py:64
-msgid ""
-"Encryption key missing — the key was NOT saved (it is never stored in plain "
-"text). Ask the server administrator to configure PAYMENT_CONFIG_KEY, then "
-"try again."
-msgstr ""
-"Clé de chiffrement manquante — la clé n'a PAS été enregistrée (elle n'est "
-"jamais stockée en clair). Demandez à l'administrateur du serveur de "
-"configurer PAYMENT_CONFIG_KEY, puis réessayez."
 
 #: .\shipping\admin.py:70
 msgid ""
@@ -2766,7 +2890,7 @@ msgid "Add an address to speed up your next checkout."
 msgstr "Ajoutez une adresse pour accélérer votre prochaine commande."
 
 #: .\templates\accounts\address_list.html:105 .\templates\home.html:277
-#: .\templates\includes\assistant_widget.html:24
+#: .\templates\includes\assistant_widget.html:26
 #: .\templates\store\cart.html:212 .\templates\store\product_detail.html:230
 #: .\templates\store\product_detail.html:234
 #: .\templates\store\product_detail.html:644 .\templates\store\store.html:146
@@ -3378,6 +3502,48 @@ msgstr "Aucune transaction"
 msgid "When you pay for an order, it will appear here."
 msgstr "Lorsque vous réglez une commande, elle apparaît ici."
 
+#: .\templates\admin\assistant\assistantconfig\change_form.html:7
+#: .\templates\admin\shipping\checkoutapiconfig\change_form.html:11
+msgid "Encryption key missing"
+msgstr "Clé de chiffrement manquante"
+
+#: .\templates\admin\assistant\assistantconfig\change_form.html:9
+#, fuzzy
+#| msgid ""
+#| "Encryption key missing — the key was NOT saved (it is never stored in "
+#| "plain text). Ask the server administrator to configure "
+#| "PAYMENT_CONFIG_KEY, then try again."
+msgid ""
+"The OpenAI API key is stored encrypted and cannot be saved right now. Ask "
+"the server administrator to configure PAYMENT_CONFIG_KEY. Non-secret "
+"settings on this page can still be saved."
+msgstr ""
+"Clé de chiffrement manquante — la clé n'a PAS été enregistrée (elle n'est "
+"jamais stockée en clair). Demandez à l'administrateur du serveur de "
+"configurer PAYMENT_CONFIG_KEY, puis réessayez."
+
+#: .\templates\admin\assistant\assistantconfig\change_form.html:17
+#: .\templates\admin\shipping\checkoutapiconfig\change_form.html:21
+msgid "API operations"
+msgstr "Opérations de paiement"
+
+#: .\templates\admin\assistant\assistantconfig\change_form.html:21
+msgid "Test OpenAI connection"
+msgstr "Tester la connexion OpenAI"
+
+#: .\templates\admin\assistant\assistantconfig\change_form.html:23
+#, fuzzy
+#| msgid "Save a browser key first, then test it here."
+msgid "Save an API key first, then the test appears here."
+msgstr "Enregistrez d'abord une browser key, puis testez-la ici."
+
+#: .\templates\admin\assistant\assistantconfig\change_form.html:27
+msgid ""
+"The test is read-only (lists your models) — no chat call, no cost beyond a "
+"metadata request, the key is never displayed. The assistant keeps working in "
+"curated-knowledge mode while OpenAI is disabled."
+msgstr ""
+
 #: .\templates\admin\index.html:4
 msgid "Django site admin"
 msgstr ""
@@ -3618,10 +3784,6 @@ msgstr ""
 msgid "Use this shop"
 msgstr ""
 
-#: .\templates\admin\shipping\checkoutapiconfig\change_form.html:11
-msgid "Encryption key missing"
-msgstr "Clé de chiffrement manquante"
-
 #: .\templates\admin\shipping\checkoutapiconfig\change_form.html:13
 msgid ""
 "Secret API keys are stored encrypted and cannot be saved right now. Ask the "
@@ -3631,10 +3793,6 @@ msgid ""
 "settings on this page can still be saved. The browser key below is public by "
 "design and does not need encryption."
 msgstr ""
-
-#: .\templates\admin\shipping\checkoutapiconfig\change_form.html:21
-msgid "API operations"
-msgstr "Opérations de paiement"
 
 #: .\templates\admin\shipping\checkoutapiconfig\change_form.html:28
 msgid "Save a browser key first, then test it here."
@@ -4012,63 +4170,71 @@ msgstr "Panier"
 msgid "Assistant"
 msgstr "Assistant"
 
-#: .\templates\includes\assistant_widget.html:21
+#: .\templates\includes\assistant_widget.html:22
+msgid "AI assistant · online"
+msgstr "Assistant IA · en ligne"
+
+#: .\templates\includes\assistant_widget.html:23
+msgid "Limited mode — curated store answers"
+msgstr "Mode limité — réponses éditoriales de la boutique"
+
+#: .\templates\includes\assistant_widget.html:23
 msgid "Answers from our store & policies"
 msgstr "Réponses issues de notre boutique et de nos politiques"
 
-#: .\templates\includes\assistant_widget.html:35
+#: .\templates\includes\assistant_widget.html:37
 msgid "Ask about shipping, returns, sizes…"
 msgstr "Posez une question sur la livraison, les retours, les tailles…"
 
-#: .\templates\includes\assistant_widget.html:36
+#: .\templates\includes\assistant_widget.html:38
 msgid "Your question"
 msgstr "Votre question"
 
-#: .\templates\includes\assistant_widget.html:37
-#: .\templates\includes\assistant_widget.html:58
+#: .\templates\includes\assistant_widget.html:39
+#: .\templates\includes\assistant_widget.html:60
 msgid "Send"
 msgstr "Envoyer"
 
-#: .\templates\includes\assistant_widget.html:43
+#: .\templates\includes\assistant_widget.html:45
 msgid "AI answers may be imperfect — verify important details."
 msgstr ""
 "Les réponses de l'IA peuvent être imparfaites — vérifiez les détails "
 "importants."
 
-#: .\templates\includes\assistant_widget.html:49
+#: .\templates\includes\assistant_widget.html:51
 msgid "Thinking…"
 msgstr "Réflexion…"
 
-#: .\templates\includes\assistant_widget.html:50
+#: .\templates\includes\assistant_widget.html:52
 msgid "Something went wrong. Please try again."
 msgstr "Une erreur s'est produite. Veuillez réessayer."
 
-#: .\templates\includes\assistant_widget.html:51
+#: .\templates\includes\assistant_widget.html:53
 msgid "Was this helpful?"
 msgstr "Cela vous a-t-il aidé ?"
 
-#: .\templates\includes\assistant_widget.html:52
+#: .\templates\includes\assistant_widget.html:54
 msgid "Yes"
 msgstr "Oui"
 
-#: .\templates\includes\assistant_widget.html:53
+#: .\templates\includes\assistant_widget.html:55
 msgid "No"
 msgstr "Non"
 
-#: .\templates\includes\assistant_widget.html:54
+#: .\templates\includes\assistant_widget.html:56
 msgid "Thanks for your feedback."
 msgstr "Merci pour votre retour."
 
-#: .\templates\includes\assistant_widget.html:55
+#: .\templates\includes\assistant_widget.html:57
 #: .\templates\orders\order_complete.html:63
 msgid "Contact support"
 msgstr "Contacter le support"
 
-#: .\templates\includes\assistant_widget.html:56
+#: .\templates\includes\assistant_widget.html:58
 msgid "Your request was sent. Our team will get back to you."
 msgstr "Votre demande a été envoyée. Notre équipe vous recontactera."
 
-#: .\templates\includes\assistant_widget.html:57
+#: .\templates\includes\assistant_widget.html:59
 msgid "Leave your email and we will get back to you:"
 msgstr "Laissez-nous votre e-mail et nous vous recontacterons :"
 
@@ -5136,7 +5302,8 @@ msgstr "Télécharger la facture PDF"
 
 #: .\templates\orders\order_complete.html:84
 msgid "This page updates as production information becomes available."
-msgstr "Cette page se met à jour dès que les informations de production arrivent."
+msgstr ""
+"Cette page se met à jour dès que les informations de production arrivent."
 
 #: .\templates\orders\order_complete.html:93
 msgid "Confirmation email sent"
