@@ -3713,3 +3713,22 @@ form .form-control,form .custom-select{transition:border-color .18s var(--ease),
 .ai-card img{width:44px;height:44px;object-fit:cover;border-radius:9px;flex:0 0 auto;background:rgba(0,0,0,.04);}
 .ai-card-name{font-weight:700;font-size:.82rem;line-height:1.3;}
 .ai-card-price{font-size:.78rem;color:var(--primary);font-weight:800;}
+
+/* PDP wishlist "Saved" state: readable premium tint instead of white-on-red (owner bug) */
+.wish-btn-pdp.is-active{
+  background:rgba(220,38,38,.10)!important;
+  border-color:rgba(220,38,38,.45)!important;
+  color:#b91c1c!important;
+  font-weight:700;
+}
+.wish-btn-pdp.is-active i{color:#dc2626!important;}
+[data-theme="dark"] .wish-btn-pdp.is-active{
+  background:rgba(248,113,113,.14)!important;
+  border-color:rgba(248,113,113,.5)!important;
+  color:#fca5a5!important;
+}
+[data-theme="dark"] .wish-btn-pdp.is-active i{color:#f87171!important;}
+.wish-btn-pdp:focus-visible{outline:2px solid #dc2626;outline-offset:2px;}
+
+/* Assistant memory note */
+.ai-memory-note{font-size:.7rem;opacity:.55;text-align:center;padding:.2rem .8rem .35rem;}
