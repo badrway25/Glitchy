@@ -160,7 +160,11 @@
               {% endif %}
 
               <div id="payPanelStripe" class="pay-panel is-active">
-				<form id="stripeForm">
+				{% if not stripe_ready %}
+                <div class="pp-error" style="margin:0 0 .8rem;" role="status">
+                  {% trans "Card payments are not configured yet. Choose PayPal or contact us." %}</div>
+                {% endif %}
+                <form id="stripeForm">
 					<div id="stripe-payment-element"></div>
 
 					<button id="stripePayBtn" type="submit" class="btn btn-primary btn-block mt-3">
@@ -251,6 +255,33 @@
     var l = document.getElementById("ppLoading");
     if(l) l.style.display = "none";
   }
+  function ppReconcileThenError(fallbackMsg){
+    // The backend may have completed the capture AFTER the frontend gave up (slow upstream).
+    // Check the DB truth first: a PAID customer must reach the thank-you page, never a
+    // "do not pay again" warning.
+    ppShowStatus("{% trans 'Checking your payment status…' %}");
+    fetch("{% url 'paypal_status' %}", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-CSRFToken": csrftoken },
+      credentials: "same-origin",
+      body: JSON.stringify({ order_number: orderID }),
+    }).then(function(res){ return res.json(); })
+      .then(function(d){
+        if (d.ok && d.status === "completed" && d.redirect_url) {
+          ppShowStatus("{% trans 'We found your completed PayPal payment. Redirecting…' %}");
+          window.location.href = d.redirect_url;
+          return;
+        }
+        if (d.ok && d.status === "processing") {
+          ppShowError("{% trans 'Your payment is still being confirmed. Do not pay again — refresh this page in a moment.' %}");
+          return;
+        }
+        ppShowError(fallbackMsg || "{% trans 'We could not confirm the payment status. Do not pay again until we check this order — please contact us.' %}");
+      })
+      .catch(function(){
+        ppShowError(fallbackMsg || "{% trans 'We could not confirm the payment status. Do not pay again until we check this order — please contact us.' %}");
+      });
+  }
   var ppInflight = false;
   if (window.paypal && !window.__ppRendered) {
   window.__ppRendered = true;                     // render-once guard (tab switches re-fire nothing)
@@ -293,28 +324,31 @@
       }).then(function(res){ return res.json().then(function(d){ return {ok: res.ok, d: d}; }); })
         .then(function(r){
           clearTimeout(timer);
-          if(!r.ok){
-            if (r.d.retry && window.paypal) {      // INSTRUMENT_DECLINED: documented retry
-              ppShowError(r.d.error);
-              return;
-            }
-            ppShowError(r.d.error || "{% trans 'PayPal could not confirm the payment. Please try again or use card.' %}");
+          var d = r.d || {};
+          if (d.ok && d.redirect_url) {          // completed OR already_completed → success
+            ppShowStatus("{% trans 'Payment confirmed — redirecting…' %}");
+            window.location.href = d.redirect_url;
             return;
           }
-          ppShowStatus("{% trans 'Payment confirmed — redirecting…' %}");
-          window.location.href = redirect_url + '?order_number=' + r.d.order_number + '&payment_id=' + r.d.transID;
+          if (d.ok && d.status === "pending") {
+            ppShowStatus(d.message || "{% trans 'Payment is pending review.' %}");
+            return;
+          }
+          if (d.retry && window.paypal) {        // INSTRUMENT_DECLINED: documented retry
+            ppShowError(d.message || d.error || "");
+            return;
+          }
+          ppReconcileThenError(d.message || d.error);
         })
         .catch(function(err){
           clearTimeout(timer);
-          if (err && err.name === "AbortError") {
-            ppShowError("{% trans 'Payment confirmation timed out. If you approved it in PayPal, do NOT pay again — contact us and we will check it.' %}");
-          } else {
-            ppShowError("{% trans 'PayPal could not confirm the payment. Please try again or use card.' %}");
-          }
+          ppReconcileThenError(err && err.name === "AbortError"
+            ? "{% trans 'PayPal is taking longer than expected.' %}" : null);
         });
     },
 
     onCancel: function(){ ppShowStatus(""); },
+
     onError: function(){
       ppShowStatus("");
       ppShowError("{% trans 'PayPal encountered a problem. Please try again or use card.' %}");
@@ -500,6 +534,7 @@
     const tab = e.target.closest(".pay-tab[data-paytab]");
     if(!tab) return;
     if(tab.dataset.paytab === "stripe"){
+      if (!STRIPE_READY) return;               // elegant message already rendered in the panel
       setTimeout(() => mountStripe().catch(err => {
         const msg = document.getElementById("stripeMsg");
         if(msg) msg.textContent = err.message || "Stripe init failed.";
@@ -507,7 +542,9 @@
     }
   });
 
+  var STRIPE_READY = {% if stripe_ready %}true{% else %}false{% endif %};
   function mountIfCardActive(){
+    if (!STRIPE_READY) return;                 // no 503 noise while paying with PayPal
     // The Card tab is active by default but Stripe only mounted on CLICK — on live this
     // surfaced as a stuck "Loading…" or a generic error only after re-clicking the tab.
     const active = document.querySelector('.pay-tab.active[data-paytab="stripe"]');
