@@ -17,7 +17,7 @@
   <div class="gl-eyebrow" style="margin-top:0;">{% trans "API operations" %}</div>
   <div style="display:flex;flex-wrap:wrap;gap:.55rem;align-items:center;">
     {% if gl_has_key %}
-      <form method="post" action="{% url 'admin:assistant_assistantconfig_test' original.pk %}" style="margin:0;">
+      <form method="post" action="{% url 'admin:assistant_assistantconfig_test' original.pk %}" style="margin:0;" data-gl-op="aitest">
         {% csrf_token %}<button type="submit" class="gl-action">{% trans "Test OpenAI connection" %}</button></form>
     {% else %}
       <div style="opacity:.75;font-size:.88rem;">{% trans "Save an API key first, then the test appears here." %}</div>

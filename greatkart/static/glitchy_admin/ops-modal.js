@@ -12,11 +12,14 @@
     sync: ["Connecting to Printify", "Reading products", "Mapping catalog", "Updating local database", "Building report"],
     use: ["Selecting shop", "Saving"],
     paytest: ["Connecting to the payment provider", "Checking credentials (read-only)", "Building report"],
+    aitest: ["Connecting to OpenAI", "Validating key (read-only)", "Building report"],
+    gkeytest: ["Connecting to Google", "Checking the server key (read-only)", "Building report"],
     default: ["Working with Printify", "Please wait"]
   };
   var TITLES = {
     discover: "Discovering shops…", test: "Testing connection…", dryrun: "Dry-run in progress…",
-    sync: "Syncing products…", use: "Selecting shop…", paytest: "Testing connection…", default: "Working…"
+    sync: "Syncing products…", use: "Selecting shop…", paytest: "Testing connection…",
+    aitest: "Testing OpenAI connection…", gkeytest: "Testing Google connection…", default: "Working…"
   };
 
   function reduced() {

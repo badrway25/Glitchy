@@ -30,7 +30,7 @@ save error never comes as a surprise. Never prints any key value.{% endcomment %
             data-msg-status="{% trans 'Places responded with status:' %}">
       {% trans "Test browser key in this browser" %}</button>
     {% if gl_has_key %}
-      <form method="post" action="{% url 'admin:shipping_checkoutapiconfig_test' original.pk %}" style="margin:0;">
+      <form method="post" action="{% url 'admin:shipping_checkoutapiconfig_test' original.pk %}" style="margin:0;" data-gl-op="gkeytest">
         {% csrf_token %}<button type="submit" class="gl-action">{% trans "Test server key (server-side)" %}</button></form>
     {% else %}
       <div style="opacity:.75;font-size:.88rem;">
