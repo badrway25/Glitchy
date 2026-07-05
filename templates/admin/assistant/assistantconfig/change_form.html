@@ -1,0 +1,30 @@
+{% extends "admin/change_form.html" %}
+{% load i18n %}
+
+{% block content %}
+{% if gl_secretbox_ready is not None and not gl_secretbox_ready %}
+<div class="gl-card" style="max-width:960px;margin:0 0 1.25rem;padding:1rem 1.25rem;border:1px solid rgba(214,158,46,.5);border-radius:14px;background:rgba(214,158,46,.08);">
+  <div style="font-weight:700;color:#8a5a12;margin-bottom:.25rem;">⚠ {% trans "Encryption key missing" %}</div>
+  <div style="font-size:.9rem;line-height:1.6;">
+    {% trans "The OpenAI API key is stored encrypted and cannot be saved right now. Ask the server administrator to configure PAYMENT_CONFIG_KEY. Non-secret settings on this page can still be saved." %}
+  </div>
+</div>
+{% endif %}
+{{ block.super }}
+
+{% if original and gl_is_superadmin %}
+<div class="gl-card gl-payment-ops" style="margin-top:1.5rem;max-width:960px;">
+  <div class="gl-eyebrow" style="margin-top:0;">{% trans "API operations" %}</div>
+  <div style="display:flex;flex-wrap:wrap;gap:.55rem;align-items:center;">
+    {% if gl_has_key %}
+      <form method="post" action="{% url 'admin:assistant_assistantconfig_test' original.pk %}" style="margin:0;">
+        {% csrf_token %}<button type="submit" class="gl-action">{% trans "Test OpenAI connection" %}</button></form>
+    {% else %}
+      <div style="opacity:.75;font-size:.88rem;">{% trans "Save an API key first, then the test appears here." %}</div>
+    {% endif %}
+  </div>
+  <p style="font-size:.82rem;color:var(--gl-muted);margin:.5rem 0 0;">
+    {% trans "The test is read-only (lists your models) — no chat call, no cost beyond a metadata request, the key is never displayed. The assistant keeps working in curated-knowledge mode while OpenAI is disabled." %}</p>
+</div>
+{% endif %}
+{% endblock %}

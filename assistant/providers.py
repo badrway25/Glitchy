@@ -21,7 +21,27 @@ class OpenAIProvider:
     ENDPOINT = "https://api.openai.com/v1/chat/completions"
 
     def __init__(self):
-        self.api_key = getattr(settings, "AI_API_KEY", "") or ""
+        # DB-first (encrypted admin config), env fallback — same resolver philosophy
+        # as payments: nothing changes for existing deployments until the owner
+        # configures the admin. The key NEVER leaves the server.
+        self.api_key = ""
+        self.model_override = ""
+        self.temperature = None
+        self.max_tokens = None
+        try:
+            from .models import AssistantConfig
+            cfg = AssistantConfig.load()
+            if cfg and cfg.is_enabled and cfg.has_api_key():
+                key = cfg.get_api_key()
+                if key:
+                    self.api_key = key
+                    self.model_override = cfg.model or ""
+                    self.temperature = cfg.temperature
+                    self.max_tokens = cfg.max_output_tokens
+        except Exception:
+            pass
+        if not self.api_key:
+            self.api_key = getattr(settings, "AI_API_KEY", "") or ""
         self.model = getattr(settings, "AI_MODEL", "gpt-4o-mini")
         self.max_tokens = getattr(settings, "AI_MAX_TOKENS", 500)
         self.timeout = getattr(settings, "AI_TIMEOUT_SECONDS", 20)

@@ -118,3 +118,80 @@ class AssistantFeedback(models.Model):
     class Meta:
         verbose_name = _("Assistant feedback")
         verbose_name_plural = _("Assistant feedback")
+
+
+class AssistantConfig(models.Model):
+    """Singleton OpenAI configuration for the Glitchy Assistant.
+
+    Mirrors the Payment/Google control-center pattern: the API key is WRITE-ONLY and
+    encrypted at rest via payments.secrets (PAYMENT_CONFIG_KEY — historical name, one
+    secretbox per deployment); only a fingerprint + last-4 are ever shown again. The
+    provider resolves DB-first with env (AI_API_KEY) fallback, so existing deployments
+    keep working until the owner configures the admin.
+    """
+    is_enabled = models.BooleanField(
+        default=False, help_text="Master switch: the assistant calls OpenAI only when ON. "
+                                 "OFF = curated-knowledge fallback mode (still useful).")
+    model = models.CharField(max_length=64, default="gpt-4o-mini",
+                             help_text="OpenAI model id used for answers.")
+    temperature = models.FloatField(default=0.4)
+    max_input_chars = models.PositiveIntegerField(default=600)
+    max_output_tokens = models.PositiveIntegerField(default=350)
+    rate_limit_per_session = models.PositiveIntegerField(
+        default=12, help_text="Messages allowed per session per 10 minutes.")
+    system_prompt_extra = models.TextField(
+        blank=True, default="",
+        help_text="Optional store-specific guidance appended to the built-in safe prompt. "
+                  "Never overrides the safety rules.")
+
+    api_key_ciphertext = models.TextField(blank=True, default="")
+    api_key_fingerprint = models.CharField(max_length=16, blank=True, default="")
+    api_key_last_four = models.CharField(max_length=8, blank=True, default="")
+    api_key_set_at = models.DateTimeField(blank=True, null=True)
+
+    last_connection_status = models.CharField(max_length=16, blank=True, default="")
+    last_connection_detail = models.CharField(max_length=200, blank=True, default="")
+    last_connection_at = models.DateTimeField(blank=True, null=True)
+
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Assistant AI settings"
+        verbose_name_plural = "Assistant AI settings"
+
+    def __str__(self):
+        return "Glitchy Assistant — OpenAI"
+
+    # --- encrypted key slot (same secretbox as payments/Google) -------------------
+    def set_api_key(self, plaintext, by=""):
+        from payments import secrets as secretbox
+        plaintext = (plaintext or "").strip()
+        self.api_key_ciphertext = secretbox.encrypt(plaintext)
+        self.api_key_fingerprint = secretbox.fingerprint(plaintext)
+        self.api_key_last_four = plaintext[-4:] if len(plaintext) >= 4 else ""
+        from django.utils import timezone
+        self.api_key_set_at = timezone.now()
+
+    def get_api_key(self):
+        from payments import secrets as secretbox
+        return secretbox.decrypt(self.api_key_ciphertext)
+
+    def has_api_key(self):
+        return bool(self.api_key_ciphertext)
+
+    def api_key_display(self):
+        if not self.has_api_key():
+            return ""
+        return f"•••• {self.api_key_last_four} · fp:{self.api_key_fingerprint}"
+
+    def record_connection(self, status, detail=""):
+        from django.utils import timezone
+        self.last_connection_status = status
+        self.last_connection_detail = (detail or "")[:200]
+        self.last_connection_at = timezone.now()
+        self.save(update_fields=["last_connection_status", "last_connection_detail",
+                                 "last_connection_at"])
+
+    @classmethod
+    def load(cls):
+        return cls.objects.order_by("id").first()
