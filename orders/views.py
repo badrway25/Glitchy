@@ -163,6 +163,31 @@ def _paypal_success_payload(order, payment_id, status="completed"):
             "payment_id": payment_id, "redirect_url": redirect_url}
 
 
+def order_status(request):
+    """Read-only polling endpoint for the order-complete page. Owner-scoped, no PII,
+    never mutates. Powers 'this page updates automatically'."""
+    order_number = (request.GET.get("order_number") or "")[:40]
+    qs = Order.objects.filter(order_number=order_number, is_ordered=True)
+    if request.user.is_authenticated:
+        order = qs.filter(user=request.user).first()
+    else:
+        order = qs.filter(is_guest=True, session_key=request.session.session_key).first()
+    if not order:
+        return JsonResponse({"ok": False}, status=404)
+    from .timeline import get_order_timeline, timeline_summary
+    return JsonResponse({
+        "ok": True,
+        "payment_status": "completed",
+        "production_status": timeline_summary(order),
+        "timeline": [{"key": s_["key"], "label": s_["label"], "status": s_["status"],
+                      "description": s_["description"], "icon": s_["icon"],
+                      "action_url": s_.get("action_url", "")}
+                     for s_ in get_order_timeline(order)],
+        "tracking_url": order.tracking_url or None,
+        "updated_at": order.updated_at.isoformat() if getattr(order, "updated_at", None) else "",
+    })
+
+
 @require_POST
 def paypal_capture(request):
     """SERVER-SIDE capture + finalize for PayPal, with a deterministic JSON contract.
@@ -806,6 +831,24 @@ def order_complete(request):
             "subtotal": subtotal,
             "recommended_products": recommended_products,
         }
+        from .timeline import get_order_timeline, timeline_summary
+        context["timeline"] = get_order_timeline(order)
+        context["production_status"] = timeline_summary(order)
+        try:
+            from notifications.models import OutboundEvent
+            ev_row = (OutboundEvent.objects
+                      .filter(order=order, event_type="order.paid")
+                      .order_by("-created_at").first())
+            context["confirmation_email_status"] = ev_row.status if ev_row else ""
+        except Exception:
+            context["confirmation_email_status"] = ""
+        try:
+            from payments.models import PaymentProviderConfig
+            prov = (payment.payment_method or "").lower()
+            cfg = PaymentProviderConfig.objects.filter(provider=prov).first()
+            context["is_test_payment"] = bool(cfg and cfg.environment == "test")
+        except Exception:
+            context["is_test_payment"] = False
         return render(request, "orders/order_complete.html", context)
 
     except (Payment.DoesNotExist, Order.DoesNotExist):
