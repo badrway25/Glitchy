@@ -233,6 +233,115 @@ def category_readiness():
     return rows
 
 
+def payments_snapshot():
+    """Aggregated payment KPIs — counts + sums only, never a card/id/PII."""
+    try:
+        from django.db.models import Sum, Count
+        from orders.models import Order, Payment
+    except Exception:
+        return {"available": False}
+    now = timezone.now()
+    d1 = now - timezone.timedelta(days=1)
+    d7 = now - timezone.timedelta(days=7)
+    paid = Order.objects.filter(is_ordered=True)
+    by_method = list(Payment.objects.filter(created_at__gte=d7)
+                     .values("payment_method").annotate(n=Count("id")).order_by("-n")[:4])
+    return {
+        "available": True,
+        "today": paid.filter(created_at__gte=d1).count(),
+        "revenue_7d": round(paid.filter(created_at__gte=d7)
+                            .aggregate(s=Sum("order_total"))["s"] or 0, 2),
+        "pending": Order.objects.filter(is_ordered=False,
+                                        created_at__gte=d7).count(),
+        "by_method": by_method,
+    }
+
+
+def outbox_snapshot():
+    """n8n/email outbox health — status counts + config flag, zero recipients shown."""
+    try:
+        from django.conf import settings as st
+        from django.db.models import Count
+        from notifications.models import OutboundEvent
+    except Exception:
+        return {"available": False}
+    d7 = timezone.now() - timezone.timedelta(days=7)
+    counts = {r["status"]: r["n"] for r in
+              OutboundEvent.objects.filter(created_at__gte=d7)
+              .values("status").annotate(n=Count("id"))}
+    return {
+        "available": True,
+        "n8n_enabled": bool(getattr(st, "N8N_ENABLED", False)),
+        "sent": counts.get("sent", 0),
+        "pending": counts.get("pending", 0) + counts.get("skipped", 0),
+        "failed": counts.get("failed", 0),
+    }
+
+
+def assistant_snapshot():
+    """Assistant status — config + 24h volume, no message content."""
+    try:
+        from assistant.models import AssistantConfig, AssistantMessage
+        from assistant.providers import OpenAIProvider
+    except Exception:
+        return {"available": False}
+    cfg = AssistantConfig.load()
+    d1 = timezone.now() - timezone.timedelta(hours=24)
+    msgs = AssistantMessage.objects.filter(created_at__gte=d1)
+    return {
+        "available": True,
+        "online": OpenAIProvider().available(),
+        "enabled": bool(cfg and cfg.is_enabled),
+        "key_set": bool(cfg and cfg.has_api_key()),
+        "model": (cfg.model if cfg else ""),
+        "msgs_24h": msgs.filter(role="user").count(),
+        "blocked_24h": msgs.filter(role="assistant",
+                                   provider="guardrail").count(),
+    }
+
+
+def ops_health():
+    """Configured yes/no per provider — flags only, never a key."""
+    out = []
+    try:
+        from payments import config as pconf
+        out.append(("Stripe", bool(pconf.stripe_secret_key() and pconf.stripe_publishable_key())))
+        out.append(("PayPal", pconf.paypal_available()))
+    except Exception:
+        pass
+    try:
+        from shipping.models import CheckoutApiConfig
+        c = CheckoutApiConfig.load()
+        out.append(("Google Places", bool(c and c.autocomplete_ready())))
+    except Exception:
+        pass
+    try:
+        from assistant.models import AssistantConfig
+        a = AssistantConfig.load()
+        out.append(("OpenAI", bool(a and a.is_enabled and a.has_api_key())))
+    except Exception:
+        pass
+    try:
+        from django.conf import settings as st
+        out.append(("n8n", bool(getattr(st, "N8N_ENABLED", False))))
+    except Exception:
+        pass
+    return out
+
+
+def recent_activity(limit=6):
+    """Latest paid orders — number/status/total only (no names, no addresses)."""
+    try:
+        from orders.models import Order
+        rows = list(Order.objects.filter(is_ordered=True)
+                    .order_by("-created_at")
+                    .values("order_number", "status", "order_total", "created_at",
+                            "printify_status")[:limit])
+        return rows
+    except Exception:
+        return []
+
+
 def dashboard_callback(request, context):
     try:
         context["gl_health"] = catalog_health()
@@ -241,8 +350,14 @@ def dashboard_callback(request, context):
         context["gl_orders"] = orders_snapshot()
         context["gl_wishlist"] = wishlist_signal()
         context["gl_categories"] = category_readiness()
+        context["gl_payments"] = payments_snapshot()
+        context["gl_outbox"] = outbox_snapshot()
+        context["gl_assistant"] = assistant_snapshot()
+        context["gl_ops_health"] = ops_health()
+        context["gl_recent"] = recent_activity()
     except Exception:
-        for k in ("gl_health", "gl_status", "gl_sync", "gl_orders", "gl_wishlist", "gl_categories"):
+        for k in ("gl_health", "gl_status", "gl_sync", "gl_orders", "gl_wishlist", "gl_categories",
+                  "gl_payments", "gl_outbox", "gl_assistant", "gl_ops_health", "gl_recent"):
             context.setdefault(k, None)
     context["gl_quick_actions"] = [
         {"label": "Printify accounts", "url": _safe_url("admin:printify_integration_printifyaccountconfig_changelist")},
@@ -250,5 +365,8 @@ def dashboard_callback(request, context):
         {"label": "Missing images", "url": _pl("?missing_image=1")},
         {"label": "Missing prices", "url": _pl("?missing_price=1")},
         {"label": "Orders", "url": _safe_url("admin:orders_order_changelist")},
+        {"label": "Payments config", "url": _safe_url("admin:payments_paymentproviderconfig_changelist")},
+        {"label": "Assistant settings", "url": _safe_url("admin:assistant_assistantconfig_changelist")},
+        {"label": "Email outbox", "url": _safe_url("admin:notifications_outboundevent_changelist")},
     ]
     return context

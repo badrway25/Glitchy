@@ -185,7 +185,67 @@
     </div>
     {% endif %}
 
+    
+  {# ===== Control-center row: payments / outbox / assistant / ops health ===== #}
+  <div class="gl-grid gl-grid-2" style="margin-top:.85rem;">
+
+    {% if gl_payments and gl_payments.available %}
     <div class="gl-card" data-gl-reveal>
+      <div class="gl-eyebrow" style="margin-top:0;">{% trans "Payments" %}</div>
+      <div class="gl-kv"><span class="k">{% trans "Paid orders (24h)" %}</span><span class="v">{{ gl_payments.today }}</span></div>
+      <div class="gl-kv"><span class="k">{% trans "Revenue (7d)" %}</span><span class="v">€ {{ gl_payments.revenue_7d }}</span></div>
+      <div class="gl-kv"><span class="k">{% trans "Awaiting payment (7d)" %}</span><span class="v">{{ gl_payments.pending }}</span></div>
+      {% if gl_payments.by_method %}
+      <div class="gl-kv"><span class="k">{% trans "Methods (7d)" %}</span><span class="v">
+        {% for m in gl_payments.by_method %}{{ m.payment_method }} × {{ m.n }}{% if not forloop.last %} · {% endif %}{% endfor %}</span></div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {% if gl_outbox and gl_outbox.available %}
+    <div class="gl-card" data-gl-reveal>
+      <div class="gl-eyebrow" style="margin-top:0;">{% trans "Email outbox" %}</div>
+      <div class="gl-kv"><span class="k">n8n</span><span class="v"><span class="gl-pulse {% if not gl_outbox.n8n_enabled %}off{% endif %}"></span>{% if gl_outbox.n8n_enabled %}{% trans "enabled" %}{% else %}{% trans "SMTP fallback" %}{% endif %}</span></div>
+      <div class="gl-kv"><span class="k">{% trans "Sent (7d)" %}</span><span class="v">{{ gl_outbox.sent }}</span></div>
+      <div class="gl-kv"><span class="k">{% trans "Pending" %}</span><span class="v">{{ gl_outbox.pending }}</span></div>
+      <div class="gl-kv"><span class="k">{% trans "Failed" %}</span><span class="v {% if gl_outbox.failed %}gl-bad{% endif %}">{{ gl_outbox.failed }}</span></div>
+    </div>
+    {% endif %}
+
+    {% if gl_assistant and gl_assistant.available %}
+    <div class="gl-card" data-gl-reveal>
+      <div class="gl-eyebrow" style="margin-top:0;">{% trans "Assistant" %}</div>
+      <div class="gl-kv"><span class="k">{% trans "Mode" %}</span><span class="v"><span class="gl-pulse {% if not gl_assistant.online %}warn{% endif %}"></span>{% if gl_assistant.online %}{% trans "online (AI)" %}{% else %}{% trans "limited" %}{% endif %}</span></div>
+      <div class="gl-kv"><span class="k">{% trans "Model" %}</span><span class="v">{{ gl_assistant.model|default:"—" }}</span></div>
+      <div class="gl-kv"><span class="k">{% trans "Messages (24h)" %}</span><span class="v">{{ gl_assistant.msgs_24h }}</span></div>
+      <div class="gl-kv"><span class="k">{% trans "Safety blocks (24h)" %}</span><span class="v">{{ gl_assistant.blocked_24h }}</span></div>
+    </div>
+    {% endif %}
+
+    {% if gl_ops_health %}
+    <div class="gl-card" data-gl-reveal>
+      <div class="gl-eyebrow" style="margin-top:0;">{% trans "Operational health" %}</div>
+      {% for name, ok in gl_ops_health %}
+      <div class="gl-kv"><span class="k">{{ name }}</span>
+        <span class="v"><span class="gl-pulse {% if not ok %}off{% endif %}"></span>{% if ok %}{% trans "configured" %}{% else %}{% trans "not configured" %}{% endif %}</span></div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+
+  {% if gl_recent %}
+  <div class="gl-card" data-gl-reveal style="margin-top:.85rem;">
+    <div class="gl-eyebrow" style="margin-top:0;">{% trans "Recent orders" %}</div>
+    <div class="gl-recent-rows">
+      {% for r in gl_recent %}
+      <div class="gl-kv"><span class="k">#{{ r.order_number }} · {{ r.created_at|date:"d M H:i" }}</span>
+        <span class="v">{{ r.status }}{% if r.printify_status %} · {{ r.printify_status }}{% endif %} · € {{ r.order_total }}</span></div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="gl-card" data-gl-reveal>
       <div class="gl-eyebrow" style="margin-top:0;">{% trans "Quick actions" %}</div>
       <div class="gl-actions">
         {% for a in gl_quick_actions %}

@@ -253,3 +253,8 @@ html.dark .gl-login-main { background: #221f1a; }
 @media (prefers-reduced-motion: reduce) {
   .gl-login-hero-glow, .gl-g-tri rect { animation: none !important; }
 }
+
+/* Breathing room between status dots and their text (owner feedback) */
+.gl-pulse { margin-right: .55rem; vertical-align: middle; flex: 0 0 auto; }
+.gl-kv { padding: .5rem 0; }
+.gl-kv .v { display: inline-flex; align-items: center; gap: .1rem; }
