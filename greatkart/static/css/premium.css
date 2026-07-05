@@ -3637,3 +3637,8 @@ form .form-control,form .custom-select{transition:border-color .18s var(--ease),
 .pp-error{margin:.7rem 0 0;padding:.65rem .85rem;border-radius:10px;font-size:.85rem;font-weight:600;
   background:rgba(220,38,38,.08);color:#b91c1c;border:1px solid rgba(220,38,38,.25);}
 .pp-note{margin:.85rem 0 0;font-size:.78rem;line-height:1.55;opacity:.65;text-align:center;}
+
+/* PayPal confirming status line */
+.pp-status{margin:.7rem 0 0;padding:.6rem .85rem;border-radius:10px;font-size:.85rem;font-weight:600;
+  background:rgba(184,151,90,.1);color:#7a5f2e;border:1px solid rgba(184,151,90,.25);text-align:center;}
+[data-theme="dark"] .pp-status{color:#e0cfa6;}
