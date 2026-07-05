@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: greatkart 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-04 22:49+0200\n"
+"POT-Creation-Date: 2026-07-05 09:44+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,35 +18,35 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: .\accounts\admin.py:22 .\orders\admin.py:153
-#: .\templates\accounts\address_form.html:45 .\templates\accounts\login.html:37
+#: .\templates\accounts\address_form.html:55 .\templates\accounts\login.html:37
 #: .\templates\legal\cookies.html:26 .\templates\legal\privacy.html:31
 #: .\templates\legal\terms.html:25 .\templates\store\checkout.html:128
 msgid "Email"
 msgstr "E-mail"
 
-#: .\accounts\forms.py:17 .\templates\store\checkout.html:181
+#: .\accounts\forms.py:20 .\templates\store\checkout.html:181
 msgid "Select country"
 msgstr "Sélectionner un pays"
 
-#: .\accounts\forms.py:18 .\templates\accounts\address_form.html:62
+#: .\accounts\forms.py:21 .\templates\accounts\address_form.html:113
 #: .\templates\includes\shipping_estimator.html:37
 #: .\templates\store\checkout.html:178
 msgid "Country"
 msgstr "Pays"
 
-#: .\accounts\forms.py:29
+#: .\accounts\forms.py:65
 msgid "Optional"
 msgstr "Facultatif"
 
-#: .\accounts\forms.py:35
+#: .\accounts\forms.py:71
 msgid "Please enter a city."
 msgstr "Veuillez saisir une ville."
 
-#: .\accounts\forms.py:42
+#: .\accounts\forms.py:78
 msgid "Please enter a postal code."
 msgstr "Veuillez saisir un code postal."
 
-#: .\accounts\forms.py:48 .\orders\forms.py:47
+#: .\accounts\forms.py:84 .\orders\forms.py:30
 msgid "Please enter a valid phone number."
 msgstr "Veuillez saisir un numéro de téléphone valide."
 
@@ -56,7 +56,7 @@ msgid "Your collection"
 msgstr "Votre collection"
 
 #: .\accounts\test_phase64_premium.py:115 .\orders\admin.py:140
-#: .\templates\accounts\address_form.html:53
+#: .\templates\accounts\address_form.html:92
 msgid "Shipping address"
 msgstr "Adresse de livraison"
 
@@ -130,11 +130,11 @@ msgstr "Ces articles ne sont plus disponibles."
 msgid "Some items are no longer available and were skipped."
 msgstr "Certains articles ne sont plus disponibles et ont été ignorés."
 
-#: .\accounts\views.py:493
+#: .\accounts\views.py:517
 msgid "Address removed."
 msgstr "Adresse supprimée."
 
-#: .\accounts\views.py:503
+#: .\accounts\views.py:527
 msgid "Default address updated."
 msgstr "Adresse par défaut mise à jour."
 
@@ -341,11 +341,11 @@ msgstr ""
 msgid "Payment control"
 msgstr "Contrôle des paiements"
 
-#: .\greatkart\settings.py:225 .\payments\models.py:80
+#: .\greatkart\settings.py:225 .\payments\models.py:84
 msgid "Payment providers"
 msgstr "Fournisseurs de paiement"
 
-#: .\greatkart\settings.py:226 .\payments\models.py:168
+#: .\greatkart\settings.py:226 .\payments\models.py:172
 msgid "Payment monitor"
 msgstr "Moniteur de paiements"
 
@@ -723,43 +723,59 @@ msgstr "Coût de livraison"
 msgid "Payment fee"
 msgstr "Frais de paiement"
 
-#: .\orders\forms.py:38
+#: .\orders\forms.py:22
 msgid "Phone numbers can only contain digits, spaces and + ( ) - ."
 msgstr ""
 
-#: .\orders\forms.py:45
+#: .\orders\forms.py:28
 msgid "This phone number looks too short or too long."
 msgstr "Ce numéro de téléphone semble trop court ou trop long."
 
-#: .\orders\forms.py:52
+#: .\orders\forms.py:33
 msgid "Please enter a valid phone number (e.g. +39 333 1234567)."
 msgstr "Veuillez saisir un numéro de téléphone valide."
 
-#: .\orders\forms.py:60
+#: .\orders\forms.py:73
 msgid "This field contains invalid characters."
 msgstr ""
 
-#: .\orders\views.py:452
+#: .\orders\views.py:131
+msgid "Invalid order total."
+msgstr "Total de commande invalide."
+
+#: .\orders\views.py:138
+msgid ""
+"Card payments are not configured yet. Please choose another payment method "
+"or contact us."
+msgstr "Les paiements par carte ne sont pas encore configurés. Choisissez un autre moyen de paiement ou contactez-nous."
+
+#: .\orders\views.py:159
+msgid ""
+"We could not start the card payment. Please try again in a moment or choose "
+"another payment method."
+msgstr "Impossible de démarrer le paiement par carte. Réessayez dans un instant ou choisissez un autre moyen."
+
+#: .\orders\views.py:471
 msgid "We could not process this request. Please try again."
 msgstr "Impossible de charger le produit. Veuillez réessayer."
 
-#: .\orders\views.py:458
+#: .\orders\views.py:477
 msgid "Please review the highlighted fields and try again."
 msgstr "Vérifiez les champs en surbrillance et réessayez."
 
-#: .\orders\views.py:467
+#: .\orders\views.py:486
 msgid "We don't ship to this country yet."
 msgstr "Nous ne livrons pas encore dans ce pays."
 
-#: .\orders\views.py:468
+#: .\orders\views.py:487
 msgid "We're sorry, we don't ship to the selected country yet."
 msgstr "Nous ne livrons pas encore dans ce pays."
 
-#: .\orders\views.py:487 .\shipping\address_validation.py:171
+#: .\orders\views.py:506 .\shipping\address_validation.py:171
 msgid "Please select a verified address from the suggestions."
 msgstr "Veuillez sélectionner une adresse vérifiée parmi les suggestions."
 
-#: .\orders\views.py:498
+#: .\orders\views.py:517
 msgid ""
 "This address is not verified. Confirm it to continue, or pick it from the "
 "suggestions."
@@ -767,7 +783,7 @@ msgstr ""
 "Cette adresse n'est pas vérifiée. Confirmez-la pour continuer, ou choisissez-"
 "la parmi les suggestions."
 
-#: .\orders\views.py:501
+#: .\orders\views.py:520
 msgid "Please review your address below."
 msgstr "Vérifiez votre adresse ci-dessous."
 
@@ -775,165 +791,211 @@ msgstr "Vérifiez votre adresse ci-dessous."
 msgid "Set / replace Stripe secret key"
 msgstr ""
 
-#: .\payments\admin.py:37 .\shipping\admin.py:34
+#: .\payments\admin.py:38 .\shipping\admin.py:34
 msgid ""
 "Write-only. Leave blank to keep the current key. Encrypted at rest, never "
 "shown again."
 msgstr ""
 
-#: .\payments\admin.py:39
+#: .\payments\admin.py:40
 msgid "Set / replace Stripe webhook signing secret"
 msgstr ""
 
-#: .\payments\admin.py:41
+#: .\payments\admin.py:43
 msgid "Write-only. Used to verify webhook signatures."
 msgstr ""
 
-#: .\payments\admin.py:43
+#: .\payments\admin.py:45
 msgid "Set / replace PayPal client secret"
 msgstr ""
 
-#: .\payments\admin.py:45
+#: .\payments\admin.py:48
 msgid "Write-only. Encrypted at rest, never shown again."
 msgstr ""
 
-#: .\payments\admin.py:75
+#: .\payments\admin.py:83
 msgid ""
 "PAYMENT_CONFIG_KEY is not configured on the server — cannot encrypt the "
 "secret. Set it in the environment first."
 msgstr ""
 
-#: .\payments\admin.py:99 .\payments\admin.py:103 .\payments\admin.py:112
-#: .\payments\admin.py:166
+#: .\payments\admin.py:109
+msgid ""
+"Stripe Dashboard → Developers → API keys (Publishable + Secret). Webhook "
+"signing secret: Developers → Webhooks → your endpoint. Test keys start "
+"sk_test_/pk_test_, live keys sk_live_/pk_live_. Live checkout stays OFF "
+"until a superuser enables it below."
+msgstr ""
+
+#: .\payments\admin.py:113
+msgid ""
+"PayPal Developer Dashboard → Apps & Credentials (Sandbox or Live) → your app "
+"→ Client ID + Secret. Webhook ID: your app → Webhooks. Sandbox is the "
+"default; Live checkout stays OFF until a superuser enables it below."
+msgstr ""
+
+#: .\payments\admin.py:117 .\payments\admin.py:181
 msgid "Provider"
 msgstr ""
 
-#: .\payments\admin.py:100
-msgid "Pick a provider and Save, then add credentials + test the connection."
+#: .\payments\admin.py:118
+msgid "Stripe credentials"
 msgstr ""
 
-#: .\payments\admin.py:104
-msgid "Stripe keys"
+#: .\payments\admin.py:122
+msgid "PayPal credentials"
 msgstr ""
 
-#: .\payments\admin.py:106 .\payments\admin.py:115 .\payments\admin.py:210
+#: .\payments\admin.py:126 .\payments\admin.py:230
 #: .\templates\admin\payments\paymentproviderconfig\change_form.html:9
 msgid "Payment operations"
 msgstr "Opérations de paiement"
 
-#: .\payments\admin.py:107 .\payments\admin.py:116
+#: .\payments\admin.py:127
 msgid "Safety gates"
 msgstr ""
 
-#: .\payments\admin.py:108 .\payments\admin.py:117
-#: .\printify_integration\admin.py:318 .\shipping\admin.py:103
+#: .\payments\admin.py:128 .\printify_integration\admin.py:318
+#: .\shipping\admin.py:103
 msgid "Connection status"
 msgstr ""
 
-#: .\payments\admin.py:109 .\payments\admin.py:118
-#: .\printify_integration\admin.py:96 .\shipping\admin.py:104
+#: .\payments\admin.py:129 .\printify_integration\admin.py:96
+#: .\shipping\admin.py:104
 msgid "Meta"
 msgstr ""
 
-#: .\payments\admin.py:113
-msgid "PayPal credentials"
-msgstr ""
-
-#: .\payments\admin.py:168
+#: .\payments\admin.py:183
 msgid "LIVE"
 msgstr ""
 
-#: .\payments\admin.py:168
+#: .\payments\admin.py:183
 msgid "TEST"
 msgstr ""
 
-#: .\payments\admin.py:173 .\printify_integration\admin.py:311
+#: .\payments\admin.py:188 .\printify_integration\admin.py:311
 #: .\shipping\admin.py:138 .\templates\admin\index.html:82
 msgid "Connection"
 msgstr ""
 
-#: .\payments\admin.py:177 .\shipping\admin.py:143
+#: .\payments\admin.py:192 .\shipping\admin.py:143
 msgid "not tested"
 msgstr ""
 
-#: .\payments\admin.py:181
-msgid "Secret status"
+#: .\payments\admin.py:198
+msgid "Not saved yet — enter the credentials above and Save."
 msgstr ""
 
-#: .\payments\admin.py:184
-msgid "Save first, then add credentials."
-msgstr ""
-
-#: .\payments\admin.py:186 .\payments\models.py:18
-msgid "Stripe secret key"
-msgstr ""
-
-#: .\payments\admin.py:187
-msgid "Webhook secret"
-msgstr ""
-
-#: .\payments\admin.py:188
-msgid "PayPal secret"
-msgstr ""
-
-#: .\payments\admin.py:193 .\shipping\admin.py:152
+#: .\payments\admin.py:204 .\shipping\admin.py:152
 msgid "Updated by"
 msgstr ""
 
-#: .\payments\admin.py:196 .\printify_integration\admin.py:95
+#: .\payments\admin.py:207
+#, fuzzy
+#| msgid "View return status"
+msgid "Stripe secret status"
+msgstr "Voir le statut du retour"
+
+#: .\payments\admin.py:209 .\payments\admin.py:242
+msgid "Secret key"
+msgstr ""
+
+#: .\payments\admin.py:210 .\payments\admin.py:243
+msgid "Webhook secret"
+msgstr ""
+
+#: .\payments\admin.py:212
+msgid "PayPal secret status"
+msgstr ""
+
+#: .\payments\admin.py:214 .\payments\admin.py:247
+msgid "Client secret"
+msgstr ""
+
+#: .\payments\admin.py:216 .\printify_integration\admin.py:95
 #: .\shipping\admin.py:155
 msgid "Connection status (read-only)"
 msgstr ""
 
-#: .\payments\admin.py:199 .\shipping\admin.py:158
+#: .\payments\admin.py:219 .\shipping\admin.py:158
 msgid "Never tested. Use 'Test connection'."
 msgstr ""
 
-#: .\payments\admin.py:213
-msgid "Save first, then Test connection."
+#: .\payments\admin.py:234
+msgid ""
+"Enter the credentials above and Save — then Test connection appears here."
 msgstr ""
 
-#: .\payments\admin.py:217
-msgid "Active credential source"
+#: .\payments\admin.py:236 .\printify_integration\admin.py:70
+#: .\templates\admin\index.html:85
+msgid "set"
 msgstr ""
 
-#: .\payments\admin.py:218
+#: .\payments\admin.py:237
+msgid "not set"
+msgstr ""
+
+#: .\payments\admin.py:241
+msgid "Publishable key"
+msgstr ""
+
+#: .\payments\admin.py:246
+msgid "Client id"
+msgstr ""
+
+#: .\payments\admin.py:248
+msgid "Webhook id"
+msgstr ""
+
+#: .\payments\admin.py:250
+msgid "Active source"
+msgstr ""
+
+#: .\payments\admin.py:250
 msgid "Ready for checkout"
 msgstr ""
 
-#: .\payments\admin.py:218
+#: .\payments\admin.py:251
 msgid "yes"
 msgstr ""
 
-#: .\payments\admin.py:218
+#: .\payments\admin.py:251
 msgid "no"
 msgstr ""
 
-#: .\payments\admin.py:220
+#: .\payments\admin.py:254
+msgid "Live mode is disabled until explicitly allowed by a superuser."
+msgstr ""
+
+#: .\payments\admin.py:256
 msgid ""
 "Test connection is read-only — it never creates a payment, capture or refund."
 msgstr ""
 
-#: .\payments\admin.py:244 .\shipping\admin.py:184
+#: .\payments\admin.py:280 .\shipping\admin.py:184
 #, python-format
 msgid "Connection OK — %(d)s"
 msgstr ""
 
-#: .\payments\admin.py:246 .\shipping\admin.py:186
+#: .\payments\admin.py:282 .\shipping\admin.py:186
 #, python-format
 msgid "Connection failed — %(e)s"
 msgstr ""
 
-#: .\payments\admin.py:274
+#: .\payments\admin.py:310
 msgid "Result"
 msgstr ""
 
-#: .\payments\admin.py:277
+#: .\payments\admin.py:313
 msgid "ok"
 msgstr ""
 
-#: .\payments\admin.py:277
+#: .\payments\admin.py:313
 msgid "fail"
+msgstr ""
+
+#: .\payments\models.py:18
+msgid "Stripe secret key"
 msgstr ""
 
 #: .\payments\models.py:19
@@ -957,48 +1019,56 @@ msgid "Use this config for checkout. OFF by default."
 msgstr ""
 
 #: .\payments\models.py:45
+msgid "PayPal webhook id (not a secret)."
+msgstr ""
+
+#: .\payments\models.py:47
 msgid "Leave blank to derive from the environment."
 msgstr ""
 
-#: .\payments\models.py:66
+#: .\payments\models.py:68
 msgid "Superuser only. Keep OFF until tested."
 msgstr ""
 
-#: .\payments\models.py:67
+#: .\payments\models.py:69 .\payments\models.py:70
+msgid "Superuser only. Keep OFF by default."
+msgstr ""
+
+#: .\payments\models.py:71
 msgid "Superuser only. Required to use live keys."
 msgstr ""
 
-#: .\payments\models.py:79
+#: .\payments\models.py:83
 msgid "Payment provider"
 msgstr "Fournisseur de paiement"
 
-#: .\payments\models.py:148
+#: .\payments\models.py:152
 #: .\templates\admin\payments\paymentproviderconfig\change_form.html:13
 #: .\templates\admin\printify_integration\printifyaccountconfig\change_form.html:16
 msgid "Test connection"
 msgstr "Tester la connexion"
 
-#: .\payments\models.py:148
+#: .\payments\models.py:152
 msgid "Webhook"
 msgstr ""
 
-#: .\payments\models.py:149
+#: .\payments\models.py:153
 msgid "Verify capture"
 msgstr ""
 
-#: .\payments\models.py:149 .\returns\admin.py:51
+#: .\payments\models.py:153 .\returns\admin.py:51
 msgid "Refund"
 msgstr "Remboursement"
 
-#: .\payments\models.py:150
+#: .\payments\models.py:154
 msgid "Finalize"
 msgstr ""
 
-#: .\payments\models.py:156
+#: .\payments\models.py:160
 msgid "Provider event/charge id — idempotency key."
 msgstr ""
 
-#: .\payments\models.py:167
+#: .\payments\models.py:171
 msgid "Payment event"
 msgstr "Événement de paiement"
 
@@ -1016,10 +1086,6 @@ msgstr ""
 msgid ""
 "PRINTIFY_CONFIG_KEY is not configured on the server, so the token cannot be "
 "encrypted. Set that environment key first (a Fernet key)."
-msgstr ""
-
-#: .\printify_integration\admin.py:70 .\templates\admin\index.html:85
-msgid "set"
 msgstr ""
 
 #: .\printify_integration\admin.py:70 .\templates\admin\index.html:85
@@ -2395,81 +2461,115 @@ msgstr ""
 msgid "Back to addresses"
 msgstr "Retour aux commandes"
 
-#: .\templates\accounts\address_form.html:39
+#: .\templates\accounts\address_form.html:34
+#, fuzzy
+#| msgid "Type at least 3 characters…"
+msgid "Type at least a few characters…"
+msgstr "Saisissez au moins 3 caractères…"
+
+#: .\templates\accounts\address_form.html:35 .\templates\store\checkout.html:49
+msgid "No suggestions — you can keep typing the full address."
+msgstr "Aucune suggestion — vous pouvez continuer à saisir l'adresse complète."
+
+#: .\templates\accounts\address_form.html:36 .\templates\store\checkout.html:50
+msgid "Suggestion applied — please complete the missing fields."
+msgstr ""
+
+#: .\templates\accounts\address_form.html:37 .\templates\store\checkout.html:51
+msgid "Google Places is not available — enter the address manually."
+msgstr "Google Places n'est pas disponible — saisissez l'adresse manuellement."
+
+#: .\templates\accounts\address_form.html:38 .\templates\store\checkout.html:52
+msgid ""
+"Postal code not unique here — it completes automatically when you pick the "
+"street."
+msgstr ""
+"Code postal non unique ici — il se complète automatiquement quand vous "
+"choisissez la rue."
+
+#: .\templates\accounts\address_form.html:49
 #: .\templates\includes\footer.html:82 .\templates\legal\cookies.html:25
 #: .\templates\legal\privacy.html:30 .\templates\legal\terms.html:24
 #: .\templates\store\checkout.html:116
 msgid "Contact"
 msgstr "Contact"
 
-#: .\templates\accounts\address_form.html:40
+#: .\templates\accounts\address_form.html:50
 msgid "Who should we address the parcel to?"
 msgstr "À qui adressons-nous le colis ?"
 
-#: .\templates\accounts\address_form.html:43
+#: .\templates\accounts\address_form.html:53
 #: .\templates\accounts\register.html:45 .\templates\store\checkout.html:119
 msgid "First name"
 msgstr "Prénom"
 
-#: .\templates\accounts\address_form.html:44
+#: .\templates\accounts\address_form.html:54
 #: .\templates\accounts\register.html:46 .\templates\store\checkout.html:124
 msgid "Last name"
 msgstr "Nom"
 
-#: .\templates\accounts\address_form.html:46
+#: .\templates\accounts\address_form.html:56
 #: .\templates\store\checkout.html:133
 msgid "Phone"
 msgstr "Téléphone"
 
-#: .\templates\accounts\address_form.html:54
+#: .\templates\accounts\address_form.html:60
+#: .\templates\accounts\address_form.html:77
+#: .\templates\store\checkout.html:141 .\templates\store\checkout.html:158
+msgid "Phone prefix"
+msgstr "Indicatif téléphonique"
+
+#: .\templates\accounts\address_form.html:93
 msgid "Where should we deliver your order?"
 msgstr "Où livrons-nous votre commande ?"
 
-#: .\templates\accounts\address_form.html:57
-msgid "Address line 1"
-msgstr "Adresse ligne 1"
+#: .\templates\accounts\address_form.html:96
+#: .\templates\store\checkout.html:220 .\templates\store\checkout.html:223
+msgid "Street address"
+msgstr "Adresse (rue)"
 
-#: .\templates\accounts\address_form.html:58
+#: .\templates\accounts\address_form.html:100
 msgid "Address line 2"
 msgstr "Adresse ligne 2"
 
-#: .\templates\accounts\address_form.html:58
+#: .\templates\accounts\address_form.html:100
 msgid "(optional)"
 msgstr "(facultatif)"
 
-#: .\templates\accounts\address_form.html:59
+#: .\templates\accounts\address_form.html:101
 #: .\templates\store\checkout.html:197
 msgid "City"
 msgstr "Ville"
 
-#: .\templates\accounts\address_form.html:60
-msgid "State / Province"
-msgstr "État / Province"
+#: .\templates\accounts\address_form.html:105
+#: .\templates\store\checkout.html:188
+msgid "State / Region / Province"
+msgstr "État / Région / Province"
 
-#: .\templates\accounts\address_form.html:61
+#: .\templates\accounts\address_form.html:109
 #: .\templates\includes\shipping_estimator.html:47
 #: .\templates\includes\shipping_estimator.html:50
 #: .\templates\store\checkout.html:207
 msgid "Postal code"
 msgstr "Code postal"
 
-#: .\templates\accounts\address_form.html:70
+#: .\templates\accounts\address_form.html:121
 msgid "Delivery preferences"
 msgstr "Préférences de livraison"
 
-#: .\templates\accounts\address_form.html:71
+#: .\templates\accounts\address_form.html:122
 msgid "Make this the address we use by default."
 msgstr "Définir comme adresse par défaut."
 
-#: .\templates\accounts\address_form.html:76
+#: .\templates\accounts\address_form.html:127
 msgid "Set as my default address"
 msgstr "Enregistrer / mettre à jour mon adresse par défaut"
 
-#: .\templates\accounts\address_form.html:83
+#: .\templates\accounts\address_form.html:134
 msgid "Save address"
 msgstr "Utiliser une adresse enregistrée"
 
-#: .\templates\accounts\address_form.html:84
+#: .\templates\accounts\address_form.html:135
 #: .\templates\accounts\address_list.html:110 .\templates\store\cart.html:218
 msgid "Cancel"
 msgstr "Annulée"
@@ -3310,13 +3410,21 @@ msgid "To fulfil"
 msgstr "À traiter"
 
 #: .\templates\admin\payments\paymentproviderconfig\change_form.html:16
-msgid "Add the provider secret first, then Test connection will appear here."
+msgid ""
+"Add the provider secret above and Save — then Test connection appears here."
 msgstr ""
 
-#: .\templates\admin\payments\paymentproviderconfig\change_form.html:20
+#: .\templates\admin\payments\paymentproviderconfig\change_form.html:18
+#, fuzzy
+#| msgid "View all"
+msgid "View logs"
+msgstr "Tout voir"
+
+#: .\templates\admin\payments\paymentproviderconfig\change_form.html:21
 msgid ""
 "Test connection is read-only — it never creates a payment, capture or "
-"refund. Checkout and live mode stay OFF until you enable them below."
+"refund. Checkout, capture, refund and live mode stay OFF until you enable "
+"them below."
 msgstr ""
 
 #: .\templates\admin\printify_integration\printifyaccountconfig\change_form.html:9
@@ -5373,24 +5481,6 @@ msgstr "Vous avez un compte ? Connectez-vous"
 msgid "Type at least 3 characters…"
 msgstr "Saisissez au moins 3 caractères…"
 
-#: .\templates\store\checkout.html:49
-msgid "No suggestions — you can keep typing the full address."
-msgstr "Aucune suggestion — vous pouvez continuer à saisir l'adresse complète."
-
-#: .\templates\store\checkout.html:50
-msgid "Suggestion applied — please complete the missing fields."
-msgstr ""
-
-#: .\templates\store\checkout.html:51
-msgid "Google Places is not available — enter the address manually."
-msgstr "Google Places n'est pas disponible — saisissez l'adresse manuellement."
-
-#: .\templates\store\checkout.html:52
-msgid ""
-"Postal code not unique here — it completes automatically when you pick the "
-"street."
-msgstr "Code postal non unique ici — il se complète automatiquement quand vous choisissez la rue."
-
 #: .\templates\store\checkout.html:64
 msgid "My address is correct — continue"
 msgstr "Mon adresse est correcte — continuer"
@@ -5421,10 +5511,6 @@ msgstr ""
 "Sélectionnez-en une pour remplir automatiquement vos informations de "
 "facturation."
 
-#: .\templates\store\checkout.html:141 .\templates\store\checkout.html:158
-msgid "Phone prefix"
-msgstr "Indicatif téléphonique"
-
 #: .\templates\store\checkout.html:167
 msgid "e.g. 333 1234567"
 msgstr ""
@@ -5432,10 +5518,6 @@ msgstr ""
 #: .\templates\store\checkout.html:175
 msgid "Delivery destination"
 msgstr "Destination de livraison"
-
-#: .\templates\store\checkout.html:188
-msgid "State / Region / Province"
-msgstr "État / Région / Province"
 
 #: .\templates\store\checkout.html:192
 msgid "Start typing a province or region…"
@@ -5448,10 +5530,6 @@ msgstr "Commencez à saisir une ville…"
 #: .\templates\store\checkout.html:211
 msgid "Start typing a postal code…"
 msgstr "Commencez à saisir un code postal…"
-
-#: .\templates\store\checkout.html:220 .\templates\store\checkout.html:223
-msgid "Street address"
-msgstr "Adresse (rue)"
 
 #: .\templates\store\checkout.html:223
 msgid "street and number"
@@ -6096,6 +6174,12 @@ msgstr "Articles de la liste de favoris"
 #: .\wishlist\views.py:117
 msgid "Saved for later."
 msgstr "Enregistré pour plus tard."
+
+#~ msgid "Address line 1"
+#~ msgstr "Adresse ligne 1"
+
+#~ msgid "State / Province"
+#~ msgstr "État / Province"
 
 #~ msgid "State"
 #~ msgstr "Région"
