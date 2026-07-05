@@ -43,9 +43,12 @@
           <span class="meta-chip">
             <i class="fa fa-fingerprint"></i> {% blocktrans with t=transID %}Transaction {{ t }}{% endblocktrans %}
           </span>
-          <span class="meta-chip">
-            <i class="fa fa-check-circle"></i> {{ payment.status }}
+          <span class="meta-chip oc-chip-ok">
+            <i class="fa fa-check-circle"></i> {% trans "Payment confirmed" %} · {{ payment.payment_method }}
           </span>
+          {% if is_test_payment %}
+          <span class="meta-chip oc-chip-test"><i class="fa fa-flask"></i> {% trans "Sandbox / test payment" %}</span>
+          {% endif %}
         </div>
       </div>
 
@@ -53,101 +56,68 @@
         <a href="{% url 'invoice_pdf' order_number %}" class="btn btn-soft btn-block">
           <i class="fa fa-file-pdf mr-2"></i>{% trans "Download PDF invoice" %}
         </a>
-
-
         <a href="{% url 'store' %}" class="btn btn-primary btn-block">
-          {% trans "Shop more" %} <i class="fa fa-arrow-right ml-2"></i>
+          {% trans "Continue shopping" %} <i class="fa fa-arrow-right ml-2"></i>
+        </a>
+        <a href="mailto:{{ SUPPORT_EMAIL }}" class="btn btn-soft btn-block">
+          <i class="fa fa-headset mr-2"></i>{% trans "Contact support" %}
         </a>
       </div>
     </div>
 
-    <!-- ===== Premium Timeline (4 steps) ===== -->
-    {% comment %}
-      Status mapping:
-      New       -> Confirmed
-      Accepted  -> Packed
-      Completed -> Shipped
-      Cancelled -> Cancelled
-    {% endcomment %}
-
-    {% if order.status == 'Cancelled' %}
-      {# Cancelled state: only show red cancelled step #}
-      <div class="oc-timeline oc-timeline--cancelled">
-        <div class="oc-step is-muted">
-          <div class="dot"></div>
-          <div class="label">
-            <div class="title">{% trans "Confirmed" %}</div>
-            <div class="sub text-muted">{% trans "Order received" %}</div>
-          </div>
+    <!-- ===== Honest production timeline (real data only) ===== -->
+    <div class="oc-timeline" id="ocTimeline" data-status-url="{% url 'order_status' %}?order_number={{ order_number|urlencode }}">
+      {% for step in timeline %}
+      <div class="oc-step {% if step.status == 'done' %}done{% elif step.status == 'current' %}is-current{% elif step.status == 'error' %}is-danger{% else %}is-muted{% endif %}" data-step="{{ step.key }}">
+        <div class="dot"><i class="fa {{ step.icon }}" aria-hidden="true"></i></div>
+        <div class="label">
+          <div class="title">{{ step.label }}</div>
+          <div class="sub text-muted">{{ step.description }}</div>
+          {% if step.action_url %}<a class="oc-track-link" href="{{ step.action_url }}" target="_blank" rel="noopener">{% trans "Track parcel" %} <i class="fa fa-arrow-right"></i></a>{% endif %}
         </div>
+        {% if not forloop.last %}<span class="oc-arrow" aria-hidden="true"><i class="fa fa-chevron-right"></i></span>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    <div class="oc-live text-muted" id="ocLive">
+      <span class="oc-live-dot" aria-hidden="true"></span>
+      {% trans "This page updates as production information becomes available." %}
+    </div>
 
-        <div class="oc-step is-muted">
-          <div class="dot"></div>
-          <div class="label">
-            <div class="title">{% trans "Packed" %}</div>
-            <div class="sub text-muted">{% trans "Preparing shipment" %}</div>
+    <!-- ===== Info cards ===== -->
+    <div class="oc-info-grid">
+      <div class="oc-info-card">
+        <i class="fa fa-envelope-open-text" aria-hidden="true"></i>
+        <div>
+          <div class="oc-info-title">
+            {% if confirmation_email_status == 'sent' %}{% trans "Confirmation email sent" %}
+            {% else %}{% trans "We'll email your confirmation" %}{% endif %}
           </div>
-        </div>
-
-        <div class="oc-step is-muted">
-          <div class="dot"></div>
-          <div class="label">
-            <div class="title">{% trans "Shipped" %}</div>
-            <div class="sub text-muted">{% trans "On the way" %}</div>
-          </div>
-        </div>
-
-        <div class="oc-step is-danger done">
-          <div class="dot"></div>
-          <div class="label">
-            <div class="title">{% trans "Cancelled" %}</div>
-            <div class="sub">{% trans "This order has been cancelled" %}</div>
-          </div>
+          <div class="oc-info-sub text-muted">{{ order.email }}</div>
         </div>
       </div>
-
-    {% else %}
-      {# Normal progress state #}
-      <div class="oc-timeline">
-        <div class="oc-step done">
-          <div class="dot"></div>
-          <div class="label">
-            <div class="title">{% trans "Confirmed" %}</div>
-            <div class="sub text-muted">{% trans "Order received" %}</div>
-          </div>
-        </div>
-
-        <div class="oc-step {% if order.status == 'Accepted' or order.status == 'Completed' %}done{% endif %}">
-          <div class="dot"></div>
-          <div class="label">
-            <div class="title">{% trans "Packed" %}</div>
-            <div class="sub text-muted">{% trans "Preparing shipment" %}</div>
-          </div>
-        </div>
-
-        <div class="oc-step {% if order.status == 'Completed' %}done{% endif %}">
-          <div class="dot"></div>
-          <div class="label">
-            <div class="title">{% trans "Shipped" %}</div>
-            <div class="sub text-muted">{% trans "On the way" %}</div>
-          </div>
-        </div>
-
-        <div class="oc-step is-muted">
-          <div class="dot"></div>
-          <div class="label">
-            <div class="title">{% trans "Cancelled" %}</div>
-            <div class="sub text-muted">{% trans "Only if payment fails or you cancel" %}</div>
-          </div>
+      <div class="oc-info-card">
+        <i class="fa fa-print" aria-hidden="true"></i>
+        <div>
+          <div class="oc-info-title">{% trans "Made to order" %}</div>
+          <div class="oc-info-sub text-muted">{% trans "Production starts after payment confirmation." %}</div>
         </div>
       </div>
-    {% endif %}
+      <div class="oc-info-card">
+        <i class="fa fa-truck" aria-hidden="true"></i>
+        <div>
+          <div class="oc-info-title">{% trans "Tracking on its way" %}</div>
+          <div class="oc-info-sub text-muted">{% trans "Tracking will appear when the carrier receives the parcel." %}</div>
+        </div>
+      </div>
+    </div>
 
     <!-- ===== Invoice card ===== -->
     <div class="oc-card">
       <div class="oc-card-head">
         <div class="oc-brand">
-          <img src="{% static 'images/logo.png' %}" alt="Logo">
+          <img src="{% static 'images/brand/logo-glitchy-nav.png' %}" alt="{{ SITE_NAME }}" class="oc-logo oc-logo-dark">
+          <img src="{% static 'images/brand/logo-glitchy-nav-light.png' %}" alt="{{ SITE_NAME }}" class="oc-logo oc-logo-light">
           <div class="oc-brand-text">
             <div class="oc-brand-name">{% trans "Invoice" %}</div>
             <div class="oc-brand-meta text-muted">{% trans "Order details & receipt" %}</div>
@@ -230,6 +200,16 @@
           <span>€ {{ subtotal }}</span>
         </div>
         <div class="oc-total-row">
+          <span class="text-muted">{% trans "Shipping" %}</span>
+          <span>{% if order.shipping_cost %}€ {{ order.shipping_cost|floatformat:2 }}{% else %}{% trans "Free" %}{% endif %}</span>
+        </div>
+        {% if order.discount %}
+        <div class="oc-total-row">
+          <span class="text-muted">{% trans "Discount" %}</span>
+          <span>− € {{ order.discount|floatformat:2 }}</span>
+        </div>
+        {% endif %}
+        <div class="oc-total-row">
           <span class="text-muted">{% trans "Tax" %}</span>
           <span>€ {{ order.tax }}</span>
         </div>
@@ -293,4 +273,44 @@
 {% endif %}
 </div>
   </section>
-  {% endblock %}
+  
+<script>
+(function () {
+  "use strict";
+  var tl = document.getElementById("ocTimeline");
+  if (!tl) return;
+  var url = tl.getAttribute("data-status-url");
+  var tries = 0, MAX_TRIES = 10;                 // ~2.5 minutes, then stop quietly
+  function apply(data) {
+    (data.timeline || []).forEach(function (step) {
+      var el = tl.querySelector('[data-step="' + step.key + '"]');
+      if (!el) return;
+      el.classList.remove("done", "is-current", "is-muted", "is-danger");
+      el.classList.add(step.status === "done" ? "done" :
+                       step.status === "current" ? "is-current" :
+                       step.status === "error" ? "is-danger" : "is-muted");
+      var sub = el.querySelector(".sub");
+      if (sub && step.description) sub.textContent = step.description;
+    });
+    if (data.production_status === "shipped" || data.production_status === "delivered") {
+      return true;                                // final enough — stop polling
+    }
+    return false;
+  }
+  function tick() {
+    tries += 1;
+    fetch(url, { credentials: "same-origin" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        if (d && d.ok) {
+          if (apply(d)) return;
+        }
+        if (tries < MAX_TRIES) window.setTimeout(tick, 15000);
+        else { var live = document.getElementById("ocLive"); if (live) live.style.opacity = ".45"; }
+      })
+      .catch(function () { if (tries < MAX_TRIES) window.setTimeout(tick, 20000); });
+  }
+  window.setTimeout(tick, 12000);                 // first refresh after 12s
+})();
+</script>
+{% endblock %}

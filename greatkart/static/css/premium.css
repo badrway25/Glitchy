@@ -3642,3 +3642,59 @@ form .form-control,form .custom-select{transition:border-color .18s var(--ease),
 .pp-status{margin:.7rem 0 0;padding:.6rem .85rem;border-radius:10px;font-size:.85rem;font-weight:600;
   background:rgba(184,151,90,.1);color:#7a5f2e;border:1px solid rgba(184,151,90,.25);text-align:center;}
 [data-theme="dark"] .pp-status{color:#e0cfa6;}
+
+/* ============================================================================
+   Order complete — honest timeline, info cards, live chip (premium refresh)
+   ========================================================================= */
+.oc-timeline{display:flex;flex-wrap:wrap;gap:.4rem .2rem;align-items:stretch;margin:1.4rem 0 .6rem;}
+.oc-timeline .oc-step{display:flex;align-items:flex-start;gap:.65rem;flex:1 1 170px;min-width:150px;
+  padding:.9rem .8rem;border-radius:14px;border:1px solid rgba(120,110,95,.14);position:relative;
+  background:rgba(250,247,240,.45);}
+[data-theme="dark"] .oc-timeline .oc-step{background:rgba(255,255,255,.02);border-color:rgba(210,195,170,.12);}
+.oc-timeline .dot{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;
+  background:rgba(120,110,95,.1);color:rgba(120,110,95,.7);font-size:.95rem;}
+.oc-step.done .dot{background:rgba(22,163,74,.14);color:#15803d;}
+.oc-step.is-current .dot{background:rgba(184,151,90,.18);color:#8a6a2f;box-shadow:0 0 0 4px rgba(184,151,90,.12);}
+.oc-step.is-danger .dot{background:rgba(220,38,38,.12);color:#b91c1c;}
+.oc-step.is-current{border-color:rgba(184,151,90,.45);}
+.oc-step.done{border-color:rgba(22,163,74,.25);}
+.oc-step.is-muted{opacity:.62;}
+.oc-step .title{font-weight:800;font-size:.86rem;}
+.oc-step .sub{font-size:.75rem;line-height:1.45;}
+.oc-arrow{position:absolute;right:-11px;top:50%;transform:translateY(-50%);z-index:2;
+  color:rgba(120,110,95,.45);font-size:.7rem;background:var(--bg,#fff);border-radius:50%;
+  width:18px;height:18px;display:grid;place-items:center;border:1px solid rgba(120,110,95,.2);}
+[data-theme="dark"] .oc-arrow{background:#221f1a;}
+.oc-track-link{display:inline-flex;align-items:center;gap:.35rem;margin-top:.35rem;font-size:.78rem;font-weight:700;}
+.oc-live{display:flex;align-items:center;gap:.5rem;font-size:.78rem;margin:0 0 1.2rem;}
+.oc-live-dot{width:8px;height:8px;border-radius:50%;background:#16a34a;display:inline-block;
+  animation:oc-pulse 2s ease-in-out infinite;}
+@keyframes oc-pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+@media (prefers-reduced-motion:reduce){.oc-live-dot{animation:none;}}
+.oc-info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.8rem;margin:0 0 1.6rem;}
+.oc-info-card{display:flex;gap:.7rem;align-items:flex-start;padding:.95rem 1rem;border-radius:13px;
+  border:1px solid rgba(120,110,95,.14);background:rgba(250,247,240,.45);}
+[data-theme="dark"] .oc-info-card{background:rgba(255,255,255,.02);border-color:rgba(210,195,170,.12);}
+.oc-info-card > i{color:var(--primary);font-size:1.05rem;padding-top:.15rem;}
+.oc-info-title{font-weight:800;font-size:.85rem;}
+.oc-info-sub{font-size:.76rem;line-height:1.5;}
+.oc-chip-ok{background:rgba(22,163,74,.1)!important;color:#15803d!important;border-color:rgba(22,163,74,.3)!important;}
+.oc-chip-test{background:rgba(214,158,46,.12)!important;color:#8a5a12!important;border-color:rgba(214,158,46,.35)!important;}
+.oc-logo{height:34px;width:auto;}
+.oc-logo-light{display:none;}
+[data-theme="dark"] .oc-logo-dark{display:none;}
+[data-theme="dark"] .oc-logo-light{display:block;}
+@media (max-width:575.98px){
+  .oc-timeline{flex-direction:column;}
+  .oc-timeline .oc-step{flex:1 1 auto;}
+  .oc-arrow{right:auto;left:26px;top:auto;bottom:-11px;transform:rotate(90deg);}
+}
+
+/* Order-complete hero check: smaller, refined (owner feedback: was too big) */
+.oc-icon{width:44px!important;height:44px!important;border-radius:13px!important;font-size:17px!important;}
+
+/* Order-complete items table: Qty/Total must stay readable in dark mode (owner feedback) */
+[data-theme="dark"] .oc-table td,
+[data-theme="dark"] .oc-table th{ color:var(--text,#efe9df)!important; }
+.oc-table td.text-center, .oc-table td.text-right{ font-weight:600; }
+[data-theme="dark"] .oc-totals .oc-total-row span:last-child{ color:var(--text,#efe9df); }
