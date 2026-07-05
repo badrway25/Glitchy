@@ -35,6 +35,11 @@ def test_connection(cfg):
                     "OpenAI key works, but the configured model was not found in your "
                     "account's model list — double-check the model id.")}
             cfg.record_connection("connected", _("OpenAI reachable."))
+            if not cfg.is_enabled:
+                return {"ok": True, "detail": _(
+                    "OpenAI key works — but the assistant is still DISABLED: turn on "
+                    "'Is enabled' above and save, or the store keeps answering in "
+                    "limited mode.")}
             return {"ok": True, "detail": _("OpenAI connection OK — key valid, model available.")}
         if resp.status_code == 401:
             cfg.record_connection("failed", _("Invalid key (401)."))

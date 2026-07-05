@@ -96,3 +96,69 @@ def is_in_scope(query):
     )
     ql = (query or "").lower()
     return any(w in ql for w in scope_words)
+
+
+def store_facts(query, lang="en"):
+    """REAL store facts injected for every in-scope question, so the model always has
+    grounded material for the core topics (empty-KB deployments used to repeat the
+    decline sentence for perfectly normal questions).
+
+    Sources: the SAME shipping rate table the checkout charges from, the payment
+    resolver availability flags, the public return-window setting. No secrets, no
+    internal costs, no PII.
+    """
+    from django.conf import settings
+    lines = []
+    try:
+        from shipping.constants import COUNTRY_NAMES
+        from shipping.services import fallback_quote
+        ql = (query or "").lower()
+        _LOCAL_NAMES = {
+            "IT": ("italia", "italy", "italie"), "FR": ("francia", "france"),
+            "BE": ("belgio", "belgium", "belgique"), "DE": ("germania", "germany", "allemagne"),
+            "ES": ("spagna", "spain", "espagne"), "NL": ("olanda", "netherlands", "pays-bas"),
+            "PT": ("portogallo", "portugal"), "CH": ("svizzera", "switzerland", "suisse"),
+            "AT": ("austria", "autriche"), "IE": ("irlanda", "ireland", "irlande"),
+            "GB": ("regno unito", "uk", "united kingdom", "royaume-uni", "inghilterra"),
+            "US": ("stati uniti", "usa", "united states", "etats-unis"),
+            "CA": ("canada",), "AU": ("australia", "australie"),
+        }
+        code = ""
+        for cc, names in _LOCAL_NAMES.items():
+            if any(n in ql for n in names):
+                code = cc
+                break
+        codes = [code] if code else ["IT", "FR"]
+        for cc in codes:
+            fq = fallback_quote(cc, total_quantity=1, subtotal=0.0)
+            if fq.available:
+                nm = COUNTRY_NAMES.get(cc, cc)
+                extra = ""
+                thr = getattr(fq, "free_threshold", None)
+                if thr:
+                    extra = f", free over EUR {thr:.0f}"
+                lines.append(f"Shipping to {nm}: cost EUR {fq.cost:.2f}{extra}, "
+                             f"estimated {fq.eta_label}.")
+    except Exception:
+        pass
+    try:
+        from payments import config as pconf
+        methods = []
+        if pconf.stripe_secret_key() and pconf.stripe_publishable_key():
+            methods.append("credit/debit card (Stripe)")
+        if pconf.paypal_available():
+            methods.append("PayPal")
+        if methods:
+            lines.append("Payment methods available at checkout: " + ", ".join(methods) + ".")
+        lines.append("Payment issues: suggest retrying, trying the other method, or "
+                     "contacting support. Never ask for card numbers in chat.")
+    except Exception:
+        pass
+    days = getattr(settings, "RETURN_WINDOW_DAYS", None)
+    if days:
+        lines.append(f"Returns: customers can request a return within {days} days; "
+                     "the returns page has the step-by-step procedure.")
+    support = getattr(settings, "SUPPORT_EMAIL", "")
+    if support:
+        lines.append(f"Support contact: {support}.")
+    return chr(10).join(lines)
