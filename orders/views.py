@@ -108,6 +108,53 @@ def stripe_return(request):
 
 
 @require_POST
+def paypal_create_order(request):
+    """Server-side PayPal order creation from the checkout snapshot (pending Order + cart).
+
+    Replaces the old client-side actions.order.create({amount only}) that made the popup
+    show wallet defaults and context-free totals. Sandbox/live comes from the resolver;
+    amounts are Decimal-built and consistency-checked before anything reaches PayPal."""
+    try:
+        body = json.loads(request.body.decode("utf-8") or "{}")
+    except Exception:
+        return JsonResponse({"error": "Invalid JSON"}, status=400)
+    order = _resolve_pending_order(request, body.get("order_number"))
+    if not order:
+        return JsonResponse({"error": str(_("Order not found."))}, status=404)
+
+    cart_items, _sk = _place_order_cart_items(request)
+    if not cart_items:
+        return JsonResponse({"error": str(_("Your cart is empty."))}, status=400)
+
+    # the popup must show the checkout address — refuse to open it without one
+    if not (order.address_line_1 and order.city and order.country):
+        return JsonResponse({"error": str(
+            _("Please complete your delivery address before paying with PayPal."))}, status=400)
+
+    from payments.paypal_payload import PayloadMismatch, build_order_payload
+    try:
+        payload = build_order_payload(order, cart_items)
+    except PayloadMismatch as exc:
+        logger.warning("paypal payload mismatch for order %s: %s", order.order_number, exc)
+        return JsonResponse({"error": str(
+            _("Payment amount mismatch prevented for your safety. Please refresh and try "
+              "again."))}, status=409)
+
+    from .paypal import create_order
+    paypal_id, err = create_order(payload)
+    if not paypal_id:
+        if err in ("SHIPPING_ADDRESS_INVALID", "INVALID_COUNTRY_CODE", "POSTAL_CODE_REQUIRED"):
+            msg = _("PayPal could not validate the provided shipping address. Please review "
+                    "it and choose PayPal again.")
+        elif err == "paypal_unavailable":
+            msg = _("PayPal is temporarily unavailable. Please use card.")
+        else:
+            msg = _("PayPal order could not be created. Please try again or use card.")
+        return JsonResponse({"error": str(msg), "code": err}, status=502)
+    return JsonResponse({"id": paypal_id})
+
+
+@require_POST
 def stripe_create_intent(request):
     try:
         data = json.loads(request.body.decode("utf-8") or "{}")

@@ -67,3 +67,37 @@ def verify_capture(capture_id, expected_amount, expected_currency):
     if (amount.get("currency_code") or "").upper() != str(expected_currency).upper():
         return False, "currency_mismatch"
     return True, "ok"
+
+
+def create_order(payload):
+    """Create a PayPal Orders v2 order SERVER-SIDE from the trusted payload.
+
+    Returns (order_id, error_code). Fail-closed: no config → no order. Logs only safe
+    codes (never token, payload PII or secrets)."""
+    if not paypal_available():
+        return None, "paypal_unavailable"
+    import requests
+    from payments import config as pc
+    try:
+        token = _access_token()
+        resp = requests.post(
+            f"{pc.paypal_api_base()}/v2/checkout/orders",
+            json=payload,
+            headers={"Authorization": f"Bearer {token}",
+                     "Content-Type": "application/json"},
+            timeout=20)
+        if resp.status_code in (200, 201):
+            oid = resp.json().get("id")
+            return (oid, "") if oid else (None, "no_order_id")
+        # safe diagnostics: PayPal's issue code only (no PII echo)
+        try:
+            issue = (resp.json().get("details") or [{}])[0].get("issue", "")
+        except Exception:
+            issue = ""
+        logging.getLogger("orders").warning(
+            "paypal create order failed http=%s issue=%s", resp.status_code, issue or "?")
+        return None, issue or f"http_{resp.status_code}"
+    except Exception as exc:
+        logging.getLogger("orders").warning(
+            "paypal create order error=%s", type(exc).__name__)
+        return None, "network"
