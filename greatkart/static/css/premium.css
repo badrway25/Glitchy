@@ -3698,3 +3698,18 @@ form .form-control,form .custom-select{transition:border-color .18s var(--ease),
 [data-theme="dark"] .oc-table th{ color:var(--text,#efe9df)!important; }
 .oc-table td.text-center, .oc-table td.text-right{ font-weight:600; }
 [data-theme="dark"] .oc-totals .oc-total-row span:last-child{ color:var(--text,#efe9df); }
+
+/* Assistant: ONE close only (header) — the FAB hides while the panel is open */
+.ai-assistant.is-open .ai-fab{opacity:0!important;visibility:hidden!important;pointer-events:none!important;transform:scale(.85);}
+/* Panel flip when the FAB sits near the top of the viewport */
+.ai-panel--below{bottom:auto!important;top:72px!important;}
+/* Premium product cards inside the chat */
+.ai-cards{display:flex;flex-direction:column;gap:.5rem;margin:.35rem 0 .6rem;}
+.ai-card{display:flex;gap:.65rem;align-items:center;padding:.5rem .6rem;border-radius:12px;
+  border:1px solid rgba(120,110,95,.16);background:rgba(250,247,240,.6);text-decoration:none;color:inherit;
+  transition:border-color .15s ease, transform .15s ease;}
+.ai-card:hover{border-color:var(--primary);transform:translateY(-1px);text-decoration:none;color:inherit;}
+[data-theme="dark"] .ai-card{background:rgba(255,255,255,.03);border-color:rgba(210,195,170,.14);}
+.ai-card img{width:44px;height:44px;object-fit:cover;border-radius:9px;flex:0 0 auto;background:rgba(0,0,0,.04);}
+.ai-card-name{font-weight:700;font-size:.82rem;line-height:1.3;}
+.ai-card-price{font-size:.78rem;color:var(--primary);font-weight:800;}

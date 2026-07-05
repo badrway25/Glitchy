@@ -19,9 +19,29 @@
   var loaded = false, busy = false;
   var dragMoved = false;   // set true by the drag module when a real drag (not a click) happened
 
+  function clampPanel() {
+    /* The panel is anchored above the draggable FAB — dragged to the top of the screen it
+       used to open OFF-viewport (irrecoverable). Flip it below the FAB when there is no
+       room above; if still out, reset the FAB to its default corner. */
+    var panel = document.getElementById("aiPanel");
+    if (!panel) return;
+    panel.classList.remove("ai-panel--below");
+    var r = panel.getBoundingClientRect();
+    if (r.top < 8) {
+      panel.classList.add("ai-panel--below");
+      r = panel.getBoundingClientRect();
+    }
+    if (r.top < 8 || r.bottom > window.innerHeight - 8 && r.height < window.innerHeight - 16) {
+      root.style.top = ""; root.style.left = "";
+      root.style.right = "18px"; root.style.bottom = "18px";
+      try { localStorage.removeItem("gl_ai_fab_pos"); } catch (e) {}
+      panel.classList.remove("ai-panel--below");
+    }
+  }
   function open() {
     panel.hidden = false;
     root.classList.add("is-open");
+    window.setTimeout(clampPanel, 20);
     toggle.setAttribute("aria-expanded", "true");
     if (!loaded) { loaded = true; loadSuggestions(); }
     setTimeout(function () { input.focus(); }, 60);
@@ -37,6 +57,14 @@
     root.classList.contains("is-open") ? close() : open();
   });
   root.querySelectorAll("[data-ai-close]").forEach(function (b) { b.addEventListener("click", close); });
+  (function clampSavedPos() {
+    var r = root.getBoundingClientRect();
+    if (r.left < -8 || r.top < -8 || r.left > window.innerWidth - 40 || r.top > window.innerHeight - 40) {
+      root.style.top = ""; root.style.left = "";
+      root.style.right = "18px"; root.style.bottom = "18px";
+      try { localStorage.removeItem("gl_ai_fab_pos"); } catch (e) {}
+    }
+  })();
   document.addEventListener("keydown", function (e) { if (e.key === "Escape" && root.classList.contains("is-open")) close(); });
 
   // External openers (e.g. "Need help choosing?" on the collections page) can open the
@@ -134,6 +162,35 @@
     restorePos();
   })();
 
+
+  function productCards(list) {
+    /* Premium product cards — DOM building with textContent only (no injection). */
+    var wrap = document.createElement("div");
+    wrap.className = "ai-cards";
+    list.slice(0, 3).forEach(function (p) {
+      var a = document.createElement("a");
+      a.className = "ai-card";
+      a.href = p.url || "#";
+      if (p.image) {
+        var img = document.createElement("img");
+        img.src = p.image; img.alt = p.name || ""; img.loading = "lazy";
+        a.appendChild(img);
+      }
+      var body = document.createElement("div");
+      body.className = "ai-card-body";
+      var t = document.createElement("div");
+      t.className = "ai-card-name"; t.textContent = p.name || "";
+      var pr = document.createElement("div");
+      pr.className = "ai-card-price";
+      pr.textContent = (typeof p.price === "number") ? ("€ " + p.price.toFixed(2)) : "";
+      body.appendChild(t); body.appendChild(pr);
+      a.appendChild(body);
+      wrap.appendChild(a);
+    });
+    messages.appendChild(wrap);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
   function bubble(role, text) {
     var el = document.createElement("div");
     el.className = "ai-msg ai-msg-" + role;
@@ -151,6 +208,9 @@
       .then(function (r) { return r.json(); })
       .then(function (d) {
         if (d.greeting) bubble("assistant", d.greeting);
+        var sub = document.getElementById("aiStatusSub");
+        if (sub) sub.textContent = d.ai_ready ? sub.getAttribute("data-online")
+                                              : sub.getAttribute("data-limited");
         if (d.questions && d.questions.length) {
           quick.hidden = false;
           d.questions.forEach(function (q) {
@@ -185,6 +245,7 @@
       .then(function (d) {
         thinking.remove();
         var el = bubble("assistant", d.answer || (I18N.error || "Error"));
+        if (d.products && d.products.length) productCards(d.products);
         if (d.message_id) addFeedback(el, d.message_id);
         if (d.can_contact_support) addSupport();
       })

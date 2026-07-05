@@ -18,7 +18,9 @@
         <span class="ai-head-dot"></span>
         <div>
           <div class="ai-head-title">{{ SITE_NAME }} {% trans "Assistant" %}</div>
-          <div class="ai-head-sub">{% trans "Answers from our store & policies" %}</div>
+          <div class="ai-head-sub" id="aiStatusSub"
+               data-online="{% trans 'AI assistant · online' %}"
+               data-limited="{% trans 'Limited mode — curated store answers' %}">{% trans "Answers from our store & policies" %}</div>
         </div>
       </div>
       <button class="ai-head-close" type="button" data-ai-close aria-label="{% trans 'Close' %}">
