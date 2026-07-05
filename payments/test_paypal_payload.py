@@ -72,7 +72,7 @@ class PayloadBuilderTests(TestCase):
 
     def test_shipping_preference_is_set_provided_address(self):
         p = build_order_payload(_order(), _items())
-        ctx = p["payment_source"]["paypal"]["experience_context"]
+        ctx = p["application_context"]
         self.assertEqual(ctx["shipping_preference"], "SET_PROVIDED_ADDRESS")
         self.assertEqual(ctx["user_action"], "PAY_NOW")
 
@@ -134,7 +134,7 @@ class PayPalCreateOrderEndpointTests(TestCase):
         self.assertEqual(payload["purchase_units"][0]["amount"]["value"], "33.42")
         self.assertEqual(payload["purchase_units"][0]["shipping"]["address"]["admin_area_2"], "Milano")
         self.assertEqual(
-            payload["payment_source"]["paypal"]["experience_context"]["shipping_preference"],
+            payload["application_context"]["shipping_preference"],
             "SET_PROVIDED_ADDRESS")
         self.assertNotIn("tok", str(r.content))               # token never surfaces
 
@@ -171,3 +171,120 @@ class PayPalCreateOrderEndpointTests(TestCase):
             r = self._post(c)
         self.assertEqual(r.status_code, 502)
         self.assertIn("card", r.json()["error"].lower())
+
+
+@override_settings(ALLOWED_HOSTS=["testserver", "127.0.0.1", "localhost"])
+class PayPalServerCaptureTests(TestCase):
+    """Server-side capture endpoint — replaces the hanging client actions.order.capture()."""
+
+    def _setup(self, **kw):
+        # reuse the create-order fixture
+        t = PayPalCreateOrderEndpointTests()
+        t.client = self.client
+        return PayPalCreateOrderEndpointTests._setup_order(self, **kw)
+
+    _setup_order = PayPalCreateOrderEndpointTests._setup_order
+
+    def _capture(self, c, pp_id="PP-OID-1"):
+        return c.post("/orders/paypal/capture/",
+                      json.dumps({"order_number": "O-88", "paypal_order_id": pp_id}),
+                      content_type="application/json")
+
+    def _pp_response(self, status="COMPLETED", amount="33.42", currency="EUR"):
+        return MagicMock(status_code=201, json=lambda: {
+            "status": status,
+            "purchase_units": [{"payments": {"captures": [
+                {"id": "CAP-777", "amount": {"value": amount, "currency_code": currency}}]}}]})
+
+    def test_capture_success_finalizes_order(self):
+        c = self._setup_order()
+        with patch("orders.paypal.paypal_available", return_value=True), \
+             patch("orders.paypal._access_token", return_value="tok"), \
+             patch("requests.post") as post:
+            post.return_value = self._pp_response()
+            r = self._capture(c)
+        self.assertEqual(r.status_code, 200, r.content)
+        self.assertEqual(r.json()["transID"], "CAP-777")     # REAL capture id, not order id
+        from orders.models import Order, Payment
+        o = Order.objects.get(order_number="O-88")
+        self.assertTrue(o.is_ordered)
+        self.assertEqual(Payment.objects.get(payment_id="CAP-777").amount_paid, "33.42")
+        self.assertNotIn("tok", r.content.decode())
+
+    def test_amount_mismatch_blocks_finalization(self):
+        c = self._setup_order()
+        with patch("orders.paypal.paypal_available", return_value=True), \
+             patch("orders.paypal._access_token", return_value="tok"), \
+             patch("requests.post") as post:
+            post.return_value = self._pp_response(amount="1.00")
+            r = self._capture(c)
+        self.assertEqual(r.status_code, 409)
+        from orders.models import Order
+        self.assertFalse(Order.objects.get(order_number="O-88").is_ordered)
+
+    def test_instrument_declined_maps_to_retry(self):
+        c = self._setup_order()
+        with patch("orders.paypal.paypal_available", return_value=True), \
+             patch("orders.paypal._access_token", return_value="tok"), \
+             patch("requests.post") as post:
+            post.return_value = MagicMock(status_code=422, json=lambda: {
+                "details": [{"issue": "INSTRUMENT_DECLINED"}]})
+            r = self._capture(c)
+        self.assertEqual(r.status_code, 402)
+        self.assertTrue(r.json().get("retry"))
+        self.assertIn("declined", r.json()["error"].lower())
+
+    def test_pending_status_polite_message(self):
+        c = self._setup_order()
+        with patch("orders.paypal.paypal_available", return_value=True), \
+             patch("orders.paypal._access_token", return_value="tok"), \
+             patch("requests.post") as post:
+            post.return_value = self._pp_response(status="PENDING")
+            r = self._capture(c)
+        self.assertEqual(r.status_code, 402)
+        self.assertIn("pending", r.json()["error"].lower())
+
+    def test_network_failure_is_elegant_502(self):
+        c = self._setup_order()
+        with patch("orders.paypal.paypal_available", return_value=True), \
+             patch("orders.paypal._access_token", return_value="tok"), \
+             patch("requests.post", side_effect=Exception("boom")):
+            r = self._capture(c)
+        self.assertEqual(r.status_code, 502)
+        self.assertNotIn("boom", r.json()["error"])
+
+    def test_missing_or_bad_capture_id_rejected(self):
+        c = self._setup_order()
+        with patch("orders.paypal.paypal_available", return_value=True):
+            r = self._capture(c, pp_id="")
+        self.assertEqual(r.status_code, 502)
+
+
+class PayPalTemplateGuardTests(TestCase):
+    """The payments template must keep the single-button, no-client-capture contract."""
+
+    def _tpl(self):
+        import pathlib
+        from django.conf import settings as dj
+        return (pathlib.Path(dj.BASE_DIR) / "templates" / "orders" /
+                "payments.html").read_text(encoding="utf-8")
+
+    def test_single_gold_paypal_button(self):
+        t = self._tpl()
+        self.assertIn("fundingSource: paypal.FUNDING.PAYPAL", t)
+        self.assertIn("color: 'gold'", t)
+        self.assertIn("disable-funding=paylater,card,credit,venmo", t)
+        self.assertNotIn("color: 'black'", t)
+
+    def test_no_client_capture_no_manual_window(self):
+        t = self._tpl()
+        self.assertNotIn("actions.order.capture", t)          # server capture only
+        self.assertNotIn("window.open(", t)                   # SDK owns the popup
+        self.assertIn("__ppRendered", t)                      # render-once guard
+        self.assertEqual(t.count("paypal-button-container"), 2)  # 1 div + 1 render call
+
+    def test_loading_and_timeout_states_present(self):
+        t = self._tpl()
+        for marker in ("Connecting to PayPal", "Confirming your payment",
+                       "timed out", "ppStatus"):
+            self.assertIn(marker, t)
