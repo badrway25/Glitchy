@@ -114,15 +114,15 @@ def build_order_payload(order, cart_items, *, currency=None, brand_name=None, lo
             "items": items,
             "shipping": shipping,
         }],
-        "payment_source": {
-            "paypal": {
-                "experience_context": {
-                    # the popup must show the CHECKOUT address, never the wallet default
-                    "shipping_preference": "SET_PROVIDED_ADDRESS",
-                    "user_action": "PAY_NOW",
-                    "brand_name": brand_name[:127],
-                    **({"locale": locale} if locale else {}),
-                },
-            },
+        # application_context (NOT payment_source.paypal.experience_context): orders created
+        # with an explicit payment_source push PayPal into the payer-action redirect flow,
+        # which fights the JS SDK Buttons popup (symptom: an extra blank window + a client
+        # capture that hangs ~1min then errors). application_context carries the same
+        # preferences and is the SDK-Buttons-compatible shape.
+        "application_context": {
+            "shipping_preference": "SET_PROVIDED_ADDRESS",
+            "user_action": "PAY_NOW",
+            "brand_name": brand_name[:127],
+            **({"locale": locale} if locale else {}),
         },
     }

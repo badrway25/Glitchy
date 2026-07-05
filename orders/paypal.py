@@ -101,3 +101,54 @@ def create_order(payload):
         logging.getLogger("orders").warning(
             "paypal create order error=%s", type(exc).__name__)
         return None, "network"
+
+
+def capture_order(paypal_order_id):
+    """SERVER-SIDE capture of an approved Orders v2 order.
+
+    Returns (result, issue): result = {"status","capture_id","amount","currency"} on any
+    parseable outcome, None on transport failure; issue = PayPal issue code / safe reason.
+    Replaces the client-side actions.order.capture() that hung against server-created
+    orders. Never logs tokens or payer data."""
+    if not paypal_available():
+        return None, "paypal_unavailable"
+    import requests
+    from payments import config as pc
+    oid = (paypal_order_id or "").strip()[:64]
+    if not oid or not all(c.isalnum() or c in "-_" for c in oid):
+        return None, "invalid_order_id"
+    try:
+        token = _access_token()
+        resp = requests.post(
+            f"{pc.paypal_api_base()}/v2/checkout/orders/{oid}/capture",
+            json={},
+            headers={"Authorization": f"Bearer {token}",
+                     "Content-Type": "application/json"},
+            timeout=25)
+        try:
+            data = resp.json()
+        except Exception:
+            data = {}
+        if resp.status_code in (200, 201):
+            status = data.get("status", "")
+            cap, amount, currency = "", "", ""
+            try:
+                c0 = data["purchase_units"][0]["payments"]["captures"][0]
+                cap = c0.get("id", "")
+                amount = (c0.get("amount") or {}).get("value", "")
+                currency = (c0.get("amount") or {}).get("currency_code", "")
+            except Exception:
+                pass
+            return {"status": status, "capture_id": cap,
+                    "amount": amount, "currency": currency}, ""
+        issue = ""
+        try:
+            issue = (data.get("details") or [{}])[0].get("issue", "")
+        except Exception:
+            pass
+        logging.getLogger("orders").warning(
+            "paypal capture failed http=%s issue=%s", resp.status_code, issue or "?")
+        return None, issue or f"http_{resp.status_code}"
+    except Exception as exc:
+        logging.getLogger("orders").warning("paypal capture error=%s", type(exc).__name__)
+        return None, "network"
