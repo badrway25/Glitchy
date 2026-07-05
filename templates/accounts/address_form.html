@@ -30,7 +30,17 @@
             <div class="auth-errsum" role="alert" data-reveal>{{ form.non_field_errors }}</div>
           {% endif %}
 
-          <form method="post" class="addr-form" novalidate>
+          <form method="post" class="addr-form" novalidate id="checkoutForm"
+                data-addr-min="{% trans 'Type at least a few characters…' %}"
+                data-addr-none="{% trans 'No suggestions — you can keep typing the full address.' %}"
+                data-addr-partial="{% trans 'Suggestion applied — please complete the missing fields.' %}"
+                data-addr-noapi="{% trans 'Google Places is not available — enter the address manually.' %}"
+                data-addr-cap-street="{% trans 'Postal code not unique here — it completes automatically when you pick the street.' %}">
+            <input type="hidden" name="google_place_id" value="" data-addr-placeid>
+            <input type="hidden" name="address_verified" value="" data-addr-verified>
+            <input type="hidden" name="address_validation_source" value="" data-addr-source>
+            <span class="addr-status" data-addr-status data-mode="disabled" hidden>
+              <span data-addr-badge-ok hidden></span><span data-addr-badge-warn hidden></span></span>
             {% csrf_token %}
 
             <div class="dash-card addr-section" data-reveal>
@@ -43,7 +53,36 @@
                 {% with f=form.first_name %}<label class="addr-field"><span class="addr-label">{% trans "First name" %}</span>{{ f }}{% if f.errors %}<small class="auth-err">{{ f.errors.0 }}</small>{% endif %}</label>{% endwith %}
                 {% with f=form.last_name %}<label class="addr-field"><span class="addr-label">{% trans "Last name" %}</span>{{ f }}{% if f.errors %}<small class="auth-err">{{ f.errors.0 }}</small>{% endif %}</label>{% endwith %}
                 {% with f=form.email %}<label class="addr-field"><span class="addr-label">{% trans "Email" %}</span>{{ f }}{% if f.errors %}<small class="auth-err">{{ f.errors.0 }}</small>{% endif %}</label>{% endwith %}
-                {% with f=form.phone %}<label class="addr-field"><span class="addr-label">{% trans "Phone" %}</span>{{ f }}{% if f.errors %}<small class="auth-err">{{ f.errors.0 }}</small>{% endif %}</label>{% endwith %}
+                {% with f=form.phone %}<div class="addr-field"><span class="addr-label">{% trans "Phone" %}</span>
+                  <div class="phone-row{% if f.errors %} has-error{% endif %}">
+                    <div class="pfx" data-pfx hidden>
+                      <button type="button" class="pfx-btn" data-pfx-toggle
+                              aria-haspopup="listbox" aria-expanded="false" aria-label="{% trans 'Phone prefix' %}">
+                        <span class="pfx-flag" data-pfx-flag></span>
+                        <span class="pfx-dial" data-pfx-dial></span>
+                        <span class="pfx-caret" aria-hidden="true">▾</span>
+                      </button>
+                      <ul class="pfx-menu" role="listbox" hidden data-pfx-menu>
+                        {% for p in phone_prefixes %}
+                          <li role="option">
+                            <button type="button" class="pfx-opt" data-dial="{{ p.dial }}" data-code="{{ p.code }}">
+                              <span class="pfx-flag">{% include 'includes/_flag_svg.html' with code=p.code %}</span>
+                              <span class="pfx-dial">{{ p.dial }}</span>
+                              <span class="pfx-name">{{ p.name }}</span>
+                            </button>
+                          </li>
+                        {% endfor %}
+                      </ul>
+                    </div>
+                    <select name="phone_prefix" class="form-control phone-prefix" data-pfx-select data-no-enhance aria-label="{% trans 'Phone prefix' %}">
+                      {% for p in phone_prefixes %}
+                        <option value="{{ p.dial }}" data-code="{{ p.code }}"
+                          {% if p.code == prefill_country %}selected{% endif %}>{{ p.code }} {{ p.dial }}</option>
+                      {% endfor %}
+                    </select>
+                    {{ f }}
+                  </div>
+                  {% if f.errors %}<small class="auth-err">{{ f.errors.0 }}</small>{% endif %}</div>{% endwith %}
               </div>
             </div>
 
@@ -54,11 +93,23 @@
                   <div class="addr-section-d">{% trans "Where should we deliver your order?" %}</div></div>
               </div>
               <div class="addr-grid">
-                {% with f=form.address_line_1 %}<label class="addr-field addr-col-2"><span class="addr-label">{% trans "Address line 1" %}</span>{{ f }}{% if f.errors %}<small class="auth-err">{{ f.errors.0 }}</small>{% endif %}</label>{% endwith %}
+                {% with f=form.address_line_1 %}<div class="addr-field addr-col-2 addr-ac-wrap"><span class="addr-label">{% trans "Street address" %}</span>{{ f }}
+                  <ul class="addr-suggest" role="listbox" hidden data-addr-suggest></ul>
+                  <div class="addr-ac-hint" data-addr-hint hidden></div>
+                  {% if f.errors %}<small class="auth-err">{{ f.errors.0 }}</small>{% endif %}</div>{% endwith %}
                 {% with f=form.address_line_2 %}<label class="addr-field addr-col-2"><span class="addr-label">{% trans "Address line 2" %} <em class="addr-opt">{% trans "(optional)" %}</em></span>{{ f }}{% if f.errors %}<small class="auth-err">{{ f.errors.0 }}</small>{% endif %}</label>{% endwith %}
-                {% with f=form.city %}<label class="addr-field"><span class="addr-label">{% trans "City" %}</span>{{ f }}{% if f.errors %}<small class="auth-err">{{ f.errors.0 }}</small>{% endif %}</label>{% endwith %}
-                {% with f=form.state %}<label class="addr-field"><span class="addr-label">{% trans "State / Province" %}</span>{{ f }}{% if f.errors %}<small class="auth-err">{{ f.errors.0 }}</small>{% endif %}</label>{% endwith %}
-                {% with f=form.postal_code %}<label class="addr-field"><span class="addr-label">{% trans "Postal code" %}</span>{{ f }}{% if f.errors %}<small class="auth-err">{{ f.errors.0 }}</small>{% endif %}</label>{% endwith %}
+                {% with f=form.city %}<div class="addr-field addr-ac-wrap"><span class="addr-label">{% trans "City" %}</span>{{ f }}
+                  <ul class="addr-suggest" role="listbox" hidden data-city-suggest></ul>
+                  <div class="addr-ac-hint" data-city-hint hidden></div>
+                  {% if f.errors %}<small class="auth-err">{{ f.errors.0 }}</small>{% endif %}</div>{% endwith %}
+                {% with f=form.state %}<div class="addr-field addr-ac-wrap"><span class="addr-label">{% trans "State / Region / Province" %}</span>{{ f }}
+                  <ul class="addr-suggest" role="listbox" hidden data-state-suggest></ul>
+                  <div class="addr-ac-hint" data-state-hint hidden></div>
+                  {% if f.errors %}<small class="auth-err">{{ f.errors.0 }}</small>{% endif %}</div>{% endwith %}
+                {% with f=form.postal_code %}<div class="addr-field addr-ac-wrap"><span class="addr-label">{% trans "Postal code" %}</span>{{ f }}
+                  <ul class="addr-suggest" role="listbox" hidden data-postal-suggest></ul>
+                  <div class="addr-ac-hint" data-postal-hint hidden></div>
+                  {% if f.errors %}<small class="auth-err">{{ f.errors.0 }}</small>{% endif %}</div>{% endwith %}
                 {% with f=form.country %}<label class="addr-field"><span class="addr-label">{% trans "Country" %}</span>{{ f }}{% if f.errors %}<small class="auth-err">{{ f.errors.0 }}</small>{% endif %}</label>{% endwith %}
               </div>
             </div>
@@ -91,4 +142,12 @@
     </div>
   </div>
 </section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/address-autocomplete.js' %}?v={{ ASSET_VERSION }}"></script>
+{% if checkout_api %}
+<script async defer
+  src="https://maps.googleapis.com/maps/api/js?key={{ checkout_api.maps_browser_key|urlencode }}&libraries=places&callback=__glxAddrInit&loading=async"></script>
+{% endif %}
 {% endblock %}

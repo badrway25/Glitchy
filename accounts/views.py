@@ -429,6 +429,28 @@ def address_list(request):
     })
 
 @login_required(login_url="login")
+def _address_form_extras(request, form=None):
+    """Checkout-parity context for the address form: flag dial prefixes + Google config."""
+    from shipping.constants import COUNTRIES
+    from shipping.models import CheckoutApiConfig
+    _DIAL = {"IT": "+39", "FR": "+33", "DE": "+49", "ES": "+34", "NL": "+31", "BE": "+32",
+             "AT": "+43", "PT": "+351", "IE": "+353", "CH": "+41", "GB": "+44", "US": "+1",
+             "CA": "+1", "AU": "+61"}
+    def _flag(cc):
+        return chr(0x1F1E6 + ord(cc[0]) - 65) + chr(0x1F1E6 + ord(cc[1]) - 65)
+    api_cfg = CheckoutApiConfig.load()
+    country = ""
+    if form is not None:
+        country = (form.initial.get("country") or getattr(form.instance, "country", "") or "")
+    return {
+        "phone_prefixes": [{"code": c, "dial": _DIAL.get(c, ""), "flag": _flag(c), "name": str(n)}
+                            for c, n in COUNTRIES if _DIAL.get(c)],
+        "prefill_prefix": "",
+        "prefill_country": country,
+        "checkout_api": api_cfg if (api_cfg and api_cfg.autocomplete_ready()) else None,
+    }
+
+
 def address_create(request):
     if request.method == "POST":
         form = AddressForm(request.POST)
@@ -453,7 +475,8 @@ def address_create(request):
             "is_default": (Address.objects.filter(user=request.user).count() == 0),
         })
 
-    return render(request, "accounts/address_form.html", {"form": form, "mode": "create"})
+    ctx = {"form": form, "mode": "create"}; ctx.update(_address_form_extras(request, form))
+    return render(request, "accounts/address_form.html", ctx)
 
 @login_required(login_url="login")
 def address_edit(request, address_id):
@@ -473,7 +496,8 @@ def address_edit(request, address_id):
     else:
         form = AddressForm(instance=addr)
 
-    return render(request, "accounts/address_form.html", {"form": form, "mode": "edit", "addr": addr})
+    ctx = {"form": form, "mode": "edit", "addr": addr}; ctx.update(_address_form_extras(request, form))
+    return render(request, "accounts/address_form.html", ctx)
 
 @login_required(login_url="login")
 @require_POST

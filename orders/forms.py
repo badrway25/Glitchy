@@ -8,6 +8,31 @@ from .models import Order
 # 10 while the dropdown offered 14 — PT/IE/CA/AU silently failed validation).
 from shipping.constants import COUNTRIES as COUNTRY_CHOICES
 
+
+def clean_international_phone(raw, prefix, country):
+    """Shared E.164 validation (checkout + address book). Returns (e164, error_message)."""
+    from django.utils.translation import gettext as _
+    raw = (raw or "").strip()
+    prefix = (prefix or "").strip()
+    country = (country or "").strip().upper()
+    if not raw:
+        return "", None
+    allowed = set("0123456789 +().-")
+    if any(ch not in allowed for ch in raw):
+        return None, _("Phone numbers can only contain digits, spaces and + ( ) - .")
+    import phonenumbers
+    candidate = raw if raw.startswith("+") else ((prefix + raw) if prefix.startswith("+") else raw)
+    try:
+        parsed = phonenumbers.parse(candidate, country or None)
+        if not phonenumbers.is_possible_number(parsed):
+            return None, _("This phone number looks too short or too long.")
+        if not phonenumbers.is_valid_number(parsed):
+            return None, _("Please enter a valid phone number.")
+        return phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.E164), None
+    except phonenumbers.NumberParseException:
+        return None, _("Please enter a valid phone number (e.g. +39 333 1234567).")
+
+
 class OrderForm(forms.ModelForm):
     country = forms.ChoiceField(choices=COUNTRY_CHOICES)
     postal_code = forms.CharField(max_length=20, required=True)
@@ -33,23 +58,11 @@ class OrderForm(forms.ModelForm):
         country = (cleaned.get("country") or "").strip().upper()
 
         if raw:
-            allowed = set("0123456789 +().-")
-            if any(ch not in allowed for ch in raw):
-                self.add_error("phone", _("Phone numbers can only contain digits, spaces and + ( ) - ."))
-            else:
-                import phonenumbers
-                candidate = raw if raw.startswith("+") else ((prefix + raw) if prefix.startswith("+") else raw)
-                try:
-                    parsed = phonenumbers.parse(candidate, country or None)
-                    if not phonenumbers.is_possible_number(parsed):
-                        self.add_error("phone", _("This phone number looks too short or too long."))
-                    elif not phonenumbers.is_valid_number(parsed):
-                        self.add_error("phone", _("Please enter a valid phone number."))
-                    else:
-                        cleaned["phone"] = phonenumbers.format_number(
-                            parsed, phonenumbers.PhoneNumberFormat.E164)
-                except phonenumbers.NumberParseException:
-                    self.add_error("phone", _("Please enter a valid phone number (e.g. +39 333 1234567)."))
+            e164, err = clean_international_phone(raw, prefix, country)
+            if err:
+                self.add_error("phone", err)
+            elif e164:
+                cleaned["phone"] = e164
 
         # Light address hygiene: normalize whitespace, reject control chars.
         for f in ("address_line_1", "address_line_2", "city", "state", "postal_code"):
