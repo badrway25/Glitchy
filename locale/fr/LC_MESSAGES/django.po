@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: greatkart 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-05 15:41+0200\n"
+"POT-Creation-Date: 2026-07-05 17:08+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -303,13 +303,6 @@ msgstr "Faux lorsque l'assistant a refusé de répondre faute de contexte."
 msgid "Assistant feedback"
 msgstr "Retour sur l'assistant"
 
-#: .\assistant\services.py:109
-msgid ""
-"I can't access sensitive account, database or admin data — I can help with "
-"products, shipping, payments and your own orders. For anything else, our "
-"support team is happy to help."
-msgstr "Je ne peux pas accéder aux données sensibles de compte, base de données ou administration — je peux vous aider avec les produits, la livraison, les paiements et vos propres commandes. Pour le reste, notre support est là."
-
 #: .\assistant\services_openai.py:13
 #, fuzzy
 #| msgid "No server key set."
@@ -359,39 +352,45 @@ msgstr ""
 msgid "OpenAI reachable."
 msgstr "API Address Validation joignable."
 
-#: .\assistant\services_openai.py:38
+#: .\assistant\services_openai.py:40
+msgid ""
+"OpenAI key works — but the assistant is still DISABLED: turn on 'Is enabled' "
+"above and save, or the store keeps answering in limited mode."
+msgstr "La clé OpenAI fonctionne — mais l'assistant est encore DÉSACTIVÉ : activez 'Is enabled' ci-dessus et enregistrez, sinon la boutique reste en mode limité."
+
+#: .\assistant\services_openai.py:43
 msgid "OpenAI connection OK — key valid, model available."
 msgstr ""
 
-#: .\assistant\services_openai.py:40
+#: .\assistant\services_openai.py:45
 msgid "Invalid key (401)."
 msgstr ""
 
-#: .\assistant\services_openai.py:42
+#: .\assistant\services_openai.py:47
 msgid ""
 "OpenAI rejected the key (401) — it looks invalid or revoked. Re-copy it from "
 "the OpenAI dashboard."
 msgstr ""
 
-#: .\assistant\services_openai.py:45
+#: .\assistant\services_openai.py:50
 msgid "Quota/billing (429)."
 msgstr ""
 
-#: .\assistant\services_openai.py:47
+#: .\assistant\services_openai.py:52
 msgid ""
 "OpenAI answered 429 — quota exhausted or billing not active on the account."
 msgstr ""
 
-#: .\assistant\services_openai.py:51
+#: .\assistant\services_openai.py:56
 #, python-format
 msgid "OpenAI answered an unexpected status (%(code)s). Try again in a moment."
 msgstr ""
 
-#: .\assistant\services_openai.py:55
+#: .\assistant\services_openai.py:60
 msgid "Network timeout."
 msgstr ""
 
-#: .\assistant\services_openai.py:57
+#: .\assistant\services_openai.py:62
 #, fuzzy
 #| msgid "Could not reach Google (network/timeout)."
 msgid ""
@@ -6560,6 +6559,16 @@ msgstr "Articles de la liste de favoris"
 #: .\wishlist\views.py:117
 msgid "Saved for later."
 msgstr "Enregistré pour plus tard."
+
+#~ msgid ""
+#~ "I can't access sensitive account, database or admin data — I can help "
+#~ "with products, shipping, payments and your own orders. For anything else, "
+#~ "our support team is happy to help."
+#~ msgstr ""
+#~ "Je ne peux pas accéder aux données sensibles de compte, base de données "
+#~ "ou administration — je peux vous aider avec les produits, la livraison, "
+#~ "les paiements et vos propres commandes. Pour le reste, notre support est "
+#~ "là."
 
 #~ msgid "Shop more"
 #~ msgstr "Continuer mes achats"

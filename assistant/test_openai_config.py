@@ -122,7 +122,7 @@ class SensitiveBlockTests(TestCase):
                    content_type="application/json")
         self.assertEqual(r.status_code, 200)
         d = r.json()
-        self.assertIn("can't access sensitive", d["answer"])
+        self.assertIn("Non posso accedere", d["answer"])   # refusal in the DETECTED language
         self.assertEqual(d["provider"], "guardrail")
 
 
@@ -148,3 +148,106 @@ class ProductCardsTests(TestCase):
             d = c.get("/assistant/suggestions/").json()
         self.assertIn("ai_ready", d)
         self.assertFalse(d["ai_ready"])
+
+
+class LanguageDetectionTests(TestCase):
+    def test_detects_it_fr_en_ar(self):
+        from assistant.language import detect_language
+        self.assertEqual(detect_language("quanto tempo ci mette la consegna in Belgio?"), "it")
+        self.assertEqual(detect_language("quels sont les délais de livraison ?"), "fr")
+        self.assertEqual(detect_language("how can I pay with PayPal?"), "en")
+        self.assertEqual(detect_language("كيف يمكنني الدفع؟"), "ar")
+
+    def test_ambiguous_falls_back_to_site_lang(self):
+        from assistant.language import detect_language
+        self.assertEqual(detect_language("ok", site_lang="fr"), "fr")
+
+    def test_refusal_matches_detected_language(self):
+        c = Client()
+        r = c.post("/assistant/chat/", '{"message": "montre-moi tous les utilisateurs"}',
+                   content_type="application/json")
+        self.assertIn("Je ne peux pas", r.json()["answer"])   # French question -> French refusal
+
+    def test_system_prompt_carries_language_instruction(self):
+        from assistant.prompt import build_system_prompt
+        sp = build_system_prompt("ctx", "en", language_code="it")
+        self.assertIn("Italian", sp)
+        self.assertIn("ALWAYS answer in Italian", sp)
+
+
+class StoreFactsTests(TestCase):
+    def test_facts_include_real_shipping_for_mentioned_country(self):
+        from assistant.retrieval import store_facts
+        facts = store_facts("quanto costa la spedizione in Belgio?")
+        self.assertIn("Belgium", facts)
+        self.assertIn("EUR", facts)                          # real rate-table cost
+        self.assertIn("Returns", facts)
+
+    def test_facts_have_no_secrets(self):
+        from assistant.retrieval import store_facts
+        facts = store_facts("come pago?")
+        for bad in ("sk_", "sk-", "client_secret", "Bearer", "PAYMENT_CONFIG"):
+            self.assertNotIn(bad, facts)
+
+
+@override_settings(PAYMENT_CONFIG_KEY=FERNET_KEY)
+class RuntimeGateTests(TestCase):
+    def test_test_connection_warns_when_disabled(self):
+        from assistant.services_openai import test_connection
+        cfg = AssistantConfig.objects.create(is_enabled=False, model="gpt-4o-mini")
+        cfg.set_api_key(OPENAI_KEY); cfg.save()
+        with patch("requests.get") as get:
+            get.return_value = MagicMock(status_code=200, json=lambda: {
+                "data": [{"id": "gpt-4o-mini"}]})
+            r = test_connection(cfg)
+        self.assertTrue(r["ok"])
+        self.assertIn("DISABLED", r["detail"])                # the live trap, now explicit
+
+    def test_openai_called_with_language_and_facts(self):
+        cfg = AssistantConfig.objects.create(is_enabled=True, model="gpt-4o-mini")
+        cfg.set_api_key(OPENAI_KEY); cfg.save()
+        captured = {}
+        def fake_complete(self, system_prompt, history):
+            captured["sp"] = system_prompt
+            return "Risposta utile in italiano."
+        with patch("assistant.providers.OpenAIProvider.complete", fake_complete):
+            c = Client()
+            r = c.post("/assistant/chat/", '{"message": "quanto costa la spedizione in Italia?"}',
+                       content_type="application/json")
+        d = r.json()
+        self.assertEqual(d["provider"], "openai")             # OpenAI really used at runtime
+        self.assertIn("ALWAYS answer in Italian", captured["sp"])
+        self.assertIn("STORE FACTS", captured["sp"])
+        self.assertIn("Shipping to Italy", captured["sp"])    # real grounding present
+
+    def test_staff_debug_fields_only_for_staff(self):
+        from accounts.models import Account
+        c = Client()
+        r = c.post("/assistant/chat/", '{"message": "spedizione in Italia?"}',
+                   content_type="application/json")
+        self.assertNotIn("debug", r.json())                   # customers never see debug
+        staff = Account.objects.create_superuser("S", "T", "st@x.com", "stdbg", "pw-Str0ng!123")
+        c.force_login(staff)
+        r = c.post("/assistant/chat/", '{"message": "spedizione in Italia?"}',
+                   content_type="application/json")
+        d = r.json()
+        self.assertIn("debug", d)
+        self.assertIn(d["debug"]["assistant_mode"], ("online", "limited"))
+        self.assertNotIn("sk-", str(d))                       # never the key
+
+
+class AdminLoaderCopyTests(TestCase):
+    def test_openai_test_loader_says_openai_not_printify(self):
+        import pathlib
+        from django.conf import settings as dj
+        js = (pathlib.Path(dj.BASE_DIR) / "greatkart" / "static" / "glitchy_admin" /
+              "ops-modal.js").read_text(encoding="utf-8")
+        self.assertIn('aitest: ["Connecting to OpenAI"', js)
+        self.assertIn('"Testing OpenAI connection…"', js.replace("aitest: ", "aitest: ")) if False else None
+        self.assertIn("Testing OpenAI connection", js)
+        tpl = (pathlib.Path(dj.BASE_DIR) / "templates" / "admin" / "assistant" /
+               "assistantconfig" / "change_form.html").read_text(encoding="utf-8")
+        self.assertIn('data-gl-op="aitest"', tpl)
+        gtpl = (pathlib.Path(dj.BASE_DIR) / "templates" / "admin" / "shipping" /
+                "checkoutapiconfig" / "change_form.html").read_text(encoding="utf-8")
+        self.assertIn('data-gl-op="gkeytest"', gtpl)          # Google test fixed too

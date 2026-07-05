@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: greatkart 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-05 15:41+0200\n"
+"POT-Creation-Date: 2026-07-05 17:08+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -299,13 +299,6 @@ msgstr "Falso quando l'assistente non ha risposto per mancanza di contesto."
 msgid "Assistant feedback"
 msgstr "Feedback sull'assistente"
 
-#: .\assistant\services.py:109
-msgid ""
-"I can't access sensitive account, database or admin data — I can help with "
-"products, shipping, payments and your own orders. For anything else, our "
-"support team is happy to help."
-msgstr "Non posso accedere a dati sensibili di account, database o amministrazione — posso aiutarti con prodotti, spedizioni, pagamenti e i tuoi ordini. Per il resto, il nostro supporto è a disposizione."
-
 #: .\assistant\services_openai.py:13
 #, fuzzy
 #| msgid "No server key set."
@@ -361,42 +354,54 @@ msgstr ""
 msgid "OpenAI reachable."
 msgstr "API Address Validation raggiungibile."
 
-#: .\assistant\services_openai.py:38
+#: .\assistant\services_openai.py:40
+msgid ""
+"OpenAI key works — but the assistant is still DISABLED: turn on 'Is enabled' "
+"above and save, or the store keeps answering in limited mode."
+msgstr "La chiave OpenAI funziona — ma l'assistente è ancora DISATTIVATO: attiva 'Is enabled' qui sopra e salva, altrimenti lo store continua a rispondere in modalità limitata."
+
+#: .\assistant\services_openai.py:43
 msgid "OpenAI connection OK — key valid, model available."
 msgstr "Connessione OpenAI OK — chiave valida, modello disponibile."
 
-#: .\assistant\services_openai.py:40
-msgid "Invalid key (401)."
-msgstr ""
-
-#: .\assistant\services_openai.py:42
-msgid ""
-"OpenAI rejected the key (401) — it looks invalid or revoked. Re-copy it from "
-"the OpenAI dashboard."
-msgstr "OpenAI ha rifiutato la chiave (401) — sembra non valida o revocata. Ricopiala dalla dashboard OpenAI."
-
 #: .\assistant\services_openai.py:45
-msgid "Quota/billing (429)."
+msgid "Invalid key (401)."
 msgstr ""
 
 #: .\assistant\services_openai.py:47
 msgid ""
-"OpenAI answered 429 — quota exhausted or billing not active on the account."
-msgstr "OpenAI ha risposto 429 — quota esaurita o fatturazione non attiva sull'account."
+"OpenAI rejected the key (401) — it looks invalid or revoked. Re-copy it from "
+"the OpenAI dashboard."
+msgstr ""
+"OpenAI ha rifiutato la chiave (401) — sembra non valida o revocata. "
+"Ricopiala dalla dashboard OpenAI."
 
-#: .\assistant\services_openai.py:51
+#: .\assistant\services_openai.py:50
+msgid "Quota/billing (429)."
+msgstr ""
+
+#: .\assistant\services_openai.py:52
+msgid ""
+"OpenAI answered 429 — quota exhausted or billing not active on the account."
+msgstr ""
+"OpenAI ha risposto 429 — quota esaurita o fatturazione non attiva "
+"sull'account."
+
+#: .\assistant\services_openai.py:56
 #, python-format
 msgid "OpenAI answered an unexpected status (%(code)s). Try again in a moment."
 msgstr ""
 
-#: .\assistant\services_openai.py:55
+#: .\assistant\services_openai.py:60
 msgid "Network timeout."
 msgstr ""
 
-#: .\assistant\services_openai.py:57
+#: .\assistant\services_openai.py:62
 msgid ""
 "Could not reach OpenAI (network/timeout). Check the server's connectivity."
-msgstr "Impossibile raggiungere OpenAI (rete/timeout). Controlla la connettività del server."
+msgstr ""
+"Impossibile raggiungere OpenAI (rete/timeout). Controlla la connettività del "
+"server."
 
 #: .\assistant\views.py:91
 msgid ""
@@ -6704,6 +6709,15 @@ msgstr "Articoli dei preferiti"
 #: .\wishlist\views.py:117
 msgid "Saved for later."
 msgstr "Salvato per dopo."
+
+#~ msgid ""
+#~ "I can't access sensitive account, database or admin data — I can help "
+#~ "with products, shipping, payments and your own orders. For anything else, "
+#~ "our support team is happy to help."
+#~ msgstr ""
+#~ "Non posso accedere a dati sensibili di account, database o "
+#~ "amministrazione — posso aiutarti con prodotti, spedizioni, pagamenti e i "
+#~ "tuoi ordini. Per il resto, il nostro supporto è a disposizione."
 
 #~ msgid "Shop more"
 #~ msgstr "Continua a fare acquisti"
