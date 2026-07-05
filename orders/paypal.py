@@ -21,16 +21,31 @@ def paypal_available():
     return pc.paypal_available()
 
 
+_TOKEN_CACHE = {"token": "", "expires_at": 0.0, "base": ""}
+
+
 def _access_token():
+    """Client-credentials token with a module cache (PayPal tokens last hours) — halves the
+    latency of every create/capture. Never logged, never returned to clients."""
+    import time
     import requests
     from payments import config as pc
     base = pc.paypal_api_base()
+    now = time.time()
+    if (_TOKEN_CACHE["token"] and _TOKEN_CACHE["base"] == base
+            and now < _TOKEN_CACHE["expires_at"]):
+        return _TOKEN_CACHE["token"]
     resp = requests.post(f"{base}/v1/oauth2/token",
                          auth=(pc.paypal_client_id(), pc.paypal_secret()),
                          data={"grant_type": "client_credentials"},
                          headers={"Accept": "application/json"}, timeout=15)
     resp.raise_for_status()
-    return resp.json().get("access_token", "")
+    data = resp.json()
+    token = data.get("access_token", "")
+    if token:
+        _TOKEN_CACHE.update(token=token, base=base,
+                            expires_at=now + max(60, int(data.get("expires_in", 300)) - 60))
+    return token
 
 
 def verify_capture(capture_id, expected_amount, expected_currency):

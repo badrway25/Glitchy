@@ -249,6 +249,16 @@ def finalize_order_payment(*, order, payment, request=None):
         if cart:
             CartItem.objects.filter(cart=cart).delete()
 
+    # Slow EXTERNAL side-effects (Printify push, n8n/SMTP notifications) run in a background
+    # thread: on a slow SMTP they took ~1 minute INSIDE the capture request, so the frontend
+    # timed out and told a paid customer "do NOT pay again" while the DB was already
+    # completed. The DB core above stays synchronous; these are fire-and-forget and each
+    # guards its own failures.
+    import threading
+    threading.Thread(target=_post_finalize_side_effects, args=(order,), daemon=True).start()
+
+
+def _post_finalize_side_effects(order):
     # Push to Printify (test mode: don't auto-send to production from web flow).
     try:
         push_order_to_printify(order, auto_send=False)

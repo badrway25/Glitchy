@@ -154,54 +154,85 @@ def paypal_create_order(request):
     return JsonResponse({"id": paypal_id})
 
 
+def _paypal_success_payload(order, payment_id, status="completed"):
+    """Stable success contract the JS relies on — ok/status/redirect_url, no PII."""
+    from django.urls import reverse
+    redirect_url = (reverse("order_complete")
+                    + f"?order_number={order.order_number}&payment_id={payment_id}")
+    return {"ok": True, "status": status, "order_id": order.order_number,
+            "payment_id": payment_id, "redirect_url": redirect_url}
+
+
 @require_POST
 def paypal_capture(request):
-    """SERVER-SIDE capture + finalize for PayPal (replaces client actions.order.capture()).
+    """SERVER-SIDE capture + finalize for PayPal, with a deterministic JSON contract.
 
-    Statuses are mapped precisely (COMPLETED / INSTRUMENT_DECLINED / PENDING / other) and the
-    amount+currency are verified from the capture response itself before the order is marked
-    paid. Idempotent via Payment.get_or_create. Logs carry only provider/op/status codes."""
+    ok/status/redirect_url always; already-completed orders answer an IDEMPOTENT success
+    (no second capture, ever); ORDER_ALREADY_CAPTURED from PayPal reconciles from the DB.
+    Amount+currency verified from the capture response. Logs only provider/op/status codes."""
     try:
         body = json.loads(request.body.decode("utf-8") or "{}")
     except Exception:
-        return JsonResponse({"error": "Invalid JSON"}, status=400)
-    order = _resolve_pending_order(request, body.get("order_number"))
+        return JsonResponse({"ok": False, "status": "error", "code": "BAD_JSON",
+                             "message": "Invalid JSON"}, status=400)
+
+    order_number = body.get("order_number")
+    # IDEMPOTENCY FIRST: if this order is already paid, this is a success — never a retry,
+    # never a scary message, never a second capture.
+    completed = Order.objects.filter(order_number=order_number, is_ordered=True).first()
+    if completed and (request.user.is_authenticated and completed.user_id == request.user.id
+                      or completed.session_key == request.session.session_key):
+        pid = completed.payment.payment_id if completed.payment_id else ""
+        return JsonResponse(_paypal_success_payload(completed, pid, "already_completed"))
+
+    order = _resolve_pending_order(request, order_number)
     if not order:
-        return JsonResponse({"error": str(_("Order not found or already confirmed."))}, status=404)
+        return JsonResponse({"ok": False, "status": "error", "code": "ORDER_NOT_FOUND",
+                             "message": str(_("Order not found or already confirmed."))},
+                            status=404)
 
     from .paypal import capture_order
     result, issue = capture_order(body.get("paypal_order_id"))
     if result is None:
         if issue == "INSTRUMENT_DECLINED":
-            # PayPal's documented retry path: buyer picks another funding source in the popup
-            return JsonResponse({"error": str(
-                _("Your payment method was declined inside PayPal. Please try another one.")),
-                "retry": True}, status=402)
+            return JsonResponse({"ok": False, "status": "error", "code": issue, "retry": True,
+                                 "message": str(_("Your payment method was declined inside "
+                                                  "PayPal. Please try another one."))}, status=402)
         if issue == "ORDER_ALREADY_CAPTURED":
-            return JsonResponse({"error": str(_("This payment was already captured."))}, status=409)
+            if order.is_ordered and order.payment_id:
+                return JsonResponse(_paypal_success_payload(
+                    order, order.payment.payment_id, "already_completed"))
+            logger.warning("paypal op=capture order=%s already-captured but not finalized",
+                           order.order_number)
+            return JsonResponse({"ok": False, "status": "error", "code": issue,
+                                 "message": str(_("Do not pay again until we check this "
+                                                  "order. Please contact us."))}, status=409)
         logger.warning("paypal op=capture order=%s failed issue=%s", order.order_number, issue)
-        return JsonResponse({"error": str(
-            _("PayPal could not confirm the payment. Please try again or use card."))}, status=502)
+        return JsonResponse({"ok": False, "status": "error", "code": "PAYPAL_CAPTURE_FAILED",
+                             "message": str(_("PayPal could not confirm the payment. Please "
+                                              "try again or use card."))}, status=502)
 
     status = result.get("status", "")
     if status != "COMPLETED":
         logger.warning("paypal op=capture order=%s status=%s", order.order_number, status or "?")
         if status == "PENDING":
-            msg = _("Your PayPal payment is pending review. We will confirm it by email shortly.")
-        else:
-            msg = _("PayPal could not confirm the payment. Please try again or use card.")
-        return JsonResponse({"error": str(msg), "status": status}, status=402)
+            return JsonResponse({"ok": True, "status": "pending",
+                                 "message": str(_("Your PayPal payment is pending review. We "
+                                                  "will confirm it by email shortly."))})
+        return JsonResponse({"ok": False, "status": "error",
+                             "code": "PAYPAL_STATUS_" + (status or "UNKNOWN"),
+                             "message": str(_("PayPal could not confirm the payment. Please "
+                                              "try again or use card."))}, status=402)
 
-    # amount/currency verification straight from the capture response
     expected = f"{float(order.order_total):.2f}"
     currency = (getattr(settings, "PAYPAL_CURRENCY", "EUR") or "EUR").upper()
     if result.get("amount") != expected or (result.get("currency") or "").upper() != currency:
         logger.error("paypal op=capture order=%s amount_mismatch got=%s/%s want=%s/%s",
                      order.order_number, result.get("amount"), result.get("currency"),
                      expected, currency)
-        return JsonResponse({"error": str(
-            _("Payment amount mismatch prevented for your safety. Please contact support."))},
-            status=409)
+        return JsonResponse({"ok": False, "status": "error", "code": "AMOUNT_MISMATCH",
+                             "message": str(_("Payment amount mismatch prevented for your "
+                                              "safety. Please contact support."))}, status=409)
 
     trans_id = result.get("capture_id") or body.get("paypal_order_id")
     payment, _created = Payment.objects.get_or_create(
@@ -213,11 +244,37 @@ def paypal_capture(request):
             finalize_order_payment(order=order, payment=payment)
         except Exception:
             logger.error("paypal op=finalize order=%s failed", order.order_number)
-            return JsonResponse({"error": str(
-                _("Payment succeeded, but we could not finalize your order. Please contact "
-                  "support."))}, status=500)
+            return JsonResponse({"ok": False, "status": "error", "code": "FINALIZE_FAILED",
+                                 "message": str(_("Payment succeeded, but we could not "
+                                                  "finalize your order. Please contact "
+                                                  "support."))}, status=500)
     messages.success(request, _("Payment successful. Your order is confirmed."))
-    return JsonResponse({"order_number": order.order_number, "transID": payment.payment_id})
+    return JsonResponse(_paypal_success_payload(order, payment.payment_id, "completed"))
+
+
+@require_POST
+def paypal_status(request):
+    """Post-timeout reconciliation — DB-only read, idempotent, never captures.
+
+    If the capture finished server-side after the frontend gave up, this answers
+    completed + redirect so a PAID customer reaches the thank-you page instead of being
+    told to contact support."""
+    try:
+        body = json.loads(request.body.decode("utf-8") or "{}")
+    except Exception:
+        return JsonResponse({"ok": False, "status": "error"}, status=400)
+    order_number = (body.get("order_number") or "")[:40]
+    qs = Order.objects.filter(order_number=order_number)
+    if request.user.is_authenticated:
+        order = qs.filter(user=request.user).first()
+    else:
+        order = qs.filter(is_guest=True, session_key=request.session.session_key).first()
+    if not order:
+        return JsonResponse({"ok": True, "status": "unknown"})
+    if order.is_ordered and order.payment_id:
+        return JsonResponse(_paypal_success_payload(
+            order, order.payment.payment_id, "completed"))
+    return JsonResponse({"ok": True, "status": "processing"})
 
 
 @require_POST
@@ -712,6 +769,8 @@ def place_order(request, total=0, quantity=0):
         "coupon_code": data.coupon_code,
         "grand_total": data.order_total,
     }
+    from payments import config as _pconf
+    context["stripe_ready"] = bool(_pconf.stripe_secret_key() and _pconf.stripe_publishable_key())
     return render(request, "orders/payments.html", context)
 
 
