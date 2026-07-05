@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: greatkart 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-05 09:44+0200\n"
+"POT-Creation-Date: 2026-07-05 11:10+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -739,43 +739,83 @@ msgstr "Veuillez saisir un numéro de téléphone valide."
 msgid "This field contains invalid characters."
 msgstr ""
 
-#: .\orders\views.py:131
+#: .\orders\views.py:123
+#, fuzzy
+#| msgid "Order info"
+msgid "Order not found."
+msgstr "Informations de la commande"
+
+#: .\orders\views.py:127
+#, fuzzy
+#| msgid "Your cart is empty"
+msgid "Your cart is empty."
+msgstr "Votre panier est vide"
+
+#: .\orders\views.py:132
+msgid "Please complete your delivery address before paying with PayPal."
+msgstr "Complétez votre adresse de livraison avant de payer avec PayPal."
+
+#: .\orders\views.py:140
+msgid ""
+"Payment amount mismatch prevented for your safety. Please refresh and try "
+"again."
+msgstr "Écart de montant bloqué pour votre sécurité. Actualisez la page et réessayez."
+
+#: .\orders\views.py:147
+msgid ""
+"PayPal could not validate the provided shipping address. Please review it "
+"and choose PayPal again."
+msgstr "PayPal n'a pas pu valider l'adresse de livraison fournie. Vérifiez-la et choisissez à nouveau PayPal."
+
+#: .\orders\views.py:150 .\templates\orders\payments.html:296
+msgid "PayPal is temporarily unavailable. Please use card."
+msgstr "PayPal est temporairement indisponible. Utilisez la carte."
+
+#: .\orders\views.py:152 .\templates\orders\payments.html:259
+msgid "PayPal order could not be created. Please try again or use card."
+msgstr "Impossible de créer la commande PayPal. Réessayez ou utilisez la carte."
+
+#: .\orders\views.py:178
 msgid "Invalid order total."
 msgstr "Total de commande invalide."
 
-#: .\orders\views.py:138
+#: .\orders\views.py:185
 msgid ""
 "Card payments are not configured yet. Please choose another payment method "
 "or contact us."
-msgstr "Les paiements par carte ne sont pas encore configurés. Choisissez un autre moyen de paiement ou contactez-nous."
+msgstr ""
+"Les paiements par carte ne sont pas encore configurés. Choisissez un autre "
+"moyen de paiement ou contactez-nous."
 
-#: .\orders\views.py:159
+#: .\orders\views.py:206
 msgid ""
 "We could not start the card payment. Please try again in a moment or choose "
 "another payment method."
-msgstr "Impossible de démarrer le paiement par carte. Réessayez dans un instant ou choisissez un autre moyen."
+msgstr ""
+"Impossible de démarrer le paiement par carte. Réessayez dans un instant ou "
+"choisissez un autre moyen."
 
-#: .\orders\views.py:471
+#: .\orders\views.py:518
 msgid "We could not process this request. Please try again."
 msgstr "Impossible de charger le produit. Veuillez réessayer."
 
-#: .\orders\views.py:477
+#: .\orders\views.py:524
 msgid "Please review the highlighted fields and try again."
 msgstr "Vérifiez les champs en surbrillance et réessayez."
 
-#: .\orders\views.py:486
+#: .\orders\views.py:533
 msgid "We don't ship to this country yet."
 msgstr "Nous ne livrons pas encore dans ce pays."
 
-#: .\orders\views.py:487
+#: .\orders\views.py:534
 msgid "We're sorry, we don't ship to the selected country yet."
 msgstr "Nous ne livrons pas encore dans ce pays."
 
-#: .\orders\views.py:506 .\shipping\address_validation.py:171
+#: .\orders\views.py:553 .\shipping\address_validation.py:171
 msgid "Please select a verified address from the suggestions."
 msgstr "Veuillez sélectionner une adresse vérifiée parmi les suggestions."
 
-#: .\orders\views.py:517
+#: .\orders\views.py:564
 msgid ""
 "This address is not verified. Confirm it to continue, or pick it from the "
 "suggestions."
@@ -783,7 +823,7 @@ msgstr ""
 "Cette adresse n'est pas vérifiée. Confirmez-la pour continuer, ou choisissez-"
 "la parmi les suggestions."
 
-#: .\orders\views.py:520
+#: .\orders\views.py:567
 msgid "Please review your address below."
 msgstr "Vérifiez votre adresse ci-dessous."
 
@@ -4555,7 +4595,7 @@ msgid "Price: high to low"
 msgstr "Prix : décroissant"
 
 #: .\templates\merchandising\collection.html:74
-#: .\templates\orders\payments.html:170 .\templates\store\cart.html:193
+#: .\templates\orders\payments.html:178 .\templates\store\cart.html:193
 #: .\templates\store\checkout.html:339 .\templates\store\product_detail.html:81
 #, python-format
 msgid "%(d)s-day returns"
@@ -5077,16 +5117,34 @@ msgid "Card"
 msgstr "Carte"
 
 #: .\templates\orders\payments.html:148
+msgid "Secure checkout with PayPal"
+msgstr "Paiement sécurisé avec PayPal"
+
+#: .\templates\orders\payments.html:150
+msgid "Loading PayPal…"
+msgstr "Chargement de PayPal…"
+
+#: .\templates\orders\payments.html:153
+msgid ""
+"You will review the exact order total and your delivery address inside "
+"PayPal before confirming. Nothing is charged until you approve."
+msgstr "Dans PayPal, vous vérifierez le montant exact de la commande et votre adresse de livraison avant de confirmer. Aucun débit tant que vous n'approuvez pas."
+
+#: .\templates\orders\payments.html:156
 msgid "After payment, your order will be confirmed automatically."
 msgstr "Après le paiement, votre commande sera confirmée automatiquement."
 
-#: .\templates\orders\payments.html:158
+#: .\templates\orders\payments.html:166
 msgid "Pay"
 msgstr "Payer"
 
-#: .\templates\orders\payments.html:169 .\templates\store\checkout.html:339
+#: .\templates\orders\payments.html:177 .\templates\store\checkout.html:339
 msgid "Secure payment"
 msgstr "Paiement sécurisé"
+
+#: .\templates\orders\payments.html:293
+msgid "PayPal encountered a problem. Please try again or use card."
+msgstr "PayPal a rencontré un problème. Réessayez ou utilisez la carte."
 
 #: .\templates\returns\policy.html:17
 #, python-format
