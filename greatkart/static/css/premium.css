@@ -3591,3 +3591,31 @@ form .form-control,form .custom-select{transition:border-color .18s var(--ease),
 .addr-badge-muted{background:rgba(120,110,95,.08);color:inherit;opacity:.7;border:1px dashed rgba(120,110,95,.3);
   font-weight:600;}
 @media (max-width:575.98px){ .co-section{padding:.95rem .85rem 1.05rem;} .addr-suggest{max-height:240px;} }
+
+/* ============================================================================
+   Cart + address-book premium refinements (live feedback)
+   ========================================================================= */
+/* Remove: discreet ghost action, not a red CTA */
+.btn-remove{
+  padding:.35rem .6rem!important; border:0!important; background:transparent!important;
+  color:var(--muted,#8a8378)!important; font-weight:600!important; font-size:.82rem!important;
+  border-radius:8px!important; gap:.4rem!important;
+}
+.btn-remove:hover{ background:rgba(220,38,38,.08)!important; color:#dc2626!important; transform:none!important; }
+.btn-remove:focus-visible{ outline:2px solid #dc2626; outline-offset:2px; }
+.btn-remove i{ font-size:.85em; }
+
+/* Cart thumbnail: soft container like the checkout mini-thumb — NO visible border */
+.cart-thumb{
+  border:0!important; box-shadow:none!important;
+  background:rgba(0,0,0,.035)!important; border-radius:16px!important;
+}
+:root[data-theme="dark"] .cart-thumb{ background:rgba(255,255,255,.06)!important; }
+
+/* Address book actions: quiet ghost pills; delete = subtle danger */
+.addr-card .btn-soft.btn-sm{
+  padding:.32rem .65rem; font-size:.8rem; font-weight:600; border-radius:9px;
+  background:transparent; border:1px solid rgba(120,110,95,.22);
+}
+.addr-card .btn-soft.btn-sm:hover{ border-color:var(--primary); background:rgba(184,151,90,.08); }
+.addr-card .btn-soft.btn-sm.text-danger:hover{ border-color:#dc2626; background:rgba(220,38,38,.07); }
