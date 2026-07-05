@@ -94,6 +94,10 @@ _SENSITIVE_PATTERNS = (
     # internal billing / margins
     "fatturazione interna", "internal billing", "margini", "margins", "printify cost",
     "costi printify", "provider config",
+    # memory exfiltration / storing sensitive data
+    "ricordati la mia carta", "ricorda la mia carta", "remember my card", "save my card",
+    "numero di carta", "card number", "numéro de carte", "memorizza la password",
+    "cosa ha chiesto", "what did the other", "altro utente ha chiesto", "other user asked",
     # prompt injection
     "ignora le regole", "ignore the rules", "ignore previous", "ignora le istruzioni",
     "system prompt", "le tue istruzioni", "your instructions", "jailbreak",
@@ -142,6 +146,8 @@ def answer_question(request, query):
     knowledge = retrieval.retrieve_knowledge(query, limit=5)
     faqs = retrieval.retrieve_faqs(query, limit=4)
     products = retrieval.retrieve_products(query, limit=4)
+    if not products:
+        products = _followup_products(conv)          # conversational memory for follow-ups
     order_ctx = _order_context_for(request, query, lang)
     in_scope = bool(knowledge or faqs or products or order_ctx) or retrieval.is_in_scope(query)
 
@@ -299,6 +305,30 @@ def _smart_fallback_answer(query, msg_lang):
         return (f"You can request a return within {days} days. The guided procedure is on "
                 f"the Returns page; support is here if you need a hand.")
     return None
+
+
+def _followup_products(conv, limit=4):
+    """Products referenced by the PREVIOUS assistant turns — the conversational memory the
+    retrieval layer was missing: 'quanto costa?' after a product search now reuses the
+    products just shown instead of finding nothing and answering generically."""
+    ids = []
+    try:
+        for m in conv.messages.filter(role="assistant").order_by("-created_at")[:3]:
+            for src in (m.used_sources or []):
+                if isinstance(src, str) and src.startswith("product:"):
+                    try:
+                        pid = int(src.split(":", 1)[1])
+                        if pid not in ids:
+                            ids.append(pid)
+                    except ValueError:
+                        continue
+        if not ids:
+            return []
+        from store.models import Product
+        found = {p.id: p for p in Product.objects.filter(id__in=ids[:limit], is_available=True)}
+        return [found[i] for i in ids[:limit] if i in found]
+    except Exception:
+        return []
 
 
 def _finalise(conv, answer, provider, grounded, sources, products=None, language=""):

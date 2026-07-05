@@ -17,10 +17,10 @@
       <div class="ai-head-brand">
         <span class="ai-head-dot"></span>
         <div>
-          <div class="ai-head-title">{{ SITE_NAME }} {% trans "Assistant" %}</div>
+          <div class="ai-head-title">{{ SITE_NAME }} {% trans "Support Assistant" %}</div>
           <div class="ai-head-sub" id="aiStatusSub"
                data-online="{% trans 'AI assistant · online' %}"
-               data-limited="{% trans 'Limited mode — curated store answers' %}">{% trans "Answers from our store & policies" %}</div>
+               data-limited="{% trans 'Limited mode — curated store answers' %}">{% trans "Products · Delivery · Payments · Orders" %}</div>
         </div>
       </div>
       <button class="ai-head-close" type="button" data-ai-close aria-label="{% trans 'Close' %}">
@@ -30,6 +30,7 @@
 
     <div id="aiMessages" class="ai-messages"></div>
 
+    <div class="ai-memory-note text-muted">{% trans "I keep the context of this chat while you browse." %}</div>
     <div id="aiQuick" class="ai-quick" hidden></div>
 
     <form id="aiForm" class="ai-input" autocomplete="off">

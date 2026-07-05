@@ -15,16 +15,14 @@ from .models import AssistantFeedback, AssistantMessage
 logger = logging.getLogger("assistant")
 
 QUICK_QUESTIONS = [
-    {"key": "choose", "en": "Help me choose a product",
-     "it": "Aiutami a scegliere un prodotto", "fr": "Aidez-moi à choisir un produit"},
-    {"key": "goes_with", "en": "What goes well with this item?",
-     "it": "Cosa sta bene con questo articolo?", "fr": "Qu'est-ce qui va bien avec cet article ?"},
-    {"key": "gift", "en": "Do you have gift ideas?",
-     "it": "Avete idee regalo?", "fr": "Avez-vous des idées cadeaux ?"},
-    {"key": "save", "en": "How do I save items for later?",
-     "it": "Come salvo gli articoli per dopo?", "fr": "Comment enregistrer des articles pour plus tard ?"},
-    {"key": "sizing", "en": "Can you help me find my size?",
-     "it": "Puoi aiutarmi a trovare la taglia?", "fr": "Pouvez-vous m'aider à trouver ma taille ?"},
+    {"key": "find", "en": "Find a product",
+     "it": "Trova un prodotto", "fr": "Trouver un produit"},
+    {"key": "delivery", "en": "Delivery times & costs",
+     "it": "Tempi e costi di consegna", "fr": "Délais et frais de livraison"},
+    {"key": "payment", "en": "Payment problem",
+     "it": "Problema con il pagamento", "fr": "Problème de paiement"},
+    {"key": "order", "en": "Where is my order?",
+     "it": "Dov'è il mio ordine?", "fr": "Où est ma commande ?"},
     {"key": "returns", "en": "How do returns work?",
      "it": "Come funzionano i resi?", "fr": "Comment fonctionnent les retours ?"},
 ]
