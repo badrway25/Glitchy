@@ -204,7 +204,9 @@ class PayPalServerCaptureTests(TestCase):
             post.return_value = self._pp_response()
             r = self._capture(c)
         self.assertEqual(r.status_code, 200, r.content)
-        self.assertEqual(r.json()["transID"], "CAP-777")     # REAL capture id, not order id
+        self.assertTrue(r.json()["ok"])
+        self.assertEqual(r.json()["payment_id"], "CAP-777")   # REAL capture id, not order id
+        self.assertIn("redirect_url", r.json())
         from orders.models import Order, Payment
         o = Order.objects.get(order_number="O-88")
         self.assertTrue(o.is_ordered)
@@ -232,7 +234,7 @@ class PayPalServerCaptureTests(TestCase):
             r = self._capture(c)
         self.assertEqual(r.status_code, 402)
         self.assertTrue(r.json().get("retry"))
-        self.assertIn("declined", r.json()["error"].lower())
+        self.assertIn("declined", r.json()["message"].lower())
 
     def test_pending_status_polite_message(self):
         c = self._setup_order()
@@ -241,8 +243,8 @@ class PayPalServerCaptureTests(TestCase):
              patch("requests.post") as post:
             post.return_value = self._pp_response(status="PENDING")
             r = self._capture(c)
-        self.assertEqual(r.status_code, 402)
-        self.assertIn("pending", r.json()["error"].lower())
+        self.assertEqual(r.status_code, 200)                 # pending is ok:true now
+        self.assertEqual(r.json()["status"], "pending")
 
     def test_network_failure_is_elegant_502(self):
         c = self._setup_order()
@@ -251,7 +253,7 @@ class PayPalServerCaptureTests(TestCase):
              patch("requests.post", side_effect=Exception("boom")):
             r = self._capture(c)
         self.assertEqual(r.status_code, 502)
-        self.assertNotIn("boom", r.json()["error"])
+        self.assertNotIn("boom", r.json()["message"])
 
     def test_missing_or_bad_capture_id_rejected(self):
         c = self._setup_order()
@@ -286,5 +288,95 @@ class PayPalTemplateGuardTests(TestCase):
     def test_loading_and_timeout_states_present(self):
         t = self._tpl()
         for marker in ("Connecting to PayPal", "Confirming your payment",
-                       "timed out", "ppStatus"):
+                       "taking longer than expected", "ppStatus", "ppReconcileThenError"):
             self.assertIn(marker, t)
+
+
+@override_settings(ALLOWED_HOSTS=["testserver", "127.0.0.1", "localhost"])
+class PayPalReconciliationTests(TestCase):
+    """Completed-in-DB / frontend-timeout reconciliation — the live bug."""
+
+    _setup_order = PayPalCreateOrderEndpointTests._setup_order
+
+    def _complete(self, c):
+        from orders.models import Order, Payment
+        o = Order.objects.get(order_number="O-88")
+        p = Payment.objects.create(payment_id="CAP-DONE", email=o.email,
+                                   payment_method="PayPal", amount_paid="33.42",
+                                   status="COMPLETED")
+        o.payment = p; o.is_ordered = True; o.save()
+        return o
+
+    def test_capture_on_already_completed_order_is_idempotent_success(self):
+        c = self._setup_order()
+        self._complete(c)
+        with patch("requests.post") as post:                 # NO PayPal call may happen
+            r = c.post("/orders/paypal/capture/",
+                       json.dumps({"order_number": "O-88", "paypal_order_id": "PP-X"}),
+                       content_type="application/json")
+        self.assertEqual(r.status_code, 200)
+        self.assertFalse(post.called)                        # no second capture, ever
+        d = r.json()
+        self.assertTrue(d["ok"])
+        self.assertEqual(d["status"], "already_completed")
+        self.assertEqual(d["payment_id"], "CAP-DONE")
+        self.assertIn("redirect_url", d)
+
+    def test_status_endpoint_finds_completed_payment(self):
+        c = self._setup_order()
+        self._complete(c)
+        r = c.post("/orders/paypal/status/", json.dumps({"order_number": "O-88"}),
+                   content_type="application/json")
+        d = r.json()
+        self.assertTrue(d["ok"])
+        self.assertEqual(d["status"], "completed")
+        self.assertIn("redirect_url", d)
+
+    def test_status_endpoint_processing_when_not_finalized(self):
+        c = self._setup_order()
+        r = c.post("/orders/paypal/status/", json.dumps({"order_number": "O-88"}),
+                   content_type="application/json")
+        self.assertEqual(r.json()["status"], "processing")
+
+    def test_status_endpoint_unknown_for_foreign_order(self):
+        c = self._setup_order()
+        r = c.post("/orders/paypal/status/", json.dumps({"order_number": "NOPE"}),
+                   content_type="application/json")
+        self.assertEqual(r.json()["status"], "unknown")
+
+    def test_already_captured_issue_reconciles_from_db(self):
+        c = self._setup_order()
+        from orders.models import Order, Payment
+        o = Order.objects.get(order_number="O-88")
+        p = Payment.objects.create(payment_id="CAP-R", email=o.email,
+                                   payment_method="PayPal", amount_paid="33.42",
+                                   status="COMPLETED")
+        # order finalized but... simulate the race: is_ordered True with payment set
+        o.payment = p; o.is_ordered = True; o.save()
+        r = c.post("/orders/paypal/capture/",
+                   json.dumps({"order_number": "O-88", "paypal_order_id": "PP-X"}),
+                   content_type="application/json")
+        self.assertEqual(r.json()["status"], "already_completed")
+
+
+class StripeIsolationTests(TestCase):
+    """Stripe must never fire while the shopper pays with PayPal."""
+
+    def _tpl(self):
+        import pathlib
+        from django.conf import settings as dj
+        return (pathlib.Path(dj.BASE_DIR) / "templates" / "orders" /
+                "payments.html").read_text(encoding="utf-8")
+
+    def test_stripe_mount_gated_on_readiness(self):
+        t = self._tpl()
+        self.assertIn("STRIPE_READY", t)
+        self.assertIn("if (!STRIPE_READY) return;", t)
+        self.assertIn("Card payments are not configured yet. Choose PayPal or contact us.", t)
+
+    def test_reconciliation_wired_in_js(self):
+        t = self._tpl()
+        self.assertIn("ppReconcileThenError", t)
+        self.assertIn("paypal_status", t)
+        # the scary message only appears AFTER a reconciliation attempt
+        self.assertNotIn("do NOT pay again — contact us and we will check it", t)

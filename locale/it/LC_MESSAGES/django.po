@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: greatkart 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-05 11:49+0200\n"
+"POT-Creation-Date: 2026-07-05 12:22+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -779,56 +779,61 @@ msgstr ""
 "PayPal non ha potuto convalidare l'indirizzo di spedizione fornito. "
 "Controllalo e scegli di nuovo PayPal."
 
-#: .\orders\views.py:150 .\templates\orders\payments.html:323
+#: .\orders\views.py:150 .\templates\orders\payments.html:357
 msgid "PayPal is temporarily unavailable. Please use card."
 msgstr "PayPal è temporaneamente non disponibile. Usa la carta."
 
-#: .\orders\views.py:152 .\templates\orders\payments.html:274
+#: .\orders\views.py:152 .\templates\orders\payments.html:305
 msgid "PayPal order could not be created. Please try again or use card."
 msgstr "Impossibile creare l'ordine PayPal. Riprova o usa la carta."
 
-#: .\orders\views.py:170
+#: .\orders\views.py:191
 msgid "Order not found or already confirmed."
 msgstr "Ordine non trovato o già confermato."
 
-#: .\orders\views.py:178
+#: .\orders\views.py:199
 msgid "Your payment method was declined inside PayPal. Please try another one."
-msgstr "Il metodo di pagamento è stato rifiutato dentro PayPal. Provane un altro."
+msgstr ""
+"Il metodo di pagamento è stato rifiutato dentro PayPal. Provane un altro."
 
-#: .\orders\views.py:181
-msgid "This payment was already captured."
-msgstr "Questo pagamento è già stato incassato."
+#: .\orders\views.py:208
+msgid "Do not pay again until we check this order. Please contact us."
+msgstr "Non pagare di nuovo finché non verifichiamo questo ordine. Contattaci."
 
-#: .\orders\views.py:184 .\orders\views.py:192
-#: .\templates\orders\payments.html:301 .\templates\orders\payments.html:312
+#: .\orders\views.py:212 .\orders\views.py:224
 msgid "PayPal could not confirm the payment. Please try again or use card."
 msgstr "PayPal non ha potuto confermare il pagamento. Riprova o usa la carta."
 
-#: .\orders\views.py:190
+#: .\orders\views.py:220
 msgid ""
 "Your PayPal payment is pending review. We will confirm it by email shortly."
-msgstr "Il tuo pagamento PayPal è in revisione. Lo confermeremo a breve via email."
+msgstr ""
+"Il tuo pagamento PayPal è in revisione. Lo confermeremo a breve via email."
 
-#: .\orders\views.py:203
+#: .\orders\views.py:234
 msgid ""
 "Payment amount mismatch prevented for your safety. Please contact support."
-msgstr "Discrepanza nell'importo bloccata per la tua sicurezza. Contatta l'assistenza."
+msgstr ""
+"Discrepanza nell'importo bloccata per la tua sicurezza. Contatta "
+"l'assistenza."
 
-#: .\orders\views.py:217
+#: .\orders\views.py:248
 msgid ""
 "Payment succeeded, but we could not finalize your order. Please contact "
 "support."
-msgstr "Il pagamento è riuscito ma non siamo riusciti a finalizzare l'ordine. Contatta l'assistenza."
+msgstr ""
+"Il pagamento è riuscito ma non siamo riusciti a finalizzare l'ordine. "
+"Contatta l'assistenza."
 
-#: .\orders\views.py:219
+#: .\orders\views.py:251
 msgid "Payment successful. Your order is confirmed."
 msgstr "Pagamento riuscito. Il tuo ordine è confermato."
 
-#: .\orders\views.py:244
+#: .\orders\views.py:301
 msgid "Invalid order total."
 msgstr "Totale ordine non valido."
 
-#: .\orders\views.py:251
+#: .\orders\views.py:308
 msgid ""
 "Card payments are not configured yet. Please choose another payment method "
 "or contact us."
@@ -836,7 +841,7 @@ msgstr ""
 "I pagamenti con carta non sono ancora configurati. Scegli un altro metodo di "
 "pagamento o contattaci."
 
-#: .\orders\views.py:272
+#: .\orders\views.py:329
 msgid ""
 "We could not start the card payment. Please try again in a moment or choose "
 "another payment method."
@@ -844,27 +849,27 @@ msgstr ""
 "Non siamo riusciti ad avviare il pagamento con carta. Riprova tra un istante "
 "o scegli un altro metodo."
 
-#: .\orders\views.py:584
+#: .\orders\views.py:641
 msgid "We could not process this request. Please try again."
 msgstr "Non siamo riusciti a elaborare la richiesta. Riprova."
 
-#: .\orders\views.py:590
+#: .\orders\views.py:647
 msgid "Please review the highlighted fields and try again."
 msgstr "Controlla i campi evidenziati e riprova."
 
-#: .\orders\views.py:599
+#: .\orders\views.py:656
 msgid "We don't ship to this country yet."
 msgstr "Non spediamo ancora in questo paese."
 
-#: .\orders\views.py:600
+#: .\orders\views.py:657
 msgid "We're sorry, we don't ship to the selected country yet."
 msgstr "Non spediamo ancora in questo Paese."
 
-#: .\orders\views.py:619 .\shipping\address_validation.py:171
+#: .\orders\views.py:676 .\shipping\address_validation.py:171
 msgid "Please select a verified address from the suggestions."
 msgstr "Seleziona un indirizzo verificato dai suggerimenti."
 
-#: .\orders\views.py:630
+#: .\orders\views.py:687
 msgid ""
 "This address is not verified. Confirm it to continue, or pick it from the "
 "suggestions."
@@ -872,7 +877,7 @@ msgstr ""
 "Questo indirizzo non è verificato. Confermalo per continuare, oppure "
 "sceglilo dai suggerimenti."
 
-#: .\orders\views.py:633
+#: .\orders\views.py:690
 msgid "Please review your address below."
 msgstr "Controlla il tuo indirizzo qui sotto."
 
@@ -4726,7 +4731,7 @@ msgid "Price: high to low"
 msgstr "Prezzo: dal più alto"
 
 #: .\templates\merchandising\collection.html:74
-#: .\templates\orders\payments.html:179 .\templates\store\cart.html:193
+#: .\templates\orders\payments.html:183 .\templates\store\cart.html:193
 #: .\templates\store\checkout.html:339 .\templates\store\product_detail.html:81
 #, python-format
 msgid "%(d)s-day returns"
@@ -5274,33 +5279,59 @@ msgstr ""
 msgid "After payment, your order will be confirmed automatically."
 msgstr "Dopo il pagamento, il tuo ordine verrà confermato automaticamente."
 
-#: .\templates\orders\payments.html:167
+#: .\templates\orders\payments.html:165
+msgid "Card payments are not configured yet. Choose PayPal or contact us."
+msgstr "I pagamenti con carta non sono ancora configurati. Scegli PayPal o contattaci."
+
+#: .\templates\orders\payments.html:171
 msgid "Pay"
 msgstr "Paga"
 
-#: .\templates\orders\payments.html:178 .\templates\store\checkout.html:339
+#: .\templates\orders\payments.html:182 .\templates\store\checkout.html:339
 msgid "Secure payment"
 msgstr "Pagamento sicuro"
 
-#: .\templates\orders\payments.html:264
+#: .\templates\orders\payments.html:262
+msgid "Checking your payment status…"
+msgstr "Verifica dello stato del pagamento…"
+
+#: .\templates\orders\payments.html:271
+msgid "We found your completed PayPal payment. Redirecting…"
+msgstr "Abbiamo trovato il tuo pagamento PayPal completato. Reindirizzamento…"
+
+#: .\templates\orders\payments.html:276
+msgid ""
+"Your payment is still being confirmed. Do not pay again — refresh this page "
+"in a moment."
+msgstr "Il tuo pagamento è ancora in conferma. Non pagare di nuovo — ricarica la pagina tra un istante."
+
+#: .\templates\orders\payments.html:279 .\templates\orders\payments.html:282
+msgid ""
+"We could not confirm the payment status. Do not pay again until we check "
+"this order — please contact us."
+msgstr "Non riusciamo a confermare lo stato del pagamento. Non pagare di nuovo finché non verifichiamo l'ordine — contattaci."
+
+#: .\templates\orders\payments.html:295
 msgid "Connecting to PayPal…"
 msgstr "Connessione a PayPal…"
 
-#: .\templates\orders\payments.html:284
+#: .\templates\orders\payments.html:315
 msgid "Confirming your payment…"
 msgstr "Conferma del pagamento in corso…"
 
-#: .\templates\orders\payments.html:304
+#: .\templates\orders\payments.html:329
 msgid "Payment confirmed — redirecting…"
 msgstr "Pagamento confermato — reindirizzamento…"
 
-#: .\templates\orders\payments.html:310
-msgid ""
-"Payment confirmation timed out. If you approved it in PayPal, do NOT pay "
-"again — contact us and we will check it."
-msgstr "La conferma del pagamento è scaduta. Se lo hai approvato in PayPal, NON pagare di nuovo — contattaci e verifichiamo."
+#: .\templates\orders\payments.html:334
+msgid "Payment is pending review."
+msgstr "Il pagamento è in revisione."
 
-#: .\templates\orders\payments.html:320
+#: .\templates\orders\payments.html:346
+msgid "PayPal is taking longer than expected."
+msgstr "PayPal sta impiegando più del previsto."
+
+#: .\templates\orders\payments.html:354
 msgid "PayPal encountered a problem. Please try again or use card."
 msgstr "PayPal ha riscontrato un problema. Riprova o usa la carta."
 
@@ -6442,6 +6473,16 @@ msgstr "Articoli dei preferiti"
 #: .\wishlist\views.py:117
 msgid "Saved for later."
 msgstr "Salvato per dopo."
+
+#~ msgid "This payment was already captured."
+#~ msgstr "Questo pagamento è già stato incassato."
+
+#~ msgid ""
+#~ "Payment confirmation timed out. If you approved it in PayPal, do NOT pay "
+#~ "again — contact us and we will check it."
+#~ msgstr ""
+#~ "La conferma del pagamento è scaduta. Se lo hai approvato in PayPal, NON "
+#~ "pagare di nuovo — contattaci e verifichiamo."
 
 #~ msgid "Address line 1"
 #~ msgstr "Indirizzo riga 1"
