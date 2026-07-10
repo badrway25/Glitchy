@@ -442,6 +442,60 @@ class ProductColorImage(models.Model):
         return [int(i) for i in self.image_ids.split(",") if i.strip().isdecimal()]
 
 
+class ProductColorImageMapRun(models.Model):
+    """History of colour-image mapping executions (admin UI + management command).
+
+    Stores SAFE aggregates and a safe per-row summary only — never tokens, keys,
+    prompts or raw provider payloads. Rows are written by
+    printify_integration/map_runner.py; the admin renders them as the run history
+    and result pages so no SSH access is needed for ordinary mapping operations."""
+
+    MODE_DRY_RUN = "dry_run"
+    MODE_APPLY = "apply"
+    MODE_CHOICES = [(MODE_DRY_RUN, "Dry run"), (MODE_APPLY, "Apply")]
+
+    SOURCE_DB = "db"
+    SOURCE_LIVE = "live"
+    SOURCE_CHOICES = [(SOURCE_DB, "DB data"), (SOURCE_LIVE, "Live payload refetch")]
+
+    STATUS_RUNNING = "running"
+    STATUS_SUCCEEDED = "succeeded"
+    STATUS_FAILED = "failed"
+    STATUS_PARTIAL = "partial"
+    STATUS_CHOICES = [(STATUS_RUNNING, "Running"), (STATUS_SUCCEEDED, "Succeeded"),
+                      (STATUS_FAILED, "Failed"), (STATUS_PARTIAL, "Partial")]
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.CharField(max_length=150, blank=True, default="",
+                                  help_text="Admin username/email or 'cli'")
+    mode = models.CharField(max_length=12, choices=MODE_CHOICES, default=MODE_DRY_RUN)
+    source = models.CharField(max_length=12, choices=SOURCE_CHOICES, default=SOURCE_DB)
+    use_openai = models.BooleanField(default=False)
+    max_ai_calls = models.IntegerField(default=0)
+    only_unresolved = models.BooleanField(default=False)
+    status = models.CharField(max_length=12, choices=STATUS_CHOICES,
+                              default=STATUS_RUNNING)
+    products_scanned = models.IntegerField(default=0)
+    products_changed = models.IntegerField(default=0)
+    colors_resolved = models.IntegerField(default=0)
+    colors_unresolved = models.IntegerField(default=0)
+    manual_preserved = models.IntegerField(default=0)
+    openai_calls_used = models.IntegerField(default=0)
+    duration_ms = models.IntegerField(default=0)
+    safe_summary_json = models.JSONField(default=dict, blank=True,
+                                         help_text="Safe per-product rows (no secrets)")
+    safe_error = models.CharField(max_length=200, blank=True, default="")
+    started_at = models.DateTimeField(blank=True, null=True)
+    finished_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Colour-image mapping run"
+
+    def __str__(self):
+        return f"Run #{self.pk} · {self.mode} · {self.status}"
+
+
 class ReviewRating(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     user = models.ForeignKey(Account, on_delete=models.CASCADE)

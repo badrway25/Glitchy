@@ -82,8 +82,7 @@ class CommandDryRunApplyTests(TestCase):
 class CommandOpenAITests(TestCase):
     def test_openai_without_apply_is_ignored(self):
         _setup_partial_product()
-        with mock.patch("printify_integration.management.commands."
-                        "build_color_image_maps.classify_image_color") as classify:
+        with mock.patch("printify_integration.map_runner.classify_image_color") as classify:
             out = StringIO()
             call_command("build_color_image_maps", "--openai", stdout=out)
             classify.assert_not_called()
@@ -104,8 +103,7 @@ class CommandOpenAITests(TestCase):
         fake_provider.available.return_value = True
         with mock.patch("assistant.providers.OpenAIProvider",
                         return_value=fake_provider), \
-             mock.patch("printify_integration.management.commands."
-                        "build_color_image_maps.classify_image_color",
+             mock.patch("printify_integration.map_runner.classify_image_color",
                         return_value="red") as classify:
             call_command("build_color_image_maps", "--apply", "--openai",
                          stdout=StringIO())
@@ -132,8 +130,7 @@ class CommandOpenAITests(TestCase):
         fake_provider.available.return_value = True
         with mock.patch("assistant.providers.OpenAIProvider",
                         return_value=fake_provider), \
-             mock.patch("printify_integration.management.commands."
-                        "build_color_image_maps.classify_image_color",
+             mock.patch("printify_integration.map_runner.classify_image_color",
                         return_value="red") as classify:
             call_command("build_color_image_maps", "--apply", "--openai",
                          stdout=StringIO())
@@ -162,8 +159,7 @@ class CommandOpenAITests(TestCase):
         fake_provider.available.return_value = True
         with mock.patch("assistant.providers.OpenAIProvider",
                         return_value=fake_provider), \
-             mock.patch("printify_integration.management.commands."
-                        "build_color_image_maps.classify_image_color",
+             mock.patch("printify_integration.map_runner.classify_image_color",
                         return_value=None) as classify:
             call_command("build_color_image_maps", "--apply", "--openai",
                          "--max-ai-calls=1", stdout=StringIO())
@@ -194,8 +190,7 @@ class CommandLiveRefetchTests(TestCase):
         }
         fake_client = mock.Mock()
         fake_client.get_product.return_value = payload
-        with mock.patch("printify_integration.management.commands."
-                        "build_color_image_maps._resolve_client",
+        with mock.patch("printify_integration.map_runner._resolve_client",
                         return_value=fake_client):
             call_command("build_color_image_maps", "--apply", "--live",
                          stdout=StringIO())

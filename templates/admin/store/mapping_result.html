@@ -1,0 +1,114 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Mapping results" %}{% endblock %}
+
+{% block content %}
+<div style="max-width:1080px;margin:0 auto;padding:8px 4px;">
+
+  <div style="margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+    <div>
+      <h1 style="font-size:1.35rem;font-weight:800;margin:0;">
+        {% trans "Mapping results" %} — run #{{ run.pk }}
+        <span style="background:{% if run.status == 'succeeded' %}#16a34a{% elif run.status == 'partial' %}#d97706{% elif run.status == 'failed' %}#dc2626{% else %}#64748b{% endif %};color:#fff;padding:3px 10px;border-radius:999px;font-size:12px;vertical-align:middle;">{{ run.get_status_display }}</span>
+        {% if run.mode == "dry_run" %}<span style="background:#64748b;color:#fff;padding:3px 10px;border-radius:999px;font-size:12px;vertical-align:middle;">{% trans "Dry run" %} — {% trans "nothing was written" %}</span>{% endif %}
+      </h1>
+      <p style="color:#64748b;margin:6px 0 0;font-size:.88rem;">
+        {{ run.created_at|date:"Y-m-d H:i" }} · {{ run.created_by|default:"—" }} ·
+        {{ run.source }} · {{ run.duration_ms }} ms
+      </p>
+    </div>
+    <a class="button" href="{% url 'admin:store_colormap_dashboard' %}">‹ {% trans "Variant image mapping" %}</a>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;">
+    {% for card in stat_cards %}
+    <div style="background:var(--body-bg,#fff);border:1px solid rgba(100,116,139,.25);border-radius:14px;padding:12px 14px;">
+      <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:#64748b;">{{ card.label }}</div>
+      <div style="font-size:1.25rem;font-weight:800;margin-top:2px;color:{{ card.color|default:'inherit' }};">{{ card.value }}</div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if warnings %}
+  <div style="background:rgba(217,119,6,.08);border:1px solid rgba(217,119,6,.35);border-radius:12px;padding:12px 16px;margin-bottom:20px;">
+    <strong style="color:#b45309;font-size:.85rem;">{% trans "Warnings" %}</strong>
+    <ul style="margin:6px 0 0;padding-left:18px;font-size:.84rem;color:#92400e;">
+      {% for w in warnings %}<li>{{ w }}</li>{% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  {% if run.mode == "dry_run" and can_apply %}
+  <div style="background:rgba(22,163,74,.06);border:1px solid rgba(22,163,74,.35);border-radius:14px;padding:18px;margin-bottom:20px;">
+    <h2 style="font-size:1rem;font-weight:700;margin:0 0 6px;">{% trans "Apply mapping" %}</h2>
+    <p style="color:#475569;font-size:.85rem;margin:0 0 12px;">
+      {% trans "Re-runs this exact scope and writes the results." %}
+      {% trans "Manual pins preserved" %}.
+      {% if run.use_openai_requested %}⚠ {% trans "This may use OpenAI credits." %}{% endif %}
+    </p>
+    <form method="post" action="{% url 'admin:store_colormap_apply' %}">
+      {% csrf_token %}
+      {% for k, v in apply_params.items %}<input type="hidden" name="{{ k }}" value="{{ v }}">{% endfor %}
+      <label style="display:block;margin-bottom:12px;font-size:.88rem;">
+        <input type="checkbox" name="confirm" value="1" required>
+        {% trans "I understand this will update variant image mappings." %}
+      </label>
+      <button type="submit" class="button default" style="background:#1c1a17;color:#fff;border:0;border-radius:10px;padding:9px 18px;font-weight:600;cursor:pointer;">{% trans "Apply mapping" %}</button>
+    </form>
+  </div>
+  {% elif run.mode == "dry_run" %}
+  <div style="background:rgba(148,163,184,.1);border-radius:12px;padding:12px 16px;margin-bottom:20px;font-size:.85rem;color:#64748b;">
+    {% trans "Applying requires a superadmin account." %}
+  </div>
+  {% endif %}
+
+  <div style="background:var(--body-bg,#fff);border:1px solid rgba(100,116,139,.25);border-radius:14px;padding:18px;margin-bottom:20px;">
+    <h2 style="font-size:1rem;font-weight:700;margin:0 0 12px;">{% trans "Rows" %}</h2>
+    {% if rows %}
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:.85rem;">
+        <thead><tr style="text-align:left;color:#64748b;">
+          <th style="padding:6px;">{% trans "Product" %}</th>
+          <th style="padding:6px;">{% trans "Colour" %}</th>
+          <th style="padding:6px;">{% trans "Primary" %}</th>
+          <th style="padding:6px;">{% trans "Source" %}</th>
+          <th style="padding:6px;">{% trans "Confidence" %}</th>
+          <th style="padding:6px;">{% trans "Images" %}</th>
+          <th style="padding:6px;">{% trans "Detail" %}</th>
+          <th style="padding:6px;"></th>
+        </tr></thead>
+        <tbody>
+        {% for row in rows %}
+          <tr style="border-top:1px solid rgba(100,116,139,.15);">
+            <td style="padding:6px;">{{ row.product }}</td>
+            <td style="padding:6px;text-transform:capitalize;">{{ row.color }}</td>
+            <td style="padding:6px;">
+              {% if row.primary_url %}<img src="{{ row.primary_url }}" style="width:38px;height:38px;object-fit:cover;border-radius:8px;" loading="lazy">{% else %}—{% endif %}
+            </td>
+            <td style="padding:6px;">
+              <span style="background:{% if row.source == 'deterministic' %}#16a34a{% elif row.source == 'heuristic' %}#d97706{% elif row.source == 'openai' %}#7c3aed{% elif row.source == 'manual' %}#0f766e{% else %}#94a3b8{% endif %};color:#fff;padding:2px 8px;border-radius:999px;font-size:11px;">{{ row.source }}</span>
+            </td>
+            <td style="padding:6px;">{{ row.confidence|floatformat:2 }}</td>
+            <td style="padding:6px;">{{ row.images }}</td>
+            <td style="padding:6px;color:#64748b;">{{ row.detail|default:"—" }}</td>
+            <td style="padding:6px;white-space:nowrap;">
+              <a href="/admin/store/product/{{ row.product_id }}/change/">{% trans "Admin" %}</a>
+              {% if row.product_url %} · <a href="{{ row.product_url }}" target="_blank" rel="noopener">PDP</a>{% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+      <p style="color:#64748b;font-size:.88rem;margin:0;">{% trans "No rows in this run." %}</p>
+    {% endif %}
+  </div>
+
+  <details style="margin-bottom:30px;">
+    <summary style="cursor:pointer;font-size:.85rem;color:#64748b;">{% trans "Diagnostics" %} (JSON)</summary>
+    <pre style="background:rgba(148,163,184,.1);border-radius:10px;padding:12px;font-size:.75rem;overflow-x:auto;">{{ diagnostics_json }}</pre>
+  </details>
+</div>
+{% endblock %}

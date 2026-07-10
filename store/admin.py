@@ -1,4 +1,4 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.db.models import Count, Q
 from django.utils import timezone
 from django.utils.html import format_html
@@ -12,8 +12,15 @@ except Exception:                           # graceful fallback if Unfold is abs
     from django.contrib.admin import ModelAdmin as BaseModelAdmin
     from django.contrib.admin import TabularInline as BaseTabularInline
 
-from .models import (GeneralFAQ, Product, ProductColorImage, ProductDescriptionTranslation,
-                     ProductFAQ, ProductImage, ReviewRating, Variation)
+from .models import (GeneralFAQ, Product, ProductColorImage, ProductColorImageMapRun,
+                     ProductDescriptionTranslation, ProductFAQ, ProductImage,
+                     ReviewRating, Variation)
+
+
+def _is_superadmin(user):
+    """Same gate as the other control centers: custom is_superadmin OR is_superuser."""
+    return bool(getattr(user, "is_superadmin", False) or
+                getattr(user, "is_superuser", False))
 
 
 # --- Catalog-health filters (drive the dashboard quick links) ---------------
@@ -135,7 +142,8 @@ class ProductAdmin(BaseModelAdmin):
                        "big_preview", "printify_description_raw")
     inlines = [ProductImageInline, VariationInline, DescriptionTranslationInline,
                ColorImageMapInline]
-    actions = ["resync_from_printify", "rebuild_color_maps", "audit_data_quality",
+    actions = ["resync_from_printify", "rebuild_color_maps", "dry_run_color_maps",
+               "openai_enrich_color_maps", "audit_data_quality",
                "translate_missing_descriptions",
                "bulk_activate", "bulk_deactivate", "bulk_mark_stale"]
 
@@ -330,6 +338,46 @@ class ProductAdmin(BaseModelAdmin):
             "Colour-image maps rebuilt: %(r)d/%(c)d colours resolved, %(e)d error(s).") % {
             "r": resolved, "c": colors, "e": err})
 
+    def _runner_action(self, request, queryset, *, apply, use_openai=False):
+        """Shared body for the changelist mapping actions — one runner, one report."""
+        from django.urls import reverse
+        from printify_integration.map_runner import run_color_image_mapping
+        from store.models import ProductColorImageMapRun
+        result = run_color_image_mapping(
+            products=queryset, apply=apply, source="live",
+            use_openai=use_openai, max_ai_calls=20,
+            requested_by=str(request.user)[:150])
+        # persist the exact selection so the result page's Apply re-runs THIS
+        # scope (ids), never a defaulted-to-everything one
+        run = ProductColorImageMapRun.objects.get(pk=result["run_id"])
+        run.safe_summary_json["params"] = {
+            "scope": "ids",
+            "ids": ",".join(str(pk) for pk in queryset.values_list("pk", flat=True)),
+            "source": "live", "use_openai": "1" if use_openai else "",
+            "max_ai_calls": "20", "product_id": "",
+        }
+        run.save(update_fields=["safe_summary_json"])
+        url = reverse("admin:store_colormap_run_result", args=[result["run_id"]])
+        self.message_user(request, format_html(
+            '{} — <a href="{}">{}</a>',
+            _("Colour mapping %(mode)s: %(r)d resolved, %(u)d unresolved "
+              "across %(p)d product(s).") % {
+                "mode": _("applied") if apply else _("dry-run"),
+                "r": result["colors_resolved"], "u": result["colors_unresolved"],
+                "p": result["products_scanned"]},
+            url, _("Mapping results")))
+
+    @admin.action(description=_("Dry-run colour-image mapping (selected)"))
+    def dry_run_color_maps(self, request, queryset):
+        self._runner_action(request, queryset, apply=False)
+
+    @admin.action(description=_("OpenAI enrich unresolved mappings (selected)"))
+    def openai_enrich_color_maps(self, request, queryset):
+        if not _is_superadmin(request.user):
+            self.message_user(request, _("Superadmin only."), level=messages.ERROR)
+            return
+        self._runner_action(request, queryset, apply=True, use_openai=True)
+
     @admin.action(description=_("Translate missing descriptions (IT/FR)"))
     def translate_missing_descriptions(self, request, queryset):
         from assistant import translation
@@ -397,6 +445,216 @@ class ProductColorImageAdmin(BaseModelAdmin):
             return "—"
         return format_html('<img src="{}" style="width:44px;height:44px;object-fit:cover;'
                            'border-radius:8px;" loading="lazy">', url)
+
+
+@admin.register(ProductColorImageMapRun)
+class ProductColorImageMapRunAdmin(BaseModelAdmin):
+    """Run history + the "Variant image mapping" operations pages (dashboard,
+    dry-run preview, confirm-apply, results). Everything goes through the shared
+    runner (printify_integration/map_runner.py) — the same engine as the CLI.
+    Dry-run is the default; Apply and the OpenAI stage are superadmin-only."""
+
+    list_display = ("id", "created_at", "created_by", "mode", "source",
+                    "status_badge", "products_scanned", "colors_resolved",
+                    "colors_unresolved", "openai_calls_used", "duration_ms",
+                    "result_link")
+    list_filter = ("mode", "status", "use_openai")
+    readonly_fields = [f.name for f in ProductColorImageMapRun._meta.fields]
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False    # run history is an audit trail — never hand-deletable
+
+    @admin.display(description=_("Status"), ordering="status")
+    def status_badge(self, obj):
+        colors = {"succeeded": "#16a34a", "partial": "#d97706",
+                  "failed": "#dc2626", "running": "#64748b"}
+        return format_html(
+            '<span style="background:{};color:#fff;padding:2px 8px;border-radius:999px;'
+            'font-size:11px;">{}</span>',
+            colors.get(obj.status, "#94a3b8"), obj.get_status_display())
+
+    @admin.display(description="")
+    def result_link(self, obj):
+        from django.urls import reverse
+        return format_html('<a href="{}">{}</a>',
+                           reverse("admin:store_colormap_run_result", args=[obj.pk]),
+                           _("Mapping results"))
+
+    # ---- operations pages ----------------------------------------------------
+    def get_urls(self):
+        from django.urls import path
+        return [
+            path("mapping/", self.admin_site.admin_view(self.dashboard_view),
+                 name="store_colormap_dashboard"),
+            path("mapping/preview/", self.admin_site.admin_view(self.preview_view),
+                 name="store_colormap_preview"),
+            path("mapping/apply/", self.admin_site.admin_view(self.apply_view),
+                 name="store_colormap_apply"),
+            path("mapping/run/<int:run_id>/",
+                 self.admin_site.admin_view(self.result_view),
+                 name="store_colormap_run_result"),
+        ] + super().get_urls()
+
+    @staticmethod
+    def _scope_queryset(params):
+        qs = (Product.objects.filter(variation__variation_category="color")
+              .distinct().order_by("id"))
+        scope = params.get("scope") or "all"
+        if scope == "printify":
+            qs = qs.exclude(printify_product_id__isnull=True) \
+                   .exclude(printify_product_id="")
+        elif scope == "product":
+            try:
+                qs = qs.filter(id=int(params.get("product_id") or 0))
+            except (TypeError, ValueError):
+                qs = qs.none()
+        elif scope == "ids":
+            ids = [int(i) for i in str(params.get("ids") or "").split(",")
+                   if i.strip().isdecimal()]
+            qs = qs.filter(id__in=ids)
+        return qs, scope == "unresolved"
+
+    @staticmethod
+    def _run_params(request):
+        return {
+            "scope": request.POST.get("scope") or "all",
+            "product_id": request.POST.get("product_id") or "",
+            "ids": request.POST.get("ids") or "",
+            "source": "live" if request.POST.get("source") == "live" else "db",
+            "use_openai": "1" if request.POST.get("use_openai") else "",
+            "max_ai_calls": request.POST.get("max_ai_calls") or "20",
+        }
+
+    def _openai_available(self):
+        try:
+            from assistant.providers import OpenAIProvider
+            return OpenAIProvider().available()
+        except Exception:
+            return False
+
+    def dashboard_view(self, request):
+        from django.shortcuts import render
+        from django.urls import reverse
+        resolved = ProductColorImage.objects.exclude(image_ids="").count()
+        unresolved = (ProductColorImage.objects.filter(image_ids="")
+                      .exclude(source=ProductColorImage.SOURCE_MANUAL).count())
+        manual = ProductColorImage.objects.filter(
+            source=ProductColorImage.SOURCE_MANUAL).count()
+        last = ProductColorImageMapRun.objects.first()
+        cards = [
+            {"label": _("Resolved colours"), "value": resolved, "color": "#16a34a"},
+            {"label": _("Unresolved colours"), "value": unresolved,
+             "color": "#dc2626" if unresolved else "#16a34a"},
+            {"label": _("Manual pins preserved"), "value": manual, "color": "#0f766e"},
+            {"label": _("Products scanned"),
+             "value": last.products_scanned if last else "—",
+             "hint": _("last run")},
+            {"label": "OpenAI", "value": last.openai_calls_used if last else "—",
+             "hint": _("calls, last run"), "color": "#7c3aed"},
+            {"label": _("Last run"),
+             "value": last.created_at.strftime("%Y-%m-%d %H:%M") if last else "—",
+             "hint": last.get_status_display() if last else ""},
+        ]
+        context = dict(
+            self.admin_site.each_context(request),
+            stat_cards=cards,
+            recent_runs=ProductColorImageMapRun.objects.all()[:10],
+            preview_url=reverse("admin:store_colormap_preview"),
+            openai_available=self._openai_available(),
+        )
+        return render(request, "admin/store/mapping_dashboard.html", context)
+
+    def preview_view(self, request):
+        from django.http import HttpResponseNotAllowed
+        from django.shortcuts import redirect
+        from printify_integration.map_runner import run_color_image_mapping
+        if request.method != "POST":
+            return HttpResponseNotAllowed(["POST"])
+        params = self._run_params(request)
+        qs, only_unresolved = self._scope_queryset(params)
+        result = run_color_image_mapping(
+            products=qs, apply=False, source=params["source"],
+            use_openai=False, only_unresolved=only_unresolved,
+            requested_by=str(request.user)[:150])
+        run = ProductColorImageMapRun.objects.get(pk=result["run_id"])
+        run.safe_summary_json["params"] = params
+        run.save(update_fields=["safe_summary_json"])
+        return redirect("admin:store_colormap_run_result", run_id=run.pk)
+
+    def apply_view(self, request):
+        from django.http import HttpResponseForbidden, HttpResponseNotAllowed
+        from django.shortcuts import redirect
+        from printify_integration.map_runner import run_color_image_mapping
+        if request.method != "POST":
+            return HttpResponseNotAllowed(["POST"])
+        if not _is_superadmin(request.user):
+            return HttpResponseForbidden("Superadmin only.")
+        if not request.POST.get("confirm"):
+            self.message_user(request, _("Please confirm before applying."),
+                              level=messages.WARNING)
+            return redirect("admin:store_colormap_dashboard")
+        params = self._run_params(request)
+        qs, only_unresolved = self._scope_queryset(params)
+        try:
+            max_ai = max(1, min(200, int(params["max_ai_calls"])))
+        except (TypeError, ValueError):
+            max_ai = 20
+        result = run_color_image_mapping(
+            products=qs, apply=True, source=params["source"],
+            use_openai=bool(params["use_openai"]), max_ai_calls=max_ai,
+            only_unresolved=only_unresolved,
+            requested_by=str(request.user)[:150])
+        run = ProductColorImageMapRun.objects.get(pk=result["run_id"])
+        run.safe_summary_json["params"] = params
+        run.save(update_fields=["safe_summary_json"])
+        self.message_user(request, _("Mapping applied: %(r)d colours resolved, "
+                                     "%(u)d unresolved.") % {
+            "r": result["colors_resolved"], "u": result["colors_unresolved"]})
+        return redirect("admin:store_colormap_run_result", run_id=run.pk)
+
+    def result_view(self, request, run_id):
+        import json as jsonlib
+        from django.shortcuts import get_object_or_404, render
+        run = get_object_or_404(ProductColorImageMapRun, pk=run_id)
+        summary = run.safe_summary_json or {}
+        rows = summary.get("rows") or []
+        products = Product.objects.in_bulk({r["product_id"] for r in rows})
+        for row in rows:
+            product = products.get(row["product_id"])
+            try:
+                row["product_url"] = product.get_url() if product else ""
+            except Exception:
+                row["product_url"] = ""
+        run.use_openai_requested = bool((summary.get("params") or {}).get("use_openai"))
+        cards = [
+            {"label": _("Products scanned"), "value": run.products_scanned},
+            {"label": _("Products changed"), "value": run.products_changed},
+            {"label": _("Resolved colours"), "value": run.colors_resolved,
+             "color": "#16a34a"},
+            {"label": _("Unresolved colours"), "value": run.colors_unresolved,
+             "color": "#dc2626" if run.colors_unresolved else "#16a34a"},
+            {"label": _("Manual pins preserved"), "value": run.manual_preserved,
+             "color": "#0f766e"},
+            {"label": "OpenAI", "value": run.openai_calls_used, "color": "#7c3aed"},
+        ]
+        apply_params = summary.get("params") or {}
+        context = dict(
+            self.admin_site.each_context(request),
+            run=run, rows=rows, warnings=summary.get("warnings") or [],
+            stat_cards=cards,
+            # no stored params (e.g. CLI runs) -> no Apply button: re-running with
+            # a defaulted scope would silently expand a selection to the whole catalog
+            can_apply=_is_superadmin(request.user) and bool(apply_params),
+            apply_params=apply_params,
+            diagnostics_json=jsonlib.dumps(summary, indent=1)[:20000],
+        )
+        return render(request, "admin/store/mapping_result.html", context)
 
 
 @admin.register(ProductDescriptionTranslation)

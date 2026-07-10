@@ -1,0 +1,116 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Variant image mapping" %}{% endblock %}
+
+{% block content %}
+<div style="max-width:1080px;margin:0 auto;padding:8px 4px;">
+
+  <div style="margin-bottom:22px;">
+    <h1 style="font-size:1.45rem;font-weight:800;margin:0;">{% trans "Variant image mapping" %}</h1>
+    <p style="color:#64748b;margin:6px 0 0;font-size:.95rem;">
+      {% trans "Match product colours to the right gallery images" %} ·
+      <span style="color:#16a34a;font-weight:600;">deterministic</span> →
+      <span style="color:#d97706;font-weight:600;">heuristic</span> →
+      <span style="color:#7c3aed;font-weight:600;">OpenAI ({% trans "optional" %})</span>
+    </p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:24px;">
+    {% for card in stat_cards %}
+    <div style="background:var(--body-bg,#fff);border:1px solid rgba(100,116,139,.25);border-radius:14px;padding:14px 16px;">
+      <div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:#64748b;">{{ card.label }}</div>
+      <div style="font-size:1.35rem;font-weight:800;margin-top:4px;color:{{ card.color|default:'inherit' }};">{{ card.value }}</div>
+      {% if card.hint %}<div style="font-size:.75rem;color:#94a3b8;margin-top:2px;">{{ card.hint }}</div>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+
+  <div style="background:var(--body-bg,#fff);border:1px solid rgba(100,116,139,.25);border-radius:14px;padding:20px;margin-bottom:24px;">
+    <h2 style="font-size:1.05rem;font-weight:700;margin:0 0 4px;">{% trans "Run mapping" %}</h2>
+    <p style="color:#64748b;font-size:.85rem;margin:0 0 16px;">
+      {% trans "Dry run is always safe: it shows what would change without writing anything." %}
+      {% trans "Manual pins preserved" %}.
+    </p>
+    <form method="post" action="{{ preview_url }}">
+      {% csrf_token %}
+      <div style="display:flex;gap:24px;flex-wrap:wrap;">
+        <fieldset style="border:0;padding:0;min-width:220px;">
+          <legend style="font-size:.8rem;font-weight:700;color:#475569;">{% trans "Scope" %}</legend>
+          <label style="display:block;margin:4px 0;"><input type="radio" name="scope" value="all" checked> {% trans "All products" %}</label>
+          <label style="display:block;margin:4px 0;"><input type="radio" name="scope" value="unresolved"> {% trans "Only unresolved colours" %}</label>
+          <label style="display:block;margin:4px 0;"><input type="radio" name="scope" value="printify"> {% trans "Printify products only" %}</label>
+          <label style="display:block;margin:4px 0;">
+            <input type="radio" name="scope" value="product"> {% trans "Single product ID" %}
+            <input type="number" name="product_id" min="1" style="width:90px;margin-left:6px;">
+          </label>
+        </fieldset>
+        <fieldset style="border:0;padding:0;min-width:220px;">
+          <legend style="font-size:.8rem;font-weight:700;color:#475569;">{% trans "Source" %}</legend>
+          <label style="display:block;margin:4px 0;"><input type="radio" name="source" value="live" checked> {% trans "Live payload refetch (recommended)" %}</label>
+          <label style="display:block;margin:4px 0;"><input type="radio" name="source" value="db"> {% trans "DB data only" %}</label>
+        </fieldset>
+        <fieldset style="border:0;padding:0;min-width:260px;">
+          <legend style="font-size:.8rem;font-weight:700;color:#475569;">{% trans "OpenAI enrichment" %}</legend>
+          {% if openai_available %}
+            <label style="display:block;margin:4px 0;">
+              <input type="checkbox" name="use_openai" value="1"> {% trans "Classify unresolved images with OpenAI" %}
+            </label>
+            <label style="display:block;margin:4px 0;font-size:.85rem;">
+              {% trans "Max AI calls" %}
+              <input type="number" name="max_ai_calls" value="20" min="1" max="200" style="width:80px;margin-left:6px;">
+            </label>
+            <div style="font-size:.78rem;color:#b45309;margin-top:4px;">
+              ⚠ {% trans "This may use OpenAI credits." %} {% trans "Runs only on Apply, only for unresolved colours." %}
+            </div>
+          {% else %}
+            <div style="font-size:.82rem;color:#64748b;background:rgba(148,163,184,.12);border-radius:10px;padding:10px;">
+              {% trans "No OpenAI key configured" %} — {% trans "set it up in Assistant AI settings to enable enrichment." %}
+            </div>
+          {% endif %}
+        </fieldset>
+      </div>
+      <div style="margin-top:18px;display:flex;gap:10px;align-items:center;">
+        <button type="submit" class="button default" style="background:#1c1a17;color:#fff;border:0;border-radius:10px;padding:9px 18px;font-weight:600;cursor:pointer;">{% trans "Run dry-run" %}</button>
+        <span style="font-size:.8rem;color:#64748b;">{% trans "Nothing is written in a dry run. You confirm Apply on the results page." %}</span>
+      </div>
+    </form>
+  </div>
+
+  <div style="background:var(--body-bg,#fff);border:1px solid rgba(100,116,139,.25);border-radius:14px;padding:20px;">
+    <h2 style="font-size:1.05rem;font-weight:700;margin:0 0 12px;">{% trans "Recent runs" %}</h2>
+    {% if recent_runs %}
+      <table style="width:100%;border-collapse:collapse;font-size:.86rem;">
+        <thead><tr style="text-align:left;color:#64748b;">
+          <th style="padding:6px;">#</th><th style="padding:6px;">{% trans "When" %}</th>
+          <th style="padding:6px;">{% trans "By" %}</th><th style="padding:6px;">{% trans "Mode" %}</th>
+          <th style="padding:6px;">{% trans "Source" %}</th><th style="padding:6px;">{% trans "Status" %}</th>
+          <th style="padding:6px;">{% trans "Resolved colours" %}</th>
+          <th style="padding:6px;">{% trans "Unresolved colours" %}</th>
+          <th style="padding:6px;">AI</th><th style="padding:6px;"></th>
+        </tr></thead>
+        <tbody>
+        {% for run in recent_runs %}
+          <tr style="border-top:1px solid rgba(100,116,139,.15);">
+            <td style="padding:6px;">{{ run.pk }}</td>
+            <td style="padding:6px;">{{ run.created_at|date:"Y-m-d H:i" }}</td>
+            <td style="padding:6px;">{{ run.created_by|default:"—" }}</td>
+            <td style="padding:6px;">{% if run.mode == "apply" %}<strong>Apply</strong>{% else %}Dry run{% endif %}</td>
+            <td style="padding:6px;">{{ run.source }}</td>
+            <td style="padding:6px;">
+              <span style="background:{% if run.status == 'succeeded' %}#16a34a{% elif run.status == 'partial' %}#d97706{% elif run.status == 'failed' %}#dc2626{% else %}#64748b{% endif %};color:#fff;padding:2px 8px;border-radius:999px;font-size:11px;">{{ run.get_status_display }}</span>
+            </td>
+            <td style="padding:6px;">{{ run.colors_resolved }}</td>
+            <td style="padding:6px;">{{ run.colors_unresolved }}</td>
+            <td style="padding:6px;">{{ run.openai_calls_used }}</td>
+            <td style="padding:6px;"><a href="{% url 'admin:store_colormap_run_result' run.pk %}">{% trans "Mapping results" %}</a></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p style="color:#64748b;font-size:.88rem;margin:0;">{% trans "No runs yet — start with a dry run above." %}</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
