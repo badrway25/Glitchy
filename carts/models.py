@@ -21,9 +21,27 @@ class CartItem(models.Model):
     quantity = models.IntegerField()
     is_active = models.BooleanField(default=True)
     printify_variant_id = models.IntegerField(blank=True, null=True)
+    # Snapshot of the gallery image matching the colour chosen at add-to-cart
+    # time, so the cart keeps showing the right mockup even if the catalogue
+    # gallery/mapping changes later. Resolution order lives in
+    # store/variant_thumbnail.py (snapshot -> colour mapping -> product fallback).
+    selected_image = models.ForeignKey('store.ProductImage', blank=True, null=True,
+                                       on_delete=models.SET_NULL, related_name='+')
 
     def sub_total(self):
         return self.product.price * self.quantity
+
+    def line_image_url(self):
+        """Variant-aware thumbnail URL for this line ('' -> placeholder)."""
+        from store.variant_thumbnail import resolve_cart_item_image
+        return resolve_cart_item_image(self)
+
+    def line_color_value(self):
+        """Selected colour display value ('' when the line has no colour)."""
+        for v in self.variations.all():
+            if v.variation_category == "color":
+                return v.variation_value
+        return ""
 
     def __unicode__(self):
         return self.product

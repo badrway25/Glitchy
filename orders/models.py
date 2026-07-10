@@ -125,9 +125,24 @@ class OrderProduct(models.Model):
     ordered = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    # Image snapshot copied from the cart line at finalize time (or resolved
+    # then) so historical orders keep showing the purchased colour's mockup.
+    selected_image = models.ForeignKey('store.ProductImage', blank=True, null=True,
+                                       on_delete=models.SET_NULL, related_name='+')
 
     def line_total(self):
         return float(self.product_price) * int(self.quantity)
+
+    def line_image_url(self):
+        """Variant-aware thumbnail URL for this order line ('' -> placeholder)."""
+        from store.variant_thumbnail import resolve_order_item_image
+        return resolve_order_item_image(self)
+
+    def line_color_value(self):
+        for v in self.variations.all():
+            if v.variation_category == "color":
+                return v.variation_value
+        return ""
 
     def __str__(self):
         return self.product.product_name
