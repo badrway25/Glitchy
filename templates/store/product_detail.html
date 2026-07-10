@@ -627,6 +627,39 @@
   </div>
 </section>
 
+<!-- Premium add-to-cart confirmation modal (outside #pdpForm; fed by the AJAX
+     response via the 'glitchy:cart-added' event — no-JS keeps the classic
+     redirect-to-cart flow and never sees this) -->
+<div class="atc-backdrop" id="atcModal" hidden data-currency="{{ CURRENCY_SYMBOL }}">
+  <div class="atc-modal" role="dialog" aria-modal="true" aria-labelledby="atcTitle"
+       aria-describedby="atcSubtitle">
+    <button class="atc-close" type="button" data-atc-close aria-label="{% trans 'Close' %}">{% icon "close" "ic" 18 %}</button>
+    <div class="atc-state">
+      <span class="atc-check"><i class="fas fa-check" aria-hidden="true"></i></span>
+      <div>
+        <h3 class="atc-title" id="atcTitle">{% trans "Added to cart" %}</h3>
+        <p class="atc-subtitle" id="atcSubtitle">{% trans "Your item was added" %}</p>
+      </div>
+    </div>
+    <div class="atc-line">
+      <img class="atc-thumb" src="" alt="" data-atc-thumb hidden>
+      <div class="atc-line-info">
+        <div class="atc-name" data-atc-name></div>
+        <div class="atc-variants">
+          <span class="variant-pill" data-atc-color-wrap hidden><span class="variant-k">{% trans "Colour" %}</span><span class="variant-v" data-atc-color></span></span>
+          <span class="variant-pill" data-atc-size-wrap hidden><span class="variant-k">{% trans "Size" %}</span><span class="variant-v" data-atc-size></span></span>
+        </div>
+        <div class="atc-meta"><span class="atc-qty">{% trans "Quantity" %}: <strong data-atc-qty></strong></span><span class="atc-price" data-atc-price></span></div>
+        <div class="atc-imgnote" data-atc-imgnote hidden>{% trans "Image reflects your selected colour" %}</div>
+      </div>
+    </div>
+    <div class="atc-actions">
+      <button class="btn btn-soft atc-continue" type="button" data-atc-close>{% trans "Continue shopping" %}</button>
+      <a class="btn btn-primary atc-viewcart" href="{% url 'cart' %}">{% trans "View cart" %}</a>
+    </div>
+  </div>
+</div>
+
 <!-- Lightbox Modal (Bootstrap) -->
 <div class="modal fade pdp-modal" id="pdpLightbox" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-xl" role="document">

@@ -172,7 +172,15 @@
         setBusy(false);
         if (res.d && res.d.ok) {
           updateCount(res.d.count);
-          if (window.glToast) window.glToast(form.getAttribute("data-added-msg") || "Added to your bag", "success");
+          /* let the premium add-to-cart modal claim the confirmation; the toast
+             stays as the fallback when no listener preventDefault()s (grid pages,
+             modal missing, JS partially loaded) */
+          var claimed = !document.dispatchEvent(new CustomEvent("glitchy:cart-added", {
+            cancelable: true, detail: res.d
+          }));
+          if (!claimed && window.glToast) {
+            window.glToast(form.getAttribute("data-added-msg") || "Added to your bag", "success");
+          }
         } else if (window.glToast) {
           window.glToast(form.getAttribute("data-options-msg") || "Please choose your options first.", "warn");
         }
