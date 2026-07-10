@@ -281,7 +281,10 @@
               {% for cart_item in cart_items %}
               <div class="mini-row">
                 <a class="mini-thumb" href="{{ cart_item.product.get_url }}">
-                  {% if cart_item.product.images %}<img src="{{ cart_item.product.images.url }}" alt="{{ cart_item.product.product_name }}">{% endif %}
+                  {% with line_img=cart_item.line_image_url %}
+                  {% if line_img %}<img src="{{ line_img }}" alt="{{ cart_item.product.product_name }}{% if cart_item.line_color_value %} — {{ cart_item.line_color_value|capfirst }}{% endif %}">
+                  {% elif cart_item.product.images %}<img src="{{ cart_item.product.images.url }}" alt="{{ cart_item.product.product_name }}">{% endif %}
+                  {% endwith %}
                 </a>
                 <div class="mini-info">
                   <a href="{{ cart_item.product.get_url }}" class="mini-title">{{ cart_item.product.product_name }}</a>

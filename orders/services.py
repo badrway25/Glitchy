@@ -213,6 +213,17 @@ def finalize_order_payment(*, order, payment, request=None):
             ordered=True,
         )
         op.variations.set(item.variations.all())
+        # carry the colour-matched image snapshot across (the cart rows are
+        # deleted below); if the cart line never got one, resolve it now so
+        # historical orders keep the purchased colour's mockup
+        selected_image = item.selected_image
+        if selected_image is None or selected_image.product_id != item.product_id:
+            from store.variant_thumbnail import resolve_variant_image
+            selected_image = resolve_variant_image(
+                item.product, variations=item.variations.all())
+        if selected_image is not None:
+            op.selected_image = selected_image
+            op.save(update_fields=["selected_image"])
         total_production_cost += unit_cost * int(item.quantity)
 
         # reduce stock

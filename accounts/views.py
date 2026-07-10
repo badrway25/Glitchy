@@ -359,6 +359,11 @@ def order_reorder(request, order_number):
             ci = CartItem.objects.create(product=product, user=request.user, quantity=op.quantity)
             if variations:
                 ci.variations.add(*variations)
+            # carry the purchased colour's image snapshot back into the cart
+            # (validated: only if it still belongs to this product)
+            if op.selected_image_id and op.selected_image.product_id == product.pk:
+                ci.selected_image = op.selected_image
+                ci.save(update_fields=["selected_image"])
         added += 1
     if added:
         messages.success(request, _("Added to your cart — review and check out when you're ready."))

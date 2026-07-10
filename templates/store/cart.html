@@ -56,11 +56,16 @@
           <div class="cart-item">
             <div class="cart-prod">
               <a class="cart-thumb" href="{{ cart_item.product.get_url }}" aria-label="{% trans 'Open product' %}">
-                {% if cart_item.product.images %}
+                {# variant-aware: snapshot -> colour mapping -> product fallback (store/variant_thumbnail.py) #}
+                {% with line_img=cart_item.line_image_url %}
+                {% if line_img %}
+                  <img src="{{ line_img }}" alt="{{ cart_item.product.product_name }}{% if cart_item.line_color_value %} — {{ cart_item.line_color_value|capfirst }}{% endif %}">
+                {% elif cart_item.product.images %}
                   <img src="{{ cart_item.product.images.url }}" alt="{{ cart_item.product.product_name }}">
                 {% else %}
                   <img src="{% static 'images/placeholder.png' %}" alt="{% trans 'No image' %}">
                 {% endif %}
+                {% endwith %}
               </a>
 
               <div class="cart-prod-info">

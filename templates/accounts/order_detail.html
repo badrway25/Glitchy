@@ -215,8 +215,11 @@
                         <td>
                           <div class="od-item">
                             <a href="{{ it.product.get_url }}" class="od-thumb">
-                              <img src="{% if it.product.cover_image %}{{ it.product.cover_image }}{% else %}{% static 'images/placeholder.png' %}{% endif %}"
-                                   alt="{{ it.product.product_name }}" loading="lazy" decoding="async">
+                              {# snapshot-aware: the purchased colour's mockup, not the live catalogue cover #}
+                              {% with line_img=it.line_image_url %}
+                              <img src="{% if line_img %}{{ line_img }}{% elif it.product.cover_image %}{{ it.product.cover_image }}{% else %}{% static 'images/placeholder.png' %}{% endif %}"
+                                   alt="{{ it.product.product_name }}{% if it.line_color_value %} — {{ it.line_color_value|capfirst }}{% endif %}" loading="lazy" decoding="async">
+                              {% endwith %}
                             </a>
                             <div class="od-item-body">
                               <a href="{{ it.product.get_url }}" class="ord-id">{{ it.product.product_name }}</a>

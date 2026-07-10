@@ -171,9 +171,17 @@
             {% for item in ordered_products %}
               <tr>
                 <td>
-                  <div class="oc-item-title">{{ item.product.product_name }}</div>
+                  <div class="oc-item-line">
+                    {% with line_img=item.line_image_url %}
+                    {% if line_img %}
+                      <img class="oc-item-thumb" src="{{ line_img }}" loading="lazy"
+                           alt="{{ item.product.product_name }}{% if item.line_color_value %} — {{ item.line_color_value|capfirst }}{% endif %}">
+                    {% endif %}
+                    {% endwith %}
+                    <div>
+                      <div class="oc-item-title">{{ item.product.product_name }}</div>
 
-                  {% if item.variations.all %}
+                      {% if item.variations.all %}
   <div class="oc-item-variants">
     {% for i in item.variations.all %}
       <span class="variant-pill variant-{{ i.variation_category|lower }}">
@@ -183,10 +191,13 @@
     {% endfor %}
   </div>
 {% endif %}
+                    </div>
+                  </div>
                 </td>
 
                 <td class="text-center">{{ item.quantity }}</td>
-                <td class="text-right">€ {{ item.product_price }}</td>
+                {# line_total, not the per-unit product_price — the column header says "Total" #}
+                <td class="text-right">€ {{ item.line_total|floatformat:2 }}</td>
               </tr>
             {% endfor %}
           </tbody>
@@ -244,7 +255,11 @@
           <div class="card product-card">
             <div class="media-skeleton">
               <a href="{{ p.get_url }}" class="d-block">
-                <img data-skeleton src="{{ p.images.url }}" alt="{{ p.product_name }}">
+                {# cover_image guards the empty-ImageField case (bare .images.url raises) #}
+                {% with rec_img=p.cover_image %}
+                {% if rec_img %}<img data-skeleton src="{{ rec_img }}" alt="{{ p.product_name }}">
+                {% else %}<img data-skeleton src="{% static 'images/placeholder.png' %}" alt="{{ p.product_name }}">{% endif %}
+                {% endwith %}
               </a>
 
               {# opzionale: badge #}

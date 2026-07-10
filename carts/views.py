@@ -46,6 +46,50 @@ def _cart_qty(request):
     return int(n or 0)
 
 
+def _ensure_line_snapshot(line, product_variation):
+    """Persist the colour-matched gallery image on the cart line.
+
+    Set once at first add (an existing snapshot wins — quantity bumps via the
+    cart '+' stepper must not churn it). The backend resolves the image itself
+    from the persisted colour mapping; nothing image-related is trusted from
+    the client."""
+    if line.selected_image_id:
+        return
+    from store.variant_thumbnail import resolve_variant_image
+    img = resolve_variant_image(line.product,
+                                variations=product_variation or line.variations.all())
+    if img is not None:
+        line.selected_image = img
+        line.save(update_fields=["selected_image"])
+
+
+def _line_json(line):
+    """Safe line payload for the AJAX response (feeds the add-to-cart modal)."""
+    from django.urls import reverse
+    color = size = ""
+    for v in line.variations.all():
+        if v.variation_category == "color":
+            color = v.variation_value
+        elif v.variation_category == "size":
+            size = v.variation_value
+    url = line.line_image_url()
+    return {
+        "line": {
+            "product_name": line.product.product_name,
+            "quantity": line.quantity,
+            "price": str(line.product.price),
+            "color": color,
+            "size": size,
+            "image_url": url,
+            "thumb_url": url,
+            # True only when a colour-matched snapshot exists — the modal's
+            # "image reflects your selected colour" note must not lie on fallbacks
+            "variant_matched": bool(line.selected_image_id),
+        },
+        "cart_url": reverse("cart"),
+    }
+
+
 def add_cart(request, product_id):
     current_user = request.user
     product = get_object_or_404(Product, id=product_id)
@@ -93,15 +137,17 @@ def add_cart(request, product_id):
                 item = CartItem.objects.get(product=product, id=item_id)
                 item.quantity += 1
                 item.save()
-                messages.success(request, f"Updated quantity for {product.product_name}.")
-
+                messages.success(request, _("Updated quantity for %(name)s.") % {
+                    "name": product.product_name})
+                line = item
             else:
                 item = CartItem.objects.create(product=product, quantity=1, user=current_user)
                 if len(product_variation) > 0:
                     item.variations.clear()
                     item.variations.add(*product_variation)
                 item.save()
-                messages.success(request, f"Added {product.product_name} to cart.")
+                messages.success(request, _("Added to cart."))
+                line = item
         else:
             cart_item = CartItem.objects.create(
                 product=product,
@@ -112,9 +158,12 @@ def add_cart(request, product_id):
                 cart_item.variations.clear()
                 cart_item.variations.add(*product_variation)
             cart_item.save()
+            line = cart_item
 
+        _ensure_line_snapshot(line, product_variation)
         if _is_ajax(request):
-            return JsonResponse({"ok": True, "count": _cart_qty(request), "name": product.product_name})
+            return JsonResponse({"ok": True, "count": _cart_qty(request),
+                                 "name": product.product_name, **_line_json(line)})
         messages.success(request, _("Added %(name)s to your bag.") % {"name": product.product_name})
         return redirect('cart')
 
@@ -166,14 +215,16 @@ def add_cart(request, product_id):
             item = CartItem.objects.get(product=product, id=item_id)
             item.quantity += 1
             item.save()
-            messages.info(request, "Cart updated.")
+            messages.info(request, _("Cart updated."))
+            line = item
         else:
             item = CartItem.objects.create(product=product, quantity=1, cart=cart)
             if len(product_variation) > 0:
                 item.variations.clear()
                 item.variations.add(*product_variation)
             item.save()
-            messages.success(request, "Added to cart.")
+            messages.success(request, _("Added to cart."))
+            line = item
     else:
         cart_item = CartItem.objects.create(
             product=product,
@@ -184,9 +235,12 @@ def add_cart(request, product_id):
             cart_item.variations.clear()
             cart_item.variations.add(*product_variation)
         cart_item.save()
+        line = cart_item
 
+    _ensure_line_snapshot(line, product_variation)
     if _is_ajax(request):
-        return JsonResponse({"ok": True, "count": _cart_qty(request), "name": product.product_name})
+        return JsonResponse({"ok": True, "count": _cart_qty(request),
+                             "name": product.product_name, **_line_json(line)})
     messages.success(request, _("Added %(name)s to your bag.") % {"name": product.product_name})
     return redirect('cart')
 

@@ -109,9 +109,18 @@ class MarginBandFilter(admin.SimpleListFilter):
 
 class OrderProductInline(BaseTabularInline):
     model = OrderProduct
-    readonly_fields = ("payment", "user", "product", "quantity", "product_price",
-                       "production_cost", "ordered")
+    readonly_fields = ("line_thumb", "payment", "user", "product", "quantity",
+                       "product_price", "production_cost", "ordered")
+    fields = readonly_fields
     extra = 0
+
+    @admin.display(description=_("Image"))
+    def line_thumb(self, obj):
+        url = obj.line_image_url() if obj and obj.pk else ""
+        if not url:
+            return "—"
+        return format_html('<img src="{}" style="width:44px;height:44px;object-fit:cover;'
+                           'border-radius:8px;" loading="lazy">', url)
 
 
 @admin.register(Order)
