@@ -276,6 +276,8 @@ def _upsert_product(p: dict, fallback_category, settings_map, overwrite_category
     tags = p.get("tags") or []
     obj.printify_tags = ", ".join(str(t) for t in tags)[:400]
     obj.printify_options_summary = _options_summary(p.get("options") or [])
+    # keep the original (uncleaned) description for admin reference / future re-parsing
+    obj.printify_description_raw = (p.get("description") or "")[:8000]
     obj.save()
 
     _sync_images(obj, p, refresh=refresh_images)
@@ -285,6 +287,12 @@ def _upsert_product(p: dict, fallback_category, settings_map, overwrite_category
         import_print_areas(obj, p)
     except Exception:
         pass
+    try:
+        from .variant_images import rebuild_color_image_map
+        rebuild_color_image_map(obj, payload=p)
+    except Exception as exc:  # mapping problems must never abort a sync
+        logger.warning("color-image map rebuild failed for %s: %s",
+                       obj.slug, exc.__class__.__name__)
     return obj, is_new
 
 

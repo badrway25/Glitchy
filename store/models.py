@@ -58,6 +58,10 @@ class Product(models.Model):
     printify_tags = models.CharField(max_length=400, blank=True, default="")
     printify_options_summary = models.CharField(max_length=300, blank=True, default="",
                                                 help_text="e.g. 'Sizes: S–XXL · Colours: 5'")
+    printify_description_raw = models.TextField(blank=True, default="",
+                                                help_text="Original (uncleaned) Printify description as "
+                                                          "received at sync time — admin reference only, "
+                                                          "never rendered to customers")
 
     # --- Premium product detail content (bulleted "More" sections) ---
     composition = models.TextField(blank=True, default="",
@@ -380,6 +384,62 @@ class Variation(models.Model):
     def is_buyable(self):
         """Customer-side: a variant is buyable only if enabled, available and active."""
         return self.is_active and self.printify_is_enabled and self.printify_is_available
+
+
+class ProductColorImage(models.Model):
+    """Persisted "colour → gallery images" mapping that powers the PDP colour-driven gallery.
+
+    One row per (product, colour value). Built offline — at Printify sync time from the
+    product payload (options + variants → exact variant-id sets per colour, intersected
+    with each image's `printify_variant_ids`), retro-fitted from DB data / heuristics, or
+    as a last resort classified by OpenAI via the `build_color_image_maps` command.
+    `source` records which stage produced the row so admins can audit provenance.
+    The storefront only READS this table; no external call ever happens in-request."""
+
+    SOURCE_DETERMINISTIC = "deterministic"
+    SOURCE_HEURISTIC = "heuristic"
+    SOURCE_OPENAI = "openai"
+    SOURCE_MANUAL = "manual"
+    SOURCE_CHOICES = [
+        (SOURCE_DETERMINISTIC, "Deterministic"),
+        (SOURCE_HEURISTIC, "Heuristic"),
+        (SOURCE_OPENAI, "OpenAI"),
+        (SOURCE_MANUAL, "Manual"),
+    ]
+
+    product = models.ForeignKey(Product, on_delete=models.CASCADE,
+                                related_name="color_image_maps")
+    color_value = models.CharField(max_length=100,
+                                   help_text="Lowercased colour Variation.variation_value")
+    image_ids = models.TextField(blank=True, default="",
+                                 help_text="Ordered comma-separated ProductImage ids for this colour")
+    primary_image = models.ForeignKey(ProductImage, blank=True, null=True,
+                                      on_delete=models.SET_NULL, related_name="+")
+    source = models.CharField(max_length=16, choices=SOURCE_CHOICES,
+                              default=SOURCE_DETERMINISTIC)
+    confidence = models.FloatField(default=1.0)
+    detail = models.CharField(max_length=200, blank=True, default="",
+                              help_text="Short provenance note (safe — no keys, no raw AI output)")
+    built_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("product", "color_value")
+        indexes = [models.Index(fields=["product", "color_value"])]
+        verbose_name = "Product colour-image map"
+
+    def save(self, *args, **kwargs):
+        # colour matching is done on lowercased values everywhere (builder, PDP JS,
+        # dropdown data-value) — normalize here so an admin-typed "Black" manual pin
+        # can never be missed by the precedence check or dropped by the rebuild cleanup
+        self.color_value = (self.color_value or "").strip().lower()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.product.product_name} · {self.color_value} ({self.source})"
+
+    def image_id_list(self):
+        # isdecimal, not isdigit: isdigit() accepts characters int() rejects (e.g. '²')
+        return [int(i) for i in self.image_ids.split(",") if i.strip().isdecimal()]
 
 
 class ReviewRating(models.Model):

@@ -1,7 +1,9 @@
+from unittest import mock
+
 from django.test import TestCase
 
 from printify_integration.services import sync_products
-from store.models import Product, Variation
+from store.models import Product, ProductColorImage, Variation
 
 
 class FakeClient:
@@ -62,3 +64,62 @@ class PrintifySyncTests(TestCase):
         log2 = sync_products(client=FakeClient())
         self.assertEqual(log2.updated_count, 1)
         self.assertEqual(Product.objects.filter(printify_product_id="pp_123").count(), 1)
+
+
+class FakeClientWithImages(FakeClient):
+    """Adds per-colour mockup images (variant_ids) and a raw HTML description."""
+
+    PRODUCT = dict(
+        FakeClient.PRODUCT,
+        description="<p>Soft <strong>organic</strong> tee.</p><ul><li>100% cotton</li></ul>",
+        images=[
+            {"src": "https://images.example/mock/a.jpg", "variant_ids": [5001],
+             "position": "front", "is_default": True},
+            {"src": "https://images.example/mock/b.jpg", "variant_ids": [5002],
+             "position": "front"},
+            {"src": "https://images.example/mock/c.jpg", "variant_ids": [5001, 5002],
+             "position": "back"},
+        ],
+    )
+
+
+@mock.patch("printify_integration.services._download_image", return_value=None)
+class SyncColorImageMapTests(TestCase):
+    """The sync must persist the raw description AND build the colour→image map
+    deterministically from the payload (no network beyond the mocked client)."""
+
+    def test_sync_builds_deterministic_color_map(self, _dl):
+        sync_products(client=FakeClientWithImages())
+        product = Product.objects.get(printify_product_id="pp_123")
+        rows = {r.color_value: r for r in ProductColorImage.objects.filter(product=product)}
+        self.assertEqual(set(rows), {"black", "white"})
+        gallery = {img.printify_src: img.id for img in product.gallery.all()}
+        black, white = rows["black"], rows["white"]
+        self.assertEqual(black.source, ProductColorImage.SOURCE_DETERMINISTIC)
+        # colour-specific image first, shared 'back' image appended
+        self.assertEqual(black.image_id_list(),
+                         [gallery["https://images.example/mock/a.jpg"],
+                          gallery["https://images.example/mock/c.jpg"]])
+        self.assertEqual(white.image_id_list(),
+                         [gallery["https://images.example/mock/b.jpg"],
+                          gallery["https://images.example/mock/c.jpg"]])
+        self.assertEqual(black.primary_image_id,
+                         gallery["https://images.example/mock/a.jpg"])
+
+    def test_sync_persists_raw_and_clean_description(self, _dl):
+        sync_products(client=FakeClientWithImages())
+        product = Product.objects.get(printify_product_id="pp_123")
+        self.assertIn("<strong>", product.printify_description_raw)   # raw kept verbatim
+        self.assertNotIn("<", product.description)                    # rendered copy stays clean
+        self.assertIn("• 100% cotton", product.description)
+
+    def test_resync_keeps_map_fresh(self, _dl):
+        sync_products(client=FakeClientWithImages())
+        product = Product.objects.get(printify_product_id="pp_123")
+        # simulate a stale/poisoned row: resync must rebuild it deterministically
+        ProductColorImage.objects.filter(product=product, color_value="black").update(
+            image_ids="999", source=ProductColorImage.SOURCE_HEURISTIC, confidence=0.5)
+        sync_products(client=FakeClientWithImages())
+        black = ProductColorImage.objects.get(product=product, color_value="black")
+        self.assertEqual(black.source, ProductColorImage.SOURCE_DETERMINISTIC)
+        self.assertNotEqual(black.image_ids, "999")
