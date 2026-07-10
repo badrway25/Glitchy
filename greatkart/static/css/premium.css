@@ -1436,6 +1436,40 @@ body.has-sticky-cta .ai-assistant{bottom:78px;}
 /* PDP description: preserve sanitized line breaks/bullets cleanly */
 .pdp-desc{white-space:normal;}
 
+/* ============ Premium PDP description sections + colour-driven gallery ============ */
+.pdp-desc-premium{display:flex;flex-direction:column;gap:12px;margin-bottom:2px;}
+.pdp-overview{line-height:1.62;}
+.pdp-overview.is-clamped{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;
+  overflow:hidden;}
+.pdp-desc-more-btn{align-self:flex-start;background:none;border:0;padding:0;margin-top:-6px;
+  font-size:.82rem;font-weight:600;letter-spacing:.02em;color:var(--accent-2,#8a6d3b);
+  cursor:pointer;text-decoration:underline;text-underline-offset:3px;}
+.pdp-desc-more-btn:hover{color:var(--primary);}
+.pdp-highlights{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px;}
+.pdp-highlights li{display:flex;align-items:flex-start;gap:10px;font-size:.9rem;
+  color:var(--text);line-height:1.5;}
+.pdp-highlights li i{color:var(--accent-2,#8a6d3b);font-size:.72rem;margin-top:5px;flex:0 0 auto;}
+.pdp-desc-sections{display:flex;flex-direction:column;}
+.pdp-details{border:0;border-top:var(--border);}
+.pdp-details:last-child{border-bottom:var(--border);}
+.pdp-details summary{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:10px 2px;cursor:pointer;list-style:none;font-size:.86rem;font-weight:600;
+  letter-spacing:.04em;text-transform:uppercase;color:var(--text);}
+.pdp-details summary::-webkit-details-marker{display:none;}
+.pdp-details summary i{font-size:.7rem;color:var(--muted);transition:transform .2s ease;}
+.pdp-details[open] summary i{transform:rotate(180deg);}
+.pdp-details-list{list-style:none;margin:0;padding:2px 2px 12px;display:flex;
+  flex-direction:column;gap:6px;font-size:.88rem;color:var(--muted);line-height:1.5;}
+.pdp-details-prose{padding:2px 2px 12px;font-size:.88rem;color:var(--muted);line-height:1.6;}
+.pdp-details-prose p{margin:0 0 8px;}
+.pdp-details-prose p:last-child{margin-bottom:0;}
+/* colour-driven gallery: smooth main-image crossfade + thumb filtering.
+   Keep the transform transition too — theme.css animates the hover zoom via
+   `transform`, and overriding `transition` here without it would kill it. */
+.pdp-image img{transition:opacity .16s ease,transform .35s ease;}
+.pdp-image img.pdp-img-swap{opacity:0;}
+.pdp-thumb.pdp-thumb-hidden{display:none;}
+
 /* ============ Premium always-visible navbar search (Phase 34) ============ */
 .premium-nav{flex-wrap:wrap;row-gap:.25rem;}
 .nav-search{flex:1 1 auto;max-width:560px;margin:0 1.5rem;position:relative;order:0;}

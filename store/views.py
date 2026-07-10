@@ -172,6 +172,33 @@ def product_detail(request, category_slug, product_slug):
         related = list(Product.objects.filter(is_available=True)
                        .exclude(id=single_product.id).prefetch_related("gallery")[:4])
 
+    # Premium description sections (Overview / Highlights / Care / More) — pure
+    # re-organization of the existing sanitized text, localized upstream.
+    from store.description_display import structure_description
+    product_description = single_product.description_for(lang)
+    description_sections = structure_description(product_description)
+
+    # Colour-driven gallery: persisted colour→image map (built offline at sync time
+    # or by build_color_image_maps). The PDP only READS these rows — no matching,
+    # no external calls in-request.
+    gallery_images = list(single_product.gallery.all())
+    images_by_id = {img.id: img for img in gallery_images}
+    img_colors = {}
+    pdp_color_map = {}
+    for row in single_product.color_image_maps.all():
+        ids = [i for i in row.image_id_list() if i in images_by_id]
+        if not ids:
+            continue
+        primary = images_by_id.get(row.primary_image_id) or images_by_id[ids[0]]
+        pdp_color_map[row.color_value] = {
+            "primary": primary.display_url() or None,
+            "images": ids,
+        }
+        for i in ids:
+            img_colors.setdefault(i, []).append(row.color_value)
+    for img in gallery_images:
+        img.color_csv = " ".join(img_colors.get(img.id, []))
+
     context = {
         'single_product': single_product,
         'in_cart': in_cart,
@@ -193,8 +220,11 @@ def product_detail(request, category_slug, product_slug):
         'outfit_products': list(outfit.active_products()) if outfit else [],
         'notify_me_enabled': single_product.stock <= 0 or not single_product.is_available,
         # Localized description: cached OpenAI translation when fresh, else clean EN source.
-        'product_description': single_product.description_for(lang),
+        'product_description': product_description,
         'product_meta_description': single_product.meta_description_for(lang),
+        'description_sections': description_sections,
+        'pdp_gallery': gallery_images,
+        'pdp_color_map': pdp_color_map,
     }
     return render(request, 'store/product_detail.html', context)
 

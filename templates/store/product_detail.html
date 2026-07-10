@@ -26,15 +26,7 @@
 
         <aside class="col-md-6 pdp-media">
 
-  {% with gallery_qs=single_product.gallery.all %}
-    {% with main_src="" %}
-      {% if gallery_qs and gallery_qs.0.image %}
-        {% with main_src=gallery_qs.0.image.url %}{% endwith %}
-      {% elif single_product.images %}
-        {% with main_src=single_product.images.url %}{% endwith %}
-      {% endif %}
-    {% endwith %}
-
+  {% with gallery_qs=pdp_gallery %}
     <div class="pdp-gallery">
       <a class="pdp-image d-block" href="#"
          data-toggle="modal" data-target="#pdpLightbox"
@@ -46,19 +38,23 @@
 
       {% if gallery_qs %}
         <div class="pdp-thumbs">
-          {% for img in gallery_qs|slice:":8" %}
+          {% for img in gallery_qs|slice:":24" %}
             {% if img.image %}
               <button type="button"
                       class="pdp-thumb {% if forloop.first %}active{% endif %}"
                       data-img="{{ img.image.url }}"
+                      data-image-id="{{ img.id }}"
+                      {% if img.color_csv %}data-colors="{{ img.color_csv }}"{% endif %}
                       aria-label="Thumbnail {{ forloop.counter }}">
-                <img src="{{ img.image.url }}" alt="thumb">
+                <img src="{{ img.image.url }}" alt="thumb" loading="lazy">
               </button>
             {% endif %}
           {% endfor %}
         </div>
       {% endif %}
     </div>
+    {# Persisted colour -> images map (built offline); read by pdp-premium.js on colour change. #}
+    {{ pdp_color_map|json_script:"pdpColorImages" }}
   {% endwith %}
 
 </aside>
@@ -129,8 +125,47 @@
               </div>
 
               {% if product_description %}
-                {# Localized (cached translation) or clean EN source; both sanitized plain text. #}
-                <div class="pdp-muted pdp-desc mb-0">{{ product_description|linebreaksbr }}</div>
+                {# Localized (cached translation) or clean EN source; both sanitized plain text, #}
+                {# re-organized into premium sections (never rewritten — see description_display). #}
+                <div class="pdp-desc-premium">
+                  {% if description_sections.overview %}
+                    <div class="pdp-muted pdp-desc pdp-overview {% if description_sections.overview|length > 280 %}is-clamped{% endif %}" id="pdpOverview">{{ description_sections.overview|linebreaksbr }}</div>
+                    {% if description_sections.overview|length > 280 %}
+                      <button type="button" class="pdp-desc-more-btn" data-overview-toggle
+                              data-label-less="{% trans 'Show less' %}">{% trans "Read more" %}</button>
+                    {% endif %}
+                  {% endif %}
+
+                  {% if description_sections.highlights %}
+                    {# no slice cap: dropping bullets 7+ would silently delete content #}
+                    <ul class="pdp-highlights" aria-label="{% trans 'Highlights' %}">
+                      {% for item in description_sections.highlights %}
+                        <li><i class="fas fa-check" aria-hidden="true"></i><span>{{ item }}</span></li>
+                      {% endfor %}
+                    </ul>
+                  {% endif %}
+
+                  {% if description_sections.care or description_sections.more %}
+                    <div class="pdp-desc-sections">
+                      {% if description_sections.care %}
+                        <details class="pdp-details">
+                          <summary>{% trans "Care instructions" %}<i class="fas fa-chevron-down" aria-hidden="true"></i></summary>
+                          <ul class="pdp-details-list">
+                            {% for item in description_sections.care %}<li>{{ item }}</li>{% endfor %}
+                          </ul>
+                        </details>
+                      {% endif %}
+                      {% if description_sections.more %}
+                        <details class="pdp-details">
+                          <summary>{% trans "More details" %}<i class="fas fa-chevron-down" aria-hidden="true"></i></summary>
+                          <div class="pdp-details-prose">
+                            {% for para in description_sections.more %}<p>{{ para }}</p>{% endfor %}
+                          </div>
+                        </details>
+                      {% endif %}
+                    </div>
+                  {% endif %}
+                </div>
               {% endif %}
 
               <!-- Shipping + returns reassurance -->
