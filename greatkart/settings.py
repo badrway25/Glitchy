@@ -216,6 +216,7 @@ UNFOLD = {
                     {"title": _("Sync monitor"), "icon": "sync", "link": "/admin/printify_integration/printifysyncstate/"},
                     {"title": _("Sync logs"), "icon": "history", "link": "/admin/printify_integration/synclog/"},
                     {"title": _("Shipping profiles"), "icon": "local_shipping", "link": "/admin/printify_integration/printifyshippingprofile/"},
+                    {"title": _("Colour-image maps"), "icon": "palette", "link": "/admin/store/productcolorimage/"},
                 ],
             },
             {

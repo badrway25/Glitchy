@@ -12,8 +12,8 @@ except Exception:                           # graceful fallback if Unfold is abs
     from django.contrib.admin import ModelAdmin as BaseModelAdmin
     from django.contrib.admin import TabularInline as BaseTabularInline
 
-from .models import (GeneralFAQ, Product, ProductDescriptionTranslation, ProductFAQ,
-                     ProductImage, ReviewRating, Variation)
+from .models import (GeneralFAQ, Product, ProductColorImage, ProductDescriptionTranslation,
+                     ProductFAQ, ProductImage, ReviewRating, Variation)
 
 
 # --- Catalog-health filters (drive the dashboard quick links) ---------------
@@ -98,6 +98,26 @@ class DescriptionTranslationInline(admin.TabularInline):
         return obj.is_fresh() if obj and obj.pk else False
 
 
+class ColorImageMapInline(admin.TabularInline):
+    """Read-only view of the persisted colour→image mapping (rebuilt by sync or the
+    'Rebuild colour-image maps' action; edited only via its own admin for manual pins)."""
+    model = ProductColorImage
+    extra = 0
+    can_delete = False
+    fields = ("color_value", "source", "confidence", "image_count", "detail", "built_at")
+    readonly_fields = fields
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    @admin.display(description=_("Images"))
+    def image_count(self, obj):
+        return len(obj.image_id_list()) if obj and obj.pk else 0
+
+
 @admin.register(Product)
 class ProductAdmin(BaseModelAdmin):
     list_display = ("thumb", "product_name", "price", "margin_hint", "quality_score",
@@ -111,9 +131,12 @@ class ProductAdmin(BaseModelAdmin):
     list_select_related = ("category",)
     search_fields = ("product_name", "sku", "printify_product_id")
     prepopulated_fields = {"slug": ("product_name",)}
-    readonly_fields = ("printify_synced_at", "printify_sync_error", "printify_panel", "big_preview")
-    inlines = [ProductImageInline, VariationInline, DescriptionTranslationInline]
-    actions = ["resync_from_printify", "audit_data_quality", "translate_missing_descriptions",
+    readonly_fields = ("printify_synced_at", "printify_sync_error", "printify_panel",
+                       "big_preview", "printify_description_raw")
+    inlines = [ProductImageInline, VariationInline, DescriptionTranslationInline,
+               ColorImageMapInline]
+    actions = ["resync_from_printify", "rebuild_color_maps", "audit_data_quality",
+               "translate_missing_descriptions",
                "bulk_activate", "bulk_deactivate", "bulk_mark_stale"]
 
     def get_queryset(self, request):
@@ -206,6 +229,10 @@ class ProductAdmin(BaseModelAdmin):
                                     "printify_options_summary", "printify_tags",
                                     "printify_visible", "printify_sync_status",
                                     "printify_synced_at", "printify_sync_error")}),
+        (_("Printify raw description (reference)"), {
+            "classes": ("collapse",),
+            "fields": ("printify_description_raw",),
+        }),
     )
 
     @admin.display(description=_("Quality"))
@@ -281,6 +308,28 @@ class ProductAdmin(BaseModelAdmin):
         self.message_user(request, _("Resynced %(ok)d product(s), %(err)d error(s).") % {
             "ok": ok, "err": err})
 
+    @admin.action(description=_("Rebuild colour-image maps (selected)"))
+    def rebuild_color_maps(self, request, queryset):
+        """Deterministic + heuristic rebuild only (no network, no OpenAI) — the
+        offline `build_color_image_maps` command covers refetch/AI stages."""
+        from printify_integration.variant_images import rebuild_color_image_map
+
+        import logging
+        resolved = colors = err = 0
+        for product in queryset:
+            try:
+                summary = rebuild_color_image_map(product)
+                colors += summary["colors"]
+                resolved += summary["resolved"]
+            except Exception as exc:
+                err += 1
+                logging.getLogger("printify").warning(
+                    "admin colour-map rebuild failed for %s: %s",
+                    product.slug, exc.__class__.__name__)
+        self.message_user(request, _(
+            "Colour-image maps rebuilt: %(r)d/%(c)d colours resolved, %(e)d error(s).") % {
+            "r": resolved, "c": colors, "e": err})
+
     @admin.action(description=_("Translate missing descriptions (IT/FR)"))
     def translate_missing_descriptions(self, request, queryset):
         from assistant import translation
@@ -299,6 +348,55 @@ class ProductAdmin(BaseModelAdmin):
                     failed += 1
         self.message_user(request, _("Translations written: %(w)d, failed: %(f)d.") % {
             "w": wrote, "f": failed})
+
+
+@admin.register(ProductColorImage)
+class ProductColorImageAdmin(BaseModelAdmin):
+    """Inspection surface for the colour→image mapping. Rows are normally rebuilt by
+    the Printify sync / the Product admin action / `build_color_image_maps`; editing
+    here (and setting source=manual) pins a mapping so rebuilds never overwrite it."""
+    list_display = ("product", "color_value", "source_badge", "confidence",
+                    "image_count", "primary_thumb", "detail", "built_at")
+    list_filter = ("source",)
+    search_fields = ("product__product_name", "color_value")
+    readonly_fields = ("built_at", "primary_thumb")
+    raw_id_fields = ("product", "primary_image")
+    list_select_related = ("product", "primary_image")
+
+    SOURCE_COLORS = {
+        ProductColorImage.SOURCE_DETERMINISTIC: "#16a34a",  # green — exact data
+        ProductColorImage.SOURCE_HEURISTIC: "#d97706",      # amber — inferred locally
+        ProductColorImage.SOURCE_OPENAI: "#7c3aed",         # violet — AI-classified
+        ProductColorImage.SOURCE_MANUAL: "#64748b",         # slate — pinned by admin
+    }
+
+    @admin.display(description=_("Source"), ordering="source")
+    def source_badge(self, obj):
+        if not obj.image_id_list():
+            # an empty row means no stage could resolve this colour — saying
+            # "Deterministic" there would misread as a confident mapping
+            return format_html(
+                '<span style="background:#94a3b8;color:#fff;padding:2px 8px;'
+                'border-radius:999px;font-size:11px;">{}</span>', _("Unresolved"))
+        return format_html(
+            '<span style="background:{};color:#fff;padding:2px 8px;border-radius:999px;'
+            'font-size:11px;">{}</span>',
+            self.SOURCE_COLORS.get(obj.source, "#94a3b8"), obj.get_source_display())
+
+    @admin.display(description=_("Images"))
+    def image_count(self, obj):
+        n = len(obj.image_id_list())
+        color = "#dc2626" if not n else "inherit"
+        return format_html('<span style="color:{}">{}</span>', color, n)
+
+    @admin.display(description=_("Primary"))
+    def primary_thumb(self, obj):
+        img = obj.primary_image
+        url = img.display_url() if img else ""
+        if not url:
+            return "—"
+        return format_html('<img src="{}" style="width:44px;height:44px;object-fit:cover;'
+                           'border-radius:8px;" loading="lazy">', url)
 
 
 @admin.register(ProductDescriptionTranslation)
