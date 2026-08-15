@@ -104,7 +104,8 @@
     <div class="hiw">
       <div class="hiw-step" data-reveal>
         <div class="hiw-num">01</div>
-        <div class="hiw-ic">{% icon "spark" "ic" 22 %}</div>
+        {# "spark" reads as a loading spinner at this size (rays, no centre); a tag fits "choose your style" and is unmistakable #}
+        <div class="hiw-ic">{% icon "tag" "ic" 22 %}</div>
         <h4 class="hiw-title">{% trans "Choose your style" %}</h4>
         <p class="hiw-text">{% trans "Browse premium pieces and pick your size and colour — no clutter, just the edit." %}</p>
       </div>
