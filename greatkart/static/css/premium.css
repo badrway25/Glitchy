@@ -2107,7 +2107,7 @@ body.has-sticky-cta .ai-assistant{bottom:78px;}
 .custom-select-dd .dropdown-menu{display:block!important;position:absolute;top:calc(100% + 8px);left:0;right:0;
   min-width:100%;border:var(--border-strong)!important;border-radius:var(--radius)!important;
   background:var(--surface)!important;box-shadow:var(--shadow)!important;padding:.4rem!important;margin:0!important;
-  z-index:1400;opacity:0;visibility:hidden;transform:translateY(-6px);max-height:min(60vh,320px);overflow:auto;
+  z-index:var(--z-variant-dropdown,1150);opacity:0;visibility:hidden;transform:translateY(-6px);max-height:min(60vh,320px);overflow:auto;
   transition:opacity .18s var(--ease),transform .18s var(--ease),visibility .18s;}
 .custom-select-dd.is-open .dropdown-menu{opacity:1;visibility:visible;transform:translateY(0);}
 .custom-select-dd .dropdown-item{border-radius:var(--radius-sm)!important;padding:.55rem .7rem!important;
@@ -2345,6 +2345,22 @@ body.has-sticky-cta .ai-assistant{bottom:78px;}
 .pmsel-menu{list-style:none;margin:0;padding:.34rem;position:absolute;z-index:60;left:0;right:0;
   top:calc(100% + 6px);min-width:100%;max-height:288px;overflow:auto;background:var(--surface);
   border:var(--border);border-radius:12px;box-shadow:var(--shadow);animation:pmsel-in .14s ease;}
+/* --- Stacking: open select dropdowns vs. CTA and overlays (F4) ----------------------
+   An open variant/select dropdown must sit ABOVE the SAVE / ADD TO CART row and the
+   mobile sticky CTA, but BELOW the size guide, the lightbox and the modals. One shared
+   layer keeps both dropdown implementations (.custom-select-dd on the PDP, .pmsel on
+   filters / checkout country) consistent:
+     mobile sticky CTA ....... 1080  (.pdp-sticky-cta)
+     >> variant dropdown ..... 1150  (--z-variant-dropdown)  <<
+     size guide modal ........ 1220  (.sg-modal)
+     toasts .................. 1400  (.toast-host)
+     add-to-cart / lightbox .. 2000  (.atc-backdrop / .vg-backdrop)
+   (The PDP dropdown was z-index:1400 — above the CTA already, but also above the size
+   guide; the visible "behind the button" was the 0.18s opacity fade-in, not z-order.)
+   Lifting the whole .pmsel.is-open (not just the menu) makes it win regardless of the
+   parent stacking context. */
+:root{--z-variant-dropdown:1150;}
+.pmsel.is-open{z-index:var(--z-variant-dropdown,1150);}
 @keyframes pmsel-in{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:none;}}
 .pmsel-opt{display:flex;align-items:center;gap:.5rem;padding:.55rem .6rem;border-radius:8px;cursor:pointer;
   font-size:.9rem;color:var(--text);user-select:none;}
