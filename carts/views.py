@@ -63,6 +63,24 @@ def _ensure_line_snapshot(line, product_variation):
         line.save(update_fields=["selected_image"])
 
 
+def _find_matching_line_id(cart_items, product_variation):
+    """Return the id of the existing line whose variation SET equals the requested
+    one, else None.
+
+    A variant's identity is the *unordered set* of its options. The classic
+    greatkart code compared ordered lists (`product_variation in ex_var_list`),
+    but `product_variation` follows POST-field order while `item.variations.all()`
+    follows DB/PK order (Variation has no Meta.ordering). Whenever those orders
+    differed, an identical variant never matched and every re-add spawned a new
+    row instead of bumping the quantity. Comparing sets fixes that; Variation
+    instances hash by primary key, so set equality is exact."""
+    want = set(product_variation)
+    for item in cart_items:
+        if set(item.variations.all()) == want:
+            return item.id
+    return None
+
+
 def _line_json(line):
     """Safe line payload for the AJAX response (feeds the add-to-cart modal)."""
     from django.urls import reverse
@@ -123,18 +141,10 @@ def add_cart(request, product_id):
 
         if is_cart_item_exists:
             cart_item = CartItem.objects.filter(product=product, user=current_user)
-            ex_var_list = []
-            id_list = []
+            match_id = _find_matching_line_id(cart_item, product_variation)
 
-            for item in cart_item:
-                existing_variation = item.variations.all()
-                ex_var_list.append(list(existing_variation))
-                id_list.append(item.id)
-
-            if product_variation in ex_var_list:
-                index = ex_var_list.index(product_variation)
-                item_id = id_list[index]
-                item = CartItem.objects.get(product=product, id=item_id)
+            if match_id is not None:
+                item = CartItem.objects.get(product=product, id=match_id)
                 item.quantity += 1
                 item.save()
                 messages.success(request, _("Updated quantity for %(name)s.") % {
@@ -201,18 +211,10 @@ def add_cart(request, product_id):
 
     if is_cart_item_exists:
         cart_item = CartItem.objects.filter(product=product, cart=cart)
-        ex_var_list = []
-        id_list = []
+        match_id = _find_matching_line_id(cart_item, product_variation)
 
-        for item in cart_item:
-            existing_variation = item.variations.all()
-            ex_var_list.append(list(existing_variation))
-            id_list.append(item.id)
-
-        if product_variation in ex_var_list:
-            index = ex_var_list.index(product_variation)
-            item_id = id_list[index]
-            item = CartItem.objects.get(product=product, id=item_id)
+        if match_id is not None:
+            item = CartItem.objects.get(product=product, id=match_id)
             item.quantity += 1
             item.save()
             messages.info(request, _("Cart updated."))
