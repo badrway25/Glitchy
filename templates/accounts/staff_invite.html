@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+
+{% block title %}{% trans "Set your admin password" %}{% endblock %}
+{% block robots %}<meta name="robots" content="noindex,nofollow">{% endblock %}
+
+{% block content %}
+<section class="auth-x">
+  <div class="container" style="max-width:520px;padding:48px 16px;">
+    <div class="summary-card" style="padding:28px;">
+      <h1 style="font-size:1.35rem;font-weight:800;margin:0 0 6px;">{% trans "Set your admin password" %}</h1>
+      <p class="text-muted" style="font-size:.9rem;margin:0 0 20px;">
+        {% blocktrans with email=invite.email %}You were invited as {{ email }}. Choose a password to activate your account.{% endblocktrans %}
+      </p>
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <label style="display:block;font-size:.85rem;font-weight:600;margin-bottom:12px;">
+          {% trans "New password" %}
+          <input type="password" name="new_password1" required autocomplete="new-password"
+                 class="form-control" style="margin-top:6px;">
+        </label>
+        <label style="display:block;font-size:.85rem;font-weight:600;margin-bottom:18px;">
+          {% trans "Confirm password" %}
+          <input type="password" name="new_password2" required autocomplete="new-password"
+                 class="form-control" style="margin-top:6px;">
+        </label>
+        <button type="submit" class="btn btn-primary btn-block">{% trans "Activate my account" %}</button>
+      </form>
+
+      <p class="text-muted" style="font-size:.78rem;margin:16px 0 0;">
+        {% trans "This link works once and then expires." %}
+      </p>
+    </div>
+  </div>
+</section>
+{% endblock %}

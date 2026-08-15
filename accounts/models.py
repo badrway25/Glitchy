@@ -96,3 +96,39 @@ class Account(AbstractBaseUser):
 
     def has_module_perms(self, add_label):
         return True
+
+class StaffInvite(models.Model):
+    """A single-use, expiring invitation to join the admin.
+
+    We never generate, store, display or email a password. The invite carries a
+    random token; the invitee sets their own password, which activates the
+    account. Everything needed for an audit lives here: who invited whom, with
+    which role, when, and whether it was used."""
+
+    account = models.ForeignKey('accounts.Account', on_delete=models.CASCADE,
+                                related_name='staff_invites')
+    email = models.EmailField(max_length=100)
+    role = models.CharField(max_length=20)
+    token = models.CharField(max_length=64, unique=True, db_index=True)
+    created_by = models.CharField(max_length=150, blank=True, default="")
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    accepted = models.BooleanField(default=False)
+    accepted_at = models.DateTimeField(blank=True, null=True)
+    granted_superadmin = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Staff invite'
+
+    def __str__(self):
+        return f"{self.email} · {self.role}"
+
+    @property
+    def is_expired(self) -> bool:
+        from django.utils import timezone
+        return timezone.now() >= self.expires_at
+
+    @property
+    def is_usable(self) -> bool:
+        return not self.accepted and not self.is_expired

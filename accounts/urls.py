@@ -27,4 +27,6 @@ urlpatterns = [
     path("addresses/<int:address_id>/delete/", views.address_delete, name="address_delete"),
     path("addresses/<int:address_id>/default/", views.address_set_default, name="address_set_default"),
 
+    # Staff invitation acceptance (single-use token; the invitee sets a password).
+    path("staff-invite/<str:token>/", views.staff_invite_accept, name="staff_invite_accept"),
 ]

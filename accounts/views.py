@@ -725,3 +725,48 @@ def resetPassword(request):
             return redirect('resetPassword')
     else:
         return render(request, 'accounts/resetPassword.html')
+
+def staff_invite_accept(request, token):
+    """Consume a staff invitation: the invitee sets their own password.
+
+    The link is single-use and expiring. We never generated a password, so there
+    is nothing to leak; an invalid, used or expired token says exactly that and
+    goes nowhere near the account."""
+    from django.contrib.auth.password_validation import validate_password
+    from django.core.exceptions import ValidationError
+    from django.utils import timezone
+
+    from .models import StaffInvite
+
+    invite = StaffInvite.objects.filter(token=token).select_related("account").first()
+    if invite is None or not invite.is_usable:
+        messages.error(request, _("This invitation link is no longer valid. "
+                                  "Ask an administrator for a new one."))
+        return redirect("login")
+
+    if request.method != "POST":
+        return render(request, "accounts/staff_invite.html", {"invite": invite})
+
+    password1 = request.POST.get("new_password1") or ""
+    password2 = request.POST.get("new_password2") or ""
+    if not password1 or password1 != password2:
+        messages.error(request, _("The two passwords didn't match."))
+        return render(request, "accounts/staff_invite.html", {"invite": invite})
+    try:
+        validate_password(password1, invite.account)
+    except ValidationError as exc:
+        for message in exc.messages:
+            messages.error(request, message)
+        return render(request, "accounts/staff_invite.html", {"invite": invite})
+
+    user = invite.account
+    user.set_password(password1)
+    user.is_active = True
+    user.save()
+
+    invite.accepted = True
+    invite.accepted_at = timezone.now()
+    invite.save(update_fields=["accepted", "accepted_at"])
+
+    messages.success(request, _("Your admin account is ready — please sign in."))
+    return redirect("login")
