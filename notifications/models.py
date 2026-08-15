@@ -136,3 +136,67 @@ class NewsletterSubscriber(models.Model):
 
     def __str__(self):
         return self.email
+
+
+class ContactRequest(models.Model):
+    """A message sent from the public contact page.
+
+    Stored first, dispatched second: if n8n or SMTP is down the customer's message
+    is never lost — it sits here as `pending` and can be retried from the admin."""
+
+    CATEGORY_ORDER = "order"
+    CATEGORY_PAYMENT = "payment"
+    CATEGORY_DELIVERY = "delivery"
+    CATEGORY_RETURNS = "returns"
+    CATEGORY_PRODUCT = "product"
+    CATEGORY_OTHER = "other"
+    CATEGORY_CHOICES = [
+        (CATEGORY_ORDER, _("Order question")),
+        (CATEGORY_PAYMENT, _("Payment problem")),
+        (CATEGORY_DELIVERY, _("Delivery and tracking")),
+        (CATEGORY_RETURNS, _("Return or refund")),
+        (CATEGORY_PRODUCT, _("Product information")),
+        (CATEGORY_OTHER, _("Other")),
+    ]
+
+    STATUS_PENDING = "pending"
+    STATUS_SENT = "sent"
+    STATUS_FAILED = "failed"
+    STATUS_CLOSED = "closed"
+    STATUS_CHOICES = [
+        (STATUS_PENDING, _("Pending")),
+        (STATUS_SENT, _("Sent")),
+        (STATUS_FAILED, _("Failed")),
+        (STATUS_CLOSED, _("Closed")),
+    ]
+
+    name = models.CharField(max_length=120)
+    email = models.EmailField(max_length=254)
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES,
+                                default=CATEGORY_OTHER, db_index=True)
+    order_number = models.CharField(max_length=40, blank=True, default="")
+    message = models.TextField(max_length=4000)
+    language = models.CharField(max_length=5, blank=True, default="en")
+    status = models.CharField(max_length=12, choices=STATUS_CHOICES,
+                              default=STATUS_PENDING, db_index=True)
+    account = models.ForeignKey('accounts.Account', on_delete=models.SET_NULL,
+                                blank=True, null=True, related_name='contact_requests')
+    order = models.ForeignKey('orders.Order', on_delete=models.SET_NULL,
+                              blank=True, null=True, related_name='contact_requests')
+    event = models.ForeignKey('notifications.OutboundEvent', on_delete=models.SET_NULL,
+                              blank=True, null=True, related_name='contact_requests')
+    # sha256 of (email + message + category): lets us drop an accidental double-submit
+    # without storing anything extra about the sender.
+    fingerprint = models.CharField(max_length=64, blank=True, default="", db_index=True)
+    source = models.CharField(max_length=24, blank=True, default="contact_page")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        indexes = [models.Index(fields=["status", "category"])]
+        verbose_name = _("Contact request")
+        verbose_name_plural = _("Contact requests")
+
+    def __str__(self):
+        return f"{self.email} · {self.get_category_display()}"

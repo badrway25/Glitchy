@@ -32,6 +32,7 @@ urlpatterns = [
 urlpatterns += i18n_patterns(
     path("", views.home, name="home"),
     path("faq/", faq_view, name="faq"),
+    path("contact/", views.contact, name="contact"),
     path("privacy/", TemplateView.as_view(template_name="legal/privacy.html",
          extra_context={"legal_title": _("Privacy Policy")}), name="privacy"),
     path("terms/", TemplateView.as_view(template_name="legal/terms.html",

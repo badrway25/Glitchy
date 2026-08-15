@@ -136,7 +136,8 @@ def answer_question(request, query):
         AssistantMessage.objects.create(conversation=conv0, role="user", content=query[:600])
         from .language import detect_language
         return _finalise(conv0, sensitive_refusal(detect_language(query, site_lang=lang0)),
-                         provider="guardrail", grounded=False, sources=[])
+                         provider="guardrail", grounded=False, sources=[],
+                         question=query)
     """Main entry point. Returns a dict the view serialises to JSON."""
     query = (query or "").strip()
     conv, lang = get_or_create_conversation(request)
@@ -158,7 +159,8 @@ def answer_question(request, query):
 
     # Out of scope and nothing to ground on -> decline immediately (no LLM call).
     if not in_scope:
-        return _finalise(conv, decline, provider="guardrail", grounded=False, sources=[])
+        return _finalise(conv, decline, provider="guardrail", grounded=False, sources=[],
+                         question=query)
 
     # Surface real, active collections so the assistant can recommend them (never invented).
     collections = []
@@ -182,7 +184,7 @@ def answer_question(request, query):
             answer = provider.complete(system_prompt, history)
             grounded = decline.split(".")[0] not in answer
             return _finalise(conv, answer, provider=provider.name, products=products, language=msg_lang,
-                             grounded=grounded, sources=sources)
+                             question=query, grounded=grounded, sources=sources)
         except ProviderError:
             pass  # fall through to curated fallback
 
@@ -194,7 +196,8 @@ def answer_question(request, query):
     else:
         answer = fb.answer_from_knowledge(knowledge, lang, decline)
     grounded = bool(knowledge)
-    return _finalise(conv, answer, provider="fallback", grounded=grounded, sources=sources, products=products)
+    return _finalise(conv, answer, provider="fallback", grounded=grounded, sources=sources,
+                     products=products, question=query)
 
 
 def _recent_history(conv, limit=6):
@@ -331,7 +334,8 @@ def _followup_products(conv, limit=4):
         return []
 
 
-def _finalise(conv, answer, provider, grounded, sources, products=None, language=""):
+def _finalise(conv, answer, provider, grounded, sources, products=None, language="",
+              question=""):
     msg = AssistantMessage.objects.create(
         conversation=conv, role="assistant", content=answer,
         provider=provider, grounded=grounded, used_sources=sources,
@@ -344,6 +348,12 @@ def _finalise(conv, answer, provider, grounded, sources, products=None, language
         "message_id": msg.id,
         "can_contact_support": not grounded,
     }
+    if out["can_contact_support"]:
+        # Point at a human instead of ending on "I don't know". Only a category
+        # keyword travels in the URL — never the shopper's words.
+        from .escalation import contact_url_for, guess_category
+        out["contact_url"] = contact_url_for(question)
+        out["contact_category"] = guess_category(question)
     if language:
         out["language"] = language
     if products:

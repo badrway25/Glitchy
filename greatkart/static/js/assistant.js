@@ -247,7 +247,7 @@
         var el = bubble("assistant", d.answer || (I18N.error || "Error"));
         if (d.products && d.products.length) productCards(d.products);
         if (d.message_id) addFeedback(el, d.message_id);
-        if (d.can_contact_support) addSupport();
+        if (d.can_contact_support) addSupport(d.contact_url);
       })
       .catch(function () {
         thinking.remove();
@@ -282,7 +282,7 @@
     afterEl.appendChild(row);
   }
 
-  function addSupport() {
+  function addSupport(contactUrl) {
     if (messages.querySelector(".ai-support")) return;
     var box = document.createElement("div");
     box.className = "ai-support ai-msg ai-msg-assistant";
@@ -292,6 +292,15 @@
     btn.textContent = I18N.contactSupport || "Contact support";
     btn.addEventListener("click", function () { supportFlow(box); });
     box.appendChild(btn);
+    /* Second route: the full contact page with the category pre-selected. The
+       server decides the category — the shopper's words never travel in the URL. */
+    if (contactUrl) {
+      var link = document.createElement("a");
+      link.className = "ai-support-link";
+      link.href = contactUrl;
+      link.textContent = I18N.contactPage || "Contact page";
+      box.appendChild(link);
+    }
     messages.appendChild(box);
     messages.scrollTop = messages.scrollHeight;
   }

@@ -53,3 +53,45 @@ def home(request):
         'visuals': all_visuals(),
     }
     return render(request, 'home.html', context)
+
+
+def contact(request):
+    """Public contact page — a real form backed by the notifications outbox.
+
+    Until now "Contact" was a `mailto:` link in the footer, which loses the message
+    if the visitor has no mail client configured and gives us nothing to track. This
+    stores every request, routes it through the existing n8n/SMTP outbox, and gives
+    support a queue in the admin."""
+    from django.shortcuts import redirect, render
+
+    from notifications.contact import handle_submission, new_form_token
+    from notifications.models import ContactRequest
+
+    categories = ContactRequest.CATEGORY_CHOICES
+    valid = {value for value, _label in categories}
+    selected = (request.GET.get("category") or "").strip()
+    if selected not in valid:
+        selected = ""
+
+    context = {
+        "categories": categories,
+        "selected_category": selected,
+        "form_ts": new_form_token(),
+        "errors": {},
+        "values": {},
+        "sent": False,
+    }
+
+    if request.method == "POST":
+        result = handle_submission(request)
+        if result.ok:
+            # PRG: a refresh must not re-send the message
+            return redirect(f"{request.path}?sent=1")
+        context["errors"] = result.errors
+        context["values"] = {k: request.POST.get(k, "") for k in
+                             ("name", "email", "order_number", "message")}
+        context["selected_category"] = request.POST.get("category", selected)
+        context["form_ts"] = new_form_token()
+
+    context["sent"] = request.GET.get("sent") == "1"
+    return render(request, "store/contact.html", context)

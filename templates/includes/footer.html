@@ -79,7 +79,7 @@
           <div class="footer-title">{% trans "Support" %}</div>
           <ul class="footer-list">
             <li><a class="footer-link" href="{% url 'faq' %}">{% trans "FAQ" %}</a></li>
-            <li><a class="footer-link" href="mailto:{{ SUPPORT_EMAIL }}">{% trans "Contact" %}</a></li>
+            <li><a class="footer-link" href="{% url 'contact' %}">{% trans "Contact us" %}</a></li>
             <li><a class="footer-link" href="{% url 'returns:policy' %}">{% trans "Returns & refunds" %}</a></li>
             <li><a class="footer-link" href="{% url 'faq' %}#shipping">{% trans "Shipping" %}</a></li>
           </ul>

@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+
+{% block title %}{% trans "Contact us" %}{% endblock %}
+{% block meta_description %}{% trans "Get in touch with the Glitchy team about an order, a payment, a delivery or a return." %}{% endblock %}
+
+{% block content %}
+<section class="contact-hero">
+  <div class="container">
+    <span class="contact-kicker">{% trans "Support" %}</span>
+    <h1 class="contact-title">{% trans "Contact us" %}</h1>
+    <p class="contact-sub">{% trans "Tell us what you need and we'll come back to you by email." %}</p>
+  </div>
+</section>
+
+<section class="contact-body">
+  <div class="container">
+    <div class="contact-grid">
+
+      <div class="contact-form-card">
+        {% if sent %}
+          <div class="contact-success" role="status">
+            <span class="contact-success-icon"><i class="fas fa-check" aria-hidden="true"></i></span>
+            <h2>{% trans "Message sent" %}</h2>
+            <p>{% trans "Thanks — we've received your message and will reply to your email address." %}</p>
+            <div class="contact-success-actions">
+              <a href="{% url 'store' %}" class="btn btn-primary">{% trans "Back to the store" %}</a>
+              <a href="{% url 'faq' %}" class="btn btn-soft">{% trans "Read the FAQ" %}</a>
+            </div>
+          </div>
+        {% else %}
+          <h2 class="contact-form-title">{% trans "Send us a message" %}</h2>
+
+          {% if errors.form %}
+            <p class="contact-error" role="alert">{{ errors.form }}</p>
+          {% endif %}
+
+          <form method="post" novalidate class="contact-form">
+            {% csrf_token %}
+            {# anti-spam: hidden honeypot + signed minimum-fill-time token #}
+            <div class="co-hp" aria-hidden="true">
+              <label>Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+            </div>
+            <input type="hidden" name="form_ts" value="{{ form_ts }}">
+
+            <fieldset class="contact-cats">
+              <legend>{% trans "What is your message about?" %}</legend>
+              <div class="contact-cat-grid">
+                {% for value, label in categories %}
+                  <label class="contact-cat">
+                    <input type="radio" name="category" value="{{ value }}"{% if selected_category == value %} checked{% elif not selected_category and forloop.first %} checked{% endif %}>
+                    <span>{{ label }}</span>
+                  </label>
+                {% endfor %}
+              </div>
+              {% if errors.category %}<p class="contact-error">{{ errors.category }}</p>{% endif %}
+            </fieldset>
+
+            <div class="contact-row">
+              <label class="contact-field">
+                <span>{% trans "Your name" %}</span>
+                <input type="text" name="name" value="{{ values.name|default:'' }}" required autocomplete="name">
+                {% if errors.name %}<em class="contact-error">{{ errors.name }}</em>{% endif %}
+              </label>
+              <label class="contact-field">
+                <span>{% trans "Email" %}</span>
+                <input type="email" name="email" value="{{ values.email|default:'' }}" required autocomplete="email">
+                {% if errors.email %}<em class="contact-error">{{ errors.email }}</em>{% endif %}
+              </label>
+            </div>
+
+            <label class="contact-field">
+              <span>{% trans "Order number" %} <em class="contact-optional">{% trans "optional" %}</em></span>
+              <input type="text" name="order_number" value="{{ values.order_number|default:'' }}" inputmode="numeric">
+            </label>
+
+            <label class="contact-field">
+              <span>{% trans "How can we help?" %}</span>
+              <textarea name="message" rows="6" required>{{ values.message|default:'' }}</textarea>
+              {% if errors.message %}<em class="contact-error">{{ errors.message }}</em>{% endif %}
+            </label>
+
+            <label class="contact-consent">
+              <input type="checkbox" name="consent" value="1">
+              <span>{% blocktrans %}I agree that Glitchy may use my email to reply to this message, as described in the <a href="/privacy/">privacy policy</a>.{% endblocktrans %}</span>
+            </label>
+            {% if errors.consent %}<p class="contact-error">{{ errors.consent }}</p>{% endif %}
+
+            <button type="submit" class="btn btn-primary contact-submit">{% trans "Send message" %}</button>
+          </form>
+        {% endif %}
+      </div>
+
+      <aside class="contact-aside">
+        <div class="contact-side-card">
+          <h3>{% trans "Before you write" %}</h3>
+          <p>{% trans "These answer most questions straight away." %}</p>
+          <ul class="contact-links">
+            <li><a href="{% url 'faq' %}">{% trans "Frequently asked questions" %}</a></li>
+            <li><a href="{% url 'returns:policy' %}">{% trans "Returns policy" %}</a></li>
+            <li><a href="{% url 'store' %}">{% trans "Browse the store" %}</a></li>
+          </ul>
+        </div>
+        <div class="contact-side-card">
+          <h3>{% trans "Response time" %}</h3>
+          <p>{% trans "We reply by email, usually within one business day." %}</p>
+        </div>
+        <div class="contact-side-card contact-side-quiet">
+          <h3>{% trans "Track an order" %}</h3>
+          <p>{% trans "Order updates are emailed to you as soon as your parcel moves." %}</p>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+</section>
+{% endblock %}
