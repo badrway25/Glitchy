@@ -59,7 +59,7 @@
         <a href="{% url 'store' %}" class="btn btn-primary btn-block">
           {% trans "Continue shopping" %} <i class="fa fa-arrow-right ml-2"></i>
         </a>
-        <a href="mailto:{{ SUPPORT_EMAIL }}" class="btn btn-soft btn-block">
+        <a href="{% if SUPPORT_EMAIL %}mailto:{{ SUPPORT_EMAIL }}{% else %}{% url 'contact' %}?category=order{% endif %}" class="btn btn-soft btn-block">
           <i class="fa fa-headset mr-2"></i>{% trans "Contact support" %}
         </a>
       </div>

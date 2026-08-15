@@ -22,5 +22,5 @@
 <p>{% trans "To the extent permitted by law, our liability is limited to the value of your order. Nothing in these terms excludes liability that cannot be excluded by law." %}</p>
 
 <h2>{% trans "Contact" %}</h2>
-<p>{% trans "Email" %}: <a href="mailto:{{ SUPPORT_EMAIL }}">{{ SUPPORT_EMAIL }}</a></p>
+<p>{% if SUPPORT_EMAIL %}{% trans "Email" %}: <a href="mailto:{{ SUPPORT_EMAIL }}">{{ SUPPORT_EMAIL }}</a>{% else %}<a href="{% url 'contact' %}">{% trans "Contact us" %}</a>{% endif %}</p>
 {% endblock %}

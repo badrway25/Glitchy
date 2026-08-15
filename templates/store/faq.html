@@ -52,7 +52,7 @@
         <button type="button" class="btn btn-primary" onclick="document.getElementById('aiToggle')?.click()">
           {% icon "headset" "ic" 16 %} {% trans "Ask the assistant" %}
         </button>
-        <a href="mailto:{{ SUPPORT_EMAIL }}" class="btn btn-soft">{% trans "Email support" %}</a>
+        <a href="{% if SUPPORT_EMAIL %}mailto:{{ SUPPORT_EMAIL }}{% else %}{% url 'contact' %}{% endif %}" class="btn btn-soft">{% if SUPPORT_EMAIL %}{% trans "Email support" %}{% else %}{% trans "Contact support" %}{% endif %}</a>
       </div>
     </div>
 

@@ -28,5 +28,5 @@
 <p>{% trans "We keep order records as long as required for accounting/legal obligations, then delete or anonymise them." %}</p>
 
 <h2>{% trans "Contact" %}</h2>
-<p>{% trans "Email" %}: <a href="mailto:{{ SUPPORT_EMAIL }}">{{ SUPPORT_EMAIL }}</a></p>
+<p>{% if SUPPORT_EMAIL %}{% trans "Email" %}: <a href="mailto:{{ SUPPORT_EMAIL }}">{{ SUPPORT_EMAIL }}</a>{% else %}<a href="{% url 'contact' %}">{% trans "Contact us" %}</a>{% endif %}</p>
 {% endblock %}

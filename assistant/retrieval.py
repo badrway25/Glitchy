@@ -158,7 +158,15 @@ def store_facts(query, lang="en"):
     if days:
         lines.append(f"Returns: customers can request a return within {days} days; "
                      "the returns page has the step-by-step procedure.")
-    support = getattr(settings, "SUPPORT_EMAIL", "")
+    # Only feed the model a REAL support address. When SUPPORT_EMAIL is a
+    # placeholder (unset env → *.example.com), telling the model about it makes the
+    # assistant quote a dead address (F5); instead steer it to the contact form.
+    from greatkart.support_email import public_support_email
+    support = public_support_email()
     if support:
         lines.append(f"Support contact: {support}.")
+    else:
+        lines.append("For anything the knowledge base cannot answer, direct the "
+                     "customer to the contact form at /contact/ — never invent or "
+                     "quote a support email address.")
     return chr(10).join(lines)

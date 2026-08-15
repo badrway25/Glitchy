@@ -23,5 +23,5 @@
 <p>{% trans "You can clear or block cookies in your browser settings; note that blocking strictly-necessary cookies will break checkout and sign-in." %}</p>
 
 <h2>{% trans "Contact" %}</h2>
-<p>{% trans "Email" %}: <a href="mailto:{{ SUPPORT_EMAIL }}">{{ SUPPORT_EMAIL }}</a></p>
+<p>{% if SUPPORT_EMAIL %}{% trans "Email" %}: <a href="mailto:{{ SUPPORT_EMAIL }}">{{ SUPPORT_EMAIL }}</a>{% else %}<a href="{% url 'contact' %}">{% trans "Contact us" %}</a>{% endif %}</p>
 {% endblock %}

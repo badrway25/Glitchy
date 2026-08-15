@@ -3,6 +3,15 @@ import os
 from django.conf import settings
 
 
+def _public_support_email():
+    """SUPPORT_EMAIL only when it is a real address — '' for placeholders (F5)."""
+    try:
+        from greatkart.support_email import public_support_email
+        return public_support_email()
+    except Exception:
+        return ""
+
+
 def _paypal_enabled():
     try:
         from payments import config as pconf
@@ -79,6 +88,8 @@ def site_globals(request):
         "PAYPAL_CURRENCY": getattr(settings, "PAYPAL_CURRENCY", "EUR"),
         "PAYPAL_ENABLED": _paypal_enabled(),
         "STRIPE_CURRENCY": getattr(settings, "STRIPE_CURRENCY", "eur").upper(),
-        "SUPPORT_EMAIL": getattr(settings, "SUPPORT_EMAIL", ""),
+        # Guarded: empty when SUPPORT_EMAIL is a placeholder, so no customer-facing
+        # template ever renders `support@example.com`. Templates fall back to /contact/.
+        "SUPPORT_EMAIL": _public_support_email(),
         "AI_ASSISTANT_ENABLED": getattr(settings, "AI_ASSISTANT_ENABLED", False),
     }
