@@ -128,7 +128,8 @@ class ColorImageMapInline(admin.TabularInline):
 @admin.register(Product)
 class ProductAdmin(BaseModelAdmin):
     list_display = ("thumb", "product_name", "price", "margin_hint", "quality_score",
-                    "img_count", "variant_count", "stock", "category", "sync_badge",
+                    "img_count", "variant_count", "express_ready", "stock", "category",
+                    "sync_badge",
                     "is_available", "is_bestseller")
     list_display_links = ("thumb", "product_name")
     list_filter = ("category", "is_available", "is_bestseller", "is_featured",
@@ -202,6 +203,12 @@ class ProductAdmin(BaseModelAdmin):
         n = n if n is not None else (obj.gallery.count() if hasattr(obj, "gallery") else 0)
         color = "#dc2626" if not n else "inherit"
         return format_html('<span style="color:{}">{}</span>', color, n)
+
+    @admin.display(description=_("Express"), boolean=True,
+                   ordering="printify_express_eligible")
+    def express_ready(self, obj):
+        """Printify Express eligibility as reported by the API (product level)."""
+        return bool(obj.printify_express_eligible and obj.printify_express_enabled)
 
     @admin.display(description=_("Vars"), ordering="_var_n")
     def variant_count(self, obj):

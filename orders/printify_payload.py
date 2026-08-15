@@ -70,10 +70,27 @@ def build_printify_payload(*, order, order_products):
             "quantity": int(op.quantity),
         })
 
-    return {
+    from shipping.express import is_express, shipping_method_id
+
+    method = getattr(order, "shipping_method", "") or "standard"
+    payload = {
         "external_id": str(order.order_number),
         "label": f"Order {order.order_number}",
         "line_items": line_items,
+        # Printify's integer vocabulary: 1 standard · 2 priority · 3 express · 4 economy.
+        # Previously absent, so Printify silently defaulted every order to standard even
+        # when the customer paid for something faster.
+        "shipping_method": shipping_method_id(method),
         "send_shipping_notification": True,
         "address_to": address_to,
     }
+    if is_express(method):
+        # The express endpoint requires both contact fields on address_to; refuse
+        # to submit rather than have Printify reject (or silently downgrade) an
+        # order the customer already paid Express for.
+        missing = [f for f in ("email", "phone") if not str(address_to.get(f) or "").strip()]
+        if missing:
+            raise ValueError(
+                "Printify Express requires address_to.%s" % " and address_to.".join(missing))
+        payload["is_printify_express"] = True
+    return payload

@@ -58,6 +58,14 @@ class Product(models.Model):
     printify_tags = models.CharField(max_length=400, blank=True, default="")
     printify_options_summary = models.CharField(max_length=300, blank=True, default="",
                                                 help_text="e.g. 'Sizes: S–XXL · Colours: 5'")
+    # Printify Express eligibility, captured verbatim from the product payload
+    # (`is_printify_express_eligible` / `is_printify_express_enabled`). Express is
+    # offered only when BOTH are true, the variants qualify and the destination
+    # allows it — see shipping/express.py.
+    printify_express_eligible = models.BooleanField(
+        default=False, help_text="Printify reports this product as Express-eligible")
+    printify_express_enabled = models.BooleanField(
+        default=False, help_text="Express is switched on for this product in Printify")
     printify_description_raw = models.TextField(blank=True, default="",
                                                 help_text="Original (uncleaned) Printify description as "
                                                           "received at sync time — admin reference only, "
@@ -367,6 +375,8 @@ class Variation(models.Model):
     printify_is_available = models.BooleanField(default=True)
     printify_is_default = models.BooleanField(default=False)
     printify_grams = models.IntegerField(default=0)
+    printify_express_eligible = models.BooleanField(
+        default=False, help_text="Printify reports this variant as Express-eligible")
     printify_synced_at = models.DateTimeField(blank=True, null=True)
 
     objects = VariationManager()

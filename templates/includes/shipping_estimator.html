@@ -14,6 +14,10 @@ Context vars (optional): ship_estimator_subtotal (Decimal), ship_estimator_varia
      data-msg-error="{% trans 'Could not estimate shipping. Please try again.' %}"
      data-msg-network="{% trans 'Network error. Please check your connection and try again.' %}"
      data-msg-country="{% trans 'Please choose a delivery country.' %}"
+     data-label-fastest="{% trans 'Fastest' %}"
+     data-msg-express-phone="{% trans 'Phone number required for Express delivery' %}"
+     data-msg-express-destination="{% trans 'Express delivery is not available for this destination' %}"
+     data-msg-express-items="{% trans 'Available for eligible products only' %}"
      data-label-subtotal="{% trans 'Subtotal' %}"
      data-label-shipping="{% trans 'Shipping' %}"
      data-label-total="{% trans 'Estimated total' %}"
@@ -74,6 +78,7 @@ Context vars (optional): ship_estimator_subtotal (Decimal), ship_estimator_varia
       <div class="se-line se-grand"><span data-se-tl-total>{% trans "Estimated total" %}</span><span data-se-total-val></span></div>
     </div>
     <p class="se-mixed" data-se-mixed hidden>{% trans "Some items use estimated shipping data." %}</p>
+    <p class="se-express-note" data-se-express-note hidden></p>
     <p class="se-disclaimer" data-se-disclaimer></p>
   </div>
 

@@ -145,6 +145,7 @@ def _sync_variations(product: Product, p: dict):
             "printify_is_available": bool(v.get("is_available", True)),
             "printify_is_default": bool(v.get("is_default", False)),
             "printify_grams": int(v.get("grams") or 0),
+            "printify_express_eligible": bool(v.get("is_printify_express_eligible", False)),
             "printify_synced_at": timezone.now(),
         }
         for oid in v.get("options") or []:
@@ -276,6 +277,10 @@ def _upsert_product(p: dict, fallback_category, settings_map, overwrite_category
     tags = p.get("tags") or []
     obj.printify_tags = ", ".join(str(t) for t in tags)[:400]
     obj.printify_options_summary = _options_summary(p.get("options") or [])
+    # Express eligibility straight from the payload — never inferred (see
+    # shipping/express.py for how it is used).
+    obj.printify_express_eligible = bool(p.get("is_printify_express_eligible", False))
+    obj.printify_express_enabled = bool(p.get("is_printify_express_enabled", False))
     # keep the original (uncleaned) description for admin reference / future re-parsing
     obj.printify_description_raw = (p.get("description") or "")[:8000]
     obj.save()

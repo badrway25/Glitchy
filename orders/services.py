@@ -113,6 +113,36 @@ def backfill_order_costs(*, only_zero=True, dry_run=False):
 # --------------------------------------------------------------------------- #
 # Printify push (idempotent)
 # --------------------------------------------------------------------------- #
+def _create_express_order(payload):
+    """Submit through Printify's Express endpoint and normalise the response.
+
+    Express may SPLIT a mixed cart into several Printify orders
+    (`data[].attributes.fulfilment_type` = "express" | "ordinary"). We adopt the
+    express order as the primary id and record every id, so the sync/timeline
+    never loses the sibling and support can see exactly what happened."""
+    from printify_integration.printify_client import get_client
+
+    res = get_client().create_express_order(payload) or {}
+    data = res.get("data")
+    if not isinstance(data, list) or not data:
+        return res if isinstance(res, dict) else {}
+
+    orders = [d for d in data if isinstance(d, dict) and d.get("id")]
+    if not orders:
+        return {}
+    express = next((d for d in orders
+                    if (d.get("attributes") or {}).get("fulfilment_type") == "express"),
+                   orders[0])
+    ids = [str(d.get("id")) for d in orders]
+    return {
+        "id": express.get("id"),
+        "status": (express.get("attributes") or {}).get("status") or "created",
+        "split_order_ids": ids,
+        "fulfilment_types": [(d.get("attributes") or {}).get("fulfilment_type", "")
+                             for d in orders],
+    }
+
+
 def push_order_to_printify(order, *, auto_send=True):
     if order.printify_order_id:
         return order.printify_order_id
@@ -133,11 +163,20 @@ def push_order_to_printify(order, *, auto_send=True):
 
     try:
         payload = build_printify_payload(order=order, order_products=ops)
-        res = create_order(payload)
+        from shipping.express import is_express
+        if is_express(getattr(order, "shipping_method", "")):
+            res = _create_express_order(payload)
+        else:
+            res = create_order(payload)
 
         order.printify_order_id = res.get("id")
         order.printify_status = res.get("status") or "created"
         order.printify_last_error = ""
+        split_ids = [i for i in (res.get("split_order_ids") or [])
+                     if str(i) != str(order.printify_order_id)]
+        if split_ids:
+            # visible, safe breadcrumb: a mixed Express cart became 2 Printify orders
+            order.printify_last_error = "Express split — sibling order(s): %s" % ", ".join(split_ids)
         order.save(update_fields=["printify_order_id", "printify_status", "printify_last_error"])
 
         if auto_send and order.printify_order_id:

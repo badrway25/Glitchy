@@ -140,6 +140,16 @@ class PrintifyClient:
         sid = shop_id or self.shop_id
         return self._post(f"/shops/{sid}/orders.json", json=payload)
 
+    def create_express_order(self, payload, shop_id=None):
+        """POST /shops/{id}/orders/express.json — Printify Express submission.
+
+        Printify may SPLIT a mixed cart: the response is {"data": [ {...} ]} where
+        each entry carries `attributes.fulfilment_type` = "express" | "ordinary",
+        each with its own order id. Callers must handle more than one order back.
+        """
+        sid = shop_id or self.shop_id
+        return self._post(f"/shops/{sid}/orders/express.json", json=payload)
+
     def send_to_production(self, order_id, shop_id=None):
         sid = shop_id or self.shop_id
         return self._post(f"/shops/{sid}/orders/{order_id}/send_to_production.json", json={})
