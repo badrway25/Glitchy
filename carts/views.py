@@ -353,6 +353,32 @@ def _estimate_throttled(request) -> bool:
     return False
 
 
+def _quote_for_request(request, cart_items, *, country, postal_code="", state="",
+                       city="", address1="", address2="", phone="", method=None,
+                       discount=None):
+    """The canonical quote for this request — one engine, one number.
+
+    Applies the session coupon so the JSON summary and the rendered Order summary
+    can never disagree about the grand total."""
+    from decimal import Decimal
+
+    from promotions.services import applied_coupon
+    from shipping.quote import checkout_quote
+    from shipping.session import get_shipping_method
+
+    subtotal = sum(float(getattr(getattr(i, "product", None), "price", 0) or 0)
+                   * int(getattr(i, "quantity", 0) or 0) for i in cart_items or [])
+    if discount is None:
+        _coupon, discount_dec = applied_coupon(request, Decimal(str(round(subtotal, 2))))
+        discount = float(discount_dec or 0)
+    if method is None:
+        method = get_shipping_method(request)
+    return checkout_quote(cart_items, country=country, postal_code=postal_code,
+                          state=state, city=city, address1=address1,
+                          address2=address2, phone=phone, method=method,
+                          discount=discount)
+
+
 @require_POST
 def shipping_estimate(request):
     """Pre-order shipping estimate (cost + delivery time) for the current cart.
@@ -360,8 +386,8 @@ def shipping_estimate(request):
     CSRF-protected, POST-only. Reads the cart SERVER-SIDE and never trusts any
     client-supplied price or cost. Returns JSON; never creates an order.
     """
-    from printify_integration.shipping_estimator import estimate_for_cart
     from shipping.geo import set_manual_country
+    from shipping.session import set_shipping_method
 
     if _estimate_throttled(request):
         return JsonResponse({"available": False, "errors_safe": ["rate_limited"],
@@ -373,6 +399,9 @@ def shipping_estimate(request):
     region = (request.POST.get("region") or "").strip()[:64]
     city = (request.POST.get("city") or "").strip()[:64]
     method = (request.POST.get("shipping_method") or "").strip()[:24]
+    address1 = (request.POST.get("address1") or "").strip()[:120]
+    address2 = (request.POST.get("address2") or "").strip()[:120]
+    phone = (request.POST.get("phone") or "").strip()[:40]
 
     if len(country) != 2 or not country.isalpha():
         return JsonResponse({"available": False, "errors_safe": ["invalid_country"],
@@ -383,9 +412,37 @@ def shipping_estimate(request):
     set_manual_country(request, country)
 
     cart_items = list(_active_cart_items(request))
-    result = estimate_for_cart(cart_items, country, postal_code=postal_code,
-                               region=region, city=city, shipping_method=method)
-    return JsonResponse(result.as_dict(), status=200)
+    # ONE quote: the estimator used to run twice here (once for the widget, once
+    # inside the quote), so the payload could mix a cached estimate's provenance
+    # with freshly computed money. The canonical quote now supplies both.
+    quote = _quote_for_request(request, cart_items, country=country,
+                               postal_code=postal_code, state=region, city=city,
+                               address1=address1, address2=address2, phone=phone,
+                               method=method)
+    # persist the chosen method only when it survived validation server-side
+    set_shipping_method(request, quote.method)
+
+    summary = quote.as_dict()
+    payload = {
+        "available": quote.available,
+        "country": quote.country,
+        "currency": quote.currency,
+        "source": quote.source,
+        "source_label": "",
+        "disclaimer": summary["message"],
+        "delivery_label": summary["delivery_label"],
+        "delivery_days_min": quote.delivery_days_min,
+        "delivery_days_max": quote.delivery_days_max,
+        "estimated_delivery_from": quote.estimated_delivery_from,
+        "estimated_delivery_to": quote.estimated_delivery_to,
+        "errors_safe": quote.errors_safe,
+        "mixed_sources": False,
+        "options": summary["options"],
+        "selected_method": quote.method,
+        "shipping_cost": quote.shipping_cost,
+        "summary": summary,
+    }
+    return JsonResponse(payload, status=200)
 
 
 def cart(request, total=0, quantity=0, cart_items=None):
@@ -476,16 +533,31 @@ def checkout(request, total=0, quantity=0, cart_items=None):
         return redirect("store")
 
     country = detect_country(request)
-    totals = compute_cart_totals(cart_items, country)
+    from shipping.session import get_shipping_method
+    method = get_shipping_method(request)
+
+    # Re-validate the session coupon against the live subtotal (anti-abuse + min order),
+    # then price ONCE with the discount inside, so the canonical quote handed to the page
+    # and the numbers rendered in the summary can never disagree.
+    from decimal import Decimal
+    from promotions.services import applied_coupon
+    preview = compute_cart_totals(cart_items, country, method=method)
+    coupon, discount = applied_coupon(request, preview.items_subtotal)
+    totals = compute_cart_totals(cart_items, country, method=method,
+                                 discount=float(discount or 0))
+    # This render has no address or phone yet, so a premium method cannot be
+    # verified here and the quote degrades it to standard. Persist that downgrade
+    # so place_order charges exactly what this page is about to show — the shopper
+    # re-picks Express in the delivery widget, where the address IS known.
+    if totals.shipping_method != method:
+        from shipping.session import set_shipping_method
+        set_shipping_method(request, totals.shipping_method)
     total = totals.items_subtotal
     quantity = totals.quantity
     tax = totals.tax
-
-    # Re-validate the session coupon against the live subtotal (anti-abuse + min order).
-    from decimal import Decimal
-    from promotions.services import applied_coupon
-    coupon, discount = applied_coupon(request, totals.items_subtotal)
-    grand_total = float(max(Decimal("0"), Decimal(str(totals.grand_total)) - discount))
+    grand_total = float(max(Decimal("0"), Decimal(str(totals.grand_total))))
+    # the canonical payload the summary renders from and the AJAX endpoint repaints
+    checkout_quote_obj = totals.quote
 
     # Guests check out without an account; no saved addresses.
     if not request.user.is_authenticated:
@@ -500,6 +572,8 @@ def checkout(request, total=0, quantity=0, cart_items=None):
             "shipping_quote": totals.shipping_quote, "prefill": prefill,
             "addresses": [], "default_addr": None, "is_guest": True,
             "coupon": coupon, "discount": discount,
+            "shipping_method": totals.shipping_method,
+            "checkout_quote": checkout_quote_obj.as_dict() if checkout_quote_obj else None,
         }
         context.update(_checkout_extras(request, prefill))
         return render(request, "store/checkout.html", context)
@@ -570,6 +644,8 @@ def checkout(request, total=0, quantity=0, cart_items=None):
         "default_addr": default_addr,
         "is_guest": False,
         "coupon": coupon, "discount": discount,
+        "shipping_method": totals.shipping_method,
+        "checkout_quote": checkout_quote_obj.as_dict() if checkout_quote_obj else None,
     }
     context.update(_checkout_extras(request, prefill))
     return render(request, "store/checkout.html", context)

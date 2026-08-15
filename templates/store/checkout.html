@@ -307,18 +307,20 @@
               {% endfor %}
             </div>
 
-            <div class="summary-lines">
-              <div class="line"><span>{% trans "Subtotal" %}</span><span>{{ CURRENCY_SYMBOL }} {{ total }}</span></div>
-              {% if discount %}
-              <div class="line line-discount"><span>{% trans "Discount" %} {% if coupon %}({{ coupon.code }}){% endif %}</span><span>− {{ CURRENCY_SYMBOL }} {{ discount }}</span></div>
-              {% endif %}
+            {% comment %}Data hooks so the ONE quote endpoint can repaint these numbers
+            in place: the summary and the delivery widget must never disagree.{% endcomment %}
+            <div class="summary-lines" data-summary-lines>
+              <div class="line"><span>{% trans "Subtotal" %}</span><span data-sum-subtotal>{{ CURRENCY_SYMBOL }} {{ total }}</span></div>
+              <div class="line line-discount" data-sum-discount-row {% if not discount %}hidden{% endif %}><span>{% trans "Discount" %} {% if coupon %}({{ coupon.code }}){% endif %}</span><span>− <span data-sum-discount>{{ CURRENCY_SYMBOL }} {{ discount }}</span></span></div>
               <div class="line">
-                <span>{% trans "Shipping" %}</span>
-                <span>{% if shipping_cost %}{{ CURRENCY_SYMBOL }} {{ shipping_cost }}{% else %}{% trans "Free" %}{% endif %}</span>
+                <span>{% trans "Shipping" %} <em class="sum-method" data-sum-method>{{ checkout_quote.delivery_label }}</em></span>
+                <span data-sum-shipping>{% if shipping_cost %}{{ CURRENCY_SYMBOL }} {{ shipping_cost }}{% else %}{% trans "Free" %}{% endif %}</span>
               </div>
-              <div class="line"><span>{% trans "Tax" %}</span><span>{{ CURRENCY_SYMBOL }} {{ tax }}</span></div>
-              <div class="line grand"><span>{% trans "Grand total" %}</span><span>{{ CURRENCY_SYMBOL }} {{ grand_total }}</span></div>
+              <div class="line"><span>{% trans "Tax" %}</span><span data-sum-tax>{{ CURRENCY_SYMBOL }} {{ tax }}</span></div>
+              <div class="line grand"><span>{% trans "Grand total" %}</span><span data-sum-grand>{{ CURRENCY_SYMBOL }} {{ grand_total }}</span></div>
+              <p class="sum-updated" data-sum-updated hidden>{% trans "Order summary updated" %}</p>
             </div>
+            <input type="hidden" name="shipping_method" id="shippingMethodInput" value="{{ shipping_method|default:'standard' }}">
 
             {% include 'includes/shipping_estimator.html' with ship_estimator_subtotal=total ship_estimator_variant='checkout' ship_estimator_country_from='countryInput' ship_estimator_zip_from='postalCodeInput' %}
 

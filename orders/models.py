@@ -60,6 +60,9 @@ class Order(models.Model):
     refunded_amount = models.FloatField(default=0.0)
 
     # --- Shipping / locale ---
+    # The delivery method the customer chose and paid for. Drives the Printify
+    # submission (standard=1 / priority=2 / express=3 via /orders/express.json).
+    shipping_method = models.CharField(max_length=24, blank=True, default="standard")
     shipping_country = models.CharField(max_length=2, blank=True, default="")
     shipping_min_days = models.PositiveIntegerField(default=0)
     shipping_max_days = models.PositiveIntegerField(default=0)

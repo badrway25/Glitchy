@@ -220,12 +220,21 @@ def _resolve_variant_id(cart_item):
     vid = getattr(cart_item, "printify_variant_id", None)
     if vid:
         return _int_or_none(vid)
-    for v in cart_item.variations.all():
+    # tolerate lines without a variations manager (totals may price duck-typed
+    # or detached items — an estimate must never raise on a shape it can skip)
+    variations = getattr(cart_item, "variations", None)
+    try:
+        rows = list(variations.all()) if variations is not None else []
+    except Exception:
+        rows = []
+    for v in rows:
         if getattr(v, "printify_variant_id", None):
             got = _int_or_none(v.printify_variant_id)
             if got:
                 return got
-    product = cart_item.product
+    product = getattr(cart_item, "product", None)
+    if product is None or not hasattr(product, "variation_set"):
+        return None
     var = (product.variation_set.filter(printify_variant_id__isnull=False)
            .exclude(printify_variant_id="")
            .order_by("-printify_is_default", "id").first())
@@ -470,7 +479,8 @@ def _single_option(method, cost, free, handling_min=None, handling_max=None, day
 # Public API
 # --------------------------------------------------------------------------- #
 def estimate_for_cart(cart_items, country, *, postal_code="", region="", city="",
-                      shipping_method="", subtotal=None, use_cache=True):
+                      shipping_method="", subtotal=None, use_cache=True,
+                      cost_map_cents=None):
     """Return a ShippingEstimateResult for the cart + destination.
 
     Tries live Printify → cached profile → local fallback, degrading gracefully
@@ -522,7 +532,10 @@ def estimate_for_cart(cart_items, country, *, postal_code="", region="", city=""
         for it in cart_items)
 
     # ---- Tier 1: live Printify -------------------------------------------- #
-    cost_map, err = _live_cost_map(cart_items, country, postal_code, region, city)
+    if cost_map_cents:            # caller already has the live map (or a test seam)
+        cost_map, err = dict(cost_map_cents), ""
+    else:
+        cost_map, err = _live_cost_map(cart_items, country, postal_code, region, city)
     if cost_map:
         options, selected = _options_from_live(cost_map, free, selected)
         result = _finalise(options, selected, SOURCE_LIVE,
@@ -534,7 +547,12 @@ def estimate_for_cart(cart_items, country, *, postal_code="", region="", city=""
         errors.append(err)
 
     # ---- Tier 2: cached catalog profile ----------------------------------- #
-    prof = _cached_profile_cost(cart_items, country, total_qty)
+    # Gated on the SAME switch as the money engine (shipping.services.quote_for_cart).
+    # Without this gate the widget quoted catalog profiles while the Order summary and
+    # the actual charge used the local rate table — the two disagreed on the same
+    # cart and country (IT: 10.00 vs 4.90).
+    prof = (_cached_profile_cost(cart_items, country, total_qty)
+            if getattr(settings, "SHIPPING_USE_PRINTIFY", False) else None)
     if prof is not None:
         win = _window_from_profile(prof["handling"], prof["min_delivery"], prof["max_delivery"])
         cost = 0.0 if free else prof["cost"]

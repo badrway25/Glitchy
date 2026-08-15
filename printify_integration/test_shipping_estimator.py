@@ -120,6 +120,7 @@ class FallbackTierTests(TestCase):
         self.p = _product()
         self.cart = [_StubItem(self.p, quantity=2)]
 
+    @override_settings(SHIPPING_USE_PRINTIFY=True)
     def test_cached_profile_used_when_present(self):
         PrintifyShippingProfile.objects.create(
             blueprint_id=145, print_provider_id=29, country_code="IT",
@@ -129,6 +130,23 @@ class FallbackTierTests(TestCase):
         self.assertEqual(r.source, se.SOURCE_CACHED)
         self.assertEqual(r.shipping_cost, 7.0)  # 5 + 2*(2-1)
 
+    def test_cached_profile_ignored_when_printify_engine_disabled(self):
+        """The profile tier is gated on SHIPPING_USE_PRINTIFY like the money engine.
+        Without the gate the delivery widget quoted catalog profiles while the Order
+        summary and the actual charge used the local rate table — they disagreed on
+        the same cart and country."""
+        PrintifyShippingProfile.objects.create(
+            blueprint_id=145, print_provider_id=29, country_code="IT",
+            first_item_cost=5.0, additional_item_cost=2.0, currency="EUR",
+            handling_days=4, min_delivery_days=7, max_delivery_days=12)
+        r = se.estimate_for_cart(self.cart, "IT", postal_code="20100", use_cache=False)
+        self.assertEqual(r.source, se.SOURCE_LOCAL)
+        from shipping.services import fallback_quote
+        self.assertAlmostEqual(r.shipping_cost,
+                               fallback_quote("IT", total_quantity=2, subtotal=0).cost,
+                               places=2)
+
+    @override_settings(SHIPPING_USE_PRINTIFY=True)
     def test_cached_profile_window_matches_profile_and_option(self):
         # Regression: the header delivery range must equal the profile's own range
         # (no double-counting transit on top) and match the selected option.

@@ -27,7 +27,11 @@
       error: root.getAttribute("data-msg-error"),
       network: root.getAttribute("data-msg-network"),
       country: root.getAttribute("data-msg-country"),
-      free: root.getAttribute("data-label-free") || "Free"
+      free: root.getAttribute("data-label-free") || "Free",
+      fastest: root.getAttribute("data-label-fastest") || "Fastest",
+      expressPhone: root.getAttribute("data-msg-express-phone") || "",
+      expressDestination: root.getAttribute("data-msg-express-destination") || "",
+      expressItems: root.getAttribute("data-msg-express-items") || ""
     };
 
     // `panel` is a <div>, not a <form> (the widget can sit inside the checkout
@@ -57,7 +61,8 @@
 
     if (!panel || !submitBtn || !endpoint) return;
 
-    var current = null; // last result payload
+    var current = null;  // last result payload
+    var selectedMethod = "";
 
     function setBusy(busy) {
       submitBtn.disabled = busy;
@@ -71,7 +76,7 @@
       if (errorBox) { errorBox.hidden = false; errorBox.textContent = text || msg.error; }
     }
 
-    function selectMethod(method) {
+    function selectMethod(method, userInitiated) {
       if (!current || !current.options) return;
       var opt = null;
       current.options.forEach(function (o) {
@@ -95,10 +100,70 @@
       if (subtotalVal) subtotalVal.textContent = money(symbol, subtotal);
       if (shippingVal) shippingVal.textContent = opt.free ? msg.free : money(symbol, cost);
       if (totalVal) totalVal.textContent = money(symbol, subtotal + cost);
-      // Let the checkout page sync its own summary if it wants to.
+      selectedMethod = opt.method;
+      var hidden = document.getElementById("shippingMethodInput");
+      if (hidden) hidden.value = opt.method;
+      /* A method change re-prices the order server-side: ask for the authoritative
+         summary rather than doing arithmetic in the browser. */
+      if (current && current.summary) paintSummary(current.summary);
+      /* A user-picked method must be re-priced server-side (Express costs more):
+         re-estimate instead of doing arithmetic in the browser. */
+      if (userInitiated) estimate();
       root.dispatchEvent(new CustomEvent("shipping:method", {
         bubbles: true, detail: { method: opt.method, cost: cost, free: !!opt.free, result: current }
       }));
+    }
+
+    /* Express is eligibility-based: say why it is unavailable rather than
+       silently hiding it, but never promise it where Printify cannot deliver. */
+    function paintExpressNote(summary) {
+      var note = root.querySelector("[data-se-express-note]");
+      if (!note) return;
+      var blockers = (summary && summary.express_blockers) || [];
+      var reason = "";
+      if (blockers.indexOf("phone_required") !== -1) {
+        reason = msg.expressPhone;
+      } else if (blockers.indexOf("destination_not_supported") !== -1 ||
+                 blockers.indexOf("po_box") !== -1) {
+        reason = msg.expressDestination;
+      } else if (blockers.indexOf("items_not_eligible") !== -1) {
+        reason = msg.expressItems;
+      }
+      note.textContent = reason || "";
+      note.hidden = !reason;
+    }
+
+    /* ---- Order summary repaint — one payload, one set of numbers ------------ */
+    function fieldValue(id) {
+      var el = document.getElementById(id);
+      return (el && el.value || "").trim();
+    }
+
+    function paintSummary(s) {
+      if (!s) return;
+      var box = document.querySelector("[data-summary-lines]");
+      if (!box) return;
+      var set = function (sel, value) {
+        var el = box.querySelector(sel);
+        if (el && value !== undefined && value !== null) el.textContent = value;
+      };
+      set("[data-sum-subtotal]", s.items_subtotal_display);
+      set("[data-sum-shipping]", s.shipping_display);
+      set("[data-sum-tax]", s.tax_display);
+      set("[data-sum-grand]", s.grand_total_display);
+      set("[data-sum-method]", s.delivery_label || "");
+      var discountRow = box.querySelector("[data-sum-discount-row]");
+      if (discountRow) {
+        var hasDiscount = parseFloat(s.discount || 0) > 0;
+        discountRow.hidden = !hasDiscount;
+        if (hasDiscount) set("[data-sum-discount]", s.discount_display);
+      }
+      var flag = box.querySelector("[data-sum-updated]");
+      if (flag) {
+        flag.hidden = false;
+        window.clearTimeout(flag._t);
+        flag._t = window.setTimeout(function () { flag.hidden = true; }, 2600);
+      }
     }
 
     function renderOptions(options) {
@@ -129,6 +194,13 @@
         main.appendChild(nm);
         main.appendChild(eta);
 
+        if (o.fastest) {
+          var fast = document.createElement("span");
+          fast.className = "se-badge-fast";
+          fast.textContent = msg.fastest || "Fastest";
+          main.appendChild(fast);
+        }
+
         var price = document.createElement("span");
         price.className = "se-option-price";
         price.textContent = o.free ? msg.free : o.cost_display;
@@ -138,9 +210,9 @@
         label.appendChild(price);
         optionsEl.appendChild(label);
 
-        label.addEventListener("click", function () { selectMethod(o.method); });
+        label.addEventListener("click", function () { selectMethod(o.method, true); });
         label.addEventListener("keydown", function (e) {
-          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); selectMethod(o.method); }
+          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); selectMethod(o.method, true); }
         });
       });
     }
@@ -162,6 +234,8 @@
       if (mixedEl) mixedEl.hidden = !data.mixed_sources;
       if (disclaimerEl) disclaimerEl.textContent = data.disclaimer || "";
 
+      if (data.summary) paintSummary(data.summary);
+      paintExpressNote(data.summary);
       var opts = data.options && data.options.length ? data.options : [];
       renderOptions(opts);
       var sel = opts.filter(function (o) { return o.selected; })[0] || opts[0];
@@ -177,6 +251,14 @@
       var body = new URLSearchParams();
       body.set("country", country);
       body.set("postal_code", (zipInput && zipInput.value || "").trim());
+      /* The server prices AND persists the choice; sending the whole destination
+         lets it apply the Express eligibility rules (state, PO box, phone). */
+      body.set("shipping_method", selectedMethod || "");
+      body.set("region", fieldValue("stateInput"));
+      body.set("city", fieldValue("cityInput"));
+      body.set("address1", fieldValue("addressLine1Input"));
+      body.set("address2", fieldValue("addressLine2Input"));
+      body.set("phone", fieldValue("phoneInput"));
       var tokenInput = panel.querySelector("[name=csrfmiddlewaretoken]");
       var token = (tokenInput && tokenInput.value) || getCookie("csrftoken");
       if (tokenInput) body.set("csrfmiddlewaretoken", tokenInput.value);

@@ -674,7 +674,22 @@ def place_order(request, total=0, quantity=0):
 
     # Address country has priority over IP for the final quote.
     country = (form.cleaned_data["country"] or detect_country(request)).upper()
-    totals = compute_cart_totals(cart_items, country)
+    # Same engine, same destination fields and same method the shopper saw in the
+    # Order summary — the amount charged can never drift from the amount shown.
+    # The method is re-validated here: an Express choice that no longer qualifies
+    # (address edited, item removed) silently degrades to standard BEFORE payment.
+    from shipping.session import get_shipping_method, set_shipping_method
+    totals = compute_cart_totals(
+        cart_items, country,
+        method=get_shipping_method(request),
+        postal_code=form.cleaned_data.get("postal_code") or "",
+        state=form.cleaned_data.get("state") or "",
+        city=form.cleaned_data.get("city") or "",
+        address1=form.cleaned_data.get("address_line_1") or "",
+        address2=form.cleaned_data.get("address_line_2") or "",
+        phone=form.cleaned_data.get("phone") or "",
+    )
+    set_shipping_method(request, totals.shipping_method)
     quote = totals.shipping_quote
 
     if not quote.available:
@@ -741,6 +756,7 @@ def place_order(request, total=0, quantity=0):
     data.shipping_cost = totals.shipping_cost
     data.tax = totals.tax
     data.order_total = totals.grand_total
+    data.shipping_method = totals.shipping_method
     data.shipping_country = country[:2]
     data.shipping_min_days = quote.min_days
     data.shipping_max_days = quote.max_days
