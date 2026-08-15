@@ -18,22 +18,35 @@
 
 {# ============================ HERO (wide, full-bleed) ============================ #}
 <section class="hero-x" data-hero aria-label="{% trans 'Featured collection' %}">
+  {% comment %}Admin override (Site visuals → Home hero) wins; otherwise the
+  shipped responsive artwork renders exactly as designed.{% endcomment %}
   <picture class="hero-x-pic">
-    {# Mobile: dedicated portrait crop #}
-    <source media="(max-width:767.98px)" type="image/webp"
-            srcset="{% static 'images/home/pexels/hero-editorial-mobile-900.webp' %}">
-    <source media="(max-width:767.98px)" type="image/jpeg"
-            srcset="{% static 'images/home/pexels/hero-editorial-mobile-900.jpg' %}">
-    {# Desktop: wide editorial crop, responsive widths #}
-    <source type="image/webp"
-            srcset="{% static 'images/home/pexels/hero-editorial-1280.webp' %} 1280w, {% static 'images/home/pexels/hero-editorial-2000.webp' %} 2000w"
-            sizes="100vw">
-    <source type="image/jpeg"
-            srcset="{% static 'images/home/pexels/hero-editorial-1280.jpg' %} 1280w, {% static 'images/home/pexels/hero-editorial-2000.jpg' %} 2000w"
-            sizes="100vw">
-    <img class="hero-x-img" src="{% static 'images/home/pexels/hero-editorial-1280.jpg' %}"
-         width="2000" height="900" fetchpriority="high" decoding="async"
-         alt="{% trans 'Editorial fashion campaign — tailored black look on a dramatic studio backdrop' %}">
+    {% if visuals.home_hero.is_custom %}
+      {% if visuals.home_hero.mobile_url %}
+        <source media="(max-width:767.98px)" srcset="{{ visuals.home_hero.mobile_url }}">
+      {% endif %}
+      <img class="hero-x-img" src="{{ visuals.home_hero.url }}"
+           width="{{ visuals.home_hero.width }}" height="{{ visuals.home_hero.height }}"
+           style="object-position:{{ visuals.home_hero.object_position }};"
+           fetchpriority="high" decoding="async"
+           alt="{{ visuals.home_hero.alt }}">
+    {% else %}
+      {# Mobile: dedicated portrait crop #}
+      <source media="(max-width:767.98px)" type="image/webp"
+              srcset="{% static 'images/home/pexels/hero-editorial-mobile-900.webp' %}">
+      <source media="(max-width:767.98px)" type="image/jpeg"
+              srcset="{% static 'images/home/pexels/hero-editorial-mobile-900.jpg' %}">
+      {# Desktop: wide editorial crop, responsive widths #}
+      <source type="image/webp"
+              srcset="{% static 'images/home/pexels/hero-editorial-1280.webp' %} 1280w, {% static 'images/home/pexels/hero-editorial-2000.webp' %} 2000w"
+              sizes="100vw">
+      <source type="image/jpeg"
+              srcset="{% static 'images/home/pexels/hero-editorial-1280.jpg' %} 1280w, {% static 'images/home/pexels/hero-editorial-2000.jpg' %} 2000w"
+              sizes="100vw">
+      <img class="hero-x-img" src="{% static 'images/home/pexels/hero-editorial-1280.jpg' %}"
+           width="2000" height="900" fetchpriority="high" decoding="async"
+           alt="{% trans 'Editorial fashion campaign — tailored black look on a dramatic studio backdrop' %}">
+    {% endif %}
   </picture>
   <div class="hero-x-scrim" aria-hidden="true"></div>
 
@@ -124,11 +137,18 @@
       <a class="edit-card" data-reveal
          href="{% if home_cats.neutrals %}{{ home_cats.neutrals.get_url }}{% else %}{% url 'store' %}{% endif %}">
         <picture class="edit-card-pic">
+          {% if visuals.home_edit_1.is_custom %}
+          <img src="{{ visuals.home_edit_1.url }}" loading="lazy" decoding="async"
+               width="{{ visuals.home_edit_1.width }}" height="{{ visuals.home_edit_1.height }}"
+               style="object-position:{{ visuals.home_edit_1.object_position }};"
+               alt="{{ visuals.home_edit_1.alt }}">
+        {% else %}
           <source type="image/webp" media="(max-width:575.98px)" srcset="{% static 'images/home/pexels/edit-neutrals-440.webp' %} 1x, {% static 'images/home/pexels/edit-neutrals-760.webp' %} 2x">
           <source type="image/jpeg" media="(max-width:575.98px)" srcset="{% static 'images/home/pexels/edit-neutrals-440.jpg' %} 1x, {% static 'images/home/pexels/edit-neutrals-760.jpg' %} 2x">
           <source type="image/webp" srcset="{% static 'images/home/pexels/edit-neutrals-760.webp' %}">
           <img src="{% static 'images/home/pexels/edit-neutrals-760.jpg' %}" loading="lazy" decoding="async"
                width="760" height="950" alt="{% trans 'Minimalist beige shirt on a hanger' %}">
+        {% endif %}
         </picture>
         <div class="edit-card-body">
           <span class="edit-kicker">{% trans "New neutrals" %}</span>
@@ -140,11 +160,18 @@
       <a class="edit-card" data-reveal
          href="{% if home_cats.tees %}{{ home_cats.tees.get_url }}{% else %}{% url 'store' %}{% endif %}">
         <picture class="edit-card-pic">
+          {% if visuals.home_edit_2.is_custom %}
+          <img src="{{ visuals.home_edit_2.url }}" loading="lazy" decoding="async"
+               width="{{ visuals.home_edit_2.width }}" height="{{ visuals.home_edit_2.height }}"
+               style="object-position:{{ visuals.home_edit_2.object_position }};"
+               alt="{{ visuals.home_edit_2.alt }}">
+        {% else %}
           <source type="image/webp" media="(max-width:575.98px)" srcset="{% static 'images/home/pexels/edit-tees-440.webp' %} 1x, {% static 'images/home/pexels/edit-tees-760.webp' %} 2x">
           <source type="image/jpeg" media="(max-width:575.98px)" srcset="{% static 'images/home/pexels/edit-tees-440.jpg' %} 1x, {% static 'images/home/pexels/edit-tees-760.jpg' %} 2x">
           <source type="image/webp" srcset="{% static 'images/home/pexels/edit-tees-760.webp' %}">
           <img src="{% static 'images/home/pexels/edit-tees-760.jpg' %}" loading="lazy" decoding="async"
                width="760" height="950" alt="{% trans 'Model wearing a clean white everyday t-shirt' %}">
+        {% endif %}
         </picture>
         <div class="edit-card-body">
           <span class="edit-kicker">{% trans "Everyday tees" %}</span>
@@ -156,11 +183,18 @@
       <a class="edit-card" data-reveal
          href="{% if home_cats.dark %}{{ home_cats.dark.get_url }}{% else %}{% url 'store' %}{% endif %}">
         <picture class="edit-card-pic">
+          {% if visuals.home_edit_3.is_custom %}
+          <img src="{{ visuals.home_edit_3.url }}" loading="lazy" decoding="async"
+               width="{{ visuals.home_edit_3.width }}" height="{{ visuals.home_edit_3.height }}"
+               style="object-position:{{ visuals.home_edit_3.object_position }};"
+               alt="{{ visuals.home_edit_3.alt }}">
+        {% else %}
           <source type="image/webp" media="(max-width:575.98px)" srcset="{% static 'images/home/pexels/edit-afterdark-440.webp' %} 1x, {% static 'images/home/pexels/edit-afterdark-760.webp' %} 2x">
           <source type="image/jpeg" media="(max-width:575.98px)" srcset="{% static 'images/home/pexels/edit-afterdark-440.jpg' %} 1x, {% static 'images/home/pexels/edit-afterdark-760.jpg' %} 2x">
           <source type="image/webp" srcset="{% static 'images/home/pexels/edit-afterdark-760.webp' %}">
           <img src="{% static 'images/home/pexels/edit-afterdark-760.jpg' %}" loading="lazy" decoding="async"
                width="760" height="950" alt="{% trans 'Moody evening look in low light' %}">
+        {% endif %}
         </picture>
         <div class="edit-card-body">
           <span class="edit-kicker">{% trans "After dark" %}</span>
@@ -217,11 +251,18 @@
     <div class="lux-split">
       <div class="lux-split-media">
         <picture>
+          {% if visuals.home_editorial.is_custom %}
+          <img src="{{ visuals.home_editorial.url }}" loading="lazy" decoding="async"
+               width="{{ visuals.home_editorial.width }}" height="{{ visuals.home_editorial.height }}"
+               style="object-position:{{ visuals.home_editorial.object_position }};"
+               alt="{{ visuals.home_editorial.alt }}">
+        {% else %}
           <source type="image/webp" media="(max-width:767.98px)" srcset="{% static 'images/home/pexels/editorial-fabric-700.webp' %}">
           <source type="image/jpeg" media="(max-width:767.98px)" srcset="{% static 'images/home/pexels/editorial-fabric-700.jpg' %}">
           <source type="image/webp" srcset="{% static 'images/home/pexels/editorial-fabric-1200.webp' %}">
           <img src="{% static 'images/home/pexels/editorial-fabric-1200.jpg' %}" loading="lazy" decoding="async"
                width="1200" height="900" alt="{% trans 'Close-up of premium soft cotton fabric, naturally draped' %}">
+        {% endif %}
         </picture>
       </div>
       <div class="lux-split-body">

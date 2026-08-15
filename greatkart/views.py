@@ -42,9 +42,14 @@ def home(request):
         'dark': _cats.get('jackets'),
     }
 
+    # Admin-editable imagery: each slot resolves to the admin's upload when one is
+    # active and valid, otherwise to the original designed static asset.
+    from storefront.visuals import all_visuals
+
     context = {
         'popular_products': popular_products,
         'latest_products': latest_products,
         'home_cats': home_cats,
+        'visuals': all_visuals(),
     }
     return render(request, 'home.html', context)

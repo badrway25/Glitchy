@@ -203,6 +203,7 @@ UNFOLD = {
                 "separator": True,
                 "items": [
                     {"title": _("Products"), "icon": "inventory_2", "link": "/admin/store/product/"},
+                    {"title": _("Site visuals"), "icon": "image", "link": "/admin/storefront/sitevisualasset/"},
                     {"title": _("Categories"), "icon": "category", "link": "/admin/category/category/"},
                     {"title": _("Orders"), "icon": "receipt_long", "link": "/admin/orders/order/"},
                     {"title": _("Customers"), "icon": "group", "link": "/admin/accounts/account/"},

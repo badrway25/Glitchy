@@ -86,3 +86,57 @@ class AnalyticsEvent(models.Model):
 
     def __str__(self):
         return f"{self.name} @ {self.created_at:%Y-%m-%d %H:%M}"
+
+
+class SiteVisualAsset(models.Model):
+    """An admin-managed override for one named homepage image slot.
+
+    The site ships with designed static artwork (see storefront/visuals.py); a row
+    here replaces one slot with an upload. Rows are validated on the way in
+    (dimensions, aspect ratio, weight, real raster format) so a well-meaning upload
+    cannot break the layout, and anything missing or inactive silently falls back
+    to the original static asset."""
+
+    slot = models.CharField(max_length=40, unique=True, db_index=True,
+                            help_text=_("Which homepage image this replaces."))
+    title = models.CharField(max_length=120, blank=True, default="",
+                             help_text=_("Internal label — never shown to customers."))
+    image = models.ImageField(upload_to="site_visuals/", blank=True, null=True)
+    mobile_image = models.ImageField(upload_to="site_visuals/", blank=True, null=True,
+                                     help_text=_("Optional portrait crop for phones."))
+    alt_text = models.CharField(max_length=200, blank=True, default="",
+                                help_text=_("Describes the image for screen readers "
+                                            "and SEO. Required when uploading."))
+    focal_point_x = models.PositiveSmallIntegerField(
+        default=50, help_text=_("Horizontal focus %, 0 = left, 100 = right."))
+    focal_point_y = models.PositiveSmallIntegerField(
+        default=50, help_text=_("Vertical focus %, 0 = top, 100 = bottom."))
+    width = models.PositiveIntegerField(default=0, editable=False)
+    height = models.PositiveIntegerField(default=0, editable=False)
+    is_active = models.BooleanField(
+        default=True, help_text=_("Uncheck to instantly restore the original image."))
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    updated_by = models.CharField(max_length=150, blank=True, default="")
+
+    class Meta:
+        ordering = ["slot"]
+        verbose_name = _("Site visual")
+        verbose_name_plural = _("Site visuals")
+
+    def __str__(self):
+        from .visuals import slot_config
+        return str(slot_config(self.slot).get("label") or self.slot)
+
+    def save(self, *args, **kwargs):
+        # cache the real pixel size so templates can reserve space (no layout shift)
+        if self.image:
+            try:
+                self.width, self.height = self.image.width, self.image.height
+            except Exception:
+                self.width = self.height = 0
+        super().save(*args, **kwargs)
+
+    @property
+    def is_custom(self) -> bool:
+        return bool(self.is_active and self.image)
