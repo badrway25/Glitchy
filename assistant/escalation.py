@@ -27,6 +27,20 @@ _RULES = (
 
 DEFAULT_CATEGORY = "other"
 
+#: categories where a human should always be one tap away, even when the assistant
+#: managed a "grounded" answer — a payment/refund/order/delivery question is exactly
+#: where a shopper needs a real person, not a knowledge-base paragraph.
+SUPPORT_SENSITIVE_CATEGORIES = {"payment", "delivery", "returns", "order"}
+
+#: extra complaint markers that warrant escalation even when the category is unclear.
+_SUPPORT_MARKERS = (
+    "problem", "issue", "broken", "not working", "doesn't work", "complaint",
+    "urgent", "not received", "didn't arrive", "hasn't arrived", "double charge",
+    "charged twice", "wrong item", "wrong order", "damaged", "missing", "scam",
+    "problema", "reclamo", "urgente", "non ricevut", "non è arrivat", "danneggiat",
+    "sbagliat", "problème", "réclamation", "urgent", "pas reçu", "endommagé",
+)
+
 
 def guess_category(text) -> str:
     """Best-effort contact category for a question. Never raises, never guesses wildly."""
@@ -37,6 +51,17 @@ def guess_category(text) -> str:
         if any(keyword in low for keyword in keywords):
             return category
     return DEFAULT_CATEGORY
+
+
+def is_support_sensitive(text) -> bool:
+    """True when the shopper needs a human — payment/order/delivery/returns, or an
+    explicit complaint. These always get a Contact-support call to action, even when
+    the assistant produced a grounded answer (F6: the escalation used to be hidden
+    exactly for these because a support paragraph counted as 'grounded')."""
+    if guess_category(text) in SUPPORT_SENSITIVE_CATEGORIES:
+        return True
+    low = str(text or "").lower()
+    return any(marker in low for marker in _SUPPORT_MARKERS)
 
 
 def contact_url_for(text=None, category=None) -> str:

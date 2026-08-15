@@ -341,21 +341,28 @@ def _finalise(conv, answer, provider, grounded, sources, products=None, language
         provider=provider, grounded=grounded, used_sources=sources,
     )
     conv.save(update_fields=[]) if False else None
+    # A human should be one tap away when the assistant is unsure (not grounded) OR
+    # when the topic is support-sensitive (payment/order/delivery/returns/complaint) —
+    # even a "grounded" answer to a refund question must still offer contact, which it
+    # previously did not because a support paragraph counted as grounded.
+    from .escalation import contact_url_for, guess_category, is_support_sensitive
+    support_sensitive = is_support_sensitive(question)
+    can_contact = (not grounded) or support_sensitive
     out = {
         "answer": answer,
         "grounded": grounded,
         "provider": provider,
         "message_id": msg.id,
-        "can_contact_support": not grounded,
+        "can_contact_support": can_contact,
     }
-    if out["can_contact_support"]:
-        # Point at a human instead of ending on "I don't know". Only a category
-        # keyword travels in the URL — never the shopper's words.
-        from .escalation import contact_url_for, guess_category
+    if can_contact:
+        # Only a category keyword travels in the URL — never the shopper's words.
         out["contact_url"] = contact_url_for(question)
         out["contact_category"] = guess_category(question)
     if language:
         out["language"] = language
-    if products:
+    # Don't dangle product cards under a refund/payment/delivery complaint — it reads
+    # as tone-deaf. Recommendations are for browsing intents, not support ones.
+    if products and not support_sensitive:
         out["products"] = _public_product_cards(products)
     return out
