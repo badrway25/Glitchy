@@ -29,6 +29,8 @@
       country: root.getAttribute("data-msg-country"),
       free: root.getAttribute("data-label-free") || "Free",
       fastest: root.getAttribute("data-label-fastest") || "Fastest",
+      total: root.getAttribute("data-label-total") || "Estimated total",
+      totalFallback: root.getAttribute("data-label-total-fallback") || "Items + shipping",
       expressPhone: root.getAttribute("data-msg-express-phone") || "",
       expressDestination: root.getAttribute("data-msg-express-destination") || "",
       expressItems: root.getAttribute("data-msg-express-items") || ""
@@ -56,6 +58,11 @@
     var subtotalVal = root.querySelector("[data-se-subtotal-val]");
     var shippingVal = root.querySelector("[data-se-shipping-val]");
     var totalVal = root.querySelector("[data-se-total-val]");
+    var totalLabelEl = root.querySelector("[data-se-tl-total]");
+    var discountRow = root.querySelector("[data-se-discount-row]");
+    var discountVal = root.querySelector("[data-se-discount-val]");
+    var taxRow = root.querySelector("[data-se-tax-row]");
+    var taxVal = root.querySelector("[data-se-tax-val]");
     var mixedEl = root.querySelector("[data-se-mixed]");
     var disclaimerEl = root.querySelector("[data-se-disclaimer]");
 
@@ -95,11 +102,10 @@
         if (radio) radio.checked = on;
         el.setAttribute("aria-checked", on ? "true" : "false");
       });
-      // Update totals (display only)
-      var cost = opt.free ? 0 : (parseFloat(opt.cost) || 0);
-      if (subtotalVal) subtotalVal.textContent = money(symbol, subtotal);
-      if (shippingVal) shippingVal.textContent = opt.free ? msg.free : money(symbol, cost);
-      if (totalVal) totalVal.textContent = money(symbol, subtotal + cost);
+      // Update totals (display only). Prefer the authoritative server summary so the
+      // widget's estimated total is the SAME grand total (tax included) the Order
+      // summary shows — never two different "total" figures on one screen.
+      paintWidgetTotals(opt);
       selectedMethod = opt.method;
       var hidden = document.getElementById("shippingMethodInput");
       if (hidden) hidden.value = opt.method;
@@ -112,6 +118,36 @@
       root.dispatchEvent(new CustomEvent("shipping:method", {
         bubbles: true, detail: { method: opt.method, cost: cost, free: !!opt.free, result: current }
       }));
+    }
+
+    /* Widget totals = Order summary totals. The server payload (checkout_quote) is
+       authoritative and already includes tax and any discount, so the widget's
+       "Estimated total" equals the summary's grand total. Only if the summary is
+       somehow absent do we fall back to items+shipping — and then the total line is
+       relabelled so it can never be misread as the final amount. */
+    function paintWidgetTotals(opt) {
+      var s = current && current.summary;
+      if (s) {
+        if (subtotalVal) subtotalVal.textContent = s.items_subtotal_display;
+        if (shippingVal) shippingVal.textContent = s.shipping_display;
+        var hasDiscount = parseFloat(s.discount || 0) > 0;
+        if (discountRow) discountRow.hidden = !hasDiscount;
+        if (hasDiscount && discountVal) discountVal.textContent = "− " + s.discount_display;
+        var hasTax = parseFloat(s.tax || 0) > 0;
+        if (taxRow) taxRow.hidden = !hasTax;
+        if (hasTax && taxVal) taxVal.textContent = s.tax_display;
+        if (totalVal) totalVal.textContent = s.grand_total_display;
+        if (totalLabelEl) totalLabelEl.textContent = msg.total;
+        return;
+      }
+      // Fallback (summary missing): items + shipping only, honestly relabelled.
+      var cost = opt.free ? 0 : (parseFloat(opt.cost) || 0);
+      if (subtotalVal) subtotalVal.textContent = money(symbol, subtotal);
+      if (shippingVal) shippingVal.textContent = opt.free ? msg.free : money(symbol, cost);
+      if (discountRow) discountRow.hidden = true;
+      if (taxRow) taxRow.hidden = true;
+      if (totalVal) totalVal.textContent = money(symbol, subtotal + cost);
+      if (totalLabelEl) totalLabelEl.textContent = msg.totalFallback;
     }
 
     /* Express is eligibility-based: say why it is unavailable rather than

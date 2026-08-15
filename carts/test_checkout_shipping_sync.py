@@ -107,6 +107,71 @@ class SummaryEstimateAgreementTests(TestCase):
 @override_settings(SHIPPING_USE_PRINTIFY=False, STORE_TAX_RATE=2.0,
                    SHIPPING_FREE_THRESHOLD=0,
                    ALLOWED_HOSTS=["testserver", "127.0.0.1", "localhost"])
+class EstimateWidgetTotalIncludesTaxTests(TestCase):
+    """F3: the widget's 'Estimated total' must be the SAME grand total the Order
+    summary shows (tax included) — never a bare subtotal+shipping figure that
+    disagrees with the grand total by the tax (the reported 83.30 vs 84.70)."""
+
+    def setUp(self):
+        _seed_cart(self.client, price=35, qty=2)      # subtotal 70.00
+
+    def _summary(self, country="US"):
+        return self.client.post(reverse("shipping_estimate"),
+                                {"country": country, "postal_code": "78701"},
+                                **AJAX).json()["summary"]
+
+    def test_widget_total_field_is_the_tax_inclusive_grand_total(self):
+        s = self._summary("US")
+        self.assertEqual(s["items_subtotal"], 70.0)
+        self.assertEqual(s["tax"], 1.40)                  # 2% of 70
+        items_plus_shipping = round(s["items_subtotal"] + s["shipping_cost"], 2)
+        # the grand total the widget renders is NOT the ambiguous items+shipping…
+        self.assertNotEqual(s["grand_total"], items_plus_shipping)
+        # …it is items + shipping + tax (− discount)
+        self.assertEqual(s["grand_total"],
+                         round(items_plus_shipping + s["tax"] - s["discount"], 2))
+
+    def test_payload_carries_the_display_strings_the_widget_needs(self):
+        s = self._summary("US")
+        for key in ("items_subtotal_display", "shipping_display", "tax_display",
+                    "discount_display", "grand_total_display"):
+            self.assertTrue(s.get(key), key)
+        from shipping.quote import money
+        self.assertEqual(s["grand_total_display"], money(s["grand_total"]))
+
+    def test_totals_stay_consistent_across_countries(self):
+        for country in ("IT", "FR", "US", "BE"):
+            s = self._summary(country)
+            self.assertEqual(
+                s["grand_total"],
+                round(s["items_subtotal"] + s["shipping_cost"] + s["tax"]
+                      - s["discount"], 2), country)
+            self.assertNotEqual(s["grand_total"],
+                                round(s["items_subtotal"] + s["shipping_cost"], 2),
+                                country)
+
+    def test_widget_js_renders_the_grand_total_and_a_tax_row(self):
+        from pathlib import Path
+        js = (Path(__file__).resolve().parent.parent / "greatkart" / "static" /
+              "js" / "shipping-estimate.js").read_text(encoding="utf-8")
+        self.assertIn("paintWidgetTotals", js)
+        self.assertIn("grand_total_display", js)          # total = grand total
+        self.assertIn("tax_row", js.replace("-", "_"))    # tax line handled
+        # the old ambiguous "subtotal + cost" arithmetic must be gone from the total
+        self.assertNotIn("money(symbol, subtotal + cost)",
+                         js[:js.index("Fallback")] if "Fallback" in js else js)
+
+    def test_estimator_template_exposes_tax_and_discount_rows(self):
+        from pathlib import Path
+        html = (Path(__file__).resolve().parent.parent / "templates" /
+                "includes" / "shipping_estimator.html").read_text(encoding="utf-8")
+        self.assertIn("data-se-tax-row", html)
+        self.assertIn("data-se-discount-row", html)
+
+
+@override_settings(SHIPPING_USE_PRINTIFY=False, STORE_TAX_RATE=2.0,
+                   SHIPPING_FREE_THRESHOLD=0,
+                   ALLOWED_HOSTS=["testserver", "127.0.0.1", "localhost"])
 class OrderMatchesSummaryTests(TestCase):
     """What the shopper is charged equals what the summary showed."""
 

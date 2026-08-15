@@ -21,6 +21,7 @@ Context vars (optional): ship_estimator_subtotal (Decimal), ship_estimator_varia
      data-label-subtotal="{% trans 'Subtotal' %}"
      data-label-shipping="{% trans 'Shipping' %}"
      data-label-total="{% trans 'Estimated total' %}"
+     data-label-total-fallback="{% trans 'Items + shipping' %}"
      data-label-free="{% trans 'Free' %}">
 
   <div class="se-head">
@@ -72,9 +73,14 @@ Context vars (optional): ship_estimator_subtotal (Decimal), ship_estimator_varia
       <span class="se-deliv" data-se-deliv></span>
     </div>
     <div class="se-options" data-se-options role="radiogroup" aria-label="{% trans 'Shipping options' %}"></div>
+    {% comment %}Totals mirror the Order summary (same checkout_quote payload): the
+    estimated total INCLUDES tax so the widget and the summary never show two
+    different "total" figures. Discount/Tax rows appear only when non-zero.{% endcomment %}
     <div class="se-totals">
       <div class="se-line"><span data-se-tl-subtotal>{% trans "Subtotal" %}</span><span data-se-subtotal-val></span></div>
+      <div class="se-line se-line-discount" data-se-discount-row hidden><span data-se-tl-discount>{% trans "Discount" %}</span><span data-se-discount-val></span></div>
       <div class="se-line"><span data-se-tl-shipping>{% trans "Shipping" %}</span><span data-se-shipping-val></span></div>
+      <div class="se-line se-line-tax" data-se-tax-row hidden><span data-se-tl-tax>{% trans "Tax" %}</span><span data-se-tax-val></span></div>
       <div class="se-line se-grand"><span data-se-tl-total>{% trans "Estimated total" %}</span><span data-se-total-val></span></div>
     </div>
     <p class="se-mixed" data-se-mixed hidden>{% trans "Some items use estimated shipping data." %}</p>
