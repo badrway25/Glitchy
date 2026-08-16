@@ -229,6 +229,15 @@ UNFOLD = {
                     {"title": _("Payment monitor"), "icon": "monitoring", "link": "/admin/payments/paymentevent/"},
                 ],
             },
+            {
+                "title": _("Mail control"),
+                "separator": True,
+                "items": [
+                    {"title": _("Email configuration"), "icon": "mail", "link": "/admin/notifications/emailconfiguration/"},
+                    {"title": _("Outbox"), "icon": "outbox", "link": "/admin/notifications/outboundevent/"},
+                    {"title": _("Contact requests"), "icon": "contact_support", "link": "/admin/notifications/contactrequest/"},
+                ],
+            },
         ],
     },
 }

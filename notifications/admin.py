@@ -120,3 +120,6 @@ class ContactRequestAdmin(admin.ModelAdmin):
             except Exception:
                 pass
         self.message_user(request, _("Retried %(n)d request(s).") % {"n": done})
+
+# Mail Control Center (email/SMTP config) — registered in a dedicated module.
+from . import admin_email  # noqa: E402,F401

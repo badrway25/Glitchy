@@ -1,0 +1,24 @@
+{% extends "admin/change_form.html" %}
+{% load i18n %}
+
+{% block content %}
+{{ block.super }}
+
+{% if original and gl_is_superadmin %}
+<div class="gl-card" style="margin-top:1.5rem;max-width:960px;">
+  <div class="gl-eyebrow" style="margin-top:0;">{% trans "Mail delivery test" %}</div>
+  <div style="display:flex;flex-wrap:wrap;gap:.55rem;align-items:center;">
+    {% if gl_can_test %}
+      <form method="post" action="{% url 'admin:notifications_emailconfiguration_test' original.pk %}">
+        {% csrf_token %}<button type="submit" class="gl-action">{% trans "Send test email" %}</button></form>
+    {% else %}
+      <div style="opacity:.75;font-size:.88rem;">
+        {% trans "Enable this configuration and choose an SMTP or Console provider, then Save — the test appears here." %}</div>
+    {% endif %}
+    <a class="gl-action" href="/admin/notifications/outboundevent/">{% trans "View outbox" %}</a>
+  </div>
+  <p style="font-size:.82rem;color:var(--gl-muted);margin:.5rem 0 0;">
+    {% trans "The test sends one message to the admin-notify address using this configuration. It is superadmin-only and rate-limited. Secrets are never shown." %}</p>
+</div>
+{% endif %}
+{% endblock %}
