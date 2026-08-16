@@ -197,6 +197,16 @@ def _link_order(contact) -> None:
         pass
 
 
+def _notify_recipient() -> str:
+    """Admin-notify address (Mail Control Center → env)."""
+    try:
+        from .email_settings import get_admin_notify_email
+        return get_admin_notify_email()
+    except Exception:
+        return (getattr(settings, "ADMIN_NOTIFY_EMAIL", "")
+                or getattr(settings, "SUPPORT_EMAIL", ""))
+
+
 def _dispatch(contact) -> None:
     """Queue the notification. A failure never breaks the customer's journey —
     the stored row simply stays `pending` for a retry."""
@@ -212,8 +222,7 @@ def _dispatch(contact) -> None:
                 "message": contact.message,
                 "language": contact.language,
             },
-            recipient_email=getattr(settings, "ADMIN_NOTIFY_EMAIL", "")
-            or getattr(settings, "SUPPORT_EMAIL", ""),
+            recipient_email=_notify_recipient(),
             language=contact.language,
         )
     except Exception:

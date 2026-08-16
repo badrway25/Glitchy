@@ -35,8 +35,9 @@ def _dispatch(event, payload):
     """Best-effort n8n growth event — never raises, never blocks, no 500."""
     try:
         from notifications.dispatcher import dispatch_event
+        from notifications.email_settings import get_admin_notify_email
         dispatch_event(event, payload,
-                       recipient_email=getattr(settings, "SUPPORT_EMAIL", "") or "")
+                       recipient_email=get_admin_notify_email() or "")
     except Exception:
         pass
 

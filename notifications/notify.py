@@ -14,6 +14,15 @@ from . import events as ev
 from .dispatcher import dispatch_event
 
 
+def _admin_recipient() -> str:
+    """Internal-alert recipient (Mail Control Center → env)."""
+    try:
+        from .email_settings import get_admin_notify_email
+        return get_admin_notify_email()
+    except Exception:
+        return getattr(settings, "ADMIN_NOTIFY_EMAIL", "") or ""
+
+
 def _abs(path: str) -> str:
     base = (getattr(settings, "SITE_BASE_URL", "") or "").rstrip("/")
     return f"{base}{path}" if base else path
@@ -113,7 +122,7 @@ def notify_internal(event_type, *, subject: str, order=None, extra: dict | None 
     dispatch_event(
         event_type,
         payload,
-        recipient_email=getattr(settings, "ADMIN_NOTIFY_EMAIL", "") or "",
+        recipient_email=_admin_recipient(),
         language="en",
         order=order,
     )

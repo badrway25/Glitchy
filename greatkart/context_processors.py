@@ -4,10 +4,11 @@ from django.conf import settings
 
 
 def _public_support_email():
-    """SUPPORT_EMAIL only when it is a real address — '' for placeholders (F5)."""
+    """Support address only when real — '' for placeholders (F5). Prefers the admin
+    Mail Control Center config, falls back to the server env."""
     try:
-        from greatkart.support_email import public_support_email
-        return public_support_email()
+        from notifications.email_settings import get_public_support_email
+        return get_public_support_email()
     except Exception:
         return ""
 

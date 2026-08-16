@@ -77,11 +77,20 @@ def send_event_email_via_smtp(event) -> bool:
     if not event.recipient_email:
         return False
     subject, html, text = render_event_email(event)
+    # From / Reply-To / transport are resolved from the admin Mail Control Center,
+    # falling back to settings. get_email_backend_settings() returns {} when no DB
+    # config is active, so get_connection() then yields the DEFAULT connection —
+    # unchanged behaviour (and the locmem test still works).
+    from .email_settings import (get_connection, get_default_from_email,
+                                 get_reply_to_email)
+    reply_to = get_reply_to_email()
     msg = EmailMultiAlternatives(
         subject=subject,
         body=text,
-        from_email=getattr(settings, "DEFAULT_FROM_EMAIL", None),
+        from_email=get_default_from_email() or getattr(settings, "DEFAULT_FROM_EMAIL", None),
         to=[event.recipient_email],
+        reply_to=[reply_to] if reply_to else None,
+        connection=get_connection(),
     )
     msg.attach_alternative(html, "text/html")
     msg.send(fail_silently=False)

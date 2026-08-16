@@ -405,11 +405,11 @@ def order_help(request, order_number):
             body_text=body, account=request.user)
         try:
             from notifications.dispatcher import dispatch_event
-            from django.conf import settings as _s
+            from notifications.email_settings import get_admin_notify_email
             dispatch_event("support.order_help",
                            {"order_number": order.order_number, "topic": topic,
                             "from_email": request.user.email, "source": "order_help"},
-                           recipient_email=getattr(_s, "SUPPORT_EMAIL", "") or request.user.email)
+                           recipient_email=get_admin_notify_email() or request.user.email)
         except Exception:
             pass
     except Exception:

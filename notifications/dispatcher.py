@@ -47,8 +47,19 @@ def verify_signature(secret: str, body: bytes, signature: str) -> bool:
     return hmac.compare_digest(expected, (signature or "").strip())
 
 
+def _n8n_settings() -> dict:
+    """n8n base URL + shared secret — admin Mail Control Center override, else env.
+    Defaults to the env values, so behaviour is unchanged until an admin opts in."""
+    try:
+        from .email_settings import get_n8n_mail_settings
+        return get_n8n_mail_settings()
+    except Exception:
+        return {"base_url": getattr(settings, "N8N_WEBHOOK_BASE_URL", "") or "",
+                "shared_secret": getattr(settings, "N8N_SHARED_SECRET", "") or ""}
+
+
 def _webhook_url(event_type: str) -> str:
-    base = (getattr(settings, "N8N_WEBHOOK_BASE_URL", "") or "").rstrip("/")
+    base = (_n8n_settings().get("base_url") or "").rstrip("/")
     if not base:
         return ""
     # Path segment = event type with dots → hyphens (n8n-friendly).
@@ -68,7 +79,7 @@ def _post_to_n8n(event: OutboundEvent) -> tuple[bool, int | None, str]:
         "data": event.payload,
     }
     body = json.dumps(body_dict, default=str, separators=(",", ":")).encode("utf-8")
-    secret = getattr(settings, "N8N_SHARED_SECRET", "") or ""
+    secret = _n8n_settings().get("shared_secret") or ""
     headers = {
         "Content-Type": "application/json",
         "X-Event-Type": event.event_type,

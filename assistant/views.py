@@ -162,10 +162,11 @@ def support_handoff(request):
         try:
             from notifications.dispatcher import dispatch_event
             from notifications import events as ev
+            from notifications.email_settings import get_admin_notify_email
             dispatch_event(getattr(ev, "SUPPORT_INBOUND", "support.inbound"),
                            {"from_email": email, "subject": sm.subject,
                             "language": sm.language, "source": "assistant"},
-                           recipient_email=getattr(settings, "SUPPORT_EMAIL", "") or email)
+                           recipient_email=get_admin_notify_email() or email)
         except Exception:
             logger.info("assistant support n8n dispatch skipped")
     except Exception:
