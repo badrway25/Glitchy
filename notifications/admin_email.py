@@ -155,11 +155,18 @@ class EmailConfigurationAdmin(BaseModelAdmin):
                 cleaned.append((title, {**opts, "fields": fields}))
         return tuple(cleaned)
 
+    #: model fields a non-superadmin may only VIEW (never modify)
+    _EDITABLE_FIELDS = ("is_enabled", "provider", "support_email", "admin_notify_email",
+                        "default_from_email", "reply_to_email", "smtp_host", "smtp_port",
+                        "smtp_use_tls", "smtp_use_ssl", "smtp_username",
+                        "n8n_mail_enabled", "n8n_webhook_url")
+
     def get_readonly_fields(self, request, obj=None):
         ro = list(super().get_readonly_fields(request, obj))
         if not _is_superadmin(request.user):
-            ro += ["is_enabled", "provider", "smtp_host", "smtp_port", "smtp_use_tls",
-                   "smtp_use_ssl", "smtp_username", "n8n_mail_enabled", "n8n_webhook_url"]
+            # non-superadmins can view the mail config but modify nothing (the secret
+            # fields are already dropped in get_form; lock every other field too).
+            ro += [f for f in self._EDITABLE_FIELDS if f not in ro]
         return ro
 
     def get_form(self, request, obj=None, **kwargs):

@@ -210,6 +210,58 @@ class SystemCheckTests(TestCase):
             self.assertEqual(support_email_configuration(app_configs=None), [])  # clear
 
 
+@override_settings(PAYMENT_CONFIG_KEY=KEY, ALLOWED_HOSTS=["testserver"])
+class AdminPermissionTests(TestCase):
+    """Superadmin can modify; a non-superadmin staffer can view but modify nothing,
+    and never sees the secret fields."""
+
+    def setUp(self):
+        from accounts.models import Account
+        self.cfg = EmailConfiguration.load()
+        self.cfg.is_enabled = True
+        self.cfg.provider = EmailConfiguration.PROVIDER_CONSOLE
+        self.cfg.set_secret("smtp_password", "keep-me-secret")
+        self.cfg.save()
+
+        def mk(email, superadmin):
+            u = Account(email=email, username=email.split("@")[0], first_name="A",
+                        last_name="B")
+            u.set_password("x")
+            u.is_active = u.is_admin = u.is_staff = True
+            u.is_superadmin = superadmin
+            u.save()
+            return u
+
+        self.super = mk("mailsuper@x.com", True)
+        self.staff = mk("mailstaff@x.com", False)
+
+    def _change_url(self):
+        return f"/admin/notifications/emailconfiguration/{self.cfg.pk}/change/"
+
+    def test_superadmin_sees_editable_secret_field(self):
+        self.client.force_login(self.super)
+        html = self.client.get(self._change_url()).content.decode()
+        self.assertIn("new_smtp_password", html)          # can set a new secret
+        self.assertIn('name="provider"', html)            # editable select
+        self.assertNotIn("keep-me-secret", html)          # never the plaintext
+
+    def test_staff_cannot_modify_and_has_no_secret_fields(self):
+        self.client.force_login(self.staff)
+        resp = self.client.get(self._change_url())
+        self.assertEqual(resp.status_code, 200)           # can VIEW
+        html = resp.content.decode()
+        self.assertNotIn("new_smtp_password", html)       # no secret field
+        self.assertNotIn("new_n8n_secret", html)
+        self.assertNotIn('name="provider"', html)         # provider not editable
+        self.assertNotIn('name="support_email"', html)    # addresses not editable
+        self.assertNotIn("keep-me-secret", html)          # never the plaintext
+
+    def test_anonymous_is_redirected_to_login(self):
+        resp = self.client.get(self._change_url())
+        self.assertEqual(resp.status_code, 302)
+        self.assertIn("/admin/login/", resp["Location"])
+
+
 @override_settings(PAYMENT_CONFIG_KEY=KEY)
 class AdminFormTests(TestCase):
     def test_tls_and_ssl_cannot_both_be_true(self):
