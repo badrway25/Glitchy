@@ -200,3 +200,142 @@ class ContactRequest(models.Model):
 
     def __str__(self):
         return f"{self.email} · {self.get_category_display()}"
+
+
+# ---------------------------------------------------------------------------- #
+#  Admin-managed email / SMTP configuration (Mail Control Center)              #
+# ---------------------------------------------------------------------------- #
+# Encrypted secret slots: <name>_ciphertext / _fingerprint / _last_four / _set_at.
+_EMAIL_SECRET_SLOTS = {
+    "smtp_password": _("SMTP password"),
+    "n8n_secret": _("n8n shared secret"),
+}
+
+
+class EmailConfiguration(models.Model):
+    """Singleton (pk=1): operational email/SMTP config, managed from the admin.
+
+    The addresses and the SMTP transport used to be env-only (``/etc/glitchy/env``);
+    this makes them editable from the portal like the other credential centers.
+    The SMTP password and the n8n secret are Fernet-encrypted at rest, write-only,
+    and never rendered. When ``is_enabled`` is off (the default) NOTHING here is
+    used and the app falls back to settings/env exactly as before — so installing
+    this model changes no behaviour until a superadmin fills it in.
+    """
+
+    SINGLETON_PK = 1
+
+    PROVIDER_SMTP = "smtp"
+    PROVIDER_N8N = "n8n"
+    PROVIDER_CONSOLE = "console"
+    PROVIDER_DISABLED = "disabled"
+    PROVIDER_CHOICES = [
+        (PROVIDER_SMTP, _("SMTP (send email directly)")),
+        (PROVIDER_N8N, _("n8n (delegate sending to the automation)")),
+        (PROVIDER_CONSOLE, _("Console (write emails to the log — testing)")),
+        (PROVIDER_DISABLED, _("Disabled (do not send email)")),
+    ]
+
+    is_enabled = models.BooleanField(
+        default=False,
+        help_text=_("Use this configuration. OFF = fall back to server env/settings."))
+    provider = models.CharField(max_length=12, choices=PROVIDER_CHOICES,
+                                default=PROVIDER_SMTP)
+
+    # --- addresses (not secret) ---
+    support_email = models.EmailField(
+        blank=True, default="",
+        help_text=_("Customer-facing support address (contact page, assistant, legal)."))
+    admin_notify_email = models.EmailField(
+        blank=True, default="",
+        help_text=_("Where contact-form and internal alerts are delivered."))
+    default_from_email = models.CharField(
+        max_length=254, blank=True, default="",
+        help_text=_("From: on outbound mail. Name <addr@…> is allowed."))
+    reply_to_email = models.EmailField(
+        blank=True, default="",
+        help_text=_("Optional Reply-To on outbound mail."))
+
+    # --- SMTP transport (password encrypted below) ---
+    smtp_host = models.CharField(max_length=200, blank=True, default="")
+    smtp_port = models.PositiveIntegerField(default=587)
+    smtp_use_tls = models.BooleanField(default=True)
+    smtp_use_ssl = models.BooleanField(default=False)
+    smtp_username = models.CharField(max_length=254, blank=True, default="")
+
+    smtp_password_ciphertext = models.TextField(blank=True, default="", editable=False)
+    smtp_password_fingerprint = models.CharField(max_length=16, blank=True, default="", editable=False)
+    smtp_password_last_four = models.CharField(max_length=8, blank=True, default="", editable=False)
+    smtp_password_set_at = models.DateTimeField(null=True, blank=True, editable=False)
+
+    # --- n8n mail override (optional; empty = use server env for n8n) ---
+    n8n_mail_enabled = models.BooleanField(
+        default=False,
+        help_text=_("Route mail through an n8n webhook configured here (else the server env is used)."))
+    n8n_webhook_url = models.URLField(
+        blank=True, default="",
+        help_text=_("n8n mail webhook base URL. Not a secret, but keep it internal."))
+    n8n_secret_ciphertext = models.TextField(blank=True, default="", editable=False)
+    n8n_secret_fingerprint = models.CharField(max_length=16, blank=True, default="", editable=False)
+    n8n_secret_last_four = models.CharField(max_length=8, blank=True, default="", editable=False)
+    n8n_secret_set_at = models.DateTimeField(null=True, blank=True, editable=False)
+
+    secret_updated_by = models.CharField(max_length=150, blank=True, default="", editable=False)
+
+    # --- last test (safe, no secret) ---
+    last_test_status = models.CharField(max_length=20, blank=True, default="", editable=False)
+    last_test_at = models.DateTimeField(null=True, blank=True, editable=False)
+    last_test_error_safe = models.CharField(max_length=250, blank=True, default="", editable=False)
+    last_test_detail_safe = models.CharField(max_length=300, blank=True, default="", editable=False)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    updated_by = models.CharField(max_length=150, blank=True, default="", editable=False)
+
+    class Meta:
+        verbose_name = _("Email configuration")
+        verbose_name_plural = _("Email configuration")
+
+    def __str__(self):
+        # Never leak secrets in __str__.
+        state = _("enabled") if self.is_enabled else _("disabled")
+        return f"Email configuration ({self.get_provider_display()} · {state})"
+
+    @classmethod
+    def load(cls):
+        obj, _created = cls.objects.get_or_create(pk=cls.SINGLETON_PK)
+        return obj
+
+    def save(self, *args, **kwargs):
+        self.pk = self.SINGLETON_PK           # enforce the singleton
+        super().save(*args, **kwargs)
+
+    # -- encrypted-secret helpers (write-only) --------------------------------
+    def set_secret(self, name, plaintext, by=""):
+        """Encrypt + store a secret slot. Raises SecretKeyMissing if no key."""
+        from . import secrets as secretbox
+        if name not in _EMAIL_SECRET_SLOTS:
+            raise KeyError(name)
+        plaintext = (plaintext or "").strip()
+        setattr(self, f"{name}_ciphertext", secretbox.encrypt(plaintext) if plaintext else "")
+        setattr(self, f"{name}_fingerprint", secretbox.fingerprint(plaintext))
+        setattr(self, f"{name}_last_four", secretbox.last_four(plaintext))
+        setattr(self, f"{name}_set_at", timezone.now() if plaintext else None)
+        if by:
+            self.secret_updated_by = str(by)[:150]
+
+    def get_secret(self, name):
+        """Decrypt a secret slot (server-side only — never render)."""
+        from . import secrets as secretbox
+        return secretbox.decrypt(getattr(self, f"{name}_ciphertext", ""))
+
+    def has_secret(self, name):
+        return bool(getattr(self, f"{name}_ciphertext", ""))
+
+    def secret_display(self, name):
+        """Masked representation for the admin — never the real secret."""
+        if not self.has_secret(name):
+            return "—"
+        lf = getattr(self, f"{name}_last_four", "")
+        fp = getattr(self, f"{name}_fingerprint", "")
+        return f"•••• {lf}  ·  fp:{fp}" if lf else f"set  ·  fp:{fp}"
